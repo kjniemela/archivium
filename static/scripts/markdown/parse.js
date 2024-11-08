@@ -132,7 +132,7 @@ if (!window.getJSON) throw 'fetchUtils.js not loaded!';
       if (this.attrs.ctx) {
         for (const attr in this.attrs.ctx) {
           let value = this.attrs.ctx[attr];
-          if (value instanceof CtxLookup) {
+          if (value instanceof CtxLookup || value instanceof GalleryUrl) {
             value = value.getValue(ctx);
           }
           this.attrs[attr] = value;
@@ -171,6 +171,17 @@ if (!window.getJSON) throw 'fetchUtils.js not loaded!';
     }
   }
 
+  class GalleryUrl {
+    constructor(idLookup) {
+      this.idLookup = idLookup;
+    }
+
+    getValue(ctx) {
+      const id = this.idLookup.getValue(ctx);
+      return `/api/universes/${ctx.item.universe_short}/items/${ctx.item.shortname}/gallery/images/${id}`;
+    }
+  }
+
   class Line {
     constructor(text) {
       this.text = text;
@@ -203,8 +214,9 @@ if (!window.getJSON) throw 'fetchUtils.js not loaded!';
       const [src, alt, height, width] = args;
       const attrs = {
         ctx: {
-          src: isNaN(Number(src)) ? src : new CtxLookup('item', 'obj_data', 'gallery', 'imgs', src, 'url'),
-          alt: alt || new CtxLookup('item', 'obj_data', 'gallery', 'imgs', src, 'label').default(alt),
+          src: isNaN(Number(src)) ? src : new GalleryUrl(new CtxLookup('item', 'gallery', src, 0)),
+          title: alt || new CtxLookup('item', 'gallery', src, 1).default(alt),
+          alt: alt || new CtxLookup('item', 'gallery', src, 2).default(alt),
         },
         raw: { args },
       };

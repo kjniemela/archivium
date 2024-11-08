@@ -93,14 +93,14 @@ block content
 
     if 'gallery' in item.obj_data && 'title' in item.obj_data.gallery
       .itemTab.hidden.gallery( data-tab='gallery' )
-        each img, index in item.obj_data.gallery.imgs || []
+        each img in item.gallery || []
           .itemKey
-            img( src=img.url, alt=img.label )
+            img( src=`/api/universes/${universe.shortname}/items/${item.shortname}/gallery/images/${img[0]}`, title=img[1], alt=img[2] )
             if contextUser && (universe.author_permissions[contextUser.id] >= perms.WRITE)
-              .editableLabel.label( data-index=index data-label=img.label )
+              .editableLabel.label( data-index=index data-label=img[2] )
             else
-              if img.label
-                .mdLabel( data-val=img.label )
+              if img[2]
+                .mdLabel( data-val=img[2] )
 
     if 'lineage' in item.obj_data && 'title' in item.obj_data.lineage
       .itemTab.hidden( data-tab='lineage' )
