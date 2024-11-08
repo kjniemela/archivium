@@ -700,6 +700,9 @@ h4, h5 {
 .grow-4 {
   flex-grow: 4;
 }
+.shrink-1 {
+  flex-shrink: 1;
+}
 
 .gap-0 {
   gap: 0;
@@ -739,4 +742,8 @@ h4, h5 {
 }
 .pa-1 {
   padding: 0.25rem;
+}
+
+.scroll-x {
+  overflow-x: auto;
 }
