@@ -4,6 +4,8 @@ const api = require('./api');
 const { render } = require('./templates');
 
 const CookieParser = require('./middleware/cookieParser');
+const multer = require('multer');
+// const bodyParser = require('body-parser');
 const Auth = require('./middleware/auth');
 
 const cron = require('node-cron');
@@ -17,6 +19,10 @@ app.use(express.json());
 
 app.use(CookieParser);
 app.use(Auth.createSession);
+
+// Configure multer storage
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 
 // Cron Jobs
@@ -43,6 +49,32 @@ require('./views')(app);
 
 // Load api routes
 require('./api/routes')(app);
+
+
+// IMAGE UPLOAD
+app.get('/upload', (req, res, next) => {
+  res.end(render(req, 'uploadImage'));
+  next();
+});
+app.post('/upload', upload.single('image'), async (req, res, next) => {
+  if (!req.file) {
+    res.status(400).send('No file uploaded.');
+    return next();
+  }
+
+  await api.image.post(req.session.user, { name: req.file.originalname, data: req.file.buffer });
+  res.redirect(`${ADDR_PREFIX}/upload`);
+  next();
+});
+app.get('/image/:id', async (req, res, next) => {
+  const [code, image] = await api.image.getOne({ id: req.params.id });
+  res.status(code);
+  if (!image) {
+    return next();
+  }
+  res.contentType('image/png');
+  res.send(image.data);
+});
 
 
 /* 

@@ -18,6 +18,14 @@ CREATE TABLE session (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE image (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  owner_id INT NOT NULL,
+  name VARCHAR(64) NOT NULL,
+  data LONGBLOB NOT NULL,
+  FOREIGN KEY (owner_id) REFERENCES user (id)
+);
+
 CREATE TABLE contact (
   requesting_user INT NOT NULL,
   accepting_user INT NOT NULL,
