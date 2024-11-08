@@ -16,6 +16,17 @@ async function postJSON(url, body) {
     .then(response => response.json());
 }
 
+async function postFormData(url, data) {
+  const formData = new FormData();
+  for (const key in data) {
+    formData.append(key, data[key]);
+  }
+  return await fetch(url, {
+    method: 'POST',
+    body: formData,
+  });
+}
+
 async function putJSON(url, body) {
   return await fetch(url, {
     method: 'PUT',

@@ -52,18 +52,15 @@ require('./api/routes')(app);
 
 
 // IMAGE UPLOAD
-app.get('/upload', (req, res, next) => {
-  res.end(render(req, 'uploadImage'));
-  next();
-});
 app.post('/upload', upload.single('image'), async (req, res, next) => {
   if (!req.file) {
     res.status(400).send('No file uploaded.');
     return next();
   }
 
-  await api.image.post(req.session.user, { name: req.file.originalname, data: req.file.buffer });
-  res.redirect(`${ADDR_PREFIX}/upload`);
+  const [code, data] = await api.image.post(req.session.user, { name: req.file.originalname, data: req.file.buffer });
+  res.status(code);
+  res.json(data);
   next();
 });
 app.get('/image/:id', async (req, res, next) => {

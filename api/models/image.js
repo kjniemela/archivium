@@ -25,11 +25,11 @@ async function getMany(options) {
   }
 }
 
-function post(user, { name, data }) {
+async function post(user, { name, data }) {
   if (!user) return [401];
 
   const queryString = `INSERT INTO image (owner_id, name, data) VALUES (?, ?, ?);`;
-  return executeQuery(queryString, [ user.id, name, data ]);
+  return [201, await executeQuery(queryString, [ user.id, name, data ])];
 }
 
 async function del(user, imageId) {

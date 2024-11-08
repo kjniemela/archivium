@@ -7,6 +7,7 @@ if (!window.createSearchableSelect) throw 'searchableSelect not loaded!';
 if (!window.modal) throw 'modal not loaded!';
 if (!window.getJSON) throw 'fetchUtils.js not loaded!';
 if (!window.CalendarPicker) throw 'calendarPicker.js not loaded!';
+if (!window.uploadImage) throw 'fileUpload.js not loaded!';
 
 function getIdValue(id) {
   return document.getElementById(id).value;
@@ -270,7 +271,7 @@ async function addTab(type, name, force=false) {
       ] }),
       createElement('button', { attrs: {
         type: 'button',
-        innerText: 'Add New Key',
+        innerText: 'Add New Image',
         onclick: () => {
           const url = getIdValue('new_gallery_image');
           const label = getIdValue('new_gallery_image_label');
@@ -283,6 +284,15 @@ async function addTab(type, name, force=false) {
         },
       } }),
       createElement('input', { attrs: { id: 'new_gallery_image', placeholder: T('Image URL') } }),
+      createElement('button', { attrs: {
+        type: 'button',
+        innerText: 'Upload Image',
+        onclick: () => {
+          uploadImage(document.body, (newId) => {
+            document.getElementById('new_gallery_image').value = `${location.protocol}//${window.location.host}/image/${newId}`;
+          });
+        },
+      } }),
       createElement('input', { attrs: { id: 'new_gallery_image_label', placeholder: `${T('Image Label')} (${T('Optional')})` } }),
     ] }),
   ] });
