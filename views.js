@@ -268,6 +268,7 @@ module.exports = function(app) {
       item.obj_data.gallery = { ...item.obj_data.gallery };
       item.obj_data.gallery.imgs = item.gallery
         .map(([id, name, label]) => ({
+          id,
           url: `/api/universes/${item.universe_short}/items/${item.shortname}/gallery/images/${id}`,
           name,
           label,

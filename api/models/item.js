@@ -1,4 +1,4 @@
-const { QueryBuilder, Cond, executeQuery, perms } = require('../utils');
+const { QueryBuilder, Cond, executeQuery, parseData, perms } = require('../utils');
 
 async function getOne(user, id, permissionsRequired=perms.READ, basicOnly=false) {
 
@@ -11,7 +11,7 @@ async function getOne(user, id, permissionsRequired=perms.READ, basicOnly=false)
   };
 
   const [errCode, data] = await getMany(user, conditions, permissionsRequired, basicOnly);
-  if (data) return [errCode];
+  if (!data) return [errCode];
   const item = data[0];
   if (!item) return [user ? 403 : 401];
   return [200, item];
@@ -284,7 +284,6 @@ async function post(user, body, universeShortName) {
         updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
-    console.log(body)
     const { title, shortname, item_type, parent_id, obj_data } = body;
     if (!title || !shortname || !item_type || !obj_data) return [400];
     return [201, await executeQuery(queryString, [
@@ -322,6 +321,11 @@ async function save(user, universeShortname, itemShortname, body, jsonMode=false
   if ('timeline' in body.obj_data) {
     timeline = body.obj_data.timeline;
     body.obj_data.timeline = { title: timeline.title };
+  }
+  let gallery;
+  if ('gallery' in body.obj_data) {
+    gallery = body.obj_data.gallery;
+    body.obj_data.gallery = { title: gallery.title };
   }
   let code; let data;
   body.obj_data = JSON.stringify(body.obj_data);
@@ -405,6 +409,17 @@ async function save(user, universeShortname, itemShortname, body, jsonMode=false
       const deletedImports = imports.filter(ti => !importsMap[ti.event_id]).map(ti => ti.event_id);
       importEvents(item.id, newImports);
       deleteImports(item.id, deletedImports);
+    }
+  }
+
+  if (gallery) {
+    const [_, existingImages] = await image.getManyByItemShort(user, universeShortname, itemShortname);
+    const newImages = {};
+    for (const img of gallery.imgs) {
+      newImages[img.id] = img;
+    }
+    for (const img of existingImages) {
+      if (!newImages[img.id]) await image.del(user, img.id);
     }
   }
 
@@ -607,7 +622,80 @@ async function snoozeUntil(user, universeShortname, itemShortname) {
   }
 }
 
+const image = (function() {
+  async function getOneByItemShort(user, universeShortname, itemShortname, options) {
+    const [code1, item] = await getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.READ, true);
+    if (!item) return [code1];
+    const [code2, data] = await getMany({ item_id: item.id, ...(options ?? {}) });
+    if (code2 !== 200) return [code2];
+    const image = data[0];
+    if (!image) return [404];
+    return [200, image];
+  }
+
+  async function getMany(options, inclData=true) {
+    try {
+      const parsedOptions = parseData(options);
+      let queryString = `
+        SELECT 
+          id, item_id, name, mimetype ${inclData ? ', data' : ''}
+        FROM itemimage
+      `;
+      if (options) queryString += ` WHERE ${parsedOptions.strings.join(' AND ')}`;
+      const users = await executeQuery(queryString, parsedOptions.values);
+      return [200, users];
+    } catch (err) {
+      console.error(err);
+      return [500];
+    }
+  }
+
+  async function getManyByItemShort(user, universeShortname, itemShortname, options, inclData=false) {
+    const [code1, item] = await getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.READ, true);
+    if (!item) return [code1];
+    const [code2, images] = await getMany({ item_id: item.id, ...(options ?? {}) }, inclData);
+    if (code2 !== 200) return [code2];
+    return [200, images];
+  }
+
+  async function post(user, file, universeShortname, itemShortname) {
+    if (!file) return [400];
+    if (!user) return [401];
+
+    const { originalname, buffer, mimetype } = file;
+    const [code, item] = await getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE, true);
+    if (!item) return [code];
+
+    const queryString = `INSERT INTO itemimage (item_id, name, mimetype, data, label) VALUES (?, ?, ?, ?, ?);`;
+    return [201, await executeQuery(queryString, [ item.id, originalname, mimetype, buffer, '' ])];
+  }
+
+  async function del(user, imageId) {
+    try {
+      if (!user) return [401];
+      const [code1, images] = (await getMany({ id: imageId }, false));
+      const image = images[0];
+      if (!image) return [code1];
+      const [code2, item] = await getOne(user, image.item_id);
+      if (!item) return [code2];
+      return [200, await executeQuery(`DELETE FROM itemimage WHERE id = ?;`, [imageId])];
+    } catch (err) {
+      console.error(err);
+      return [500];
+    }
+  }
+
+  return {
+    getOneByItemShort,
+    getMany,
+    getManyByItemShort,
+    post,
+    del,
+  };
+})();
+
 module.exports = {
+  image,
   getOne,
   getMany,
   getByAuthorUsername,

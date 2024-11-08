@@ -100,14 +100,14 @@ module.exports = function(app, upload) {
             new APIRoute('/gallery', {}, [
               new APIRoute('/upload', {
                 middleware: [upload.single('image')],
-                POST: (req) => api.itemimage.post(req.session.user, req.file, req.params.universeShortName, req.params.itemShortName),
+                POST: (req) => api.item.image.post(req.session.user, req.file, req.params.universeShortName, req.params.itemShortName),
               }),
               new APIRoute('/images', {
-                GET: (req) => api.itemimage.getManyByItemShort(req.session.user, req.params.universeShortName, req.params.itemShortName),
+                GET: (req) => api.item.image.getManyByItemShort(req.session.user, req.params.universeShortName, req.params.itemShortName),
               }, [
                 new APIRoute('/:id', {
                   GET: (req) => frmtData(
-                    api.itemimage.getOneByItemShort(req.session.user, req.params.universeShortName, req.params.itemShortName, { id: req.params.id }),
+                    api.item.image.getOneByItemShort(req.session.user, req.params.universeShortName, req.params.itemShortName, { id: req.params.id }),
                     (image) => [image?.data, (res) => image && res.contentType(image.mimetype)],
                   ),
                 }),
