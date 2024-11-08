@@ -264,6 +264,15 @@ module.exports = function(app) {
           srcId,
         }));
     }
+    if (item.gallery.length > 0) {
+      item.obj_data.gallery = { ...item.obj_data.gallery };
+      item.obj_data.gallery.imgs = item.gallery
+        .map(([id, name, label]) => ({
+          url: `/api/universes/${item.universe_short}/items/${item.shortname}/gallery/images/${id}`,
+          name,
+          label,
+        }));
+    }
     const itemMap = {};
     itemList.forEach(item => itemMap[item.shortname] = item.title);
     res.prepareRender(req.query.mode === 'raw' ? 'editItemRaw' : 'editItem', { item, itemMap });

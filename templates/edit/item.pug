@@ -71,6 +71,6 @@ block content
       div
         span( style={color: 'red', 'font-size': 'small'} )= error 
 
-  script!= `updateObjData(${JSON.stringify(item.obj_data)}); itemMap = ${JSON.stringify(itemMap)}; universe = '${item.universe_short}'`
+  script!= `updateObjData(${JSON.stringify(item.obj_data)}); itemMap = ${JSON.stringify(itemMap)}; universe = '${item.universe_short}'; item = '${item.shortname}'`
   script.
     resetTabs();

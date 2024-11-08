@@ -48,30 +48,7 @@ app.use(`${ADDR_PREFIX}/static`, express.static(path.join(__dirname, 'static/'))
 require('./views')(app);
 
 // Load api routes
-require('./api/routes')(app);
-
-
-// IMAGE UPLOAD
-app.post('/upload', upload.single('image'), async (req, res, next) => {
-  if (!req.file) {
-    res.status(400).send('No file uploaded.');
-    return next();
-  }
-
-  const [code, data] = await api.image.post(req.session.user, { name: req.file.originalname, data: req.file.buffer });
-  res.status(code);
-  res.json(data);
-  next();
-});
-app.get('/image/:id', async (req, res, next) => {
-  const [code, image] = await api.image.getOne({ id: req.params.id });
-  res.status(code);
-  if (!image) {
-    return next();
-  }
-  res.contentType('image/png');
-  res.send(image.data);
-});
+require('./api/routes')(app, upload);
 
 
 /* 

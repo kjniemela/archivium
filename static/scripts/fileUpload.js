@@ -2,7 +2,7 @@ if (!window.modal) throw 'modal not loaded!';
 if (!window.getJSON) throw 'fetchUtils.js not loaded!';
 if (!window.createElement) throw 'domUtils.js not loaded!';
 
-function uploadImage(container, callback) {
+function uploadImage(url, container, callback) {
   const imageInput = createElement('input', { attrs: { type: 'file', accept: 'image/*', required: true } });
 
   container.appendChild(modal('upload-image-modal', [
@@ -16,9 +16,9 @@ function uploadImage(container, callback) {
         innerText: T('Upload'), 
         onclick: async () => {
           const image = imageInput.files[0];
-          const response = await postFormData('/upload', { image });
+          const response = await postFormData(url, { image });
           const data = await response.json();
-          callback(data.insertId);
+          callback(data.insertId, image.name);
           removeModal('upload-image-modal');
         },
       } }),

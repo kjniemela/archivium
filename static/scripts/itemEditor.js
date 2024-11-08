@@ -269,27 +269,34 @@ async function addTab(type, name, force=false) {
           ] })
         )),
       ] }),
-      createElement('button', { attrs: {
-        type: 'button',
-        innerText: 'Add New Image',
-        onclick: () => {
-          const url = getIdValue('new_gallery_image');
-          const label = getIdValue('new_gallery_image_label');
-          if (!url) return;
-          const newState = { ...obj_data };
-          if (!('imgs' in newState.gallery)) newState.gallery.imgs = [];
-          newState.gallery.imgs.push({ url, label });
-          updateObjData(newState);
-          resetTabs(name);
-        },
-      } }),
-      createElement('input', { attrs: { id: 'new_gallery_image', placeholder: T('Image URL') } }),
+      // createElement('button', { attrs: {
+      //   type: 'button',
+      //   innerText: 'Add New Image',
+      //   onclick: () => {
+      //     const url = getIdValue('new_gallery_image');
+      //     const label = getIdValue('new_gallery_image_label');
+      //     if (!url) return;
+      //     const newState = { ...obj_data };
+      //     if (!('imgs' in newState.gallery)) newState.gallery.imgs = [];
+      //     newState.gallery.imgs.push({ url, label });
+      //     updateObjData(newState);
+      //     resetTabs(name);
+      //   },
+      // } }),
+      // createElement('input', { attrs: { id: 'new_gallery_image', placeholder: T('Image URL') } }),
       createElement('button', { attrs: {
         type: 'button',
         innerText: 'Upload Image',
         onclick: () => {
-          uploadImage(document.body, (newId) => {
-            document.getElementById('new_gallery_image').value = `${location.protocol}//${window.location.host}/image/${newId}`;
+          uploadImage(`/api/universes/${universe}/items/${item}/gallery/upload`, document.body, (newId, newName) => {
+            const url = `/api/universes/${universe}/items/${item}/gallery/images/${newId}`;
+            const label = getIdValue('new_gallery_image_label');
+            if (!url) return;
+            const newState = { ...obj_data };
+            if (!('imgs' in newState.gallery)) newState.gallery.imgs = [];
+            newState.gallery.imgs.push({ url, label, name: newName });
+            updateObjData(newState);
+            resetTabs(name);
           });
         },
       } }),

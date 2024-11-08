@@ -99,6 +99,7 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, basicOn
         [`JSON_REMOVE(JSON_OBJECTAGG(IFNULL(child_item.shortname, 'null__'), child_item.title), '$.null__')`, 'child_titles'],
         [`JSON_REMOVE(JSON_OBJECTAGG(IFNULL(parent_item.shortname, 'null__'), parent_item.title), '$.null__')`, 'parent_titles'],
         [`JSON_ARRAYAGG(JSON_ARRAY(ev.src_shortname, ev.src_title, ev.src_id, ev.event_title, ev.abstime))`, 'events'],
+        [`JSON_ARRAYAGG(JSON_ARRAY(itemimage.id, itemimage.name, itemimage.label))`, 'gallery'],
       ]),
       ...(options.select ?? []),
       ...(options.includeData ? ['item.obj_data'] : []),
@@ -117,6 +118,7 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, basicOn
             INNER JOIN item ON itemevent.item_id = item.id
             ORDER BY itemevent.abstime DESC
         ) ev`, new Cond('ev.item_id = item.id').or('ev.timeline_id = item.id')],
+        ['LEFT', 'itemimage', new Cond('itemimage.item_id = item.id')],
       ]),
       ...(options.join ?? []),
     ]

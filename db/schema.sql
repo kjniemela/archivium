@@ -18,12 +18,11 @@ CREATE TABLE session (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE image (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  owner_id INT NOT NULL,
+CREATE TABLE profileimage (
+  profile_id INT NOT NULL,
   name VARCHAR(64) NOT NULL,
   data LONGBLOB NOT NULL,
-  FOREIGN KEY (owner_id) REFERENCES user (id)
+  FOREIGN KEY (profile_id) REFERENCES user (id)
 );
 
 CREATE TABLE contact (
@@ -65,6 +64,16 @@ CREATE TABLE item (
   FOREIGN KEY (parent_id) REFERENCES item (id),
   FOREIGN KEY (last_updated_by) REFERENCES user (id),
   PRIMARY KEY (id)
+);
+
+CREATE TABLE itemimage (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  item_id INT NOT NULL,
+  name VARCHAR(64) NOT NULL,
+  label VARCHAR(256) NOT NULL,
+  mimetype VARCHAR(32) NOT NULL,
+  data LONGBLOB NOT NULL,
+  FOREIGN KEY (item_id) REFERENCES item (id)
 );
 
 CREATE TABLE snooze (
