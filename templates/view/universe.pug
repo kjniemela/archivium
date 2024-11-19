@@ -3,20 +3,26 @@ include ../mixins.pug
 
 mixin typeCard(shortname, category)
   .card.item-type
-    a.cardLink.link( href=`${ADDR_PREFIX}/universes/${universe.shortname}/items?type=${shortname}` )
-      div(style={ 'background-color': category[2] })
-        h2(align='center')= capitalize(category[1])
-    div
-      if contextUser
-        a.cardBtn.link( href=`${ADDR_PREFIX}/universes/${universe.shortname}/items/create?type=${shortname}` ) &#x2795; New
-        a.cardBtn.link( href=`${ADDR_PREFIX}/users/${contextUser.username}/items?type=${shortname}` ) My #{category[1]}
+    if displayUniverse
+      a.cardLink.link( href=`${ADDR_PREFIX}/universes/${universe.shortname}/items?type=${shortname}` )
+        div(style={ 'background-color': category[2] })
+          h2(align='center')= capitalize(category[1])
+    else
+      a.cardLink.link( href=`${ADDR_PREFIX}/universes/${universe.shortname}/items?type=${shortname}` )
+        div(style={ 'background-color': category[2] })
+          h2(align='center')= capitalize(category[1])
+      div
+        if contextUser
+          a.cardBtn.link( href=`${ADDR_PREFIX}/universes/${universe.shortname}/items/create?type=${shortname}` ) &#x2795; New
+          a.cardBtn.link( href=`${ADDR_PREFIX}/users/${contextUser.username}/items?type=${shortname}` ) My #{category[1]}
 
 block breadcrumbs
-  a.link.link-animated( href=`${ADDR_PREFIX}/` ) #{T('Home')}
-  |  / 
-  a.link.link-animated( href=`${ADDR_PREFIX}/universes` ) #{T('Universes')}
-  |  / 
-  span #{universe.title}
+  if !displayUniverse
+    a.link.link-animated( href=`${ADDR_PREFIX}/` ) #{T('Home')}
+    |  / 
+    a.link.link-animated( href=`${ADDR_PREFIX}/universes` ) #{T('Universes')}
+    |  / 
+    span #{universe.title}
 
 block scripts
   script
@@ -28,7 +34,7 @@ block content
   h1.center #{universe.title}
   p.center
     small Created by 
-      a.link.link-animated( href=`${ADDR_PREFIX}/users/${universe.owner}` ) #{universe.owner}
+      a.link.link-animated( href=link(`/users/${universe.owner}`) ) #{universe.owner}
       |  #{formatDate(new Date(universe.created_at))}
       |  - Last updated #{formatDate(new Date(universe.updated_at))}
       if contextUser
@@ -99,11 +105,11 @@ block content
     .card-list.hidden( data-tab='authors' )
       each username, id in universe.authors
         if universe.author_permissions[id] >= perms.WRITE
-          .card.sheet.gap-4( onclick=`goTo('${ADDR_PREFIX}/users/${username}')` )
+          .card.sheet.gap-4( onclick=`goTo('${link(`/users/${username}`)}')` )
             img.userIcon( alt=username, src=authors[id].gravatarLink )
             .d-flex.flex-col.grow-1
               h2.ma-0
-                a.link.link-animated( href=`${ADDR_PREFIX}/users/${username}` ) #{username}
+                a.link.link-animated( href=link(`/users/${username}`) ) #{username}
               span
                 b #{T('Joined')}: 
                 | #{formatDate(authors[id].created_at)}

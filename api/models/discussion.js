@@ -8,17 +8,19 @@ async function getThreads(user, options, canPost=false, includeExtra=false) {
     // const readOnlyQueryString = permissionLevel > perms.READ ? '' : `universe.public = 1`;
     // const usrQueryString = user ? `(au_filter.user_id = ${user.id} AND au_filter.permission_level >= ${permissionLevel})` : '';
     // const permsQueryString = `${readOnlyQueryString}${(readOnlyQueryString && usrQueryString) ? ' OR ' : ''}${usrQueryString}`;
-    const filter = canPost
-      ? `
-        (universe.public = 1 AND universe.discussion_open)
-        OR (au_filter.user_id = ${user.id} AND (
-          (au_filter.permission_level >= ${perms.READ} AND universe.discussion_open)
-          OR au_filter.permission_level >= ${perms.COMMENT}
-        ))
-      `
-      : `
-        universe.public = 1 OR (au_filter.user_id = ${user.id} AND au_filter.permission_level >= ${perms.READ})
-      `;
+    const filter = user ? (
+      canPost
+        ? `
+          (universe.public = 1 AND universe.discussion_open)
+          OR (au_filter.user_id = ${user.id} AND (
+            (au_filter.permission_level >= ${perms.READ} AND universe.discussion_open)
+            OR au_filter.permission_level >= ${perms.COMMENT}
+          ))
+        `
+        : `
+          universe.public = 1 OR (au_filter.user_id = ${user.id} AND au_filter.permission_level >= ${perms.READ})
+        `
+      ) : 'universe.public = 1';
     const conditionString = options ? `AND ${parsedOptions.strings.join(' AND ')}` : '';
     const queryString = `
       SELECT

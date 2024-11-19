@@ -1,5 +1,5 @@
 const pug = require('pug');
-const { ADDR_PREFIX } = require('../config');
+const { ADDR_PREFIX, DOMAIN } = require('../config');
 const { perms } = require('../api/utils');
 const md5 = require('md5');
 const path = require('path');
@@ -35,6 +35,7 @@ const locale = {
 
 // Basic context information to be sent to the templates
 function contextData(req) {
+  const subdomain = req.headers['x-subdomain'];
   const user = req.session.user;
   const contextUser = user ? {
     id: user.id,
@@ -48,6 +49,10 @@ function contextData(req) {
     return locale[lang][str] ?? str;
   }
 
+  function link(url, withinSubdomain=false) {
+    return `https://${withinSubdomain ? `${subdomain}.` : ''}${DOMAIN}${ADDR_PREFIX}${url}`;
+  }
+
   const searchQueries = new URLSearchParams(req.query);
   const pageQuery = new URLSearchParams();
   pageQuery.append('page', req.path)
@@ -56,10 +61,13 @@ function contextData(req) {
   return {
     contextUser,
     ADDR_PREFIX,
+    DOMAIN,
     encodedPath: pageQuery.toString(),
     searchQueries: searchQueries.toString(),
+    displayUniverse: subdomain,
     perms,
     locale: locale[lang],
+    link,
     T,
   };
 }

@@ -44,38 +44,40 @@ html(lang='en')
         ul.navbarBtns.shrink-1.scroll-x
           li.navbarBtn
             a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/`) Home
-          li.navbarBtn
-            a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/contacts`) Contacts
-          li.navbarBtn
-            a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/universes`) Universes
+          if !displayUniverse
+            li.navbarBtn
+              a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/contacts`) Contacts
+            li.navbarBtn
+              a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/universes`) Universes
           li.navbarBtn
             a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/search`) Search
-        ul.navbarBtns
-          block save
-          if contextUser
-            li.navbarBtn( style={ position: 'relative' } )
-              script.
-                function toggleUserDropdown() {
-                  const drop = document.querySelector('.user-dropdown');
-                  drop.classList.toggle('hidden');
-                }
-              a.navbarBtnLink.d-flex.align-center( onclick='toggleUserDropdown()' )
-                img.pfp( src=contextUser.gravatarLink )
-                span.navbarText #{contextUser.username} &#x23F7;
-              .user-dropdown.hidden
-                ul.navbarBtns.flex-col
+        if !displayUniverse
+          ul.navbarBtns
+            block save
+            if contextUser
+              li.navbarBtn( style={ position: 'relative' } )
+                script.
+                  function toggleUserDropdown() {
+                    const drop = document.querySelector('.user-dropdown');
+                    drop.classList.toggle('hidden');
+                  }
+                a.navbarBtnLink.d-flex.align-center( onclick='toggleUserDropdown()' )
+                  img.pfp( src=contextUser.gravatarLink )
+                  span.navbarText #{contextUser.username} &#x23F7;
+                .user-dropdown.hidden
+                  ul.navbarBtns.flex-col
+                    li.navbarBtn
+                      a.navbarBtnLink.navbarText.text-start(href=`${ADDR_PREFIX}/users/${contextUser.username}`) Profile
+                    li.navbarBtn
+                      a.navbarBtnLink.navbarText.text-start(href=`${ADDR_PREFIX}/logout`) Log Out
+            else
+              ul.navbarBtns
+                if curTemplate !== 'login'
                   li.navbarBtn
-                    a.navbarBtnLink.navbarText.text-start(href=`${ADDR_PREFIX}/users/${contextUser.username}`) Profile
+                    a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/login${curTemplate === 'signup' ? '' : `?${encodedPath}`}`) Login
+                if curTemplate !== 'signup'
                   li.navbarBtn
-                    a.navbarBtnLink.navbarText.text-start(href=`${ADDR_PREFIX}/logout`) Log Out
-          else
-            ul.navbarBtns
-              if curTemplate !== 'login'
-                li.navbarBtn
-                  a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/login${curTemplate === 'signup' ? '' : `?${encodedPath}`}`) Login
-              if curTemplate !== 'signup'
-                li.navbarBtn
-                  a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/signup${curTemplate === 'login' ? '' : `?${encodedPath}`}`) Sign Up
+                    a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/signup${curTemplate === 'login' ? '' : `?${encodedPath}`}`) Sign Up
 
     main
       .page
