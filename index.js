@@ -49,6 +49,9 @@ if (DEV_MODE) {
 // Serve static assets
 app.use(`${ADDR_PREFIX}/static`, express.static(path.join(__dirname, 'static/')));
 
+// Make static assets available in display mode
+app.use(`${ADDR_PREFIX}/display/*/static`, express.static(path.join(__dirname, 'static/')));
+
 // Load view routes
 require('./views')(app);
 
@@ -151,7 +154,6 @@ app.use((req, res, next) => {
 // Logger if in Dev Mode
 if (DEV_MODE) {
   app.use('/', (req, res, next) => {
-    // console.log(req.headers['x-subdomain'])
     const endTime = new Date();
     let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     // If the IP is in IPv6-mapped IPv4 format, extract the IPv4 part
