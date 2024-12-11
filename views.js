@@ -130,6 +130,12 @@ module.exports = function(app) {
     });
   });
 
+  get('/verify/:key', async (req, res) => {
+    const [code] = await api.user.verifyUser(req.params.key)
+    res.status(code);
+    if (code === 200) return res.redirect(`${ADDR_PREFIX}/`);
+  });
+
   /* Universe Pages */
   get('/universes', async (req, res) => {
     const [code, universes] = await api.universe.getMany(req.session.user);

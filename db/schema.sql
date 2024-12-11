@@ -6,7 +6,25 @@ CREATE TABLE user (
   salt VARCHAR(64) NOT NULL,
   created_at TIMESTAMP NOT NULL,
   updated_at TIMESTAMP NOT NULL,
+  verified BOOLEAN DEFAULT FALSE,
   PRIMARY KEY (id)
+);
+
+CREATE TABLE userverification (
+  user_id INT NOT NULL,
+  verification_key VARCHAR(64),
+  FOREIGN KEY (user_id) REFERENCES user (id),
+  UNIQUE(user_id)
+);
+
+CREATE TABLE usersettings (
+  user_id INT NOT NULL,
+  agree_tos BOOLEAN DEFAULT FALSE,
+  allow_email_updates BOOLEAN DEFAULT FALSE,
+  allow_email_notifications BOOLEAN DEFAULT FALSE,
+  allow_email_newsletter BOOLEAN DEFAULT FALSE,
+  FOREIGN KEY (user_id) REFERENCES user (id),
+  UNIQUE(user_id)
 );
 
 CREATE TABLE session (

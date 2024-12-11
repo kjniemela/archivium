@@ -121,19 +121,21 @@ function validatePassword(attempted, password, salt) {
   return utils.compareHash(attempted, password, salt);
 }
 
-async function put(user_id, userIDToPut, changes) {
-  const { updated_at } = changes;
+async function put(user_id, userIDToPut, { updated_at, verified }) {
+  const changes = { updated_at, verified };
 
   if (Number(user_id) !== Number(userIDToPut)) return [403];
 
   try {
+    const keys = Object.keys(changes).filter(key => changes[key] !== undefined);
+    const values = keys.map(key => changes[key]);
     const queryString = `
       UPDATE user
       SET
-        updated_at = ?
+        ${keys.map(key => `${key} = ?`).join(', ')}
       WHERE id = ?;
     `;
-    return [200, await executeQuery(queryString, [updated_at, userIDToPut])];
+    return [200, await executeQuery(queryString, [...values, userIDToPut])];
   } catch (err) {
     logger.error(err);
     return [500];
@@ -179,6 +181,24 @@ async function del(req) {
   }
 }
 
+async function prepareVerification(userId) {
+  const verificationKey = utils.createRandom32String();
+
+  await executeQuery('INSERT INTO userverification (user_id, verification_key) VALUES (?, ?);', [userId, verificationKey]);
+
+  return verificationKey;
+}
+
+async function verifyUser(verificationKey) {
+  const records = await executeQuery('SELECT user_id FROM userverification WHERE verification_key = ?;', [verificationKey]);
+  if (records.length === 0) return [404];
+  const [code, user] = await getOne({ id: records[0].user_id });
+  if (!user) return [code];
+  await put(user.id, user.id, { verified: true });
+
+  return [200];
+}
+
 module.exports = {
   getOne,
   getMany,
@@ -187,4 +207,6 @@ module.exports = {
   validatePassword,
   put,
   del,
+  prepareVerification,
+  verifyUser,
 };
