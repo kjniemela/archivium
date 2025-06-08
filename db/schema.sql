@@ -161,6 +161,27 @@ CREATE TABLE boardnote (
   FOREIGN KEY (board_id) REFERENCES noteboard (id)
 );
 
+CREATE TABLE story (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(128),
+  description VARCHAR(2048),
+  author_id INT,
+  created_at TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP NOT NULL,
+  FOREIGN KEY (author_id) REFERENCES user (id)
+);
+
+CREATE TABLE storychapter (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(128),
+  description VARCHAR(2048),
+  body TEXT NOT NULL,
+  story_id INT,
+  created_at TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP NOT NULL,
+  FOREIGN KEY (story_id) REFERENCES story (id)
+);
+
 CREATE TABLE item (
   id INT NOT NULL AUTO_INCREMENT,
   title VARCHAR(64) NOT NULL,
