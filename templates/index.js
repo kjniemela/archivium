@@ -3,7 +3,6 @@ const { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN } = require('../config');
 const { perms, getPfpUrl } = require('../api/utils');
 const { locale, lang, sprintf, T } = require('../locale');
 const api = require('../api');
-const md5 = require('md5');
 const path = require('path');
 
 function universeLink(req, uniShort) {

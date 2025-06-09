@@ -43,6 +43,7 @@ function sprintf(format, ...args) {
 }
 
 function T(str, ...args) {
+  if (!str) return '';
   return sprintf(locale[lang][str] ?? str, ...args);
 }
 
