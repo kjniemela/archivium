@@ -25,12 +25,12 @@ mixin universeCard(universe)
             | #{universe.followers[contextUser.id] ? T('Unfollow') : T('Follow')}
 
 .card-list
-  .card.sheet(data-goto=`${ADDR_PREFIX}/universes/create`)
-    .d-flex.justify-center(style={ 'grid-column': '1 / 4' })
-      a.link.d-flex.justify-center(href=`${ADDR_PREFIX}/universes/create`)
-        .navbarText.material-symbols-outlined.heavy.ma-0.pa-1.pr-0.grow-0(style={ 'font-size': '1.5rem' } onclick="showModal('new-tab-modal')") add
-        .big-text.navbarText.pa-1.grow-0 #{T('New Universe')}
   if contextUser
+    .card.sheet(data-goto=`${ADDR_PREFIX}/universes/create`)
+      .d-flex.justify-center(style={ 'grid-column': '1 / 4' })
+        a.link.d-flex.justify-center(href=`${ADDR_PREFIX}/universes/create`)
+          .navbarText.material-symbols-outlined.heavy.ma-0.pa-1.pr-0.grow-0(style={ 'font-size': '1.5rem' } onclick="showModal('new-tab-modal')") add
+          .big-text.navbarText.pa-1.grow-0 #{T('New Universe')}
     each universe in universes.filter(universe => (universe.followers[contextUser.id] || universe.author_permissions[contextUser.id] >= perms.WRITE))
       +universeCard(universe)
     each universe in universes.filter(universe => !(universe.followers[contextUser.id] || universe.author_permissions[contextUser.id] >= perms.WRITE))

@@ -1,5 +1,5 @@
 .card-list
-  if universe
+  if universe && contextUser
     .card.sheet(data-goto=`${universeLink(universe.shortname || universe)}/items/create${type ? `?type=${type}` : ''}`)
       .d-flex.justify-center(style={ 'grid-column': '1 / 4' })
         a.link.d-flex.justify-center(href=`${universeLink(universe.shortname || universe)}/items/create${type ? `?type=${type}` : ''}`)
