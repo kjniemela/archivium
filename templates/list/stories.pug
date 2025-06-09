@@ -1,0 +1,62 @@
+extends ../layout.pug
+include ../mixins.pug
+
+block title
+  title #{T('Stories')} — #{T('Archivium')}
+
+block breadcrumbs
+  a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+  |  / 
+  span #{T('Stories')}
+
+  
+mixin storyCard(story)
+  .card.sheet.gap-4.align-start(data-goto=`${ADDR_PREFIX}/stories/${story.shortname}`)
+    .d-flex.flex-col.grow-1
+      h3.ma-0
+        a.link.link-animated(href=`${ADDR_PREFIX}/stories/${story.shortname}`) #{story.title}
+      .d-flex.gap-1
+
+    .d-flex.flex-col.grow-3(style='grid-column: 2 / 4;')
+      span 
+        b #{T('Author')}: 
+        a.link.link-animated(href=`${ADDR_PREFIX}/users/${story.author}`) #{story.author}
+      .d-flex.gap-2.flex-wrap
+        span
+          b #{T('Created')}: 
+          | #{formatDate(story.created_at, true)}
+        | — 
+        span 
+          b #{T('Updated')}: 
+          | #{formatDate(story.updated_at, true)}
+
+block content
+  script
+    include /static/scripts/cardUtils.js
+    include /static/scripts/listUtils.js
+    include /static/scripts/searchUtils.js
+  
+  h1.center #{T('Stories')}
+  .d-flex.align-center.scroll-x
+    label.mr-1.nowrap( for='sort' )
+      b #{T('Sort by')}: 
+    select( id='sort' name='sort' )
+      option( value='updated_at' ) #{T('Updated')}
+      option( value='created_at' ) #{T('Created')}
+      option( value='title' ) #{T('Title')}
+    select( id='sort_order' name='sort_order' )
+      option( value='desc' ) #{T('Descending')}
+      option( value='asc' ) #{T('Ascending')}
+    .grow-1
+    form.flex-row.gap-0
+      button( type='submit' ) &#x1F50E;&#xFE0E;
+      input( id='search' name='search' value=search placeholder=T('Search...') )
+  hr
+  .card-list
+    .card.sheet( data-goto=`${ADDR_PREFIX}/stories/create` )
+      .d-flex.justify-center( style={ 'grid-column': '1 / 4' } )
+        a.link.d-flex.justify-center( href=`${ADDR_PREFIX}/stories/create` )
+          .navbarText.material-symbols-outlined.heavy.ma-0.pa-1.pr-0.grow-0( style={ 'font-size': '1.5rem' } onclick="showModal('new-tab-modal')" ) add
+          .big-text.navbarText.pa-1.grow-0 #{T('New Story')}
+    each story in stories
+      +storyCard(story)

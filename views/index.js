@@ -115,6 +115,11 @@ module.exports = function(app) {
   post('/notes/create', sites.ALL, Auth.verifySessionOrRedirect, forms.createNote);
   post('/notes/edit', sites.ALL, Auth.verifySessionOrRedirect, forms.editNote);
 
+  /* Story pages */
+  get('/stories', sites.ALL, Auth.verifySessionOrRedirect, pages.story.list);
+  get('/stories/create', sites.ALL, Auth.verifySessionOrRedirect, pages.story.create);
+  post('/stories/create', sites.ALL, Auth.verifySessionOrRedirect, forms.createStory);
+
   /* Universe Pages */
   get('/universes', sites.NORMAL, pages.universe.list);
   get('/universes/create', sites.NORMAL, Auth.verifySessionOrRedirect, pages.universe.create);

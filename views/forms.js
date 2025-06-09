@@ -166,6 +166,14 @@ module.exports = {
     // res.prepareRender('createUniverse', { error: data, ...req.body });
   },
 
+  async createStory(req, res) {
+    const [code, data] = await api.story.post(req.session.user, req.body);
+    res.status(code);
+    if (code === 201) return res.redirect(`${ADDR_PREFIX}/stories/${req.body.shortname}`);
+    const [_, universes] = await api.universe.getMany(req.session.user, null, perms.WRITE);
+    res.prepareRender('createStory', { universes: universes ?? [], error: data, ...req.body });
+  },
+
   async passwordResetRequest(req, res) {
     const { body } = req;
     const [code, user] = await api.user.getOne({ email: body.email });

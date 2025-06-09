@@ -2,21 +2,26 @@ UPDATE schema_version SET version = 10, comment = 'Add stories', time = NOW();
 
 CREATE TABLE story (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(128),
-  description VARCHAR(2048),
+  title VARCHAR(128) NOT NULL,
+  shortname VARCHAR(64) UNIQUE NOT NULL,
+  summary VARCHAR(2048),
+  visibility TINYINT NOT NULL,
   author_id INT,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL,
-  FOREIGN KEY (author_id) REFERENCES user (id)
+  universe_id INT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  FOREIGN KEY (author_id) REFERENCES user (id),
+  FOREIGN KEY (universe_id) REFERENCES universe (id) ON DELETE CASCADE
 );
 
 CREATE TABLE storychapter (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(128),
+  title VARCHAR(128) NOT NULL,
   description VARCHAR(2048),
+  chapter_number INT NOT NULL,
   body TEXT NOT NULL,
-  story_id INT,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL,
-  FOREIGN KEY (story_id) REFERENCES story (id)
+  story_id INT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  FOREIGN KEY (story_id) REFERENCES story (id) ON DELETE CASCADE
 );

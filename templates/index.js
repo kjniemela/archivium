@@ -41,6 +41,7 @@ function contextData(req) {
     universeLink: universeLink.bind(null, req),
     searchQueries: searchQueries.toString(),
     perms,
+    visibilityModes: api.story.visibilityModes,
     locale: locale[lang],
     T,
     sprintf,
@@ -76,6 +77,9 @@ const templates = {
 
   universeThread: compile('templates/view/universeThread.pug'),
   createUniverseThread: compile('templates/create/universeThread.pug'),
+
+  storyList: compile('templates/list/stories.pug'),
+  createStory: compile('templates/create/story.pug'),
 
   item: compile('templates/view/item.pug'),
   editItem: compile('templates/edit/item.pug'),
