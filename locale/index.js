@@ -68,7 +68,7 @@ const locale = {
     'Name': 'Namn',
     'Updated': 'Uppdaterat',
     'Universes I Follow': 'Universum jag följer',
-    'Recent Updates by Others': 'Nylage Uppdateringar av Andra Användare',
+    'Recent Updates by Others': 'Nyliga Uppdateringar av Andra Användare',
     'Universe': 'Universum',
     'Last updated by': 'Senast uppdaterat av',
     '(New)': '(Ny)',
