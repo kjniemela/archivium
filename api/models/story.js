@@ -65,7 +65,9 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
 async function post(user, body) {
   if (!user) return [401];
   const { title, shortname, summary, visibility, universe: universeShort } = body;
-  if (!title || !shortname || !universeShort) return [400];
+  if (!title) return [400, 'Title is required.'];
+  if (!shortname) return [400, 'Shortname is required.'];
+  if (!universeShort) return [400, 'Universe is required.'];
 
   const [code, universe] = await api.universe.getOne(user, { 'universe.shortname': universeShort }, perms.WRITE);
   if (!universe) return [code];
@@ -77,6 +79,7 @@ async function post(user, body) {
     `, [title, shortname, summary ?? null, visibility ?? visibilityModes.PRIVATE, user.id, universe.id]);
     return [201, data];
   } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') return [400, `Shortname "${shortname}" already in use in this universe, please choose another.`];
     logger.error(err);
     return [500];
   }
