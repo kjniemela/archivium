@@ -11,21 +11,9 @@ block breadcrumbs
   span #{T('New')}
 
 block scripts
+  script
+    include /static/scripts/shortname.js
   script.
-    function toShortname(title) {
-      let shortname = title.toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
-
-      if (shortname.length < 3) {
-          return '';
-      } else if (shortname.length > 64) {
-          shortname = shortname.substring(0, 64);
-      }
-
-      return shortname;
-    }
     window.addEventListener('load', () => {
       const titleInput = document.querySelector('#title');
       const shortnameInput = document.querySelector('#shortname');
