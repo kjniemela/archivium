@@ -48,7 +48,7 @@ block scripts
 
 block content
   h1.center #{T('Welcome to %s\'s page', user.username)}
-  div(align='center')
+  .center
     .userIcon.badge-anchor
       img(alt=user.username, src=pfpUrl)
       if user.isMe
