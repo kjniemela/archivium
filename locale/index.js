@@ -66,7 +66,7 @@ const locale = {
   }
 };
 
-const lang = 'en';
+const lang = 'sv';
 
 function sprintf(format, ...args) {
   let i = 0;
