@@ -40,7 +40,6 @@ function contextData(req) {
     universeLink: universeLink.bind(null, req),
     searchQueries: searchQueries.toString(),
     perms,
-    visibilityModes: api.story.visibilityModes,
     locale: locale[lang],
     T,
     sprintf,

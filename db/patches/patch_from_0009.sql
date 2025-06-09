@@ -5,7 +5,7 @@ CREATE TABLE story (
   title VARCHAR(128) NOT NULL,
   shortname VARCHAR(64) UNIQUE NOT NULL,
   summary VARCHAR(2048),
-  visibility TINYINT NOT NULL,
+  drafts_public BOOLEAN NOT NULL,
   author_id INT,
   universe_id INT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),

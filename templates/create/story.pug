@@ -50,16 +50,12 @@ block content
         document.querySelector('#universes-select').replaceWith(createSearchableSelect(
           'universe',
           universes.reduce((acc, universe) => ({ ...acc, [universe.shortname]: universe.title }), {}),
-          //- (value) => {
-          //-   console.log(value)
-          //- },
         ));
     div.inputGroup
-      label(for='visibility' ) #{T('Visibility')}: 
-      select(id='visibility' name='visibility' )
-        option(value=visibilityModes.PRIVATE selected=(visibility === visibilityModes.PRIVATE)) #{T('Visible only to you')}
-        option(value=visibilityModes.UNIVERSE selected=(visibility === visibilityModes.UNIVERSE)) #{T('Visible to universe authors')}
-        option(value=visibilityModes.PUBLIC selected=(visibility === visibilityModes.PUBLIC)) #{T('Visible to everyone')}
+      label(for='drafts_public' ) #{T('Drafts are visible to')}: 
+      select(id='drafts_public' name='drafts_public' )
+        option(value='private' selected=(visibility === 'private')) #{T('Only you')}
+        option(value='public' selected=(visibility === 'public')) #{T('Universe authors')}
     div
       button(type='submit') #{T('Create Universe')}
     if error

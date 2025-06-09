@@ -6,12 +6,6 @@ function setApi(_api) {
   api = _api;
 }
 
-const visibilityModes = {
-  PRIVATE: 0,
-  UNIVERSE: 1,
-  PUBLIC: 2,
-};
-
 async function getOne(user, conditions, permissionsRequired=perms.READ, options={}) {
   const [code, stories] = await getMany(user, conditions, permissionsRequired, options);
   if (!stories) return [code];
@@ -30,8 +24,6 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
 
   const parsedConditions = parseData(conditions);
   const conditionString = conditions ? `AND ${parsedConditions.strings.join(' AND ')}` : '';
-  const visibilityString = user ? 'story.author_id = ? OR' : '';
-  const visibilityValues = user ? [ user.id ] : [];
 
   if (options.sort && !options.forceSort) {
     const validSorts = { 'title': true, 'created_at': true, 'updated_at': true, 'author': true };
@@ -48,7 +40,10 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
         JSON_REMOVE(JSON_OBJECTAGG(
           IFNULL(sc.chapter_number, 'null__'),
           sc.title
-        ), '$.null__') AS chapters
+        ), '$.null__') AS chapters,
+        universe.title AS universe,
+        universe.shortname AS universe_short,
+        MAX(sc.is_draft) AS is_draft
       FROM story
       LEFT JOIN storychapter AS sc ON sc.story_id = story.id
       INNER JOIN user AS author ON author.id = story.author_id
@@ -59,11 +54,11 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
         AND au_filter.user_id = ?
         AND au_filter.permission_level >= ?
       ` : ''}
-      WHERE ((${visibilityString} story.visibility > ?) AND (story.visibility = ? ${user ? `OR au_filter.universe_id IS NOT NULL` : ''}))
+      WHERE (is_draft ${user ? `OR story.author_id = ? OR (story.drafts_public AND au_filter.universe_id IS NOT NULL)` : ''})
       ${conditionString}
       GROUP BY story.id
       ORDER BY ${options.sort ? `${options.sort} ${options.sortDesc ? 'DESC' : 'ASC'}` : 'updated_at DESC'}
-    `, [ ...(user ? [user.id, perms.WRITE] : []), ...visibilityValues, visibilityModes.PRIVATE, visibilityModes.PUBLIC, ...parsedConditions?.values ?? [] ]);
+    `, [ ...(user ? [user.id, perms.WRITE, user.id] : []), ...parsedConditions?.values ?? [] ]);
     return [200, stories];
   } catch (err) {
     logger.error(err);
@@ -73,19 +68,20 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
 
 async function post(user, body) {
   if (!user) return [401];
-  const { title, shortname, summary, visibility, universe: universeShort } = body;
+  const { title, shortname, summary, public, universe: universeShort } = body;
   if (!title) return [400, 'Title is required.'];
   if (!shortname) return [400, 'Shortname is required.'];
   if (!universeShort) return [400, 'Universe is required.'];
+  if (typeof public !== 'boolean') return [400, 'Draft visibility status is required.'];
 
   const [code, universe] = await api.universe.getOne(user, { 'universe.shortname': universeShort }, perms.WRITE);
   if (!universe) return [code];
 
   try {
     const data = await executeQuery(`
-      INSERT INTO story (title, shortname, summary, visibility, author_id, universe_id)
+      INSERT INTO story (title, shortname, summary, drafts_public, author_id, universe_id)
       VALUES (?, ?, ?, ?, ?, ?)
-    `, [title, shortname, summary ?? null, visibility ?? visibilityModes.PRIVATE, user.id, universe.id]);
+    `, [title, shortname, summary ?? null, public, user.id, universe.id]);
     return [201, data];
   } catch (err) {
     if (err.code === 'ER_DUP_ENTRY') return [400, `Shortname "${shortname}" already in use in this universe, please choose another.`];
