@@ -116,7 +116,7 @@ module.exports = function(app) {
   post('/notes/edit', sites.ALL, Auth.verifySessionOrRedirect, forms.editNote);
 
   /* Story pages */
-  get('/stories', sites.ALL, Auth.verifySessionOrRedirect, pages.story.list);
+  get('/stories', sites.ALL, pages.story.list);
   get('/stories/create', sites.ALL, Auth.verifySessionOrRedirect, pages.story.create);
   post('/stories/create', sites.ALL, Auth.verifySessionOrRedirect, forms.createStory);
 
