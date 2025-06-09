@@ -30,6 +30,8 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
 
   const parsedConditions = parseData(conditions);
   const conditionString = conditions ? `AND ${parsedConditions.strings.join(' AND ')}` : '';
+  const visibilityString = user ? 'story.author_id = ? OR' : '';
+  const visibilityValues = user ? [ user.id ] : [];
 
   if (options.sort && !options.forceSort) {
     const validSorts = { 'title': true, 'created_at': true, 'updated_at': true, 'author': true };
@@ -50,11 +52,18 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
       FROM story
       LEFT JOIN storychapter AS sc ON sc.story_id = story.id
       INNER JOIN user AS author ON author.id = story.author_id
-      WHERE (story.author_id = ? OR story.visibility = ?)
+      INNER JOIN universe ON universe.id = story.universe_id
+      ${user ? `
+      LEFT JOIN authoruniverse AS au_filter
+        ON universe.id = au_filter.universe_id
+        AND au_filter.user_id = ?
+        AND au_filter.permission_level >= ?
+      ` : ''}
+      WHERE ((${visibilityString} story.visibility > ?) AND (story.visibility = ? ${user ? `OR au_filter.universe_id IS NOT NULL` : ''}))
       ${conditionString}
       GROUP BY story.id
       ORDER BY ${options.sort ? `${options.sort} ${options.sortDesc ? 'DESC' : 'ASC'}` : 'updated_at DESC'}
-    `, [ user.id, visibilityModes.PUBLIC, ...parsedConditions?.values ?? [] ]);
+    `, [ ...(user ? [user.id, perms.WRITE] : []), ...visibilityValues, visibilityModes.PRIVATE, visibilityModes.PUBLIC, ...parsedConditions?.values ?? [] ]);
     return [200, stories];
   } catch (err) {
     logger.error(err);

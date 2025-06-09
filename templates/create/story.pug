@@ -57,9 +57,9 @@ block content
     div.inputGroup
       label(for='visibility' ) #{T('Visibility')}: 
       select(id='visibility' name='visibility' )
-        option(value=visibilityModes.PUBLIC selected=(visibility === visibilityModes.PUBLIC)) #{T('Visible to everyone')}
+        option(value=visibilityModes.PRIVATE selected=(visibility === visibilityModes.PRIVATE)) #{T('Visible only to you')}
         option(value=visibilityModes.UNIVERSE selected=(visibility === visibilityModes.UNIVERSE)) #{T('Visible to universe authors')}
-        option(value=visibilityModes.PIRVATE selected=(visibility === visibilityModes.PIRVATE)) #{T('Visible only to you')}
+        option(value=visibilityModes.PUBLIC selected=(visibility === visibilityModes.PUBLIC)) #{T('Visible to everyone')}
     div
       button(type='submit') #{T('Create Universe')}
     if error
