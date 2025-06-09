@@ -54,6 +54,7 @@ const locale = {
     'Developed by ': 'Utvecklad av ',
     'Open source on ': 'Öppen källkod på ',
     'Welcome to Archivium!': 'Välkommen till Archivium!',
+    'Welcome to Archivium': 'Välkommen till Archivium',
     'Archivium is a worldbuilding tool, allowing you to organize everything about your world in one place.':
       'Archivium är ett värktyg som tillåter dig att organisera allt möjligt om din värld i ett och samma ställe.',
     'It\'s designed for creators who want to keep track of all the details that make their worlds unique — from characters and histories to maps and cultures.': '',
@@ -76,6 +77,8 @@ const locale = {
     ' first!': ' först!',
     'May Need Review': 'Kan behöva granskning',
     'Dismiss': 'Avfärda',
+    'and': 'och',
+    'or': 'eller',
     [`perms_${perms.NONE}`]: 'Ingen',
     [`perms_${perms.READ}`]: 'Läsåtkomst',
     [`perms_${perms.COMMENT}`]: 'Åtkomst till kommentarer',
