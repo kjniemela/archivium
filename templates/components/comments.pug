@@ -37,7 +37,7 @@ div
         button#post(type='submit') #{T('Post Comment')}
       if error
         div
-          span(style={ 'font-size': 'small' }).color-error= error
+          span(style={ 'font-size': 'small' }).color-error #{T(error)}
 
   script.
     document.querySelectorAll('textarea.comment-field').forEach(el => {
