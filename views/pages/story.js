@@ -49,6 +49,24 @@ module.exports = {
     const universe = {...fetchedUniverse, ...(body ?? {}), shortname: fetchedUniverse.shortname, newShort: body?.shortname ?? fetchedUniverse.shortname};
     res.prepareRender('editUniverse', { universe, error });
   },
+
+  async deleteChapter(req, res) {
+    const [code, universe] = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.OWNER);
+    res.status(code);
+    if (!universe) return res.redirect(`${ADDR_PREFIX}/universes`);
+    res.prepareRender('deleteUniverse', { universe });
+  },
+
+  async editChapter(req, res, error, body) {
+    const [code1, story] = await api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }, perms.WRITE);
+    res.status(code1);
+    if (!story) return;
+    const [code2, fetchedChapter] = await api.story.getChapter(req.session.user, req.params.shortname, req.params.index, perms.WRITE);
+    res.status(code2);
+    if (!fetchedChapter) return;
+    const chapter = { ...fetchedChapter, ...(body ?? {}) };
+    res.prepareRender('editChapter', { story, chapter, error });
+  },
   
   async viewChapter(req, res) {
     const [code1, story] = await api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname });

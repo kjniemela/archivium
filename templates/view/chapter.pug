@@ -21,7 +21,7 @@ block breadcrumbs
 
 block content
   h1.center.ma-0 #{chapter.title}
-  if chapter.is_draft
+  if !chapter.is_published
     p.mt-1.center
       i (#{T('Draft')})
   p.center.mb-2
@@ -36,10 +36,10 @@ block content
       |  - #{T('Last updated %s', formatDate(new Date(story.updated_at)))}
   #action-bar.d-flex.justify-center.align-center.gap-2.mb-1
       if contextUser && contextUser.id === story.author_id
-        a.link.link-animated.d-flex.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/edit`)
+        a.link.link-animated.d-flex.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}/edit`)
           span.material-symbols-outlined edit
           |  #{T('Edit')}
-        a.link.link-animated.d-flex.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/delete`)
+        a.link.link-animated.d-flex.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}/delete`)
           span.material-symbols-outlined delete
           |  #{T('Delete')}
           
@@ -53,7 +53,7 @@ block content
   br
 
   -
-    const canComment = contextUser && !chapter.is_draft;
+    const canComment = contextUser && chapter.is_published;
     const canDelete = contextUser && contextUser.id === story.author_id;
     const apiRoute = `/api/stories/${story.shortname}/${chapter.chapter_number}/comments`;
     const universeShortname = story.universe_short;

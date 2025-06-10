@@ -33,10 +33,10 @@ async function createStory(owner, title, shortname, summary, public, universe) {
   return story;
 }
 
-async function createChapter(owner, story, title, summary, body='', isDraft=false) {
+async function createChapter(owner, story, title, summary, body='', isPublished=false) {
   const [,, index] = await api.story.postChapter(owner, story.shortname, { title, summary });
   const [, chapter] = await api.story.getChapter(owner, story.shortname, index);
-  await api.story.putChapter(owner, story.shortname, chapter.chapter_number, { is_draft: isDraft, body });
+  await api.story.putChapter(owner, story.shortname, chapter.chapter_number, { is_published: isPublished, body });
   return chapter;
 }
 
@@ -97,7 +97,7 @@ async function main() {
     Morbi ultricies rutrum facilisis. Duis et lacinia est. Phasellus ultricies eros ut nulla aliquet, scelerisque laoreet magna condimentum. Pellentesque ornare augue a ultricies cursus. Pellentesque fringilla, tortor eget mattis posuere, metus eros iaculis ligula, eu malesuada erat lectus id turpis. Integer volutpat maximus ornare. Nullam at mauris arcu. Nulla consequat magna accumsan nibh convallis porta. Cras vel neque eu nisi congue rutrum nec ac turpis. Quisque in nulla vehicula, efficitur dolor congue, fringilla diam. Vivamus magna libero, molestie ac feugiat eu, mattis vel dui. Praesent fermentum massa eget suscipit rutrum. Proin purus dui, mattis sed libero at, ornare faucibus magna. Pellentesque magna eros, facilisis eget nisl varius, feugiat auctor libero. Proin vitae cursus metus.
 
     Nam tortor dui, pretium et metus eget, posuere ornare erat. Curabitur convallis nisl consectetur, viverra massa sit amet, pellentesque urna. Morbi quis consectetur massa. Pellentesque nec efficitur sem. Morbi vel porttitor massa. Vivamus efficitur eros ligula, sit amet faucibus risus posuere vel. Phasellus diam justo, maximus quis varius in, consequat sed tellus. Curabitur et viverra magna, ac tempor dui. Donec a lacinia lacus, sed blandit eros.
-  `;
+  `.split('\n').map(line => line.trim()).join('\n');
 
   console.log('Creating users...');
   const users = {};
@@ -160,12 +160,12 @@ async function main() {
   const privateDraftStory2 = await createStory(users.testwriter, 'Private Draft Story Hidden', 'private-draft-story-2', loremIpsum, false, privateUniverse);
   for (const story of [publicStory1, privateStory1, publicStory2, privateStory2]) {
     for (let i = 0; i < 30; i++) {
-      await createChapter(users.testwriter, story, `Chapter ${i+1}`, `This is a summary of chapter ${i+1} of ${story.title}`, loremIpsumLong, i > 12);
+      await createChapter(users.testwriter, story, `Chapter ${i+1}`, `This is a summary of chapter ${i+1} of ${story.title}`, loremIpsumLong, i < 13);
     }
   }
   for (const story of [publicDraftStory1, privateDraftStory1, publicDraftStory2, privateDraftStory2]) {
     for (let i = 0; i < 7; i++) {
-      await createChapter(users.testwriter, story, `Chapter ${i+1}`, `This is a summary of chapter ${i+1} of ${story.title}`, loremIpsumLong, true);
+      await createChapter(users.testwriter, story, `Chapter ${i+1}`, `This is a summary of chapter ${i+1} of ${story.title}`, loremIpsumLong, false);
     }
   }
 

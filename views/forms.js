@@ -52,7 +52,6 @@ module.exports = {
       if (!universe) return;
       res.redirect(`${universeLink(req, universe.shortname)}`);
     }
-    
   },
 
   async createUniverseThread(req, res) {
@@ -172,6 +171,21 @@ module.exports = {
     if (code === 201) return res.redirect(`${ADDR_PREFIX}/stories/${req.body.shortname}`);
     const [_, universes] = await api.universe.getMany(req.session.user, null, perms.WRITE);
     res.prepareRender('createStory', { universes: universes ?? [], error: data, ...req.body });
+  },
+
+  async editChapter(req, res) {
+    req.body = {
+      ...req.body,
+      is_published: req.body.is_published === 'on',
+    }
+    const [code, errorOrIndex] = await api.story.putChapter(req.session.user, req.params.shortname, req.params.index, req.body);
+    res.status(code);
+    if (code !== 200) {
+      await pages.story.editChapter(req, res, errorOrIndex, req.body);
+      return;
+    } else {
+      res.redirect(`${ADDR_PREFIX}/stories/${req.params.shortname}/${errorOrIndex}`);
+    }
   },
 
   async commentOnChapter(req, res) {

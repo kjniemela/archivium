@@ -45,15 +45,15 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
         ), '$.null__') AS chapter_titles,
         JSON_REMOVE(JSON_OBJECTAGG(
           IFNULL(sc.chapter_number, 'null__'),
-          sc.is_draft
-        ), '$.null__') AS chapter_draft_status,
+          sc.is_published
+        ), '$.null__') AS chapter_published_status,
         JSON_REMOVE(JSON_OBJECTAGG(
           IFNULL(sc.chapter_number, 'null__'),
           sc.created_at
         ), '$.null__') AS chapter_publish_dates,
         universe.title AS universe,
         universe.shortname AS universe_short,
-        MAX(sc.is_draft) AS is_draft
+        MIN(sc.is_published) AS is_published
       FROM story
       LEFT JOIN storychapter AS sc ON sc.story_id = story.id
       INNER JOIN user AS author ON author.id = story.author_id
@@ -64,7 +64,7 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
         AND au_filter.user_id = ?
         AND au_filter.permission_level >= ?
       ` : ''}
-      WHERE (NOT is_draft ${user ? `OR story.author_id = ? OR (story.drafts_public AND au_filter.universe_id IS NOT NULL)` : ''})
+      WHERE (is_published ${user ? `OR story.author_id = ? OR (story.drafts_public AND au_filter.universe_id IS NOT NULL)` : ''})
       ${conditionString}
       GROUP BY story.id
       ORDER BY ${options.sort ? `${options.sort} ${options.sortDesc ? 'DESC' : 'ASC'}` : 'updated_at DESC'}
@@ -135,15 +135,57 @@ async function postChapter(user, shortname, payload) {
   }
 }
 
+/**
+ * This assumes we have write access to the provided story!
+ */
+async function reorderChapters(story, orderedIndexes) {
+  const newIndexes = {};
+  const ids = (await executeQuery(`
+    SELECT
+      JSON_REMOVE(JSON_OBJECTAGG(
+        IFNULL(chapter_number, 'null__'),
+        id
+      ), '$.null__') AS ids
+    FROM storychapter
+    WHERE story_id = ?
+    GROUP BY story_id
+  `, [story.id]))[0].ids;
+
+  await withTransaction(async (conn) => {
+    await conn.execute('UPDATE storychapter SET chapter_number = 0 WHERE story_id = ?', [story.id]);
+    for (let i = 0; i < orderedIndexes.length; i++) {
+      const oldIndex = orderedIndexes[i];
+      await conn.execute('UPDATE storychapter SET chapter_number = ? WHERE id = ?', [i+1, ids[oldIndex]]);
+      newIndexes[ids[oldIndex]] = i + 1;
+    }
+  });
+
+  return newIndexes;
+}
+
 async function putChapter(user, shortname, index, payload) {
   if (!user) return [401];
-  const { title, summary, body, is_draft } = payload;
+  const { title, summary, body, is_published } = payload;
 
   const [code, chapter] = await getChapter(user, shortname, index, perms.WRITE);
   if (!chapter) return [code];
 
   let publishDate = null;
-  if (!is_draft && chapter.is_draft) publishDate = new Date();
+  if (is_published && !chapter.is_published) {
+    publishDate = new Date();
+
+    // We need to make sure published chapters are grouped together
+    const [code, story] = await getOne(user, { 'story.shortname': shortname }, perms.WRITE);
+    if (!story) return [code];
+    
+    const published = story.chapter_published_status;
+    delete published[index];
+    const publishedIndexes = Object.keys(published).filter(ch => published[ch]);
+    const draftIndexes = Object.keys(published).filter(ch => !published[ch]);
+    const indexes = [...publishedIndexes, index, ...draftIndexes];
+    const newIndexes = await reorderChapters(story, indexes);
+    index = newIndexes[chapter.id];
+  }
 
   try {
     const data = await executeQuery(`
@@ -152,11 +194,11 @@ async function putChapter(user, shortname, index, payload) {
         title = ?,
         summary = ?,
         body = ?,
-        is_draft = ?,
+        is_published = ?,
         created_at = ?
       WHERE id = ?
-    `, [title ?? chapter.title, summary ?? chapter.summary, body ?? chapter.body, is_draft ?? chapter.is_draft, publishDate ?? chapter.created_at, chapter.id]);
-    return [201, data];
+    `, [title ?? chapter.title, summary ?? chapter.summary, body ?? chapter.body, is_published ?? chapter.is_published, publishDate ?? chapter.created_at, chapter.id]);
+    return [200, index];
   } catch (err) {
     logger.error(err);
     return [500];

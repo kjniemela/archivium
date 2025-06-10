@@ -261,7 +261,7 @@ async function postCommentToChapter(user, shortname, index, { body, reply_to }) 
   if (!story) return [code1];
   const [code2, chapter] = await api.story.getChapter(user, shortname, index);
   if (!chapter) return [code2];
-  if (chapter.is_draft) return [403];
+  if (!chapter.is_published) return [403];
   if (!body) return [400];
 
   try {
