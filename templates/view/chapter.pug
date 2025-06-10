@@ -48,7 +48,12 @@ block content
   .sheet
     #markdown-body
 
-  //- include ../components/comments.pug
+  -
+    const canComment = contextUser && !chapter.is_draft;
+    const canDelete = contextUser && contextUser.id === story.author_id;
+    const apiRoute = `/api/stories/${story.shortname}/${chapter.chapter_number}/comments`;
+    const universeShortname = story.universe_short;
+  include ../components/comments.pug
 
   script.
     (function() {
