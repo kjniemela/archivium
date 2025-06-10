@@ -2,12 +2,14 @@ extends ../layout.pug
 include ../mixins.pug
 
 block title
-  title #{T('Stories')} — #{T('Archivium')}
+  title #{story.title} — #{T('Archivium')}
 
 block breadcrumbs
   a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
   |  / 
-  span #{T('Stories')}
+  a.link.link-animated(href=`${ADDR_PREFIX}/stories`) #{T('Stories')}
+  |  / 
+  span #{story.title}
 
 block content
   script
@@ -33,8 +35,8 @@ block content
           a.link.link-animated(href=`${ADDR_PREFIX}/stories/${story.shortname}/delete`) #{T('Delete')}
 
   hr
-  .card-list.mb-3
-    if contextUser
+  if contextUser && contextUser.id === story.author_id
+    .card-list.mb-3
       .card.sheet( data-goto=`${ADDR_PREFIX}/stories/create` )
         .d-flex.justify-center( style={ 'grid-column': '1 / 4' } )
           a.link.d-flex.justify-center( href=`${ADDR_PREFIX}/stories/create` )
@@ -47,6 +49,6 @@ block content
           h3.ma-0
             a.link.link-animated(href=`${ADDR_PREFIX}/stories/${story.shortname}/${index}`) #{story.chapter_titles[index]}
           if story.chapter_draft_status[index]
-            span (Draft)
+            span (#{T('Draft')})
           .grow-1
           span #{formatDate(new Date(story.chapter_publish_dates[index]), true)}

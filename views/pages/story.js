@@ -49,4 +49,14 @@ module.exports = {
     const universe = {...fetchedUniverse, ...(body ?? {}), shortname: fetchedUniverse.shortname, newShort: body?.shortname ?? fetchedUniverse.shortname};
     res.prepareRender('editUniverse', { universe, error });
   },
+  
+  async viewChapter(req, res) {
+    const [code1, story] = await api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname });
+    res.status(code1);
+    if (!story) return;
+    const [code2, chapter] = await api.story.getChapter(req.session.user, story.shortname, req.params.index);
+    res.status(code2);
+    if (!chapter) return;
+    res.prepareRender('chapter', { story, chapter, comments: [] });
+  },
 };

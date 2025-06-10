@@ -120,6 +120,7 @@ module.exports = function(app) {
   get('/stories/create', sites.ALL, Auth.verifySessionOrRedirect, pages.story.create);
   post('/stories/create', sites.ALL, Auth.verifySessionOrRedirect, forms.createStory);
   get('/stories/:shortname', sites.ALL, pages.story.view);
+  get('/stories/:shortname/:index', sites.ALL, pages.story.viewChapter);
 
   /* Universe Pages */
   get('/universes', sites.NORMAL, pages.universe.list);

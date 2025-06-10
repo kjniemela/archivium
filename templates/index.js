@@ -79,6 +79,7 @@ const templates = {
   story: compile('templates/view/story.pug'),
   storyList: compile('templates/list/stories.pug'),
   createStory: compile('templates/create/story.pug'),
+  chapter: compile('templates/view/chapter.pug'),
 
   item: compile('templates/view/item.pug'),
   editItem: compile('templates/edit/item.pug'),
