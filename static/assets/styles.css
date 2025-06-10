@@ -1025,6 +1025,10 @@ input:checked + .slider:before {
   margin: 0.5rem;
 }
 
+.mx-auto {
+  margin-right: auto;
+  margin-left: auto;
+}
 
 .my-1 {
   margin-top: 0.25rem;
@@ -1065,6 +1069,12 @@ input:checked + .slider:before {
 }
 .mb-2 {
   margin-bottom: 0.5rem;
+}
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+.mb-4 {
+  margin-bottom: 1rem;
 }
 
 .mt-0 {

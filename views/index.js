@@ -119,6 +119,7 @@ module.exports = function(app) {
   get('/stories', sites.ALL, pages.story.list);
   get('/stories/create', sites.ALL, Auth.verifySessionOrRedirect, pages.story.create);
   post('/stories/create', sites.ALL, Auth.verifySessionOrRedirect, forms.createStory);
+  get('/stories/:shortname', sites.ALL, pages.story.view);
 
   /* Universe Pages */
   get('/universes', sites.NORMAL, pages.universe.list);

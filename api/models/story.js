@@ -37,10 +37,20 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
       SELECT
         story.*,
         author.username AS author,
+        COUNT(sc.id) AS chapter_count,
+        JSON_REMOVE(JSON_ARRAYAGG(IFNULL(sc.chapter_number, 'null__')), '$.null__') AS chapters,
         JSON_REMOVE(JSON_OBJECTAGG(
           IFNULL(sc.chapter_number, 'null__'),
           sc.title
-        ), '$.null__') AS chapters,
+        ), '$.null__') AS chapter_titles,
+        JSON_REMOVE(JSON_OBJECTAGG(
+          IFNULL(sc.chapter_number, 'null__'),
+          sc.is_draft
+        ), '$.null__') AS chapter_draft_status,
+        JSON_REMOVE(JSON_OBJECTAGG(
+          IFNULL(sc.chapter_number, 'null__'),
+          sc.created_at
+        ), '$.null__') AS chapter_publish_dates,
         universe.title AS universe,
         universe.shortname AS universe_short,
         MAX(sc.is_draft) AS is_draft
@@ -54,7 +64,7 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
         AND au_filter.user_id = ?
         AND au_filter.permission_level >= ?
       ` : ''}
-      WHERE (is_draft ${user ? `OR story.author_id = ? OR (story.drafts_public AND au_filter.universe_id IS NOT NULL)` : ''})
+      WHERE (NOT is_draft ${user ? `OR story.author_id = ? OR (story.drafts_public AND au_filter.universe_id IS NOT NULL)` : ''})
       ${conditionString}
       GROUP BY story.id
       ORDER BY ${options.sort ? `${options.sort} ${options.sortDesc ? 'DESC' : 'ASC'}` : 'updated_at DESC'}
@@ -66,9 +76,24 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
   }
 }
 
-async function post(user, body) {
+async function getChapter(user, shortname, index, permissionsRequired=perms.READ) {
+  const [code, story] = await getOne(user, { 'story.shortname': shortname }, permissionsRequired);
+  if (!story) return [code];
+
+  try {
+    const chapters = await executeQuery('SELECT * FROM storychapter WHERE story_id = ? AND chapter_number = ?', [story.id, index]);
+    const chapter = chapters[0];
+    if (!chapter) return [404];
+    return [200, chapter];
+  } catch (err) {
+    logger.error(err);
+    return [500];
+  }
+}
+
+async function post(user, payload) {
   if (!user) return [401];
-  const { title, shortname, summary, public, universe: universeShort } = body;
+  const { title, shortname, summary, public, universe: universeShort } = payload;
   if (!title) return [400, 'Title is required.'];
   if (!shortname) return [400, 'Shortname is required.'];
   if (!universeShort) return [400, 'Universe is required.'];
@@ -90,10 +115,60 @@ async function post(user, body) {
   }
 }
 
+async function postChapter(user, shortname, payload) {
+  if (!user) return [401];
+  const { title, summary } = payload;
+  if (!title) return [400, 'Title is required.'];
+
+  const [code, story] = await getOne(user, { 'story.shortname': shortname }, perms.WRITE);
+  if (!story) return [code];
+
+  try {
+    const data = await executeQuery(`
+      INSERT INTO storychapter (title, summary, chapter_number, body, story_id)
+      VALUES (?, ?, ?, ?, ?)
+    `, [title, summary ?? null, story.chapter_count + 1, '', story.id]);
+    return [201, data, story.chapter_count + 1];
+  } catch (err) {
+    logger.error(err);
+    return [500];
+  }
+}
+
+async function putChapter(user, shortname, index, payload) {
+  if (!user) return [401];
+  const { title, summary, body, is_draft } = payload;
+
+  const [code, chapter] = await getChapter(user, shortname, index, perms.WRITE);
+  if (!chapter) return [code];
+
+  let publishDate = null;
+  if (!is_draft && chapter.is_draft) publishDate = new Date();
+
+  try {
+    const data = await executeQuery(`
+      UPDATE storychapter
+      SET
+        title = ?,
+        summary = ?,
+        body = ?,
+        is_draft = ?,
+        created_at = ?
+      WHERE id = ?
+    `, [title ?? chapter.title, summary ?? chapter.summary, body ?? chapter.body, is_draft ?? chapter.is_draft, publishDate ?? chapter.created_at, chapter.id]);
+    return [201, data];
+  } catch (err) {
+    logger.error(err);
+    return [500];
+  }
+}
+
 module.exports = {
   setApi,
-  visibilityModes,
   getOne,
   getMany,
+  getChapter,
   post,
+  postChapter,
+  putChapter,
 };

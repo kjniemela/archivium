@@ -1,0 +1,52 @@
+extends ../layout.pug
+include ../mixins.pug
+
+block title
+  title #{T('Stories')} — #{T('Archivium')}
+
+block breadcrumbs
+  a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+  |  / 
+  span #{T('Stories')}
+
+block content
+  script
+    include /static/scripts/cardUtils.js
+    include /static/scripts/listUtils.js
+  
+  h1.center #{story.title}
+  .center.mx-auto(style={ 'max-width': '520px' })
+    small #{story.summary}
+  p#info-bar.center
+    small Created by 
+      if story.author
+        a.link.link-animated( href=`${ADDR_PREFIX}/users/${story.author}` ) #{story.author}
+      else
+        | Deleted User
+      |  #{formatDate(new Date(story.created_at))}
+      |  - Last updated #{formatDate(new Date(story.updated_at))}
+      if contextUser
+        if story.author_id === contextUser.id
+          |  - 
+          a.link.link-animated(href=`${ADDR_PREFIX}/stories/${story.shortname}/edit`) #{T('Edit')}
+          |  - 
+          a.link.link-animated(href=`${ADDR_PREFIX}/stories/${story.shortname}/delete`) #{T('Delete')}
+
+  hr
+  .card-list.mb-3
+    if contextUser
+      .card.sheet( data-goto=`${ADDR_PREFIX}/stories/create` )
+        .d-flex.justify-center( style={ 'grid-column': '1 / 4' } )
+          a.link.d-flex.justify-center( href=`${ADDR_PREFIX}/stories/create` )
+            .navbarText.material-symbols-outlined.heavy.ma-0.pa-1.pr-0.grow-0( style={ 'font-size': '1.5rem' } onclick="showModal('new-tab-modal')" ) add
+            .big-text.navbarText.pa-1.grow-0 #{T('New Chapter')}
+  .card-list.gap-1
+    each index in story.chapters.sort((a, b) => Number(a) > Number(b) ? 1 : -1)
+      .card.sheet.gap-4.align-start.py-3(data-goto=`${ADDR_PREFIX}/stories/${story.shortname}/${index}`)
+        .d-flex.align-center.gap-1(style='grid-column: 1 / 4;')
+          h3.ma-0
+            a.link.link-animated(href=`${ADDR_PREFIX}/stories/${story.shortname}/${index}`) #{story.chapter_titles[index]}
+          if story.chapter_draft_status[index]
+            span (Draft)
+          .grow-1
+          span #{formatDate(new Date(story.chapter_publish_dates[index]), true)}

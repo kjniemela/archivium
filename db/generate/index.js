@@ -27,6 +27,19 @@ async function createUniverse(owner, title, shortname, public=true, discussion_e
   return universe;
 }
 
+async function createStory(owner, title, shortname, summary, public, universe) {
+  const [, data] = await api.story.post(owner, { title, shortname, summary, public, universe: universe.shortname });
+  const [, story] = await api.story.getOne(owner, { 'story.id': data.insertId });
+  return story;
+}
+
+async function createChapter(owner, story, title, summary, isDraft=false) {
+  const [,, index] = await api.story.postChapter(owner, story.shortname, { title, summary });
+  const [, chapter] = await api.story.getChapter(owner, story.shortname, index);
+  if (!isDraft) await api.story.putChapter(owner, story.shortname, chapter.chapter_number, { is_draft: false });
+  return chapter;
+}
+
 async function setUniversePerms(owner, universe, user, permsLvl) {
   await api.universe.putPermissions(owner, universe.shortname, user, permsLvl);
 }
@@ -60,6 +73,7 @@ async function createNote(owner, title, body, public, tags, items=[], boards=[])
   }
   return note;
 }
+
 async function main() {
   const schemaConn = await mysql.createConnection({ ...DB_CONFIG, multipleStatements: true });
   await loadSchema(schemaConn, false);
@@ -122,6 +136,26 @@ async function main() {
   await setFollowingUniverse(users.testadmin, publicUniverse);
   await setFollowingUniverse(users.testadmin, privateUniverse);
   await setFollowingUniverse(users.testadmin, chatroomUniverse);
+
+  console.log('Writing stories...');
+  const publicStory1 = await createStory(users.testwriter, 'Public Story', 'public-story-1', loremIpsum, true, publicUniverse);
+  const privateStory1 = await createStory(users.testwriter, 'Private Story', 'private-story-1', loremIpsum, true, privateUniverse);
+  const publicStory2 = await createStory(users.testwriter, 'Public Story Hidden', 'public-story-2', loremIpsum, false, publicUniverse);
+  const privateStory2 = await createStory(users.testwriter, 'Private Story Hidden', 'private-story-2', loremIpsum, false, privateUniverse);
+  const publicDraftStory1 = await createStory(users.testwriter, 'Public Draft Story', 'public-draft-story-1', loremIpsum, true, publicUniverse);
+  const privateDraftStory1 = await createStory(users.testwriter, 'Private Draft Story', 'private-draft-story-1', loremIpsum, true, privateUniverse);
+  const publicDraftStory2 = await createStory(users.testwriter, 'Public Draft Story Hidden', 'public-draft-story-2', loremIpsum, false, publicUniverse);
+  const privateDraftStory2 = await createStory(users.testwriter, 'Private Draft Story Hidden', 'private-draft-story-2', loremIpsum, false, privateUniverse);
+  for (const story of [publicStory1, privateStory1, publicStory2, privateStory2]) {
+    for (let i = 0; i < 30; i++) {
+      await createChapter(users.testwriter, story, `Chapter ${i+1}`, `This is a summary of chapter ${i+1} of ${story.title}`, i > 12);
+    }
+  }
+  for (const story of [publicDraftStory1, privateDraftStory1, publicDraftStory2, privateDraftStory2]) {
+    for (let i = 0; i < 7; i++) {
+      await createChapter(users.testwriter, story, `Chapter ${i+1}`, `This is a summary of chapter ${i+1} of ${story.title}`, true);
+    }
+  }
 
   console.log('Creating threads...');
   const privateThread = await createDiscussionThread(users.testcommenter, privateUniverse, 'Private Test Thread');

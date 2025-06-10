@@ -29,36 +29,10 @@ module.exports = {
   },
   
   async view(req, res) {
-    const [code1, universe] = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
-    res.status(code1);
-    if (code1 === 403 || code1 === 401) {
-      const [code, publicBody] = await api.universe.getPublicBodyByShortname(req.params.universeShortname);
-      if (!publicBody && code1 === 401) {
-        res.status(code);
-        req.forceLogin = true;
-        req.useExQuery = true;
-        return;
-      }
-      res.status(200);
-      const [, request] = await api.universe.getUserAccessRequest(req.session.user, req.params.universeShortname);
-      return res.prepareRender('privateUniverse', { shortname: req.params.universeShortname, hasRequested: Boolean(request), publicBody });
-    }
-    else if (!universe) return;
-    const [code2, authors] = await api.user.getByUniverseShortname(req.session.user, universe.shortname);
-    res.status(code2);
-    if (!authors) return;
-    const authorMap = {};
-    authors.forEach(author => {
-      authorMap[author.id] = {
-        ...author,
-        pfpUrl: getPfpUrl(author),
-      };
-    });
-    const [code3, threads] = await api.discussion.getThreads(req.session.user, { 'discussion.universe_id': universe.id }, false, true);
-    if (!threads) return res.status(code3);
-    const [code4, counts] = await api.item.getCountsByUniverse(req.session.user, universe, false);
-    if (!counts) return res.status(code4);
-    res.prepareRender('universe', { universe, authors: authorMap, threads, counts });
+    const [code, story] = await api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname });
+    res.status(code);
+    if (!story) return;
+    res.prepareRender('story', { story });
   },
 
   async delete(req, res) {

@@ -17,10 +17,11 @@ CREATE TABLE story (
 CREATE TABLE storychapter (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(128) NOT NULL,
-  description VARCHAR(2048),
+  summary VARCHAR(2048),
   chapter_number INT NOT NULL,
   body TEXT NOT NULL,
   story_id INT NOT NULL,
+  is_draft BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
   FOREIGN KEY (story_id) REFERENCES story (id) ON DELETE CASCADE
