@@ -26,3 +26,10 @@ CREATE TABLE storychapter (
   updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
   FOREIGN KEY (story_id) REFERENCES story (id) ON DELETE CASCADE
 );
+
+CREATE TABLE storychaptercomment (
+  chapter_id INT NOT NULL,
+  comment_id INT NOT NULL,
+  FOREIGN KEY (chapter_id) REFERENCES storychapter (id) ON DELETE CASCADE,
+  FOREIGN KEY (comment_id) REFERENCES comment (id)
+);

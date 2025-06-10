@@ -57,6 +57,17 @@ module.exports = {
     const [code2, chapter] = await api.story.getChapter(req.session.user, story.shortname, req.params.index);
     res.status(code2);
     if (!chapter) return;
-    res.prepareRender('chapter', { story, chapter, comments: [] });
+    const [code3, comments, commentUsers] = await api.discussion.getCommentsByChapter(chapter.id, true);
+    if (!comments || !commentUsers) return res.status(code3);
+    const commenters = {};
+    for (const user of commentUsers) {
+      user.pfpUrl = getPfpUrl(user);
+      delete user.email;
+      commenters[user.id] = user;
+    }
+    res.prepareRender('chapter', {
+      story, chapter, comments, commenters,
+      commentAction: `${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}/comment`,
+    });
   },
 };

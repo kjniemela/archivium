@@ -74,7 +74,7 @@ module.exports = {
   async commentOnThread(req, res) {
     const [code, _] = await api.discussion.postCommentToThread(req.session.user, req.params.threadId, req.body);
     res.status(code);
-    return res.redirect(`${universeLink(req, req.params.universeShortname)}/discuss/${req.params.threadId}`);
+    return res.redirect(`${universeLink(req, req.params.universeShortname)}/discuss/${req.params.threadId}#post-comment`);
   },
  
   async createItem(req, res) {
@@ -106,7 +106,7 @@ module.exports = {
   async commentOnItem(req, res) {
     const [code, _] = await api.discussion.postCommentToItem(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);
     res.status(code);
-    res.redirect(`${universeLink(req, req.params.universeShortname)}/items/${req.params.itemShortname}?tab=comments`);
+    res.redirect(`${universeLink(req, req.params.universeShortname)}/items/${req.params.itemShortname}?tab=comments#post-comment`);
   },
 
   async editUniversePerms(req, res) {
@@ -172,6 +172,12 @@ module.exports = {
     if (code === 201) return res.redirect(`${ADDR_PREFIX}/stories/${req.body.shortname}`);
     const [_, universes] = await api.universe.getMany(req.session.user, null, perms.WRITE);
     res.prepareRender('createStory', { universes: universes ?? [], error: data, ...req.body });
+  },
+
+  async commentOnChapter(req, res) {
+    const [code, _] = await api.discussion.postCommentToChapter(req.session.user, req.params.shortname, req.params.index, req.body);
+    res.status(code);
+    res.redirect(`${ADDR_PREFIX}/stories/${req.params.shortname}/${req.params.index}#post-comment`);
   },
 
   async passwordResetRequest(req, res) {

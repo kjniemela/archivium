@@ -48,6 +48,10 @@ block content
   .sheet
     #markdown-body
 
+  br
+  hr
+  br
+
   -
     const canComment = contextUser && !chapter.is_draft;
     const canDelete = contextUser && contextUser.id === story.author_id;

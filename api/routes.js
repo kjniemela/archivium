@@ -212,7 +212,7 @@ module.exports = function(app, upload) {
             new APIRoute('/comments', {
               GET: async (req) => {
                 const [_, item] = await api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortName, req.params.itemShortName);
-                return await api.discussion.getCommentsByItem(req.session.user, item.id);
+                return await api.discussion.getCommentsByItem(item.id);
               },
             }, [
               new APIRoute('/:commentId', {

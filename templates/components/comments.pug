@@ -25,11 +25,12 @@ div
           span.link.disabled #{T('Deleted comment')}
 
   br
-  hr
-  br
+  if comments.length > 0
+    hr
+    br
 
   if contextUser && canComment
-    form(method='POST' action=commentAction)
+    form#post-comment(method='POST' action=commentAction)
       .editor(data-replicated-value='')
         textarea.comment-field(id='body' name='body' oninput="t")
         span.chars 2000

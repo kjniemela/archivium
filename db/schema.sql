@@ -188,6 +188,13 @@ CREATE TABLE storychapter (
   FOREIGN KEY (story_id) REFERENCES story (id) ON DELETE CASCADE
 );
 
+CREATE TABLE storychaptercomment (
+  chapter_id INT NOT NULL,
+  comment_id INT NOT NULL,
+  FOREIGN KEY (chapter_id) REFERENCES storychapter (id) ON DELETE CASCADE,
+  FOREIGN KEY (comment_id) REFERENCES comment (id)
+);
+
 CREATE TABLE item (
   id INT NOT NULL AUTO_INCREMENT,
   title VARCHAR(64) NOT NULL,
