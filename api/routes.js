@@ -122,6 +122,7 @@ module.exports = function(app, upload) {
     }, [
       new APIRoute('/:shortname', {
         GET: (req) => api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }),
+        PUT: (req) => api.story.put(req.session.user, req.params.shortname, req.body),
         DELETE: (req) => api.story.del(req.session.user, req.params.shortname),
       }, [
         new APIRoute('/:index', {

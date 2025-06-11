@@ -166,22 +166,27 @@ async function reorderChapters(story, orderedIndexes) {
 
 async function put(user, storyShortname, payload) {
   if (!user) return [401];
-  const { title, shortname, summary, drafts_public } = payload;
+  const { title, shortname, summary, drafts_public, order } = payload;
 
   const [code, story] = await getOne(user, { 'story.shortname': storyShortname }, perms.WRITE);
   if (!story) return [code];
 
   try {
-    await executeQuery(`
-      UPDATE story
-      SET
-        title = ?,
-        shortname = ?,
-        summary = ?,
-        drafts_public = ?,
-        updated_at = ?
-      WHERE id = ?
-    `, [title ?? story.title, shortname ?? story.shortname, summary ?? story.summary, drafts_public ?? story.drafts_public, new Date(), story.id]);
+    if (order) {
+      await reorderChapters(story, order);
+    }
+    if (title || shortname || summary || drafts_public) {
+      await executeQuery(`
+        UPDATE story
+        SET
+          title = ?,
+          shortname = ?,
+          summary = ?,
+          drafts_public = ?,
+          updated_at = ?
+        WHERE id = ?
+      `, [title ?? story.title, shortname ?? story.shortname, summary ?? story.summary, drafts_public ?? story.drafts_public, new Date(), story.id]);
+    }
     return [200, shortname ?? story.shortname];
   } catch (err) {
     logger.error(err);

@@ -48,7 +48,7 @@ block content
         span(style={ color: 'red', 'font-size': 'small' }) #{T(error)}
 
     h2.mb-0 Story Summary
-    .editor(data-replicated-value=story.summary || '')
+    .editor.mt-0(data-replicated-value=story.summary || '')
       textarea.comment-field(id='summary' name='summary' oninput="t")
         | #{story.summary || ''}
       span.chars 2000
