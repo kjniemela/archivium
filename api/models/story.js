@@ -268,6 +268,9 @@ async function delChapter(user, shortname, index) {
       `, [chapter.id]);
       await conn.execute(`DELETE FROM storychapter WHERE id = ?;`, [chapter.id]);
     });
+    const [code, story] = await getOne(user, { 'story.shortname': shortname }, perms.OWNER);
+    if (!story) throw new Error(`Fatal errror: story.getOne returned code ${code} after chapter deletion!`);
+    await reorderChapters(story, story.chapters);
     return [200];
   } catch (err) {
     logger.error(err);

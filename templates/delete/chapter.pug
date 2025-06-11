@@ -5,7 +5,7 @@ block content
     async function deleteChapter() {
       const response = await fetch(`/api/stories/#{chapter.storyShort}/#{chapter.chapter_number}`, { method: 'DELETE' })
       if (response.ok) {
-        window.location.reload();
+        window.location.href = `#{ADDR_PREFIX}/stories/#{chapter.storyShort}`;
       } else {
         const errSpan = document.getElementById('error');
         errSpan.innerText = await response.json();
