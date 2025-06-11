@@ -37,9 +37,9 @@ block content
   hr
   if contextUser && contextUser.id === story.author_id
     .card-list.mb-3
-      .card.sheet( data-goto=`${ADDR_PREFIX}/stories/create` )
+      .card.sheet( data-goto=`${ADDR_PREFIX}/stories/${story.shortname}/create` )
         .d-flex.justify-center( style={ 'grid-column': '1 / 4' } )
-          a.link.d-flex.justify-center( href=`${ADDR_PREFIX}/stories/create` )
+          a.link.d-flex.justify-center( href=`${ADDR_PREFIX}/stories/${story.shortname}/create` )
             .navbarText.material-symbols-outlined.heavy.ma-0.pa-1.pr-0.grow-0( style={ 'font-size': '1.5rem' } onclick="showModal('new-tab-modal')" ) add
             .big-text.navbarText.pa-1.grow-0 #{T('New Chapter')}
   .card-list.gap-1

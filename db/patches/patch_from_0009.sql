@@ -21,7 +21,7 @@ CREATE TABLE storychapter (
   chapter_number INT NOT NULL,
   body TEXT NOT NULL,
   story_id INT NOT NULL,
-  is_published BOOLEAN NOT NULL DEFAULT TRUE,
+  is_published BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
   FOREIGN KEY (story_id) REFERENCES story (id) ON DELETE CASCADE

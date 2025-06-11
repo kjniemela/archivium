@@ -3,6 +3,7 @@ const api = require('../../api');
 const { universeLink } = require('../../templates');
 const { perms, getPfpUrl } = require('../../api/utils');
 const logger = require('../../logger');
+const { T } = require('../../locale');
 
 module.exports = {
   async list(req, res) {
@@ -50,23 +51,16 @@ module.exports = {
     res.prepareRender('editStory', { story, error });
   },
 
-  async deleteChapter(req, res) {
-    const [code, chapter] = await api.story.getChapter(req.session.user, req.params.shortname, req.params.index, perms.OWNER);
+  async createChapter(req, res) {
+    const [code, story] = await api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname });
     res.status(code);
-    if (!chapter) return res.redirect(`${ADDR_PREFIX}/stories/${req.params.shortname}`);
-    chapter.storyShort = req.params.shortname;
-    res.prepareRender('deleteChapter', { chapter });
-  },
-
-  async editChapter(req, res, error, body) {
-    const [code1, story] = await api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }, perms.WRITE);
-    res.status(code1);
     if (!story) return;
-    const [code2, fetchedChapter] = await api.story.getChapter(req.session.user, req.params.shortname, req.params.index, perms.WRITE);
+
+    const title = `${T('Untitled Chapter')} ${story.chapter_count + 1}`;
+    const [code2, data, index] = await api.story.postChapter(req.session.user, story.shortname, { title });
     res.status(code2);
-    if (!fetchedChapter) return;
-    const chapter = { ...fetchedChapter, ...(body ?? {}) };
-    res.prepareRender('editChapter', { story, chapter, error });
+    if (!data) return;
+    return res.redirect(`${ADDR_PREFIX}/stories/${story.shortname}/${index}/edit`);
   },
   
   async viewChapter(req, res) {
@@ -88,5 +82,24 @@ module.exports = {
       story, chapter, comments, commenters,
       commentAction: `${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}/comment`,
     });
+  },
+
+  async deleteChapter(req, res) {
+    const [code, chapter] = await api.story.getChapter(req.session.user, req.params.shortname, req.params.index, perms.OWNER);
+    res.status(code);
+    if (!chapter) return res.redirect(`${ADDR_PREFIX}/stories/${req.params.shortname}`);
+    chapter.storyShort = req.params.shortname;
+    res.prepareRender('deleteChapter', { chapter });
+  },
+
+  async editChapter(req, res, error, body) {
+    const [code1, story] = await api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }, perms.WRITE);
+    res.status(code1);
+    if (!story) return;
+    const [code2, fetchedChapter] = await api.story.getChapter(req.session.user, req.params.shortname, req.params.index, perms.WRITE);
+    res.status(code2);
+    if (!fetchedChapter) return;
+    const chapter = { ...fetchedChapter, ...(body ?? {}) };
+    res.prepareRender('editChapter', { story, chapter, error });
   },
 };
