@@ -85,7 +85,7 @@ async function main() {
     Varius curabitur amet vel donec sed nullam. Vestibulum eget facilisi conubia montes scelerisque curae augue odio.
     Facilisi elit velit erat nunc sem eu finibus finibus. Rutrum nec aliquet est montes laoreet fusce egestas.
     Habitasse velit nec aenean aliquam mi dictum. Donec faucibus aliquam duis viverra amet lacus sit penatibus.
-  `;
+  `.split('\n').map(line => line.trim()).join(' ').trim();
 
   const loremIpsumLong = `
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis neque risus, eget interdum diam sagittis et. Etiam a gravida ex. Phasellus mattis metus quis augue feugiat iaculis. Nullam interdum laoreet odio, vel tempus neque. Praesent quis semper sapien, et eleifend odio. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas metus ex, iaculis at congue ut, placerat sed sem. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec euismod laoreet est in aliquet. Phasellus sit amet nulla nisi. Maecenas in venenatis elit. Sed sed feugiat risus.
@@ -97,7 +97,7 @@ async function main() {
     Morbi ultricies rutrum facilisis. Duis et lacinia est. Phasellus ultricies eros ut nulla aliquet, scelerisque laoreet magna condimentum. Pellentesque ornare augue a ultricies cursus. Pellentesque fringilla, tortor eget mattis posuere, metus eros iaculis ligula, eu malesuada erat lectus id turpis. Integer volutpat maximus ornare. Nullam at mauris arcu. Nulla consequat magna accumsan nibh convallis porta. Cras vel neque eu nisi congue rutrum nec ac turpis. Quisque in nulla vehicula, efficitur dolor congue, fringilla diam. Vivamus magna libero, molestie ac feugiat eu, mattis vel dui. Praesent fermentum massa eget suscipit rutrum. Proin purus dui, mattis sed libero at, ornare faucibus magna. Pellentesque magna eros, facilisis eget nisl varius, feugiat auctor libero. Proin vitae cursus metus.
 
     Nam tortor dui, pretium et metus eget, posuere ornare erat. Curabitur convallis nisl consectetur, viverra massa sit amet, pellentesque urna. Morbi quis consectetur massa. Pellentesque nec efficitur sem. Morbi vel porttitor massa. Vivamus efficitur eros ligula, sit amet faucibus risus posuere vel. Phasellus diam justo, maximus quis varius in, consequat sed tellus. Curabitur et viverra magna, ac tempor dui. Donec a lacinia lacus, sed blandit eros.
-  `.split('\n').map(line => line.trim()).join('\n');
+  `.split('\n').map(line => line.trim()).join('\n').trim();
 
   console.log('Creating users...');
   const users = {};

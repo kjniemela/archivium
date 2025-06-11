@@ -120,11 +120,13 @@ module.exports = function(app) {
   get('/stories/create', sites.ALL, Auth.verifySessionOrRedirect, pages.story.create);
   post('/stories/create', sites.ALL, Auth.verifySessionOrRedirect, forms.createStory);
   get('/stories/:shortname', sites.ALL, pages.story.view);
+  get('/stories/:shortname/edit', sites.ALL, Auth.verifySessionOrRedirect, pages.story.edit);
+  get('/stories/:shortname/delete', sites.ALL, Auth.verifySessionOrRedirect, pages.story.delete);
+  post('/stories/:shortname/edit', sites.ALL, Auth.verifySessionOrRedirect, forms.editStory);
   get('/stories/:shortname/:index', sites.ALL, pages.story.viewChapter);
   get('/stories/:shortname/:index/edit', sites.ALL, Auth.verifySessionOrRedirect, pages.story.editChapter);
   get('/stories/:shortname/:index/delete', sites.ALL, Auth.verifySessionOrRedirect, pages.story.deleteChapter);
   post('/stories/:shortname/:index/edit', sites.ALL, Auth.verifySessionOrRedirect, forms.editChapter);
-  post('/stories/:shortname/:index/delete', sites.ALL, Auth.verifySessionOrRedirect, forms.commentOnChapter);
   post('/stories/:shortname/:index/comment', sites.ALL, Auth.verifySessionOrRedirect, forms.commentOnChapter);
 
   /* Universe Pages */

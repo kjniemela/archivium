@@ -77,6 +77,7 @@ const templates = {
   createUniverseThread: compile('templates/create/universeThread.pug'),
 
   story: compile('templates/view/story.pug'),
+  editStory: compile('templates/edit/story.pug'),
   storyList: compile('templates/list/stories.pug'),
   createStory: compile('templates/create/story.pug'),
   chapter: compile('templates/view/chapter.pug'),

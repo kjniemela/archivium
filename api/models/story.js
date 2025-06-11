@@ -16,6 +16,7 @@ async function getOne(user, conditions, permissionsRequired=perms.READ, options=
 
 async function getMany(user, conditions, permissionsRequired=perms.READ, options={}) {
   if (permissionsRequired >= perms.WRITE) {
+    if (!user) return [401];
     conditions = {
       ...(conditions ?? {}),
       'story.author_id': user.id,
@@ -163,6 +164,31 @@ async function reorderChapters(story, orderedIndexes) {
   return newIndexes;
 }
 
+async function put(user, storyShortname, payload) {
+  if (!user) return [401];
+  const { title, shortname, summary, drafts_public } = payload;
+
+  const [code, story] = await getOne(user, { 'story.shortname': storyShortname }, perms.WRITE);
+  if (!story) return [code];
+
+  try {
+    await executeQuery(`
+      UPDATE story
+      SET
+        title = ?,
+        shortname = ?,
+        summary = ?,
+        drafts_public = ?,
+        updated_at = ?
+      WHERE id = ?
+    `, [title ?? story.title, shortname ?? story.shortname, summary ?? story.summary, drafts_public ?? story.drafts_public, new Date(), story.id]);
+    return [200, shortname ?? story.shortname];
+  } catch (err) {
+    logger.error(err);
+    return [500];
+  }
+}
+
 async function putChapter(user, shortname, index, payload) {
   if (!user) return [401];
   const { title, summary, body, is_published } = payload;
@@ -188,16 +214,17 @@ async function putChapter(user, shortname, index, payload) {
   }
 
   try {
-    const data = await executeQuery(`
+    await executeQuery(`
       UPDATE storychapter
       SET
         title = ?,
         summary = ?,
         body = ?,
         is_published = ?,
-        created_at = ?
+        created_at = ?,
+        updated_at = ?
       WHERE id = ?
-    `, [title ?? chapter.title, summary ?? chapter.summary, body ?? chapter.body, is_published ?? chapter.is_published, publishDate ?? chapter.created_at, chapter.id]);
+    `, [title ?? chapter.title, summary ?? chapter.summary, body ?? chapter.body, is_published ?? chapter.is_published, publishDate ?? chapter.created_at, new Date(), chapter.id]);
     return [200, index];
   } catch (err) {
     logger.error(err);
@@ -255,6 +282,7 @@ module.exports = {
   getChapter,
   post,
   postChapter,
+  put,
   putChapter,
   del,
   delChapter,

@@ -43,11 +43,11 @@ module.exports = {
   },
 
   async edit(req, res, error, body) {
-    const [code, fetchedUniverse] = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.WRITE);
+    const [code, fetchedStory] = await api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }, perms.WRITE);
     res.status(code);
-    if (!fetchedUniverse) return;
-    const universe = {...fetchedUniverse, ...(body ?? {}), shortname: fetchedUniverse.shortname, newShort: body?.shortname ?? fetchedUniverse.shortname};
-    res.prepareRender('editUniverse', { universe, error });
+    if (!fetchedStory) return;
+    const story = {...fetchedStory, ...(body ?? {}), shortname: fetchedStory.shortname, newShort: body?.shortname ?? fetchedStory.shortname};
+    res.prepareRender('editStory', { story, error });
   },
 
   async deleteChapter(req, res) {

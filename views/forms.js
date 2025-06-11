@@ -173,6 +173,21 @@ module.exports = {
     res.prepareRender('createStory', { universes: universes ?? [], error: data, ...req.body });
   },
 
+  async editStory(req, res) {
+    req.body = {
+      ...req.body,
+      drafts_public: req.body.drafts_public === 'on',
+    }
+    const [code, errorOrShortname] = await api.story.put(req.session.user, req.params.shortname, req.body);
+    res.status(code);
+    if (code !== 200) {
+      await pages.story.edit(req, res, errorOrShortname, req.body);
+      return;
+    } else {
+      res.redirect(`${ADDR_PREFIX}/stories/${errorOrShortname}`);
+    }
+  },
+
   async editChapter(req, res) {
     req.body = {
       ...req.body,
