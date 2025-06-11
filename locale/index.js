@@ -19,7 +19,7 @@ const locale = {
     'articles': 'artiklar',
     'character': 'karaktär',
     'characters': 'karaktärer',
-    'location:' 'område',
+    'location:': 'område',
     'locations': 'områden',
     'event': 'händelse',
     'events': 'händelser',
