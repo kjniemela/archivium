@@ -85,6 +85,7 @@ const locale = {
     'You can only change your username once every 30 days, so choose carefully!': 'Du kan bara ändra ditt namn var 30:e dag!',
     'Old password': 'Nuvarande lösenord',
     'New password': 'Nytt lösenord',
+    'Password': 'Lösenord',
     'Confirm new password': 'Bekräfta nytt lösenord',
     'Change Password': 'Ändra Lösenord',
     'Request Account Deletion': 'Begär att Radera Konto',
