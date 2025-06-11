@@ -1,0 +1,29 @@
+extends ../layout.pug
+
+block content
+  script.
+    async function deleteChapter() {
+      const response = await fetch(`/api/stories/#{chapter.storyShort}/#{chapter.chapter_number}`, { method: 'DELETE' })
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        const errSpan = document.getElementById('error');
+        errSpan.innerText = await response.json();
+      }
+    }
+
+  h2 #{T('Delete %s', chapter.title)}
+  .d-flex.flex-col
+
+    .big-text
+      p #{T('Are you sure you want to delete %s? This action is ', chapter.title)}
+        b #{T('permanent')}
+        |  #{T('and')} 
+        b.color-error #{T(' cannot be undone!')}
+    
+    .d-flex.align-center.gap-2
+      button.color-error(onclick='deleteChapter()') #{T('Delete Chapter')}
+      a.link.link-animated(href=`${ADDR_PREFIX}/stories/${chapter.storyShort}/${chapter.chapter_number}`) #{T('Go Back')}
+
+    div
+      span#error(style={ color: 'red', 'font-size': 'small' })

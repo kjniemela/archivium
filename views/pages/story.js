@@ -51,10 +51,11 @@ module.exports = {
   },
 
   async deleteChapter(req, res) {
-    const [code, universe] = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.OWNER);
+    const [code, chapter] = await api.story.getChapter(req.session.user, req.params.shortname, req.params.index, perms.OWNER);
     res.status(code);
-    if (!universe) return res.redirect(`${ADDR_PREFIX}/universes`);
-    res.prepareRender('deleteUniverse', { universe });
+    if (!chapter) return res.redirect(`${ADDR_PREFIX}/stories/${req.params.shortname}`);
+    chapter.storyShort = req.params.shortname;
+    res.prepareRender('deleteChapter', { chapter });
   },
 
   async editChapter(req, res, error, body) {
