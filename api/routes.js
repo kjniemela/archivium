@@ -116,6 +116,21 @@ module.exports = function(app, upload) {
       new APIRoute('/accepted', { GET: (req) => api.contact.getAll(req.session.user, false) }),
       new APIRoute('/pending', { GET: (req) => api.contact.getAll(req.session.user, true, false) }),
     ]),
+    new APIRoute('/stories', {
+      GET: (req) => api.story.getMany(req.session.user),
+      POST: (req) => api.story.post(req.session.user, req.body),
+    }, [
+      new APIRoute('/:shortname', {
+        GET: (req) => api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }),
+        DELETE: (req) => api.story.del(req.session.user, req.params.shortname),
+      }, [
+        new APIRoute('/:index', {
+          GET: (req) => api.story.getChapter(req.session.user, req.params.shortname, req.params.index),
+          PUT: (req) => api.story.putChapter(req.session.user, req.params.shortname, req.params.index, req.body),
+          DELETE: (req) => api.story.delChapter(req.session.user, req.params.shortname, req.params.index),
+        }, []),
+      ]),
+    ]),
     new APIRoute('/universes', {
       GET: (req) => api.universe.getMany(req.session.user),
       POST: (req) => api.universe.post(req.session.user, req.body),
@@ -150,8 +165,8 @@ module.exports = function(app, upload) {
           POST: (req) => api.item.post(req.session.user, req.body, req.params.universeShortName),
         }, [
           new APIRoute('/:itemShortName', {
-            GET: async (req) => api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortName, req.params.itemShortName),
-            PUT: async (req) => api.item.save(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body, true),
+            GET: (req) => api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortName, req.params.itemShortName),
+            PUT: (req) => api.item.save(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body, true),
             DELETE: (req) => api.item.del(req.session.user, req.params.universeShortName, req.params.itemShortName),
           }, [
             new APIRoute('/notes', {

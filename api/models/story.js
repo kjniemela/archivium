@@ -205,6 +205,49 @@ async function putChapter(user, shortname, index, payload) {
   }
 }
 
+async function del(user, shortname) {
+  const [code, story] = await getOne(user, { 'story.shortname': shortname }, perms.OWNER);
+  if (!story) return [code];
+  
+  try {
+    await withTransaction(async (conn) => {
+      await conn.execute(`
+        DELETE comment
+        FROM comment
+        INNER JOIN storychaptercomment AS scc ON scc.comment_id = comment.id
+        INNER JOIN chapter ON scc.chapter_id = chapter.id
+        WHERE chapter.story_id = ?;
+      `, [story.id]);
+      await conn.execute(`DELETE FROM story WHERE id = ?;`, [story.id]);
+    });
+    return [200];
+  } catch (err) {
+    logger.error(err);
+    return [500, 'Error: could not delete story.'];
+  }
+}
+
+async function delChapter(user, shortname, index) {
+  const [code, chapter] = await getChapter(user, shortname, index, perms.OWNER);
+  if (!chapter) return [code];
+  
+  try {
+    await withTransaction(async (conn) => {
+      await conn.execute(`
+        DELETE comment
+        FROM comment
+        INNER JOIN storychaptercomment AS scc ON scc.comment_id = comment.id
+        WHERE scc.chapter_id = ?;
+      `, [chapter.id]);
+      await conn.execute(`DELETE FROM storychapter WHERE id = ?;`, [chapter.id]);
+    });
+    return [200];
+  } catch (err) {
+    logger.error(err);
+    return [500, 'Error: could not delete chapter.'];
+  }
+}
+
 module.exports = {
   setApi,
   getOne,
@@ -213,4 +256,6 @@ module.exports = {
   post,
   postChapter,
   putChapter,
+  del,
+  delChapter,
 };
