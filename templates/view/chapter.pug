@@ -47,6 +47,15 @@ block content
 
   .sheet
     #markdown-body
+  .d-flex.mt-2
+    if story.chapter_titles[chapter.chapter_number - 1]
+      a.button.grow-1.d-flex.justify-center.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number - 1}`)
+        span.material-symbols-outlined(style={ 'font-size': '1rem' }) arrow_back_ios
+        |  #{T('Previous Chapter')}
+    if story.chapter_titles[chapter.chapter_number + 1]
+      a.button.grow-1.d-flex.justify-center.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number + 1}`)
+        |  #{T('Next Chapter')}
+        span.material-symbols-outlined(style={ 'font-size': '1rem' }) arrow_forward_ios
 
   br
   hr
