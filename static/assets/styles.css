@@ -666,6 +666,12 @@ h4, h5 {
   z-index: 1 !important;
 }
 
+/* Story styles */
+#chapter-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
 /* Fancy Links */
 .link {
   display: inline;
