@@ -24,6 +24,11 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
   }
 
   const parsedConditions = parseData(conditions);
+  if (options.search) {
+    if (!conditions) conditions = {};
+    parsedConditions.strings.push('story.title LIKE ?');
+    parsedConditions.values.push(`%${options.search}%`);
+  }
   const conditionString = conditions ? `AND ${parsedConditions.strings.join(' AND ')}` : '';
 
   if (options.sort && !options.forceSort) {

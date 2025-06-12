@@ -10,11 +10,12 @@ module.exports = {
     const search = req.query.search;
     const [code, stories] = await api.story.getMany(
       req.session.user,
-      search ? { strings: ['title LIKE ?'], values: [`%${search}%`] } : null,
+      null,
       perms.READ,
       {
         sort: req.query.sort,
         sortDesc: req.query.sort_order === 'desc',
+        search,
       },
     );
     res.status(code);
