@@ -131,6 +131,12 @@ block append styles
       if (!window.loadMarkdown) throw 'markdown/render.js not loaded!';
       if (!window.createSearchableSelect) throw 'searchableSelect not loaded!';
 
+      if (window.fetchPromise) {
+        await window.fetchPromise;
+      } else {
+        var [universe, item] = [null, null];
+      }
+
       let noteState = 'list';
       const leftBtn = document.querySelector('#notes-left-btn');
       const noteList = document.querySelector('#note-list');
@@ -209,7 +215,7 @@ block append styles
       editForm.note_tags.addEventListener('change', () => {
         updateTags(editForm.note_tags.value);
       });
-      const easyMDE = setupEasyMDE('#note-edit textarea', { universe: !{JSON.stringify(universe || null)}, context: { item: !{JSON.stringify(item || null)} }});
+      const easyMDE = setupEasyMDE('#note-edit textarea', { universe, context: { item }});
       easyMDE.codemirror.on('change', () => {
         updateDisplay(easyMDE.value());
         editForm.note_body.value = easyMDE.value();
@@ -358,7 +364,7 @@ block append styles
 
       async function deleteNote() {
         if (!confirm('Are you sure you want to delete this note? This cannot be undone!')) return;
-        await deleteJSON(`/api/users/#{contextUser.username}/notes/${editForm.note_uuid.value}`);
+        await deleteJSON(`/api/users/#{contextUser ? contextUser.username : ''}/notes/${editForm.note_uuid.value}`);
         window.location.reload();
       }
 

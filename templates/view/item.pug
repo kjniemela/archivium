@@ -121,9 +121,15 @@ block content
             if !item.obj_data.notes
               |  #{T('(Hidden)')}
 
-  
-  script!= `window.item = ${JSON.stringify(item)};`
-  script!= `window.universe = ${JSON.stringify(universe)};`
+
+  script.
+    window.fetchPromise = Promise.all([
+      getJSON(`/api/universes/#{universe.shortname}`).then(([, data]) => window.universe = data),
+      getJSON(`/api/universes/#{universe.shortname}/items/#{item.shortname}`).then(([, item]) => {
+        item.obj_data = JSON.parse(item.obj_data);
+        window.item = item;
+      }),
+    ]);
 
   .tabs
     if 'tabs' in item.obj_data
@@ -138,10 +144,14 @@ block content
     if 'timeline' in item.obj_data && 'title' in item.obj_data.timeline
       .itemTab.hidden(data-tab='timeline')
       script.
-        const timelineTab = document.querySelector('.itemTab[data-tab=timeline]');
-        if (timelineTab) {
-          renderTimeline(timelineTab, item, item.events);
-        };
+        (async function() {
+          await window.fetchPromise;
+
+          const timelineTab = document.querySelector('.itemTab[data-tab=timeline]');
+          if (timelineTab) {
+            renderTimeline(timelineTab, item, item.events);
+          };
+        })();
 
     if 'gallery' in item.obj_data && 'title' in item.obj_data.gallery
       .itemTab.hidden.gallery(data-tab='gallery')
@@ -193,7 +203,9 @@ block content
         #markdown-body
 
   script.
-    (function() {
+    (async function() {
+      await window.fetchPromise;
+
       const body = document.getElementById('markdown-body');
       if (body) {
         loadMarkdown(body, '#{universe.shortname}', item.obj_data.body, { item }).then(async () => {

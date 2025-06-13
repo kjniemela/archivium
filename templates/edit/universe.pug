@@ -123,145 +123,148 @@ block content
       button(type='button' onclick='resetCats()') #{T('Reset to default types')}
 
   script.
-    updateObjData(!{JSON.stringify(universe.obj_data)});
-    universe = '!{universe.shortname}';
+    (async function() {
+      await getJSON(`/api/universes/#{universe.shortname}`).then(([, universe]) => updateObjData(universe.obj_data));
+  
+      universe = '#{universe.shortname}';
+      window.homeMDE = setupEasyMDE('#home-body textarea', { universe });
+      homeMDE.codemirror.on('change', () => {
+        updateObjData({ homeBody: homeMDE.value() });
+      });
+      window.publicMDE = setupEasyMDE('#public-body textarea', { universe });
+      publicMDE.codemirror.on('change', () => {
+        updateObjData({ publicBody: publicMDE.value() });
+      });
+      const publicBodyContainer = document.querySelector('#public-body');
+      publicBodyContainer.classList.toggle('hidden', #{universe.public});
+      const visibilitySelect = document.querySelector('#visibility');
+      visibilitySelect.addEventListener('change', () => {
+        publicBodyContainer.classList.toggle('hidden', visibilitySelect.value !== 'private');
+      });
 
-  script.
-    window.homeMDE = setupEasyMDE('#home-body textarea', { universe });
-    homeMDE.codemirror.on('change', () => {
-      updateObjData({ homeBody: homeMDE.value() });
-    });
-    window.publicMDE = setupEasyMDE('#public-body textarea', { universe });
-    publicMDE.codemirror.on('change', () => {
-      updateObjData({ publicBody: publicMDE.value() });
-    });
-    const publicBodyContainer = document.querySelector('#public-body');
-    publicBodyContainer.classList.toggle('hidden', #{universe.public});
-    const visibilitySelect = document.querySelector('#visibility');
-    visibilitySelect.addEventListener('change', () => {
-      publicBodyContainer.classList.toggle('hidden', visibilitySelect.value !== 'private');
-    });
+      function toShortname(title) {
+        let shortname = title.toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
 
-  script.
-    function toShortname(title) {
-      let shortname = title.toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
+        if (shortname.length > 64) {
+            shortname = shortname.substring(0, 64);
+        }
 
-      if (shortname.length > 64) {
-          shortname = shortname.substring(0, 64);
+        return shortname;
       }
 
-      return shortname;
-    }
-
-    function toPlural(title) {
-      // This function is very hacky and only works in english (and only sometimes), but it'll be good enough for most cases for now.
-      return `${title}s`;
-    }
-
-    let catList;
-    function resetCatList() {
-      catList = [];
-      for (const catShortname in obj_data.cats) {
-        catList.push([catShortname, ...obj_data.cats[catShortname]]);
+      function toPlural(title) {
+        // This function is very hacky and only works in english (and only sometimes), but it'll be good enough for most cases for now.
+        return `${title}s`;
       }
-    }
 
-    function updateCats() {
-      const catsTable = document.getElementById('cats');
-      catsTable.innerHTML = '';
-      for (let i = 0; i < catList.length; i++) {
-        const [catShortname, catTitle, catTitlePl, catColor] = catList[i];
+      let catList;
+      function resetCatList() {
+        catList = [];
+        for (const catShortname in obj_data.cats) {
+          catList.push([catShortname, ...obj_data.cats[catShortname]]);
+        }
+      }
 
-        const titlePlInput = createElement('input', { dataset: { name: 'titlePl' }, attrs: { value: catTitlePl } });
-        titlePlInput.addEventListener('input', () => {
-          titlePlInput.value = titlePlInput.value.toLowerCase();
-          catList[i][2] = titlePlInput.value;
-        });
+      function updateCats() {
+        const catsTable = document.getElementById('cats');
+        catsTable.innerHTML = '';
+        for (let i = 0; i < catList.length; i++) {
+          const [catShortname, catTitle, catTitlePl, catColor] = catList[i];
 
-        const titleInput = createElement('input', { dataset: { name: 'title' }, attrs: { value: catTitle } });
-        titleInput.addEventListener('input', () => {
-          titleInput.value = titleInput.value.toLowerCase();
-          if (toPlural(catList[i][1]) === titlePlInput.value || !titlePlInput.value) {
-            titlePlInput.value = toPlural(titleInput.value);
+          const titlePlInput = createElement('input', { dataset: { name: 'titlePl' }, attrs: { value: catTitlePl } });
+          titlePlInput.addEventListener('input', () => {
+            titlePlInput.value = titlePlInput.value.toLowerCase();
             catList[i][2] = titlePlInput.value;
-          }
-          catList[i][1] = titleInput.value;
-        });
-        titleInput.addEventListener('change', () => {
-          if (!catList[i][0]) {
-            catList[i][0] = toShortname(titleInput.value);
-            updateCats();
-          }
-        });
+          });
 
-        const colorInput = createElement('input', {
-          dataset: { name: 'color' },
-          attrs: { id: `color${i}`, value: catColor, type: 'color', style: 'padding: 0; min-width: 3rem;' }
-        });
-        colorInput.addEventListener('input', () => catList[i][3] = colorInput.value);
-
-        const catRow = createElement('tr', { children: [
-          createElement('td', { dataset: { name: 'shortname' }, attrs: { innerText: catShortname } }),
-          createElement('td', { children: [titleInput] }),
-          createElement('td', { children: [titlePlInput] }),
-          createElement('td', { children: [createElement('div', { classList: ['d-flex'], children: [colorInput] })] }),
-          createElement('td', { children: [createElement('button', { attrs: {
-            innerText: T('Remove'),
-            onclick: (e) => {
-              e.preventDefault();
-              catList.splice(i, 1);
+          const titleInput = createElement('input', { dataset: { name: 'title' }, attrs: { value: catTitle } });
+          titleInput.addEventListener('input', () => {
+            titleInput.value = titleInput.value.toLowerCase();
+            if (toPlural(catList[i][1]) === titlePlInput.value || !titlePlInput.value) {
+              titlePlInput.value = toPlural(titleInput.value);
+              catList[i][2] = titlePlInput.value;
+            }
+            catList[i][1] = titleInput.value;
+          });
+          titleInput.addEventListener('change', () => {
+            if (!catList[i][0]) {
+              catList[i][0] = toShortname(titleInput.value);
               updateCats();
-            },
-          } })] }),
-        ] });
-        catsTable.appendChild(catRow);
+            }
+          });
+
+          const colorInput = createElement('input', {
+            dataset: { name: 'color' },
+            attrs: { id: `color${i}`, value: catColor, type: 'color', style: 'padding: 0; min-width: 3rem;' }
+          });
+          colorInput.addEventListener('input', () => catList[i][3] = colorInput.value);
+
+          const catRow = createElement('tr', { children: [
+            createElement('td', { dataset: { name: 'shortname' }, attrs: { innerText: catShortname } }),
+            createElement('td', { children: [titleInput] }),
+            createElement('td', { children: [titlePlInput] }),
+            createElement('td', { children: [createElement('div', { classList: ['d-flex'], children: [colorInput] })] }),
+            createElement('td', { children: [createElement('button', { attrs: {
+              innerText: T('Remove'),
+              onclick: (e) => {
+                e.preventDefault();
+                catList.splice(i, 1);
+                updateCats();
+              },
+            } })] }),
+          ] });
+          catsTable.appendChild(catRow);
+        }
       }
-    }
 
-    function addCat() {
-      catList.push(['', '', '', '#ffffff']);
-      updateCats();
-    }
+      function addCat() {
+        catList.push(['', '', '', '#ffffff']);
+        updateCats();
+      }
 
-    function resetCats() {
-      setDefaultCats();
+      function resetCats() {
+        setDefaultCats();
+        resetCatList();
+        updateCats();
+      }
+
+      window.addCat = addCat;
+      window.resetCats = resetCats;
+
+      if (!('cats' in obj_data)) setDefaultCats();
       resetCatList();
       updateCats();
-    }
 
-    if (!('cats' in obj_data)) setDefaultCats();
-    resetCatList();
-    updateCats();
+      document.forms.edit.addEventListener('submit', (e) => {
+        const formError = document.querySelector('#validation-error');
+        formError.classList.add('hidden');
 
-    document.forms.edit.addEventListener('submit', (e) => {
-      const formError = document.querySelector('#validation-error');
-      formError.classList.add('hidden');
+        const newCats = {};
+        for (let i = 0; i < catList.length; i++) {
+          let [catShortname, catTitle, catTitlePl, catColor] = catList[i];
 
-      const newCats = {};
-      for (let i = 0; i < catList.length; i++) {
-        let [catShortname, catTitle, catTitlePl, catColor] = catList[i];
+          if (!catTitle) {
+            // Title is missing, error
+            formError.innerText = T('Make sure the name fields for all item types are filled out, or remove unwanted ones!');
+            formError.classList.remove('hidden');
+            return e.preventDefault();
+          }
 
-        if (!catTitle) {
-          // Title is missing, error
-          formError.innerText = T('Make sure the name fields for all item types are filled out, or remove unwanted ones!');
-          formError.classList.remove('hidden');
-          return e.preventDefault();
+          if (!catShortname) {
+            // Shortname is missing, autofill it
+            catShortname = toShortname(catTitle);
+          }
+
+          if (!catTitlePl) {
+            // Title plural is missing, autofill it
+            catTitlePl = toPlural(catTitle);
+          }
+
+          newCats[catShortname] = [catTitle.trim(), catTitlePl.trim(), catColor];
         }
-
-        if (!catShortname) {
-          // Shortname is missing, autofill it
-          catShortname = toShortname(catTitle);
-        }
-
-        if (!catTitlePl) {
-          // Title plural is missing, autofill it
-          catTitlePl = toPlural(catTitle);
-        }
-
-        newCats[catShortname] = [catTitle.trim(), catTitlePl.trim(), catColor];
-      }
-      updateObjData({ cats: newCats });
-    });
+        updateObjData({ cats: newCats });
+      });
+    })();
