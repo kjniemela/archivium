@@ -133,7 +133,7 @@ module.exports = {
     }
     const itemMap = {};
     itemList.forEach(item => itemMap[item.shortname] = item.title);
-    res.prepareRender(req.query.mode === 'raw' ? 'editItemRaw' : 'editItem', { item, itemMap, universe, error });
+    res.prepareRender('editItem', { item, itemMap, universe, error });
   },
 
   async delete(req, res) {
