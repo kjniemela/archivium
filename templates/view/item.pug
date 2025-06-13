@@ -141,12 +141,10 @@ block content
     if 'timeline' in item.obj_data && 'title' in item.obj_data.timeline
       .itemTab.hidden(data-tab='timeline')
       script.
-        (function() {
-          const timelineTab = document.querySelector('.itemTab[data-tab=timeline]');
-          if (timelineTab) {
-            renderTimeline(timelineTab, item, item.events);
-          };
-        })();
+        const timelineTab = document.querySelector('.itemTab[data-tab=timeline]');
+        if (timelineTab) {
+          renderTimeline(timelineTab, item, item.events);
+        };
 
     if 'gallery' in item.obj_data && 'title' in item.obj_data.gallery
       .itemTab.hidden.gallery(data-tab='gallery')
