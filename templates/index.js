@@ -3,7 +3,6 @@ const { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN } = require('../config');
 const { perms, getPfpUrl } = require('../api/utils');
 const { locale, lang, sprintf, T } = require('../locale');
 const api = require('../api');
-const md5 = require('md5');
 const path = require('path');
 
 function universeLink(req, uniShort) {
@@ -76,6 +75,14 @@ const templates = {
 
   universeThread: compile('templates/view/universeThread.pug'),
   createUniverseThread: compile('templates/create/universeThread.pug'),
+
+  story: compile('templates/view/story.pug'),
+  editStory: compile('templates/edit/story.pug'),
+  storyList: compile('templates/list/stories.pug'),
+  createStory: compile('templates/create/story.pug'),
+  chapter: compile('templates/view/chapter.pug'),
+  editChapter: compile('templates/edit/chapter.pug'),
+  deleteChapter: compile('templates/delete/chapter.pug'),
 
   item: compile('templates/view/item.pug'),
   editItem: compile('templates/edit/item.pug'),

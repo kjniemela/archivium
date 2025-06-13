@@ -55,4 +55,12 @@ block content
           });
         })();
 
+  -
+    const canComment = contextUser && (
+      (universe.public && universe.discussion_open)
+      || (universe.author_permissions[contextUser.id] >= (universe.discussion_open ? perms.READ : perms.COMMENT))
+    );
+    const canDelete = contextUser && universe.author_permissions[contextUser.id] >= perms.ADMIN;
+    const apiRoute = `/api/universes/${universe.shortname}/discussion/${thread.id}`;
+    const universeShortname = universe.shortname;
   include ../components/comments.pug

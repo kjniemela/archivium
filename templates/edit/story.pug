@@ -1,0 +1,63 @@
+extends ../layout.pug
+
+block title
+  title #{T('Edit %s', story.title)}
+
+block append save
+  li#save-btn.navbarBtn
+    script.
+    a.navbarBtnLink.navbarText(onclick='document.forms.edit.requestSubmit()') #{T('Save Changes')}
+
+block content
+  script
+    include /static/scripts/domUtils.js
+    include /static/scripts/fetchUtils.js
+
+  h2 #{T('Edit %s', story.title)}
+  form#edit(method='POST')
+
+    .inputGroup
+      label(for='title') #{T('Title')}: 
+      input(id='title' type='text' name='title' value=story.title)
+
+    .inputGroup
+      label(for='shortname') #{T('Shortname')}: 
+      input(id='shortname' type='text' name='shortname' value=story.newShort)
+
+    .inputGroup
+      small(style={ 'grid-column': '2 / 4' })
+        i 
+          b #{T('Warning')}: 
+          | #{T('changing the shortname will kick out any users currently reading this story, ')}
+          | #{T('any authors currently editing chapters will be unable to save their work, ')}
+          | #{T('and any external bookmarks/links to the story will break.')}
+          | #{T('Make sure you know what you\'re doing!')}
+
+    .inputGroup
+      label(for='drafts_public') #{T('Show drafts to authors of %s', story.universe)}: 
+      label.switch
+        input(id='drafts_public' name='drafts_public' type='checkbox' checked=Boolean(story.drafts_public))
+        span.slider
+
+    div
+      button(type='submit') #{T('Save Changes')}
+
+    small.color-error.hidden#validation-error
+    if error
+      div
+        span(style={ color: 'red', 'font-size': 'small' }) #{T(error)}
+
+    h2.mb-0 Story Summary
+    .editor.mt-0(data-replicated-value=story.summary || '')
+      textarea.comment-field(id='summary' name='summary' oninput="t")
+        | #{story.summary || ''}
+      span.chars 2000
+
+  script.
+    document.querySelectorAll('textarea.comment-field').forEach(el => {
+      el.oninput = () => {
+        el.parentNode.dataset.replicatedValue = el.value;
+        el.parentNode.querySelector('.chars').innerText = 2000 - el.value.length;
+        el.form.post.disabled = el.value.length > 2000;
+      };
+    });

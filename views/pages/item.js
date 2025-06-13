@@ -67,7 +67,7 @@ module.exports = {
       item.gallery = item.gallery.sort((a, b) => a.id > b.id ? 1 : -1);
     }
 
-    const [code3, comments, commentUsers] = await api.discussion.getCommentsByItem(req.session.user, item.id, false, true);
+    const [code3, comments, commentUsers] = await api.discussion.getCommentsByItem(item.id, true);
     if (!comments || !commentUsers) return res.status(code3);
     const commenters = {};
     for (const user of commentUsers) {
