@@ -1,6 +1,6 @@
 function createSearchableSelect(id, options, onchange, groups={}) {
   const input = createElement('input');
-  const valueInput = createElement('input', { attrs: { id, hidden: true } });
+  const valueInput = createElement('input', { attrs: { id, name: id, hidden: true } });
   const optionsContainer = createElement('div', { classList: ['options-container'] });
   const select = createElement('div', { classList: ['searchable-select'], children: [
     input,

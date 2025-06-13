@@ -1,0 +1,63 @@
+extends ../layout.pug
+
+block title
+  title #{T('New Story')} — #{T('Archivium')}
+
+block breadcrumbs
+  a.link.link-animated( href=`${ADDR_PREFIX}/` ) #{T('Home')}
+  |  / 
+  a.link.link-animated( href=`${ADDR_PREFIX}/stories` ) #{T('Stories')}
+  |  / 
+  span #{T('New')}
+
+block scripts
+  script
+    include /static/scripts/shortname.js
+  script.
+    window.addEventListener('load', () => {
+      const titleInput = document.querySelector('#title');
+      const shortnameInput = document.querySelector('#shortname');
+      let hasEditedShortname = false;
+
+      titleInput.addEventListener('input', () => {
+        if (!hasEditedShortname) {
+          shortnameInput.value = toShortname(titleInput.value);
+        }
+      });
+      shortnameInput.addEventListener('input', () => {
+        hasEditedShortname = true;
+      });
+    });
+
+block content
+  script
+    include /static/scripts/domUtils.js
+    include /static/scripts/searchableSelect.js
+
+  h2 #{T('New Story')}
+  form(method='POST')
+    div.inputGroup
+      label(for='title') #{T('Title')}: 
+      input(id='title' type='text' name='title' value=`${title || ''}`)
+    div.inputGroup
+      label(for='shortname') #{T('Shortname')}: 
+      input(id='shortname' type='text' name='shortname' value=`${shortname || ''}`)
+    div.inputGroup
+      label(for='universe') #{T('Universe')}: 
+      #universes-select
+      script.
+        universes = !{JSON.stringify(universes)};
+        document.querySelector('#universes-select').replaceWith(createSearchableSelect(
+          'universe',
+          universes.reduce((acc, universe) => ({ ...acc, [universe.shortname]: universe.title }), {}),
+        ));
+    div.inputGroup
+      label(for='drafts_public' ) #{T('Drafts are visible to')}: 
+      select(id='drafts_public' name='drafts_public' )
+        option(value='private' selected=(visibility === 'private')) #{T('Only you')}
+        option(value='public' selected=(visibility === 'public')) #{T('Universe authors')}
+    div
+      button(type='submit') #{T('Create Universe')}
+    if error
+      div
+        span(style={'font-size': 'small'}).color-error #{T(error)}

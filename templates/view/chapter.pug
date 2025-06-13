@@ -1,0 +1,83 @@
+extends ../layout.pug
+
+block title
+  title #{story.title}
+
+block scripts
+  script
+    include /static/scripts/domUtils.js
+    include /static/scripts/fetchUtils.js
+    include /static/scripts/markdown/parse.js
+    include /static/scripts/markdown/render.js
+
+block breadcrumbs
+  a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+  |  / 
+  a.link.link-animated(href=`${ADDR_PREFIX}/stories`) #{T('Stories')}
+  |  / 
+  a.link.link-animated(href=`${ADDR_PREFIX}/stories/${story.shortname}`) #{story.title}
+  |  / 
+  span #{chapter.title}
+
+block content
+  h1.center.ma-0 #{chapter.title}
+  if !chapter.is_published
+    p.mt-1.center
+      i (#{T('Draft')})
+  p.center.mb-2
+    small 
+      | #{T('Chapter %s of %s ', chapter.chapter_number, story.title)}
+      |  - #{T('Created by ')}
+      if story.author
+        a.link.link-animated(href=`${ADDR_PREFIX}/users/${story.author}`) #{story.author}
+      else
+        | #{T('Deleted User')}
+      |  #{formatDate(new Date(story.created_at))}
+      |  - #{T('Last updated %s', formatDate(new Date(story.updated_at)))}
+  #action-bar.d-flex.justify-center.align-center.gap-2.mb-1
+      if contextUser && contextUser.id === story.author_id
+        a.link.link-animated.d-flex.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}/edit`)
+          span.material-symbols-outlined edit
+          |  #{T('Edit')}
+        a.link.link-animated.d-flex.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}/delete`)
+          span.material-symbols-outlined delete
+          |  #{T('Delete')}
+          
+  hr
+
+  .sheet
+    #markdown-body
+  #chapter-buttons.d-flex.mt-2
+    if story.chapter_titles[chapter.chapter_number - 1]
+      a.button.col-1.d-flex.justify-center.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number - 1}`)
+        span.material-symbols-outlined(style={ 'font-size': '1rem' }) arrow_back_ios
+        |  #{T('Previous Chapter')}
+    if story.chapter_titles[chapter.chapter_number + 1]
+      a.button.col-2.d-flex.justify-center.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number + 1}`)
+        |  #{T('Next Chapter')}
+        span.material-symbols-outlined(style={ 'font-size': '1rem' }) arrow_forward_ios
+
+  br
+  hr
+  br
+
+  -
+    const canComment = contextUser && chapter.is_published;
+    const canDelete = contextUser && contextUser.id === story.author_id;
+    const apiRoute = `/api/stories/${story.shortname}/${chapter.chapter_number}/comments`;
+    const universeShortname = story.universe_short;
+  include ../components/comments.pug
+
+  script.
+    (function() {
+      const body = document.getElementById('markdown-body');
+      if (body) {
+        loadMarkdown(body, '#{story.universe_short}', `#{chapter.body}`).then(async () => {
+          const hash = location.hash.substr(1);
+          if (hash) {
+            const el = document.getElementById(hash);
+            el.scrollIntoView();
+          }
+        });
+      };
+    })();

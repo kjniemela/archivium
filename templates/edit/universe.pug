@@ -76,7 +76,7 @@ block content
     small.color-error.hidden#validation-error
     if error
       div
-        span(style={ color: 'red', 'font-size': 'small' })= error
+        span(style={ color: 'red', 'font-size': 'small' }) #{T(error)}
 
     #home-body
       h3 #{T('Home Page')}
@@ -246,7 +246,7 @@ block content
 
         if (!catTitle) {
           // Title is missing, error
-          formError.innerText = 'Make sure the name fields for all item types are filled out, or remove unwanted ones!';
+          formError.innerText = T('Make sure the name fields for all item types are filled out, or remove unwanted ones!');
           formError.classList.remove('hidden');
           return e.preventDefault();
         }

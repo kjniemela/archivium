@@ -42,7 +42,7 @@ block content
               const value = form.username.value;
               const error = validateUsername(value);
               if (error) {
-                formError.innerText = error;
+                formError.innerText = T(error);
                 formError.classList.remove('hidden');
               }
             });
@@ -99,7 +99,7 @@ block content
               e.preventDefault();
 
               if (form.newPassword.value !== form.confirmPassword.value) {
-                formError.innerText = 'Error: new passwords do not match.';
+                formError.innerText = T('Error: new passwords do not match.');
                 formError.classList.remove('hidden');
                 return;
               }
@@ -108,7 +108,7 @@ block content
               if (response.status === 200) {
                 window.location.reload();
               } else {
-                formError.innerText = data;
+                formError.innerText = T(data);
                 formError.classList.remove('hidden');
               }
             });
@@ -117,7 +117,7 @@ block content
       h3 #{T('Request Account Deletion')}
       form#deleteAccount
         p.mb-1.mt-0
-          b.color-error Warning!
+          b.color-error #{T('Warning!')}
           br
           | #{T('Once the site owner has processed your delete request, your account ')}
           b #{T('cannot be recovered')}
@@ -159,7 +159,7 @@ block content
               if (response.status === 200) {
                 window.location.reload();
               } else {
-                formError.innerText = data;
+                formError.innerText = T(data);
                 formError.classList.remove('hidden');
               }
             });

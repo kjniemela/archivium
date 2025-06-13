@@ -52,7 +52,6 @@ module.exports = {
       if (!universe) return;
       res.redirect(`${universeLink(req, universe.shortname)}`);
     }
-    
   },
 
   async createUniverseThread(req, res) {
@@ -74,7 +73,7 @@ module.exports = {
   async commentOnThread(req, res) {
     const [code, _] = await api.discussion.postCommentToThread(req.session.user, req.params.threadId, req.body);
     res.status(code);
-    return res.redirect(`${universeLink(req, req.params.universeShortname)}/discuss/${req.params.threadId}`);
+    return res.redirect(`${universeLink(req, req.params.universeShortname)}/discuss/${req.params.threadId}#post-comment`);
   },
  
   async createItem(req, res) {
@@ -106,7 +105,7 @@ module.exports = {
   async commentOnItem(req, res) {
     const [code, _] = await api.discussion.postCommentToItem(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);
     res.status(code);
-    res.redirect(`${universeLink(req, req.params.universeShortname)}/items/${req.params.itemShortname}?tab=comments`);
+    res.redirect(`${universeLink(req, req.params.universeShortname)}/items/${req.params.itemShortname}?tab=comments#post-comment`);
   },
 
   async editUniversePerms(req, res) {
@@ -164,6 +163,50 @@ module.exports = {
     if (code === 200) return res.redirect(nextPage || `${ADDR_PREFIX}/notes?note=${body.note_uuid}`);
     return logger.error(`Error ${code}: ${data}`);
     // res.prepareRender('createUniverse', { error: data, ...req.body });
+  },
+
+  async createStory(req, res) {
+    const [code, data] = await api.story.post(req.session.user, req.body);
+    res.status(code);
+    if (code === 201) return res.redirect(`${ADDR_PREFIX}/stories/${req.body.shortname}`);
+    const [_, universes] = await api.universe.getMany(req.session.user, null, perms.WRITE);
+    res.prepareRender('createStory', { universes: universes ?? [], error: data, ...req.body });
+  },
+
+  async editStory(req, res) {
+    req.body = {
+      ...req.body,
+      drafts_public: req.body.drafts_public === 'on',
+    }
+    const [code, errorOrShortname] = await api.story.put(req.session.user, req.params.shortname, req.body);
+    res.status(code);
+    if (code !== 200) {
+      await pages.story.edit(req, res, errorOrShortname, req.body);
+      return;
+    } else {
+      res.redirect(`${ADDR_PREFIX}/stories/${errorOrShortname}`);
+    }
+  },
+
+  async editChapter(req, res) {
+    req.body = {
+      ...req.body,
+      is_published: req.body.is_published === 'on',
+    }
+    const [code, errorOrIndex] = await api.story.putChapter(req.session.user, req.params.shortname, req.params.index, req.body);
+    res.status(code);
+    if (code !== 200) {
+      await pages.story.editChapter(req, res, errorOrIndex, req.body);
+      return;
+    } else {
+      res.redirect(`${ADDR_PREFIX}/stories/${req.params.shortname}/${errorOrIndex}`);
+    }
+  },
+
+  async commentOnChapter(req, res) {
+    const [code, _] = await api.discussion.postCommentToChapter(req.session.user, req.params.shortname, req.params.index, req.body);
+    res.status(code);
+    res.redirect(`${ADDR_PREFIX}/stories/${req.params.shortname}/${req.params.index}#post-comment`);
   },
 
   async passwordResetRequest(req, res) {

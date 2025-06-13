@@ -115,14 +115,29 @@ module.exports = function(app) {
   post('/notes/create', sites.ALL, Auth.verifySessionOrRedirect, forms.createNote);
   post('/notes/edit', sites.ALL, Auth.verifySessionOrRedirect, forms.editNote);
 
+  /* Story pages */
+  get('/stories', sites.ALL, pages.story.list);
+  get('/stories/create', sites.ALL, Auth.verifySessionOrRedirect, pages.story.create);
+  post('/stories/create', sites.ALL, Auth.verifySessionOrRedirect, forms.createStory);
+  get('/stories/:shortname', sites.ALL, pages.story.view);
+  get('/stories/:shortname/edit', sites.ALL, Auth.verifySessionOrRedirect, pages.story.edit);
+  post('/stories/:shortname/edit', sites.ALL, Auth.verifySessionOrRedirect, forms.editStory);
+  get('/stories/:shortname/delete', sites.ALL, Auth.verifySessionOrRedirect, pages.story.delete);
+  get('/stories/:shortname/create', sites.ALL, Auth.verifySessionOrRedirect, pages.story.createChapter);
+  get('/stories/:shortname/:index', sites.ALL, pages.story.viewChapter);
+  get('/stories/:shortname/:index/edit', sites.ALL, Auth.verifySessionOrRedirect, pages.story.editChapter);
+  post('/stories/:shortname/:index/edit', sites.ALL, Auth.verifySessionOrRedirect, forms.editChapter);
+  get('/stories/:shortname/:index/delete', sites.ALL, Auth.verifySessionOrRedirect, pages.story.deleteChapter);
+  post('/stories/:shortname/:index/comment', sites.ALL, Auth.verifySessionOrRedirect, forms.commentOnChapter);
+
   /* Universe Pages */
   get('/universes', sites.NORMAL, pages.universe.list);
   get('/universes/create', sites.NORMAL, Auth.verifySessionOrRedirect, pages.universe.create);
   post('/universes/create', sites.NORMAL, Auth.verifySessionOrRedirect, forms.createUniverse);
   get('/universes/:universeShortname', sites.NORMAL, pages.universe.view);
-  get('/universes/:universeShortname/delete', sites.NORMAL, Auth.verifySessionOrRedirect, pages.universe.delete);
   get('/universes/:universeShortname/edit', sites.NORMAL, Auth.verifySessionOrRedirect, pages.universe.edit);
   post('/universes/:universeShortname/edit', sites.NORMAL, Auth.verifySessionOrRedirect, forms.editUniverse);
+  get('/universes/:universeShortname/delete', sites.NORMAL, Auth.verifySessionOrRedirect, pages.universe.delete);
   get('/universes/:universeShortname/discuss/create', sites.NORMAL, Auth.verifySessionOrRedirect, pages.universe.createDiscussionThread);
   post('/universes/:universeShortname/discuss/create', sites.NORMAL, Auth.verifySessionOrRedirect, forms.createUniverseThread);
   get('/universes/:universeShortname/discuss/:threadId', sites.NORMAL, Auth.verifySessionOrRedirect, pages.universe.discussionThread);
@@ -138,8 +153,8 @@ module.exports = function(app) {
   get('/universes/:universeShortname/items/:itemShortname', sites.NORMAL, pages.item.view);
   get('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, Auth.verifySessionOrRedirect, pages.item.edit);
   post('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, Auth.verifySessionOrRedirect, forms.editItem);
-  post('/universes/:universeShortname/items/:itemShortname/comment', sites.NORMAL, Auth.verifySessionOrRedirect, forms.commentOnItem);
   get('/universes/:universeShortname/items/:itemShortname/delete', sites.NORMAL, Auth.verifySessionOrRedirect, pages.item.delete);
+  post('/universes/:universeShortname/items/:itemShortname/comment', sites.NORMAL, Auth.verifySessionOrRedirect, forms.commentOnItem);
 
   /* Display Mode Pages */
   get('/', sites.DISPLAY, subdomain(pages.universe.view, (sub) => ({ universeShortname: sub })));

@@ -38,11 +38,12 @@ const locale = {
 const lang = 'en';
 
 function sprintf(format, ...args) {
- let i = 0;
- return format.replace(/%s/g, () => args[i++]);
+  let i = 0;
+  return format.replace(/%s/g, () => args[i++]);
 }
 
 function T(str, ...args) {
+  if (!str) return '';
   return sprintf(locale[lang][str] ?? str, ...args);
 }
 

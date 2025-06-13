@@ -5,6 +5,7 @@ module.exports = {
   misc: require('./misc'),
   user: require('./user'),
   item: require('./item'),
+  story: require('./story'),
   universe: require('./universe'),
   async home(req, res) {
     const user = req.session.user;

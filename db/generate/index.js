@@ -27,6 +27,19 @@ async function createUniverse(owner, title, shortname, public=true, discussion_e
   return universe;
 }
 
+async function createStory(owner, title, shortname, summary, public, universe) {
+  const [, data] = await api.story.post(owner, { title, shortname, summary, public, universe: universe.shortname });
+  const [, story] = await api.story.getOne(owner, { 'story.id': data.insertId });
+  return story;
+}
+
+async function createChapter(owner, story, title, summary, body='', isPublished=false) {
+  const [,, index] = await api.story.postChapter(owner, story.shortname, { title, summary });
+  const [, chapter] = await api.story.getChapter(owner, story.shortname, index);
+  await api.story.putChapter(owner, story.shortname, chapter.chapter_number, { is_published: isPublished, body });
+  return chapter;
+}
+
 async function setUniversePerms(owner, universe, user, permsLvl) {
   await api.universe.putPermissions(owner, universe.shortname, user, permsLvl);
 }
@@ -60,6 +73,7 @@ async function createNote(owner, title, body, public, tags, items=[], boards=[])
   }
   return note;
 }
+
 async function main() {
   const schemaConn = await mysql.createConnection({ ...DB_CONFIG, multipleStatements: true });
   await loadSchema(schemaConn, false);
@@ -71,7 +85,19 @@ async function main() {
     Varius curabitur amet vel donec sed nullam. Vestibulum eget facilisi conubia montes scelerisque curae augue odio.
     Facilisi elit velit erat nunc sem eu finibus finibus. Rutrum nec aliquet est montes laoreet fusce egestas.
     Habitasse velit nec aenean aliquam mi dictum. Donec faucibus aliquam duis viverra amet lacus sit penatibus.
-  `;
+  `.split('\n').map(line => line.trim()).join(' ').trim();
+
+  const loremIpsumLong = `
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis neque risus, eget interdum diam sagittis et. Etiam a gravida ex. Phasellus mattis metus quis augue feugiat iaculis. Nullam interdum laoreet odio, vel tempus neque. Praesent quis semper sapien, et eleifend odio. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas metus ex, iaculis at congue ut, placerat sed sem. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec euismod laoreet est in aliquet. Phasellus sit amet nulla nisi. Maecenas in venenatis elit. Sed sed feugiat risus.
+
+    Quisque lacus orci, gravida volutpat libero semper, elementum placerat dui. Ut tempus felis ac ante faucibus, a volutpat massa elementum. Quisque sagittis massa at eros malesuada interdum. Nulla viverra urna nec vehicula interdum. Cras malesuada ornare ligula, a commodo odio finibus eu. Cras malesuada, ligula nec venenatis convallis, est augue maximus justo, tincidunt auctor orci justo nec ante. Cras eu semper lorem, vitae fringilla felis. Donec placerat volutpat egestas. Nullam egestas dictum risus aliquet aliquet. Morbi eu nibh quis dolor posuere tincidunt accumsan in diam. Nam eleifend leo nec consectetur rutrum. Nullam at feugiat justo. Sed et ipsum ex. Donec nulla enim, suscipit non blandit non, porttitor ut orci. Sed gravida felis in porttitor faucibus. Nullam ultrices purus tincidunt, ullamcorper tellus eu, dapibus tortor.
+
+    Mauris ut mi neque. Duis felis turpis, malesuada at tempus et, interdum nec orci. Nullam dolor sapien, finibus eu sem non, semper aliquam neque. Nullam quis mauris sed massa tincidunt iaculis. Suspendisse lacus nulla, vulputate a gravida vel, tempus quis dolor. Cras a metus vel neque bibendum consectetur sit amet pretium justo. Aenean ac lobortis quam. Sed tempor consectetur mi id ultricies. Sed et commodo risus. Nam lobortis vulputate lectus ut elementum. Phasellus diam arcu, efficitur vitae urna ac, semper bibendum sapien. Etiam condimentum finibus lectus ac tristique. In at sem laoreet, ullamcorper enim id, porttitor enim.
+
+    Morbi ultricies rutrum facilisis. Duis et lacinia est. Phasellus ultricies eros ut nulla aliquet, scelerisque laoreet magna condimentum. Pellentesque ornare augue a ultricies cursus. Pellentesque fringilla, tortor eget mattis posuere, metus eros iaculis ligula, eu malesuada erat lectus id turpis. Integer volutpat maximus ornare. Nullam at mauris arcu. Nulla consequat magna accumsan nibh convallis porta. Cras vel neque eu nisi congue rutrum nec ac turpis. Quisque in nulla vehicula, efficitur dolor congue, fringilla diam. Vivamus magna libero, molestie ac feugiat eu, mattis vel dui. Praesent fermentum massa eget suscipit rutrum. Proin purus dui, mattis sed libero at, ornare faucibus magna. Pellentesque magna eros, facilisis eget nisl varius, feugiat auctor libero. Proin vitae cursus metus.
+
+    Nam tortor dui, pretium et metus eget, posuere ornare erat. Curabitur convallis nisl consectetur, viverra massa sit amet, pellentesque urna. Morbi quis consectetur massa. Pellentesque nec efficitur sem. Morbi vel porttitor massa. Vivamus efficitur eros ligula, sit amet faucibus risus posuere vel. Phasellus diam justo, maximus quis varius in, consequat sed tellus. Curabitur et viverra magna, ac tempor dui. Donec a lacinia lacus, sed blandit eros.
+  `.split('\n').map(line => line.trim()).join('\n').trim();
 
   console.log('Creating users...');
   const users = {};
@@ -122,6 +148,26 @@ async function main() {
   await setFollowingUniverse(users.testadmin, publicUniverse);
   await setFollowingUniverse(users.testadmin, privateUniverse);
   await setFollowingUniverse(users.testadmin, chatroomUniverse);
+
+  console.log('Writing stories...');
+  const publicStory1 = await createStory(users.testwriter, 'Public Story', 'public-story-1', loremIpsum, true, publicUniverse);
+  const privateStory1 = await createStory(users.testwriter, 'Private Story', 'private-story-1', loremIpsum, true, privateUniverse);
+  const publicStory2 = await createStory(users.testwriter, 'Public Story Hidden', 'public-story-2', loremIpsum, false, publicUniverse);
+  const privateStory2 = await createStory(users.testwriter, 'Private Story Hidden', 'private-story-2', loremIpsum, false, privateUniverse);
+  const publicDraftStory1 = await createStory(users.testwriter, 'Public Draft Story', 'public-draft-story-1', loremIpsum, true, publicUniverse);
+  const privateDraftStory1 = await createStory(users.testwriter, 'Private Draft Story', 'private-draft-story-1', loremIpsum, true, privateUniverse);
+  const publicDraftStory2 = await createStory(users.testwriter, 'Public Draft Story Hidden', 'public-draft-story-2', loremIpsum, false, publicUniverse);
+  const privateDraftStory2 = await createStory(users.testwriter, 'Private Draft Story Hidden', 'private-draft-story-2', loremIpsum, false, privateUniverse);
+  for (const story of [publicStory1, privateStory1, publicStory2, privateStory2]) {
+    for (let i = 0; i < 30; i++) {
+      await createChapter(users.testwriter, story, `Chapter ${i+1}`, `This is a summary of chapter ${i+1} of ${story.title}`, loremIpsumLong, i < 13);
+    }
+  }
+  for (const story of [publicDraftStory1, privateDraftStory1, publicDraftStory2, privateDraftStory2]) {
+    for (let i = 0; i < 7; i++) {
+      await createChapter(users.testwriter, story, `Chapter ${i+1}`, `This is a summary of chapter ${i+1} of ${story.title}`, loremIpsumLong, false);
+    }
+  }
 
   console.log('Creating threads...');
   const privateThread = await createDiscussionThread(users.testcommenter, privateUniverse, 'Private Test Thread');

@@ -42,7 +42,7 @@ block content
     div
       button(class='g-recaptcha' data-sitekey='6Lf35qkqAAAAAMnKLqoBJ9wIX30sodE4lWQS6Y3A' data-callback='onSubmit' data-action='submit') #{T('Create Account')}
     div
-      small.color-error#error(class=(error ? '' : 'hidden'))= error
+      small.color-error#error(class=(error ? '' : 'hidden')) #{T(error)}
 
     script.
       (() => {

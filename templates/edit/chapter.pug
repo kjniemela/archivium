@@ -1,0 +1,48 @@
+extends ../layout.pug
+
+block title
+  title #{T('Edit %s', chapter.title)}
+
+block append styles
+  link(rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css")
+
+block append save
+  li#save-btn.navbarBtn
+    script.
+    a.navbarBtnLink.navbarText(onclick='document.forms.edit.requestSubmit()') #{T('Save Changes')}
+
+block content
+  script(src="https://unpkg.com/easymde/dist/easymde.min.js")
+  script
+    include /static/scripts/domUtils.js
+    include /static/scripts/fetchUtils.js
+    include /static/scripts/markdown/parse.js
+    include /static/scripts/markdown/render.js
+    include /static/scripts/easyMDE.js
+
+  h2 #{T('Edit %s', chapter.title)}
+  form#edit(method='POST')
+
+    .inputGroup
+      label(for='title') #{T('Title')}: 
+      input(id='title' type='text' name='title' value=chapter.title)
+
+    .inputGroup
+      label(for='is_published') #{T('Published')}: 
+      label.switch
+        input(id='is_published' name='is_published' type='checkbox' checked=Boolean(chapter.is_published))
+        span.slider
+
+    div
+      button(type='submit') #{T('Save Changes')}
+
+    small.color-error.hidden#validation-error
+    if error
+      div
+        span(style={ color: 'red', 'font-size': 'small' }) #{T(error)}
+
+    textarea#body(name='body')
+      | #{chapter.body || ''}
+
+  script.
+    window.easyMDE = setupEasyMDE('textarea#body', { universe: '#{story.universe_short}' });

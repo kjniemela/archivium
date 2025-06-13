@@ -15,7 +15,7 @@ div
               small.ml-2 #{formatDate(comment.created_at)}
               if contextUser
                 .grow-1
-                if contextUser.id === comment.author_id || universe.author_permissions[contextUser.id] >= perms.ADMIN
+                if contextUser.id === comment.author_id || canDelete
                   small.align-self-start
                     a.link.link-animated.d-flex.align-center(onclick=`deleteComment(${comment.id})`)
                       span.material-symbols-outlined(style={ 'font-size': '1rem' }) delete
@@ -25,11 +25,12 @@ div
           span.link.disabled #{T('Deleted comment')}
 
   br
-  hr
-  br
+  if comments.length > 0
+    hr
+    br
 
-  if contextUser && ((universe.public && universe.discussion_open) || (universe.author_permissions[contextUser.id] >= (universe.discussion_open ? perms.READ : perms.COMMENT)))
-    form(method='POST' action=commentAction)
+  if contextUser && canComment
+    form#post-comment(method='POST' action=commentAction)
       .editor(data-replicated-value='')
         textarea.comment-field(id='body' name='body' oninput="t")
         span.chars 2000
@@ -37,7 +38,7 @@ div
         button#post(type='submit') #{T('Post Comment')}
       if error
         div
-          span(style={ 'font-size': 'small' }).color-error= error
+          span(style={ 'font-size': 'small' }).color-error #{T(error)}
 
   script.
     document.querySelectorAll('textarea.comment-field').forEach(el => {
@@ -49,12 +50,11 @@ div
     });
       
     document.querySelectorAll('.comment').forEach((el) => {
-      loadMarkdown(el, '#{universe.shortname}', el.dataset.val, null);
+      loadMarkdown(el, '#{universeShortname}', el.dataset.val, null);
     });
 
     async function deleteComment(commentID) {
-      const commentTypeRoute = '#{item ? `items/${item.shortname}/comments` : `discussion/${thread.id}`}';
-      const apiRoute = `/api/universes/#{universe.shortname}/${commentTypeRoute}/${commentID}`;
+      const apiRoute = `${apiRoute}/${commentID}`;
       await deleteJSON(apiRoute);
       window.location.reload();
     }

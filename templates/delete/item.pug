@@ -23,7 +23,7 @@ block content
   .d-flex.flex-col
 
     .big-text
-      p #{T('Are you want to delete %s? This action is ', item.title)}
+      p #{T('Are you sure you want to delete %s? This action is ', item.title)}
         b #{T('permanent')}
         |  #{T('and')} 
         b.color-error #{T(' cannot be undone!')}
@@ -46,7 +46,7 @@ block content
       input(id='shortname' type='text' name='shortname')
     
     .d-flex.align-center.gap-2
-      button(onclick='deleteItem()') #{T('Delete Item')}
+      button.color-error(onclick='deleteItem()') #{T('Delete Item')}
       a.link.link-animated(href=`${universeLink(item.universe_short)}/items/${item.shortname}`) #{T('Go Back')}
 
     div
