@@ -122,14 +122,11 @@ block content
               |  #{T('(Hidden)')}
 
 
+  #data(data-item=item data-universe=universe)
   script.
-    window.fetchPromise = Promise.all([
-      getJSON(`/api/universes/#{universe.shortname}`).then(([, data]) => window.universe = data),
-      getJSON(`/api/universes/#{universe.shortname}/items/#{item.shortname}`).then(([, item]) => {
-        item.obj_data = JSON.parse(item.obj_data);
-        window.item = item;
-      }),
-    ]);
+    var { item, universe } = document.querySelector('#data').dataset;
+    item = JSON.parse(item);
+    universe = JSON.parse(universe);
 
   .tabs
     if 'tabs' in item.obj_data
@@ -144,9 +141,7 @@ block content
     if 'timeline' in item.obj_data && 'title' in item.obj_data.timeline
       .itemTab.hidden(data-tab='timeline')
       script.
-        (async function() {
-          await window.fetchPromise;
-
+        (function() {
           const timelineTab = document.querySelector('.itemTab[data-tab=timeline]');
           if (timelineTab) {
             renderTimeline(timelineTab, item, item.events);
@@ -203,57 +198,53 @@ block content
         #markdown-body
 
   script.
-    (async function() {
-      await window.fetchPromise;
+    const body = document.getElementById('markdown-body');
+    if (body) {
+      loadMarkdown(body, '#{universe.shortname}', item.obj_data.body, { item }).then(async () => {
+        await tabLoadPromise;
+        const hash = location.hash.substr(1);
+        if (hash) {
+          const el = document.getElementById(hash);
+          el.scrollIntoView();
+        }
+      });
+    };
 
-      const body = document.getElementById('markdown-body');
-      if (body) {
-        loadMarkdown(body, '#{universe.shortname}', item.obj_data.body, { item }).then(async () => {
-          await tabLoadPromise;
-          const hash = location.hash.substr(1);
-          if (hash) {
-            const el = document.getElementById(hash);
-            el.scrollIntoView();
-          }
-        });
+    document.querySelectorAll('.mdVal').forEach((el) => {
+      loadMarkdown(el, '#{universe.shortname}', el.dataset.val, null, (tag) => {
+        if (tag.type === 'div') tag.attrs.style = {'text-align': 'right'};
+        if (tag.type === 'p') tag.type = 'span';
+      });
+    });
+
+    document.querySelectorAll('.mdLabel').forEach((el) => {
+      loadMarkdown(el, '#{universe.shortname}', el.dataset.val, null, (tag) => {
+        if (tag.type === 'div') {
+          tag.attrs.style = {'text-align': 'center'};
+          tag.attrs.class += ' label';
+        }
+        if (tag.type === 'p') tag.type = 'span';
+      });
+    });
+
+    const galleryModalState = {}
+    const galleryItems = document.querySelectorAll('.gallery .itemKey');
+    galleryItems.forEach((itemKey, i) => {
+      galleryModalState[i] = false;
+      const img = itemKey.querySelector('img');
+
+      img.onclick = (e) => {
+        e.stopPropagation();
+        if (!galleryModalState[i]) {
+          itemKey.classList.add('modal');
+          galleryModalState[i] = true;
+        }
       };
 
-      document.querySelectorAll('.mdVal').forEach((el) => {
-        loadMarkdown(el, '#{universe.shortname}', el.dataset.val, null, (tag) => {
-          if (tag.type === 'div') tag.attrs.style = {'text-align': 'right'};
-          if (tag.type === 'p') tag.type = 'span';
-        });
-      });
-
-      document.querySelectorAll('.mdLabel').forEach((el) => {
-        loadMarkdown(el, '#{universe.shortname}', el.dataset.val, null, (tag) => {
-          if (tag.type === 'div') {
-            tag.attrs.style = {'text-align': 'center'};
-            tag.attrs.class += ' label';
-          }
-          if (tag.type === 'p') tag.type = 'span';
-        });
-      });
-
-      const galleryModalState = {}
-      const galleryItems = document.querySelectorAll('.gallery .itemKey');
-      galleryItems.forEach((itemKey, i) => {
-        galleryModalState[i] = false;
-        const img = itemKey.querySelector('img');
-
-        img.onclick = (e) => {
-          e.stopPropagation();
-          if (!galleryModalState[i]) {
-            itemKey.classList.add('modal');
-            galleryModalState[i] = true;
-          }
-        };
-
-        itemKey.onclick = () => {
-          if (galleryModalState[i]) {
-            itemKey.classList.remove('modal');
-            galleryModalState[i] = false;
-          }
-        };
-      });
-    })();
+      itemKey.onclick = () => {
+        if (galleryModalState[i]) {
+          itemKey.classList.remove('modal');
+          galleryModalState[i] = false;
+        }
+      };
+    });

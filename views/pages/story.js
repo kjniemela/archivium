@@ -24,7 +24,10 @@ module.exports = {
   },
 
   async create(req, res) {
-    res.prepareRender('createStory');
+    const [code, universes] = await api.universe.getMany(req.session.user, null, perms.WRITE);
+    res.status(code);
+    if (code !== 200) return;
+    res.prepareRender('createStory', { universes });
   },
   
   async view(req, res) {

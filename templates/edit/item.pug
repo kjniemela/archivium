@@ -123,21 +123,16 @@ block content
     each title, shortname in itemMap
       | '#{shortname}': '#{title}',
     | };
+  #data(data-item=item)
   script.
-    (async function () {
-      await Promise.all([
-        getJSON(`/api/universes/#{universe.shortname}/items/#{item.shortname}`).then(([, item]) => {
-          item.obj_data = JSON.parse(item.obj_data);
-          window.item = item;
-        }),
-      ]);
-      
-      updateObjData(item.obj_data);
-      universe = '#{item.universe_short}';
+    var { item } = document.querySelector('#data').dataset;
+    item = JSON.parse(item);
+    
+    updateObjData(item.obj_data);
+    universe = '#{item.universe_short}';
 
-      resetTabs();
-      window.easyMDE = setupEasyMDE('#body textarea', { universe, context: { item } });
-      easyMDE.codemirror.on('change', () => {
-        updateObjData({ body: easyMDE.value() });
-      });
-    })();
+    resetTabs();
+    window.easyMDE = setupEasyMDE('#body textarea', { universe, context: { item } });
+    easyMDE.codemirror.on('change', () => {
+      updateObjData({ body: easyMDE.value() });
+    });

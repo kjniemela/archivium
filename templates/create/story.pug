@@ -46,14 +46,13 @@ block content
     div.inputGroup
       label(for='universe') #{T('Universe')}: 
       input#universes-select
+      #data(data-universes=universes)
       script.
-        (async function() {
-          const [, universes] = await getJSON(`/api/universes`);
-          document.querySelector('#universes-select').replaceWith(createSearchableSelect(
-            'universe',
-            universes.reduce((acc, universe) => ({ ...acc, [universe.shortname]: universe.title }), {}),
-          ));
-        })();
+        const universes = JSON.parse(document.querySelector('#data').dataset.universes);
+        document.querySelector('#universes-select').replaceWith(createSearchableSelect(
+          'universe',
+          universes.reduce((acc, universe) => ({ ...acc, [universe.shortname]: universe.title }), {}),
+        ));
     div.inputGroup
       label(for='drafts_public' ) #{T('Drafts are visible to')}: 
       select(id='drafts_public' name='drafts_public' )

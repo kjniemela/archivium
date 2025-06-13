@@ -131,12 +131,6 @@ block append styles
       if (!window.loadMarkdown) throw 'markdown/render.js not loaded!';
       if (!window.createSearchableSelect) throw 'searchableSelect not loaded!';
 
-      if (window.fetchPromise) {
-        await window.fetchPromise;
-      } else {
-        var [universe, item] = [null, null];
-      }
-
       let noteState = 'list';
       const leftBtn = document.querySelector('#notes-left-btn');
       const noteList = document.querySelector('#note-list');
