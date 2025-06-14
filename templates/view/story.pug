@@ -66,12 +66,43 @@ block content
       });
     });
 
+    let saveTimeout = null;
+    let saving = false;
+    async function save(list, order, delay=1000) {
+      if (saveTimeout) {
+        clearTimeout(saveTimeout);
+      }
+      saveTimeout = setTimeout(async () => {
+        console.log('SAVING...');
+
+        try {
+          saving = true;
+          await putJSON(`/api/stories/#{story.shortname}`, { order });
+          console.log('SAVED.');
+          const newIndexEls = {};
+          for (let i = 0; i < order.length; i++) {
+            const oldIndex = order[i];
+            const el = list.querySelector(`.sortable-item[data-index="${oldIndex}"]`);
+            newIndexEls[i + 1] = el;
+          }
+          for (const index in newIndexEls) {
+            const el = newIndexEls[index];
+            el.dataset.index = index;
+          }
+          saving = false;
+        } catch (err) {
+          console.error('Failed to save!');
+          console.error(err);
+        }
+      }, delay);
+    }
+
     const list = document.querySelector('.reorder-chapters');
     if (list) {
       let draggedItem = null;
 
       list.addEventListener('dragstart', (e) => {
-        if (e.target.classList.contains('sortable-item')) {
+        if (e.target.classList.contains('sortable-item') && !saving) {
           draggedItem = e.target;
           e.dataTransfer.effectAllowed = 'move';
         }
@@ -84,7 +115,7 @@ block content
       list.addEventListener('drop', async (e) => {
         e.preventDefault();
         const target = e.target.closest('.sortable-item');
-        if (target && target !== draggedItem) {
+        if (!saving && target && target !== draggedItem) {
           const children = Array.from(list.children);
           const draggedIndex = children.indexOf(draggedItem);
           const targetIndex = children.indexOf(target);
@@ -94,8 +125,7 @@ block content
             target.before(draggedItem);
           }
           const newIndexes = Array.from(list.children).map(el => el.dataset.index);
-          await putJSON(`/api/stories/#{story.shortname}`, { order: newIndexes });
-          window.location.reload();
+          save(list, newIndexes);
         }
         draggedItem = null;
       });
