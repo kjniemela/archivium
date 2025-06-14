@@ -44,19 +44,10 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
         story.*,
         author.username AS author,
         COUNT(sc.id) AS chapter_count,
-        JSON_REMOVE(JSON_ARRAYAGG(IFNULL(sc.chapter_number, 'null__')), '$.null__') AS chapters,
         JSON_REMOVE(JSON_OBJECTAGG(
           IFNULL(sc.chapter_number, 'null__'),
-          sc.title
-        ), '$.null__') AS chapter_titles,
-        JSON_REMOVE(JSON_OBJECTAGG(
-          IFNULL(sc.chapter_number, 'null__'),
-          sc.is_published
-        ), '$.null__') AS chapter_published_status,
-        JSON_REMOVE(JSON_OBJECTAGG(
-          IFNULL(sc.chapter_number, 'null__'),
-          sc.created_at
-        ), '$.null__') AS chapter_publish_dates,
+          JSON_OBJECT('title', sc.title, 'is_published', sc.is_published, 'created_at', sc.created_at)
+        ), '$.null__') AS chapters,
         universe.title AS universe,
         universe.shortname AS universe_short,
         MAX(sc.is_published) AS is_published,
@@ -215,7 +206,7 @@ async function putChapter(user, shortname, index, payload) {
     const [code, story] = await getOne(user, { 'story.shortname': shortname }, perms.WRITE);
     if (!story) return [code];
     
-    const published = story.chapter_published_status;
+    const published = Object.keys(story.chapters).reduce((acc, key) => ({ ...acc, [key]: story.chapters[key].is_published }), {});
     delete published[index];
     const publishedIndexes = Object.keys(published).filter(ch => published[ch]);
     const draftIndexes = Object.keys(published).filter(ch => !published[ch]);
@@ -281,7 +272,7 @@ async function delChapter(user, shortname, index) {
     });
     const [code, story] = await getOne(user, { 'story.shortname': shortname }, perms.OWNER);
     if (!story) throw new Error(`Fatal errror: story.getOne returned code ${code} after chapter deletion!`);
-    await reorderChapters(story, story.chapters);
+    await reorderChapters(story, Object.keys(story.chapters).sort((a, b) => a - b));
     return [200];
   } catch (err) {
     logger.error(err);

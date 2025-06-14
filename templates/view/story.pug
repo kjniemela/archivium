@@ -47,17 +47,17 @@ block content
     p.center.mb-2
       i (#{T('Drag and drop to reorder chapters.')})
   .card-list.gap-1(class={ 'reorder-chapters': canEdit })
-    each index in story.chapters.sort((a, b) => a - b)
+    each index in Object.keys(story.chapters).sort((a, b) => a - b)
       .card.sheet.sortable-item.gap-4.align-start.py-3(data-goto=`${ADDR_PREFIX}/stories/${story.shortname}/${index}` data-index=index draggable=(canEdit ? "true" : "false"))
         .d-flex.align-center.gap-1(style='grid-column: 1 / 4;')
           if canEdit
             span.material-symbols-outlined.clickable.drag_icon(style={ width: '1.5rem', 'margin-left': '-1rem' }) drag_indicator
           h3.ma-0
-            a.link.link-animated(href=`${ADDR_PREFIX}/stories/${story.shortname}/${index}`) #{story.chapter_titles[index]}
-          if !story.chapter_published_status[index]
+            a.link.link-animated(href=`${ADDR_PREFIX}/stories/${story.shortname}/${index}`) #{story.chapters[index].title}
+          if !story.chapters[index].is_published
             span (#{T('Draft')})
           .grow-1
-          span #{formatDate(new Date(story.chapter_publish_dates[index]), true)}
+          span #{formatDate(new Date(story.chapters[index].created_at), true)}
 
   script.
     document.querySelectorAll('.drag_icon').forEach(el => {
