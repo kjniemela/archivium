@@ -59,7 +59,8 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
         ), '$.null__') AS chapter_publish_dates,
         universe.title AS universe,
         universe.shortname AS universe_short,
-        MIN(sc.is_published) AS is_published
+        MAX(sc.is_published) AS is_published,
+        NOT ISNULL(au_filter.universe_id) AS shared
       FROM story
       LEFT JOIN storychapter AS sc ON sc.story_id = story.id
       INNER JOIN user AS author ON author.id = story.author_id
