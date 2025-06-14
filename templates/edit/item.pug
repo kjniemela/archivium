@@ -118,13 +118,19 @@ block content
     div
       input(id='obj_data' type='hidden' name='obj_data' value='{}')
 
+  script
+    | itemMap = {
+    each title, shortname in itemMap
+      | '#{shortname}': '#{title}',
+    | };
+  #data(data-item=item)
   script.
-    updateObjData(!{JSON.stringify(item.obj_data)});
-    itemMap = !{JSON.stringify(itemMap)};
-    universe = '!{item.universe_short}';
-    item = !{JSON.stringify(item)};
+    var { item } = document.querySelector('#data').dataset;
+    item = JSON.parse(item);
+    
+    updateObjData(item.obj_data);
+    universe = '#{item.universe_short}';
 
-  script.
     resetTabs();
     window.easyMDE = setupEasyMDE('#body textarea', { universe, context: { item } });
     easyMDE.codemirror.on('change', () => {

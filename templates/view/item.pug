@@ -121,9 +121,12 @@ block content
             if !item.obj_data.notes
               |  #{T('(Hidden)')}
 
-  
-  script!= `window.item = ${JSON.stringify(item)};`
-  script!= `window.universe = ${JSON.stringify(universe)};`
+
+  #data(data-item=item data-universe=universe)
+  script.
+    var { item, universe } = document.querySelector('#data').dataset;
+    item = JSON.parse(item);
+    universe = JSON.parse(universe);
 
   .tabs
     if 'tabs' in item.obj_data

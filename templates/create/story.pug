@@ -32,6 +32,7 @@ block scripts
 block content
   script
     include /static/scripts/domUtils.js
+    include /static/scripts/fetchUtils.js
     include /static/scripts/searchableSelect.js
 
   h2 #{T('New Story')}
@@ -44,9 +45,10 @@ block content
       input(id='shortname' type='text' name='shortname' value=`${shortname || ''}`)
     div.inputGroup
       label(for='universe') #{T('Universe')}: 
-      #universes-select
+      input#universes-select
+      #data(data-universes=universes)
       script.
-        universes = !{JSON.stringify(universes)};
+        const universes = JSON.parse(document.querySelector('#data').dataset.universes);
         document.querySelector('#universes-select').replaceWith(createSearchableSelect(
           'universe',
           universes.reduce((acc, universe) => ({ ...acc, [universe.shortname]: universe.title }), {}),

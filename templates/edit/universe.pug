@@ -122,11 +122,11 @@ block content
       button(type='button' onclick='addCat()') #{T('Add Type')}
       button(type='button' onclick='resetCats()') #{T('Reset to default types')}
 
+  #data(data-universe=universe)
   script.
-    updateObjData(!{JSON.stringify(universe.obj_data)});
-    universe = '!{universe.shortname}';
+    updateObjData(JSON.parse(document.querySelector('#data').dataset.universe).obj_data);
 
-  script.
+    universe = '#{universe.shortname}';
     window.homeMDE = setupEasyMDE('#home-body textarea', { universe });
     homeMDE.codemirror.on('change', () => {
       updateObjData({ homeBody: homeMDE.value() });
@@ -142,7 +142,6 @@ block content
       publicBodyContainer.classList.toggle('hidden', visibilitySelect.value !== 'private');
     });
 
-  script.
     function toShortname(title) {
       let shortname = title.toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
@@ -231,6 +230,9 @@ block content
       resetCatList();
       updateCats();
     }
+
+    window.addCat = addCat;
+    window.resetCats = resetCats;
 
     if (!('cats' in obj_data)) setDefaultCats();
     resetCatList();
