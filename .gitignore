@@ -8,3 +8,17 @@ dist/db/backups/
 logs/
 
 cypress/screenshots/
+
+# Editor App
+
+archivium-editor/node_modules
+archivium-editor/*.local
+static/editor/bundle.js.map
+
+archivium-editor/logs
+archivium-editor/*.log
+archivium-editor/npm-debug.log*
+archivium-editor/yarn-debug.log*
+archivium-editor/yarn-error.log*
+archivium-editor/pnpm-debug.log*
+archivium-editor/lerna-debug.log*
