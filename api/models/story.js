@@ -50,8 +50,10 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
         ), '$.null__') AS chapters,
         universe.title AS universe,
         universe.shortname AS universe_short,
-        MAX(sc.is_published) AS is_published,
+        MAX(sc.is_published) AS is_published
+        ${user ? `,
         NOT ISNULL(au_filter.universe_id) AND story.drafts_public AND NOT au_filter.user_id = story.author_id AS shared
+        ` : ''}
       FROM story
       LEFT JOIN storychapter AS sc ON sc.story_id = story.id
       INNER JOIN user AS author ON author.id = story.author_id
@@ -64,7 +66,7 @@ async function getMany(user, conditions, permissionsRequired=perms.READ, options
       ` : ''}
       WHERE (is_published ${user ? `OR story.author_id = ? OR (story.drafts_public AND au_filter.universe_id IS NOT NULL)` : ''})
       ${conditionString}
-      GROUP BY story.id, au_filter.user_id
+      GROUP BY story.id${user ? ', au_filter.user_id' : ''}
       ORDER BY ${options.sort ? `${options.sort} ${options.sortDesc ? 'DESC' : 'ASC'}` : 'updated_at DESC'}
     `, [ ...(user ? [user.id, perms.WRITE, user.id] : []), ...parsedConditions?.values ?? [] ]);
     return [200, stories];

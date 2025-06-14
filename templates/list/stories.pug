@@ -21,14 +21,18 @@ mixin storyCard(story)
       span 
         b #{T('Author')}: 
         a.link.link-animated(href=`${ADDR_PREFIX}/users/${story.author}`) #{story.author}
-      .d-flex.gap-2.flex-wrap
-        span
-          b #{T('Created')}: 
-          | #{formatDate(story.created_at, true)}
-        | — 
-        span 
-          b #{T('Updated')}: 
-          | #{formatDate(story.updated_at, true)}
+      span
+        - const publishedCount = Object.keys(story.chapters).filter(i => story.chapters[i].is_published).length;
+        b #{T('Chapters')}: 
+        | #{publishedCount} 
+        if contextUser && story.chapter_count - publishedCount > 0
+          small (#{story.chapter_count - publishedCount} drafts)
+      span
+        b #{T('Created')}: 
+        | #{formatDate(story.created_at, true)} 
+      span 
+        b #{T('Updated')}: 
+        | #{formatDate(story.updated_at, true)}
 
 block content
   script
