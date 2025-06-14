@@ -12,6 +12,9 @@ block breadcrumbs
 
 block scripts
   script
+    include /static/scripts/domUtils.js
+    include /static/scripts/fetchUtils.js
+    include /static/scripts/searchableSelect.js
     include /static/scripts/shortname.js
   script.
     window.addEventListener('load', () => {
@@ -30,11 +33,6 @@ block scripts
     });
 
 block content
-  script
-    include /static/scripts/domUtils.js
-    include /static/scripts/fetchUtils.js
-    include /static/scripts/searchableSelect.js
-
   h2 #{T('New Story')}
   form(method='POST')
     div.inputGroup
