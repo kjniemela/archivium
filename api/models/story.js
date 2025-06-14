@@ -252,8 +252,8 @@ async function del(user, shortname) {
         DELETE comment
         FROM comment
         INNER JOIN storychaptercomment AS scc ON scc.comment_id = comment.id
-        INNER JOIN chapter ON scc.chapter_id = chapter.id
-        WHERE chapter.story_id = ?;
+        INNER JOIN storychapter ON scc.chapter_id = storychapter.id
+        WHERE storychapter.story_id = ?;
       `, [story.id]);
       await conn.execute(`DELETE FROM story WHERE id = ?;`, [story.id]);
     });
