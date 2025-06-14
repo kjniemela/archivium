@@ -115,7 +115,7 @@ block content
       list.addEventListener('drop', async (e) => {
         e.preventDefault();
         const target = e.target.closest('.sortable-item');
-        if (!saving && target && target !== draggedItem) {
+        if (!saving && draggedItem && target && target !== draggedItem) {
           const children = Array.from(list.children);
           const draggedIndex = children.indexOf(draggedItem);
           const targetIndex = children.indexOf(target);
