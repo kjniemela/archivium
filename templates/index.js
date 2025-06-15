@@ -15,6 +15,20 @@ function universeLink(req, uniShort) {
   }
 }
 
+const themes = {
+  default: {
+    glass: false,
+  },
+  glass: {
+    glass: true,
+    background: 'radial-gradient(circle, #f0f0f0 0%, #8b8b8b 100%) 0 0',
+  },
+  space: {
+    glass: true,
+    backgroundImage: '/static/assets/themes/space.jpg',
+  },
+};
+
 // Basic context information to be sent to the templates
 function contextData(req) {
   const user = req.session.user;
@@ -41,6 +55,7 @@ function contextData(req) {
     searchQueries: searchQueries.toString(),
     perms,
     locale: locale[lang],
+    theme: themes.space,
     T,
     sprintf,
     validateUsername: api.user.validateUsername,
@@ -120,5 +135,5 @@ function render(req, template, context = {}) {
 module.exports = {
   render,
   universeLink,
-  locale,
+  themes,
 };

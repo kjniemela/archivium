@@ -31,7 +31,7 @@ body {
   flex-direction: column;
   background-color: #e9e9e9;
   /* background-image: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpaperset.com%2Fw%2Ffull%2Fb%2F9%2F2%2F46305.jpg&f=1&nofb=1&ipt=13279ae61d9eef3087db56778633d7b3ad963fada86e57fe4adb92d4eeaa14c2'); */
-  background-image: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic.vecteezy.com%2Fsystem%2Fresources%2Fpreviews%2F024%2F448%2F956%2Flarge_2x%2Fspace-wallpaper-banner-background-stunning-view-of-a-cosmic-galaxy-with-planets-and-space-objects-elements-of-this-image-furnished-by-nasa-generate-ai-free-photo.jpg&f=1&nofb=1&ipt=86b02dd8149d33d0406a4c272e78d9b63645175faca6c3033582fddde9f89d55');
+  /* background-image: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic.vecteezy.com%2Fsystem%2Fresources%2Fpreviews%2F024%2F448%2F956%2Flarge_2x%2Fspace-wallpaper-banner-background-stunning-view-of-a-cosmic-galaxy-with-planets-and-space-objects-elements-of-this-image-furnished-by-nasa-generate-ai-free-photo.jpg&f=1&nofb=1&ipt=86b02dd8149d33d0406a4c272e78d9b63645175faca6c3033582fddde9f89d55'); */
   background-size: cover;
   background-attachment: fixed;
   background-position: center top;
@@ -70,7 +70,7 @@ footer {
 
 .glass-pane {
   background-color: #e9e9e999;
-  box-shadow: 0 0 20px 0px #e9e9e9;
+  box-shadow: 0.125rem 0.125rem 0.3125rem 0px hsla(0, 0%, 2%, 0.18);
   border-radius: 0.25rem;
   backdrop-filter: blur(4px);
   padding: 0.5rem;
@@ -109,7 +109,7 @@ header {
   z-index: 3;
   background-color: #e9e9e9;
   /* background-image: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpaperset.com%2Fw%2Ffull%2Fb%2F9%2F2%2F46305.jpg&f=1&nofb=1&ipt=13279ae61d9eef3087db56778633d7b3ad963fada86e57fe4adb92d4eeaa14c2'); */
-  background-image: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic.vecteezy.com%2Fsystem%2Fresources%2Fpreviews%2F024%2F448%2F956%2Flarge_2x%2Fspace-wallpaper-banner-background-stunning-view-of-a-cosmic-galaxy-with-planets-and-space-objects-elements-of-this-image-furnished-by-nasa-generate-ai-free-photo.jpg&f=1&nofb=1&ipt=86b02dd8149d33d0406a4c272e78d9b63645175faca6c3033582fddde9f89d55');
+  /* background-image: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic.vecteezy.com%2Fsystem%2Fresources%2Fpreviews%2F024%2F448%2F956%2Flarge_2x%2Fspace-wallpaper-banner-background-stunning-view-of-a-cosmic-galaxy-with-planets-and-space-objects-elements-of-this-image-furnished-by-nasa-generate-ai-free-photo.jpg&f=1&nofb=1&ipt=86b02dd8149d33d0406a4c272e78d9b63645175faca6c3033582fddde9f89d55'); */
   background-size: cover;
   background-attachment: fixed;
   background-position: center top;
