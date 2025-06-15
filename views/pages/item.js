@@ -134,7 +134,7 @@ module.exports = {
     // const itemMap = {};
     // itemList.forEach(item => itemMap[item.shortname] = item.title);
     // res.prepareRender('editItem', { item, itemMap, universe, error });
-    res.prepareRender('editor');
+    res.prepareRender('editor', { itemShort: req.params.itemShortname, universeShort: req.params.universeShortname });
   },
 
   async delete(req, res) {

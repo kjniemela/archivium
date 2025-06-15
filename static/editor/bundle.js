@@ -27553,11 +27553,12 @@ if (false) // removed by dead control flow
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ App)
 /* harmony export */ });
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "./node_modules/react/jsx-dev-runtime.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./helpers */ "./src/helpers.tsx");
 function _array_like_to_array(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
     for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
@@ -27565,6 +27566,54 @@ function _array_like_to_array(arr, len) {
 }
 function _array_with_holes(arr) {
     if (Array.isArray(arr)) return arr;
+}
+function _array_without_holes(arr) {
+    if (Array.isArray(arr)) return _array_like_to_array(arr);
+}
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+        var info = gen[key](arg);
+        var value = info.value;
+    } catch (error) {
+        reject(error);
+        return;
+    }
+    if (info.done) {
+        resolve(value);
+    } else {
+        Promise.resolve(value).then(_next, _throw);
+    }
+}
+function _async_to_generator(fn) {
+    return function() {
+        var self = this, args = arguments;
+        return new Promise(function(resolve, reject) {
+            var gen = fn.apply(self, args);
+            function _next(value) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+            }
+            function _throw(err) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+            }
+            _next(undefined);
+        });
+    };
+}
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function _iterable_to_array(iter) {
+    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
 }
 function _iterable_to_array_limit(arr, i) {
     var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
@@ -27593,8 +27642,53 @@ function _iterable_to_array_limit(arr, i) {
 function _non_iterable_rest() {
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
+function _non_iterable_spread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            _define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
+function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+        var symbols = Object.getOwnPropertySymbols(object);
+        if (enumerableOnly) {
+            symbols = symbols.filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+            });
+        }
+        keys.push.apply(keys, symbols);
+    }
+    return keys;
+}
+function _object_spread_props(target, source) {
+    source = source != null ? source : {};
+    if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+        ownKeys(Object(source)).forEach(function(key) {
+            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+    }
+    return target;
+}
 function _sliced_to_array(arr, i) {
     return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
+}
+function _to_consumable_array(arr) {
+    return _array_without_holes(arr) || _iterable_to_array(arr) || _unsupported_iterable_to_array(arr) || _non_iterable_spread();
 }
 function _unsupported_iterable_to_array(o, minLen) {
     if (!o) return;
@@ -27604,43 +27698,609 @@ function _unsupported_iterable_to_array(o, minLen) {
     if (n === "Map" || n === "Set") return Array.from(n);
     if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
 }
+function _ts_generator(thisArg, body) {
+    var f, y, t, _ = {
+        label: 0,
+        sent: function() {
+            if (t[0] & 1) throw t[1];
+            return t[1];
+        },
+        trys: [],
+        ops: []
+    }, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+        return this;
+    }), g;
+    function verb(n) {
+        return function(v) {
+            return step([
+                n,
+                v
+            ]);
+        };
+    }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while(g && (g = 0, op[0] && (_ = 0)), _)try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [
+                op[0] & 2,
+                t.value
+            ];
+            switch(op[0]){
+                case 0:
+                case 1:
+                    t = op;
+                    break;
+                case 4:
+                    _.label++;
+                    return {
+                        value: op[1],
+                        done: false
+                    };
+                case 5:
+                    _.label++;
+                    y = op[1];
+                    op = [
+                        0
+                    ];
+                    continue;
+                case 7:
+                    op = _.ops.pop();
+                    _.trys.pop();
+                    continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                        _ = 0;
+                        continue;
+                    }
+                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                        _.label = op[1];
+                        break;
+                    }
+                    if (op[0] === 6 && _.label < t[1]) {
+                        _.label = t[1];
+                        t = op;
+                        break;
+                    }
+                    if (t && _.label < t[2]) {
+                        _.label = t[2];
+                        _.ops.push(op);
+                        break;
+                    }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop();
+                    continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) {
+            op = [
+                6,
+                e
+            ];
+            y = 0;
+        } finally{
+            f = t = 0;
+        }
+        if (op[0] & 5) throw op[1];
+        return {
+            value: op[0] ? op[1] : void 0,
+            done: true
+        };
+    }
+}
 
 
-function App() {
-    var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(0), 2), count = _useState[0], setCount = _useState[1];
+
+function sprintf(format) {
+    for(var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++){
+        args[_key - 1] = arguments[_key];
+    }
+    var i = 0;
+    return format.replace(/%s/g, function() {
+        return args[i++];
+    });
+}
+function T(str) {
+    for(var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++){
+        args[_key - 1] = arguments[_key];
+    }
+    // return sprintf(locale[lang][str] ?? str, ...args);
+    return sprintf.apply(void 0, [
+        str
+    ].concat(_to_consumable_array(args)));
+}
+function fetchData(url, setter) {
+    return _async_to_generator(function() {
+        var res, data, err;
+        return _ts_generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    _state.trys.push([
+                        0,
+                        3,
+                        ,
+                        4
+                    ]);
+                    return [
+                        4,
+                        fetch(url, {
+                            method: 'GET',
+                            credentials: 'include',
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        })
+                    ];
+                case 1:
+                    res = _state.sent();
+                    if (!res.ok) throw new Error('Failed to fetch');
+                    return [
+                        4,
+                        res.json()
+                    ];
+                case 2:
+                    data = _state.sent();
+                    setter(data);
+                    return [
+                        3,
+                        4
+                    ];
+                case 3:
+                    err = _state.sent();
+                    console.error(err);
+                    return [
+                        3,
+                        4
+                    ];
+                case 4:
+                    return [
+                        2
+                    ];
+            }
+        });
+    })();
+}
+function App(param) {
+    var _this = this;
+    var itemShort = param.itemShort, universeShort = param.universeShort;
+    var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), categories = _useState[0], setCategories = _useState[1];
+    var _useState1 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), item = _useState1[0], setItem = _useState1[1];
+    var _useState2 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), objData = _useState2[0], setObjData = _useState2[1];
+    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
+        fetchData("/api/universes/".concat(universeShort), function(data) {
+            setCategories(data.obj_data.cats);
+        });
+        fetchData("/api/universes/".concat(universeShort, "/items/").concat(itemShort), function(data) {
+            setObjData(JSON.parse(data.obj_data));
+            delete data.obj_data;
+            setItem(data);
+        });
+    }, [
+        itemShort,
+        universeShort
+    ]);
+    var _item_title, _item_shortname, _item_tags, _objData_comments, _objData_notes;
     return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         children: [
-            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h1", {
-                children: "Archivium Editor"
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h2", {
+                children: item ? T('Edit %s', item.title) : T('Edit')
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
-                lineNumber: 8,
+                lineNumber: 70,
                 columnNumber: 7
             }, this),
-            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                className: "card",
-                children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
-                    onClick: function() {
-                        return setCount(count + 1);
-                    },
-                    children: [
-                        "count is ",
-                        count
-                    ]
-                }, void 0, true, {
-                    fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
-                    lineNumber: 10,
-                    columnNumber: 9
-                }, this)
-            }, void 0, false, {
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("form", {
+                id: "edit",
+                method: "POST",
+                children: [
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "title",
+                                children: T('Title')
+                            }, void 0, false, {
+                                fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                lineNumber: 73,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                id: "title",
+                                type: "text",
+                                name: "title",
+                                value: (_item_title = item === null || item === void 0 ? void 0 : item.title) !== null && _item_title !== void 0 ? _item_title : '',
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
+                                        title: target.value
+                                    }));
+                                }
+                            }, void 0, false, {
+                                fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                lineNumber: 74,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                        lineNumber: 72,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "shortname",
+                                children: [
+                                    T('Shortname'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                lineNumber: 80,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                id: "shortname",
+                                type: "text",
+                                name: "shortname",
+                                value: (_item_shortname = item === null || item === void 0 ? void 0 : item.shortname) !== null && _item_shortname !== void 0 ? _item_shortname : '',
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
+                                        shortname: target.value
+                                    }));
+                                }
+                            }, void 0, false, {
+                                fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                lineNumber: 81,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                        lineNumber: 79,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("small", {
+                            style: {
+                                gridColumn: '2 / 4'
+                            },
+                            children: [
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
+                                    children: T('NOTE: changes to the shortname will not auto-save.')
+                                }, void 0, false, {
+                                    fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                    lineNumber: 88,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
+                                    fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                    lineNumber: 89,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
+                                    children: T('Other users currently editing this item will be unable to save their work. Change with caution.')
+                                }, void 0, false, {
+                                    fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                    lineNumber: 90,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                            lineNumber: 87,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                        lineNumber: 86,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "item_type",
+                                children: [
+                                    T('Type'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                lineNumber: 95,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
+                                id: "item_type",
+                                name: "item_type",
+                                defaultValue: item === null || item === void 0 ? void 0 : item.itemType,
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
+                                        itemType: target.value
+                                    }));
+                                },
+                                children: [
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                                        hidden: true,
+                                        disabled: true,
+                                        children: [
+                                            T('Select one'),
+                                            "..."
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                        lineNumber: 97,
+                                        columnNumber: 13
+                                    }, this),
+                                    categories && item && Object.keys(categories).map(function(type) {
+                                        return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                                            value: type,
+                                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)(categories[type][0])
+                                        }, type, false, {
+                                            fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                            lineNumber: 99,
+                                            columnNumber: 15
+                                        }, _this);
+                                    })
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                lineNumber: 96,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                        lineNumber: 94,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "tags",
+                                children: [
+                                    T('Tags'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                lineNumber: 107,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("textarea", {
+                                id: "tags",
+                                name: "tags",
+                                value: ((_item_tags = item === null || item === void 0 ? void 0 : item.tags) !== null && _item_tags !== void 0 ? _item_tags : []).join(' '),
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
+                                        tags: target.value.split(' ')
+                                    }));
+                                }
+                            }, void 0, false, {
+                                fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                lineNumber: 108,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                        lineNumber: 106,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "comments",
+                                children: [
+                                    T('Enable comments'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                lineNumber: 112,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                className: "switch",
+                                children: [
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                        id: "comments",
+                                        name: "comments",
+                                        type: "checkbox",
+                                        checked: (_objData_comments = objData === null || objData === void 0 ? void 0 : objData.comments) !== null && _objData_comments !== void 0 ? _objData_comments : false,
+                                        onChange: function(param) {
+                                            var target = param.target;
+                                            return objData && setObjData(_object_spread_props(_object_spread({}, objData), {
+                                                comments: target.checked
+                                            }));
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                        lineNumber: 114,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
+                                        className: "slider"
+                                    }, void 0, false, {
+                                        fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                        lineNumber: 117,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                lineNumber: 113,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                        lineNumber: 111,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "notes",
+                                children: [
+                                    T('Enable notes'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                lineNumber: 122,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                className: "switch",
+                                children: [
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                        id: "notes",
+                                        name: "notes",
+                                        type: "checkbox",
+                                        checked: (_objData_notes = objData === null || objData === void 0 ? void 0 : objData.notes) !== null && _objData_notes !== void 0 ? _objData_notes : false,
+                                        onChange: function(param) {
+                                            var target = param.target;
+                                            return objData && setObjData(_object_spread_props(_object_spread({}, objData), {
+                                                notes: target.checked
+                                            }));
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                        lineNumber: 124,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
+                                        className: "slider"
+                                    }, void 0, false, {
+                                        fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                        lineNumber: 127,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                                lineNumber: 123,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                        lineNumber: 121,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "mt-2",
+                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                            type: "submit",
+                            children: T('Save Changes')
+                        }, void 0, false, {
+                            fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                            lineNumber: 132,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
+                        lineNumber: 131,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
                 fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/App.tsx",
-                lineNumber: 9,
+                lineNumber: 71,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true);
 }
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (App);
+
+
+/***/ }),
+
+/***/ "./src/helpers.tsx":
+/*!*************************!*\
+  !*** ./src/helpers.tsx ***!
+  \*************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   capitalize: () => (/* binding */ capitalize),
+/* harmony export */   formatDate: () => (/* binding */ formatDate)
+/* harmony export */ });
+// TODO this is duplicated from helpers.pug
+var capitalize = function(str) {
+    return str[0].toUpperCase() + str.substr(1, str.length - 1);
+};
+var formatDate = function(date) {
+    var intervalOnly = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : false, short = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : false;
+    if (!date) return;
+    var now = new Date();
+    var secondsAgo = (now.getTime() - date.getTime()) / 1000;
+    if (secondsAgo < 0) {
+        //- Future Dates
+        var secondsUntil = (date.getTime() - now.getTime()) / 1000;
+        if (secondsUntil < 60) return "in ".concat(Math.round(secondsUntil), " second").concat(Math.round(secondsUntil) === 1 ? '' : 's');
+        var minutesUntil = secondsUntil / 60;
+        if (minutesUntil < 60) return "in ".concat(Math.round(minutesUntil), " minute").concat(Math.round(minutesUntil) === 1 ? '' : 's');
+        var hoursUntil = minutesUntil / 60;
+        if (hoursUntil < 24) return "in ".concat(Math.round(hoursUntil), " hour").concat(Math.round(hoursUntil) === 1 ? '' : 's');
+        var daysUntil = hoursUntil / 24;
+        if (daysUntil < 30) return "in ".concat(Math.round(daysUntil), " day").concat(Math.round(daysUntil) === 1 ? '' : 's');
+        if (intervalOnly) {
+            var weeksUntil = daysUntil / 7;
+            if (Math.round(weeksUntil) < 8) return "in ".concat(Math.round(weeksUntil), " week").concat(Math.round(weeksUntil) === 1 ? '' : 's');
+            var monthDiff = now.getMonth() - date.getMonth();
+            var yearDiff = now.getFullYear() - date.getFullYear();
+            if (yearDiff === 0) {
+                return "in ".concat(monthDiff, " months");
+            } else if (yearDiff === 1) {
+                if (monthDiff < 0) return "in ".concat(monthDiff + 12, " months");
+                else return 'next year';
+            } else {
+                var yearsUntil = yearDiff - (monthDiff < 0 ? 1 : 0);
+                if (yearsUntil === 1) return 'next year';
+                else return "".concat(yearsUntil, " years ago");
+            }
+        }
+    } else {
+        //- Past Dates
+        if (secondsAgo < 60) return "".concat(Math.round(secondsAgo), " second").concat(Math.round(secondsAgo) === 1 ? '' : 's', " ago");
+        var minutesAgo = secondsAgo / 60;
+        if (minutesAgo < 60) return "".concat(Math.round(minutesAgo), " minute").concat(Math.round(minutesAgo) === 1 ? '' : 's', " ago");
+        var hoursAgo = minutesAgo / 60;
+        if (hoursAgo < 24) return "".concat(Math.round(hoursAgo), " hour").concat(Math.round(hoursAgo) === 1 ? '' : 's', " ago");
+        var daysAgo = hoursAgo / 24;
+        if (daysAgo < 30) return "".concat(Math.round(daysAgo), " day").concat(Math.round(daysAgo) === 1 ? '' : 's', " ago");
+        if (intervalOnly) {
+            var weeksAgo = daysAgo / 7;
+            if (Math.round(weeksAgo) < 8) return "".concat(Math.round(weeksAgo), " week").concat(Math.round(weeksAgo) === 1 ? '' : 's', " ago");
+            var monthDiff1 = now.getMonth() - date.getMonth();
+            var yearDiff1 = now.getFullYear() - date.getFullYear();
+            if (yearDiff1 === 0) {
+                return "".concat(monthDiff1, " months ago");
+            } else if (yearDiff1 === 1) {
+                if (monthDiff1 < 0) return "".concat(monthDiff1 + 12, " months ago");
+                else return 'last year';
+            } else {
+                var yearsAgo = yearDiff1 - (monthDiff1 < 0 ? 1 : 0);
+                if (yearsAgo === 1) return 'last year';
+                else return "".concat(yearsAgo, " years ago");
+            }
+        }
+    }
+    if (short) return "".concat(date.toDateString(), " ").concat(date.toLocaleTimeString());
+    else return "on ".concat(date.toDateString(), " at ").concat(date.toLocaleTimeString());
+};
 
 
 /***/ })
@@ -27737,19 +28397,49 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js");
 /* harmony import */ var _App_tsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./App.tsx */ "./src/App.tsx");
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function _object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            _define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
 
 
 
 
-(0,react_dom_client__WEBPACK_IMPORTED_MODULE_2__.createRoot)(document.getElementById('root')).render(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react__WEBPACK_IMPORTED_MODULE_1__.StrictMode, {
-    children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_App_tsx__WEBPACK_IMPORTED_MODULE_3__["default"], {}, void 0, false, {
+var root = document.querySelector('#root');
+var dataset = root.dataset;
+(0,react_dom_client__WEBPACK_IMPORTED_MODULE_2__.createRoot)(root).render(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react__WEBPACK_IMPORTED_MODULE_1__.StrictMode, {
+    children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_App_tsx__WEBPACK_IMPORTED_MODULE_3__["default"], _object_spread({}, dataset), void 0, false, {
         fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/main.tsx",
-        lineNumber: 7,
+        lineNumber: 10,
         columnNumber: 5
     }, undefined)
 }, void 0, false, {
     fileName: "/home/admin/webserver/dev/archivium/archivium-editor/src/main.tsx",
-    lineNumber: 6,
+    lineNumber: 9,
     columnNumber: 3
 }, undefined));
 

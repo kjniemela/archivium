@@ -1,0 +1,62 @@
+// TODO this is duplicated from helpers.pug
+export const capitalize = (str: string) => str[0].toUpperCase() + str.substr(1,str.length-1);
+export const formatDate = (date: Date, intervalOnly=false, short=false) => {
+  if (!date) return;
+  const now = new Date();
+  const secondsAgo = (now.getTime() - date.getTime()) / 1000;
+  if (secondsAgo < 0) {
+    //- Future Dates
+    const secondsUntil = (date.getTime() - now.getTime()) / 1000;
+    if (secondsUntil < 60) return `in ${Math.round(secondsUntil)} second${Math.round(secondsUntil) === 1 ? '' : 's'}`;
+    const minutesUntil = secondsUntil / 60;
+    if (minutesUntil < 60) return `in ${Math.round(minutesUntil)} minute${Math.round(minutesUntil) === 1 ? '' : 's'}`;
+    const hoursUntil = minutesUntil / 60;
+    if (hoursUntil < 24) return `in ${Math.round(hoursUntil)} hour${Math.round(hoursUntil) === 1 ? '' : 's'}`;
+    const daysUntil = hoursUntil / 24;
+    if (daysUntil < 30) return `in ${Math.round(daysUntil)} day${Math.round(daysUntil) === 1 ? '' : 's'}`;
+    if (intervalOnly) {
+      const weeksUntil = daysUntil / 7;
+      if (Math.round(weeksUntil) < 8) return `in ${Math.round(weeksUntil)} week${Math.round(weeksUntil) === 1 ? '' : 's'}`;
+      const monthDiff = now.getMonth() - date.getMonth();
+      const yearDiff = now.getFullYear() - date.getFullYear();
+      if (yearDiff === 0) {
+        return `in ${monthDiff} months`;
+      } else if (yearDiff === 1) {
+        if (monthDiff < 0) return `in ${monthDiff + 12} months`;
+        else return 'next year';
+      } else {
+        const yearsUntil = yearDiff - (monthDiff < 0 ? 1 : 0);
+        if (yearsUntil === 1) return 'next year';
+        else return `${yearsUntil} years ago`;
+      }
+    }
+  } else {
+    //- Past Dates
+    if (secondsAgo < 60) return `${Math.round(secondsAgo)} second${Math.round(secondsAgo) === 1 ? '' : 's'} ago`;
+    const minutesAgo = secondsAgo / 60;
+    if (minutesAgo < 60) return `${Math.round(minutesAgo)} minute${Math.round(minutesAgo) === 1 ? '' : 's'} ago`;
+    const hoursAgo = minutesAgo / 60;
+    if (hoursAgo < 24) return `${Math.round(hoursAgo)} hour${Math.round(hoursAgo) === 1 ? '' : 's'} ago`;
+    const daysAgo = hoursAgo / 24;
+    if (daysAgo < 30) return `${Math.round(daysAgo)} day${Math.round(daysAgo) === 1 ? '' : 's'} ago`;
+    if (intervalOnly) {
+      const weeksAgo = daysAgo / 7;
+      if (Math.round(weeksAgo) < 8) return `${Math.round(weeksAgo)} week${Math.round(weeksAgo) === 1 ? '' : 's'} ago`;
+      const monthDiff = now.getMonth() - date.getMonth();
+      const yearDiff = now.getFullYear() - date.getFullYear();
+      if (yearDiff === 0) {
+        return `${monthDiff} months ago`;
+      } else if (yearDiff === 1) {
+        if (monthDiff < 0) return `${monthDiff + 12} months ago`;
+        else return 'last year';
+      } else {
+        const yearsAgo = yearDiff - (monthDiff < 0 ? 1 : 0);
+        if (yearsAgo === 1) return 'last year';
+        else return `${yearsAgo} years ago`;
+      }
+    }
+  }
+
+  if (short) return `${date.toDateString()} ${date.toLocaleTimeString()}`;
+  else return `on ${date.toDateString()} at ${date.toLocaleTimeString()}`;
+};
