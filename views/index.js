@@ -2,11 +2,12 @@ const { ADDR_PREFIX, DEV_MODE } = require('../config');
 const Auth = require('../middleware/auth');
 const api = require('../api');
 const md5 = require('md5');
-const { render, universeLink } = require('../templates');
+const { render, universeLink, themes } = require('../templates');
 const { perms, Cond, getPfpUrl } = require('../api/utils');
 const fs = require('fs/promises');
 const logger = require('../logger');
 const ReCaptcha = require('../middleware/reCaptcha');
+const Theme = require('../middleware/theme');
 
 const pages = require('./pages');
 const forms = require('./forms');
@@ -21,10 +22,12 @@ module.exports = function(app) {
   app.use((req, res, next) => {
     res.set('Content-Type', 'text/html; charset=utf-8');
     res.prepareRender = (template, data={}) => {
-      res.templateData = [template, data];
+      res.templateData = { template, data };
     };
     next();
-  })
+  });
+
+  app.use(Theme);
 
   const doRender = async (req, res) => {
     if (res.statusCode === 302) return; // We did a redirect, no need to render.
@@ -46,7 +49,7 @@ module.exports = function(app) {
     }
     try {
       if (!res.templateData) throw `Code ${res.statusCode} returned by page handler.`;
-      const [template, data] = res.templateData;
+      const { template, data } = res.templateData;
       res.end(render(req, template, data));
     } catch (err) {
       logger.error(`Error ${res.statusCode} rendered.`);
@@ -77,10 +80,13 @@ module.exports = function(app) {
     };
   };
 
-  const injectTheme = (themeFn, callback) => {
+  const injectContext = (context, callback) => {
     const _get = (...args) => {
       const handler = args.pop();
-      get(...args, () => handler());
+      get(...args, async (req, res) => {
+        await handler(req, res);
+        await context(req, res);
+      });
     };
 
     callback(_get);
@@ -130,7 +136,17 @@ module.exports = function(app) {
   get('/stories/:shortname/:index/edit', sites.ALL, Auth.verifySessionOrRedirect, pages.story.editChapter);
   get('/stories/:shortname/:index/delete', sites.ALL, Auth.verifySessionOrRedirect, pages.story.deleteChapter);
 
-  injectTheme(() => {}, (get) => {
+  injectContext((req, res) => {
+    if (res.templateData?.data?.universe) {
+      const themeName = res.templateData.data.universe.obj_data.theme;
+      const backgroundImage = res.templateData.data.universe.obj_data.backgroundImage;
+      const baseTheme = themes[themeName] ?? req.theme;
+      req.theme = {
+        ...baseTheme,
+        backgroundImage: backgroundImage ?? baseTheme.backgroundImage,
+      };
+    }
+  }, (get) => {
     /* Universe Pages */
     get('/universes', sites.NORMAL, pages.universe.list);
     get('/universes/create', sites.NORMAL, Auth.verifySessionOrRedirect, pages.universe.create);

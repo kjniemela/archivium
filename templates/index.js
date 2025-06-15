@@ -55,7 +55,7 @@ function contextData(req) {
     searchQueries: searchQueries.toString(),
     perms,
     locale: locale[lang],
-    theme: themes.space,
+    theme: req.theme ?? themes.default,
     T,
     sprintf,
     validateUsername: api.user.validateUsername,

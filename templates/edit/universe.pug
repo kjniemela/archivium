@@ -75,10 +75,16 @@ block content
       select#theme
         option(value='default' selected=(universe.obj_data.theme === 'default')) #{T('Default')}
         option(value='glass' selected=(universe.obj_data.theme === 'glass')) #{T('Glass')}
+        option(value='space' selected=(universe.obj_data.theme === 'space')) #{T('Space')}
 
-    #backdropUrl-div.inputGroup.hidden
-      label #{T('Background Image URL')}: 
-      input#backdropUrl(type='text' value=universe.obj_data.backdropUrl)
+    #backgroundImage-div.hidden
+      .inputGroup
+        label #{T('Background Image URL')}: 
+        input#backgroundImage(type='text' value=universe.obj_data.backgroundImage)
+
+      .inputGroup
+        small(style={ 'grid-column': '2 / 4' })
+          i #{T('Optionally provide the URL for a background image, which will be displayed behind all pages of %s.', universe.title)}
 
     div
       input#obj_data(type='hidden' name='obj_data' value='{}')
@@ -86,15 +92,15 @@ block content
 
     script.
       const theme = document.querySelector('#theme');
-      const backdropUrl = document.querySelector('#backdropUrl');
-      const backdropUrlDiv = document.querySelector('#backdropUrl-div');
+      const backgroundImage = document.querySelector('#backgroundImage');
+      const backgroundImageDiv = document.querySelector('#backgroundImage-div');
       function handleThemeChange() {
-        backdropUrlDiv.classList.toggle('hidden', theme.value === 'default');
+        backgroundImageDiv.classList.toggle('hidden', theme.value !== 'glass');
         updateObjData({ theme: theme.value });
       }
       theme.addEventListener('change', handleThemeChange);
-      backdropUrl.addEventListener('change', () => {
-        updateObjData({ backdropUrl: backdropUrl.value });
+      backgroundImage.addEventListener('change', () => {
+        updateObjData({ backgroundImage: backgroundImage.value });
       });
       handleThemeChange();
 
