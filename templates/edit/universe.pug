@@ -6,7 +6,7 @@ block title
 block append styles
   link(rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css")
   style.
-    #cats td {
+    #cats td:not(:first-child) {
       padding: 0.125rem 0;
     }
 
@@ -37,11 +37,11 @@ block content
 
     .inputGroup
       label(for='title') #{T('Title')}: 
-      input(id='title' type='text' name='title' value=universe.title)
+      input#title(type='text' name='title' value=universe.title)
 
     .inputGroup
       label(for='shortname') #{T('Shortname')}: 
-      input(id='shortname' type='text' name='shortname' value=universe.newShort)
+      input#shortname(type='text' name='shortname' value=universe.newShort)
 
     .inputGroup
       small(style={ 'grid-column': '2 / 4' })
@@ -54,25 +54,49 @@ block content
 
     .inputGroup
       label(for='visibility') #{T('Visibility')}: 
-      select(id='visibility' name='visibility')
+      select#visibility(name='visibility')
         option(value='public' selected=(universe.public)) #{T('Public')}
         option(value='private' selected=(!universe.public)) #{T('Private')}
 
     .inputGroup
       label(for='discussion_enabled') #{T('Discussion')}: 
-      select(id='discussion_enabled' name='discussion_enabled')
+      select#discussion_enabled(name='discussion_enabled')
         option(value='enabled' selected=(universe.discussion_enabled)) #{T('Enabled')}
         option(value='disabled' selected=(!universe.discussion_enabled)) #{T('Disabled')}
 
     .inputGroup
       label(for='discussion_open') #{T('Who can comment')}: 
-      select(id='discussion_open' name='discussion_open')
+      select#discussion_open(name='discussion_open')
         option(value='enabled' selected=(universe.discussion_open)) #{T('Anyone')}
         option(value='disabled' selected=(!universe.discussion_open)) #{T('Only with COMMENT permissions')}
 
+    .inputGroup
+      label #{T('Theme')}: 
+      select#theme
+        option(value='default' selected=(universe.obj_data.theme === 'default')) #{T('Default')}
+        option(value='glass' selected=(universe.obj_data.theme === 'glass')) #{T('Glass')}
+
+    #backdropUrl-div.inputGroup.hidden
+      label #{T('Background Image URL')}: 
+      input#backdropUrl(type='text' value=universe.obj_data.backdropUrl)
+
     div
-      input(id='obj_data' type='hidden' name='obj_data' value='{}')
+      input#obj_data(type='hidden' name='obj_data' value='{}')
       button(type='submit') #{T('Save Changes')}
+
+    script.
+      const theme = document.querySelector('#theme');
+      const backdropUrl = document.querySelector('#backdropUrl');
+      const backdropUrlDiv = document.querySelector('#backdropUrl-div');
+      function handleThemeChange() {
+        backdropUrlDiv.classList.toggle('hidden', theme.value === 'default');
+        updateObjData({ theme: theme.value });
+      }
+      theme.addEventListener('change', handleThemeChange);
+      backdropUrl.addEventListener('change', () => {
+        updateObjData({ backdropUrl: backdropUrl.value });
+      });
+      handleThemeChange();
 
     small.color-error.hidden#validation-error
     if error
@@ -97,7 +121,7 @@ block content
     small
       b #{T('Note:')} 
       | #{T('be aware that removing or renaming item types will not update any existing items with that type.')}
-    table
+    table.sheet
       thead
         tr
           th #{T('Shortname')}
@@ -122,6 +146,9 @@ block content
     .d-flex.gap-2.mt-2
       button(type='button' onclick='addCat()') #{T('Add Type')}
       button(type='button' onclick='resetCats()') #{T('Reset to default types')}
+
+    .mt-2
+      button(type='submit') #{T('Save Changes')}
 
   #data(data-universe=universe)
   script.

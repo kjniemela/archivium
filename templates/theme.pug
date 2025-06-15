@@ -1,0 +1,11 @@
+style
+  if theme.background
+    .
+      header, body {
+        background: #{theme.background};
+      }
+  if theme.backgroundImage
+    .
+      header, body {
+        background-image: url('#{theme.backgroundImage}');
+      }
