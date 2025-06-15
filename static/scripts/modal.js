@@ -2,8 +2,13 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
 
 (function() {
   const modals = {};
+  const anchor = new Promise((resolve) => {
+    window.addEventListener('load', () => {
+      resolve(document.querySelector('#modal-anchor'));
+    });
+  });
 
-  function modal(id, children, show=false) {
+  async function modal(id, children, show=false) {
     if (id in modals) removeModal(id);
     if (!(children instanceof Array)) children = [children];
     const newModal = createElement('div', { attrs: {
@@ -14,7 +19,7 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
     ] });
     modals[id] = newModal;
     if (show) showModal(id);
-    return newModal;
+    (await anchor).appendChild(newModal);
   }
 
   function showModal(id) {
@@ -29,7 +34,7 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
     modals[id].remove();
   }
 
-  function loadModal(id, show=false) {
+  async function loadModal(id, show=false) {
     const modalEl = document.getElementById(id);
     modalEl.classList.add('modal', 'hidden');
     modalEl.addEventListener('click', () => hideModal(id));
@@ -37,6 +42,7 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
     modalEl.innerHTML = '';
     modalEl.appendChild(createElement('div', { classList: ['modal-content'], attrs: {onclick: (e) => e.stopPropagation()}, children: content }));
     modals[id] = modalEl;
+    (await anchor).appendChild(modalEl);
     if (show) showModal(id);
   }
 

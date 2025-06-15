@@ -39,7 +39,6 @@ function bindDataValue(selector, setter) {
 
 
 function selectTab(name) {
-  console.log(selectedTab, name)
   if (selectedTab) {
     document.querySelector(`#tabs [data-tab="${selectedTab}"]`).classList.add('hidden');
     document.querySelector(`#tabs [data-tab-btn="${selectedTab}"]`).classList.remove('selected');
@@ -99,9 +98,9 @@ async function addTab(type, name, force=false) {
   }
 
   if (type !== 'custom') {
-    const option = document.querySelector(`#new_tab_type [value="${type}"]`);
+    const option = document.querySelector(`#new-tab-type [value="${type}"]`);
     if (option) option.disabled = true;
-    document.querySelector(`#new_tab_type`).selectedIndex = 0;
+    document.querySelector(`#new-tab-type`).selectedIndex = 0;
   }
 }
 
@@ -201,7 +200,7 @@ function lineageTab(name) {
 async function timelineTab(name) {
   return createElement('div', { children: [
     createElement('h4', { attrs: { innerText: T('Events') } }),
-    ...(obj_data.timeline.events ?? []).sort((a, b) => a.time > b.time ? 1 : -1).map((event, i) => (
+    ...await Promise.all((obj_data.timeline.events ?? []).sort((a, b) => a.time > b.time ? 1 : -1).map(async (event, i) => (
       createElement('div', { children: [
         ...(event.imported ? [
           createElement('span', { attrs: { innerText: `${event.title ? `${event.title} of ` : ``}${event.src}: ${event.time}` } }),
@@ -219,7 +218,7 @@ async function timelineTab(name) {
             target.value = Math.round(Number(target.value));
             resetTabs(name);
           } } }),
-          ...timePickerModal(`${i}_event_time`, () => {
+          ...await timePickerModal(`${i}_event_time`, () => {
             const input = document.getElementById(`${i}_event_time`);
             input.oninput({ target: input });
           }),
@@ -235,7 +234,7 @@ async function timelineTab(name) {
           },
         } }),
       ] })
-    )),
+    ))),
     createElement('br'),
     createElement('h4', { attrs: { innerText: T('Add Events') } }),
     createElement('div', { classList: ['d-flex', 'flex-col', 'gap-1', 'pa-1', 'align-start'], children: [
@@ -248,7 +247,7 @@ async function timelineTab(name) {
         createElement('input', { attrs: { id: 'new_event_time', type: 'number', onchange: ({ target }) => {
           target.value = Math.round(Number(target.value));
         } } }),
-        ...timePickerModal('new_event_time'),
+        ...await timePickerModal('new_event_time'),
       ]}),
       createElement('button', { attrs: {
         type: 'button',
@@ -348,7 +347,6 @@ async function importEventModal(callback) {
       }
       eventMap[src_id].push([src_shortname, src_title, src_id, event_title, abstime ]);
     }
-    console.log(eventMap, eventItems, eventItemShorts)
     fetchedEvents = true;
   }
   let selectedItem;
@@ -364,20 +362,20 @@ async function importEventModal(callback) {
     selectedEvent = { title, time };
   });
   eventSelect.classList.add('hidden');
+  await modal('import-event', [
+    createElement('div', { classList: ['sheet', 'd-flex', 'flex-col', 'gap-1'], children: [
+      itemSelect,
+      eventSelect,
+      createElement('button', { attrs: {
+        type: 'button',
+        innerText: T('Import'), 
+        onclick: () => {
+          callback([selectedItem, selectedEvent]);
+        },
+      } }),
+    ] }),
+  ]);
   return [
-    modal('import-event', [
-      createElement('div', { classList: ['sheet', 'd-flex', 'flex-col', 'gap-1'], children: [
-        itemSelect,
-        eventSelect,
-        createElement('button', { attrs: {
-          type: 'button',
-          innerText: T('Import'), 
-          onclick: () => {
-            callback([selectedItem, selectedEvent]);
-          },
-        } }),
-      ] }),
-    ]),
     createElement('button', { attrs: {
       type: 'button',
       innerText: T('Import Event'), 
@@ -388,23 +386,23 @@ async function importEventModal(callback) {
   ];
 }
 
-function timePickerModal(id, callback) {
+async function timePickerModal(id, callback) {
   const cp = new CalendarPicker();
+  await modal(`time-picker-${id}`, [
+    createElement('div', { classList: ['sheet', 'd-flex', 'flex-col', 'gap-1'], children: [
+      ...cp.fields,
+      createElement('button', { attrs: {
+        type: 'button',
+        innerText: T('Select'), 
+        onclick: () => {
+          document.getElementById(id).value = cp.getAbsTime();
+          hideModal(`time-picker-${id}`);
+          if (callback) callback();
+        },
+      } }),
+    ] }),
+  ]);
   return [
-    modal(`time-picker-${id}`, [
-      createElement('div', { classList: ['sheet', 'd-flex', 'flex-col', 'gap-1'], children: [
-        ...cp.fields,
-        createElement('button', { attrs: {
-          type: 'button',
-          innerText: T('Select'), 
-          onclick: () => {
-            document.getElementById(id).value = cp.getAbsTime();
-            hideModal(`time-picker-${id}`);
-            if (callback) callback();
-          },
-        } }),
-      ] }),
-    ]),
     createElement('button', { attrs: {
       type: 'button',
       innerHTML: '&#x1F4C5;', 
@@ -438,7 +436,7 @@ function removeTab(name, type) {
     overwriteObjData(newState);
   }
 
-  const option = document.querySelector(`#new_tab_type [value="${type}"]`);
+  const option = document.querySelector(`#new-tab-type [value="${type}"]`);
   if (option) option.disabled = false;
 }
 

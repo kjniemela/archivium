@@ -229,10 +229,10 @@ block content
     .hidden( data-tab='stories' )
       .card-list.mt-3
         if contextUser && universe.author_permissions[contextUser.id] >= perms.WRITE
-          .card.sheet( data-goto=`${ADDR_PREFIX}/stories/create` )
-            .d-flex.justify-center( style={ 'grid-column': '1 / 4' } )
-              a.link.d-flex.justify-center( href=`${ADDR_PREFIX}/stories/create` )
-                .navbarText.material-symbols-outlined.heavy.ma-0.pa-1.pr-0.grow-0( style={ 'font-size': '1.5rem' } onclick="showModal('new-tab-modal')" ) add
+          .card.sheet(data-goto=`${ADDR_PREFIX}/stories/create`)
+            .d-flex.justify-center(style={ 'grid-column': '1 / 4' })
+              a.link.d-flex.justify-center(href=`${ADDR_PREFIX}/stories/create`)
+                .navbarText.material-symbols-outlined.heavy.ma-0.pa-1.pr-0.grow-0(style={ 'font-size': '1.5rem' }) add
                 .big-text.navbarText.pa-1.grow-0 #{T('New Story')}
         each story in stories
           +storyCard(story)
