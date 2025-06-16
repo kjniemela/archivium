@@ -137,6 +137,8 @@ module.exports = function(app) {
   get('/stories/:shortname/:index/edit', sites.ALL, Auth.verifySessionOrRedirect, pages.story.editChapter);
   get('/stories/:shortname/:index/delete', sites.ALL, Auth.verifySessionOrRedirect, pages.story.deleteChapter);
 
+  get('/items', sites.NORMAL, pages.item.list);
+
   injectContext((req, res) => {
     if (res.templateData?.data?.universe) {
       const themeName = res.templateData.data.universe.obj_data.theme;
@@ -157,7 +159,6 @@ module.exports = function(app) {
     get('/universes/:universeShortname/permissions', sites.NORMAL, Auth.verifySessionOrRedirect, pages.universe.editPerms);
 
     /* Item Pages */
-    get('/items', sites.NORMAL, pages.item.list);
     get('/universes/:universeShortname/items/create', sites.NORMAL, Auth.verifySessionOrRedirect, pages.item.create);
     get('/universes/:universeShortname/items/:itemShortname', sites.NORMAL, pages.item.view);
     get('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, Auth.verifySessionOrRedirect, pages.item.edit);
