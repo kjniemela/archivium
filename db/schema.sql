@@ -34,6 +34,12 @@ CREATE TABLE user (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE useraccesstier (
+  user_id INT NOT NULL,
+  tier TINYINT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
+);
+
 CREATE TABLE userimage (
   user_id INT NOT NULL,
   name VARCHAR(64) NOT NULL,
@@ -99,6 +105,14 @@ CREATE TABLE universe (
   obj_data TEXT NOT NULL,
   FOREIGN KEY (author_id) REFERENCES user (id),
   PRIMARY KEY (id)
+);
+
+CREATE TABLE usersponsoreduniverse (
+  user_id INT NOT NULL,
+  universe_id INT NOT NULL,
+  tier TINYINT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE,
+  FOREIGN KEY (universe_id) REFERENCES universe (id) ON DELETE CASCADE
 );
 
 CREATE TABLE discussion (

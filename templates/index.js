@@ -1,6 +1,6 @@
 const pug = require('pug');
 const { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN } = require('../config');
-const { perms, getPfpUrl } = require('../api/utils');
+const { perms, getPfpUrl, tiers } = require('../api/utils');
 const { locale, lang, sprintf, T } = require('../locale');
 const api = require('../api');
 const path = require('path');
@@ -44,6 +44,7 @@ function contextData(req) {
     locale: locale[lang],
     themes,
     theme: req.theme ?? themes.default,
+    tiers,
     T,
     sprintf,
     validateUsername: api.user.validateUsername,

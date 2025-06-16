@@ -75,41 +75,42 @@ block content
 
       hr.mt-4
 
-      h3 #{T('Change Preferences')}
-      form#changePreferences
-        .inputGroup
-          label(for='theme') #{T('Preferred Theme')}: 
-          select#theme(name='theme' type='text')
-            each _, key in themes
-              if key !== 'custom'
-                option(value=key selected=(user.preferred_theme === key)) #{T(`theme_${key}`)}
-        .inputGroup
-          .d-flex.col-2
-            button(type='submit') #{T('Update Preferences')}
+      if user.tier >= tiers.BETA
+        h3 #{T('Change Preferences')}
+        form#changePreferences
+          .inputGroup
+            label(for='theme') #{T('Preferred Theme')}: 
+            select#theme(name='theme' type='text')
+              each _, key in themes
+                if key !== 'custom'
+                  option(value=key selected=(user.preferred_theme === key)) #{T(`theme_${key}`)}
+          .inputGroup
+            .d-flex.col-2
+              button(type='submit') #{T('Update Preferences')}
 
-        small.color-error.hidden#preferences-error
+          small.color-error.hidden#preferences-error
 
-        script.
-          (() => {
-            const form = document.forms.changePreferences;
-            const formError = document.querySelector('#preferences-error');
-            form.addEventListener('submit', async (e) => {
-              formError.classList.add('hidden');
-              e.preventDefault();
+          script.
+            (() => {
+              const form = document.forms.changePreferences;
+              const formError = document.querySelector('#preferences-error');
+              form.addEventListener('submit', async (e) => {
+                formError.classList.add('hidden');
+                e.preventDefault();
 
-              const value = form.theme.value;
+                const value = form.theme.value;
 
-              const [response, data] = await putJSON(`/api/users/#{user.username}/preferences`, { preferred_theme: value });
-              if (response.status === 200) {
-                window.location.reload();
-              } else {
-                formError.innerText = data;
-                formError.classList.remove('hidden');
-              }
-            });
-          })();
+                const [response, data] = await putJSON(`/api/users/#{user.username}/preferences`, { preferred_theme: value });
+                if (response.status === 200) {
+                  window.location.reload();
+                } else {
+                  formError.innerText = data;
+                  formError.classList.remove('hidden');
+                }
+              });
+            })();
 
-      hr.mt-4
+        hr.mt-4
 
       h3 #{T('Change Password')}
       form#changePassword

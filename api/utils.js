@@ -12,6 +12,13 @@ const perms = {
   OWNER: 5,
 };
 
+const tiers = {
+  FREE: 0,
+  PREMIUM: 1,
+  BETA: 2,
+  SUPER: 3,
+};
+
 async function executeQuery(query, values) {
   const [ results ] = await db.execute(query, values);
   return results;
@@ -222,6 +229,7 @@ function getPfpUrl(user) {
 
 module.exports = {
   perms,
+  tiers,
   executeQuery,
   RollbackError,
   withTransaction,
