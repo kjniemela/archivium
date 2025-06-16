@@ -73,10 +73,8 @@ block content
     .inputGroup
       label #{T('Theme')}: 
       select#theme
-        option(value='default' selected=(universe.obj_data.theme === 'default')) #{T('Default')}
-        option(value='glass' selected=(universe.obj_data.theme === 'glass')) #{T('Glass')}
-        option(value='space' selected=(universe.obj_data.theme === 'space')) #{T('Space')}
-        option(value='custom' selected=(universe.obj_data.theme === 'custom')) #{T('Custom Theme')}
+        each _, themeKey in themes
+          option(value=themeKey selected=(universe.obj_data.theme === themeKey)) #{T(`theme_${themeKey}`)}
 
     #customTheme.hidden.form-row-group
       .inputGroup

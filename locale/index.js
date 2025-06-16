@@ -13,6 +13,10 @@ const locale = {
     [`notif_${api.notification.types.UNIVERSE}`]: 'Universe Updates',
     [`notif_${api.notification.types.COMMENTS}`]: 'Comments & Discussion',
     [`notif_${api.notification.types.FEATURES}`]: 'Archivium Updates',
+    ['theme_default']: 'Default',
+    ['theme_glass']: 'Glass',
+    ['theme_space']: 'Space',
+    ['theme_custom']: 'Custom Theme',
   },
   sv: {
     'article': 'artikel',

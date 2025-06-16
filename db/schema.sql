@@ -30,6 +30,7 @@ CREATE TABLE user (
   verified BOOLEAN DEFAULT FALSE,
   suspect BOOLEAN DEFAULT FALSE,
   email_notifications BOOLEAN DEFAULT FALSE,
+  preferred_theme VARCHAR(16),
   PRIMARY KEY (id)
 );
 

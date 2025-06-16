@@ -4,6 +4,7 @@ const { perms, getPfpUrl } = require('../api/utils');
 const { locale, lang, sprintf, T } = require('../locale');
 const api = require('../api');
 const path = require('path');
+const themes = require('../themes');
 
 function universeLink(req, uniShort) {
   const displayUniverse = req.headers['x-subdomain'];
@@ -14,21 +15,6 @@ function universeLink(req, uniShort) {
     return `${ADDR_PREFIX}/universes/${uniShort}`;
   }
 }
-
-const themes = {
-  custom: {},
-  default: {
-    glass: false,
-  },
-  glass: {
-    glass: true,
-    background: 'radial-gradient(circle, #f0f0f0 0%, #8b8b8b 100%) 0 0',
-  },
-  space: {
-    glass: true,
-    backgroundImage: '/static/assets/themes/space.jpg',
-  },
-};
 
 // Basic context information to be sent to the templates
 function contextData(req) {
@@ -56,6 +42,7 @@ function contextData(req) {
     searchQueries: searchQueries.toString(),
     perms,
     locale: locale[lang],
+    themes,
     theme: req.theme ?? themes.default,
     T,
     sprintf,
@@ -136,5 +123,4 @@ function render(req, template, context = {}) {
 module.exports = {
   render,
   universeLink,
-  themes,
 };

@@ -198,6 +198,30 @@ async function put(user_id, userIDToPut, { updated_at, verified }) {
   }
 }
 
+async function putPreferences(sessionUser, username, { preferred_theme }) {
+  if (!sessionUser) return [401];
+  const [code, user] = await getOne({ 'user.username': username }, true);
+  if (!user) return [code];
+  if (Number(sessionUser.id) !== Number(user.id)) return [403];
+  const changes = { preferred_theme };
+
+  try {
+    const keys = Object.keys(changes).filter(key => changes[key] !== undefined);
+    if (keys.length === 0) return [400];
+    const values = keys.map(key => changes[key]);
+    const queryString = `
+      UPDATE user
+      SET
+        ${keys.map(key => `${key} = ?`).join(', ')}
+      WHERE id = ?;
+    `;
+    return [200, await executeQuery(queryString, [...values, user.id])];
+  } catch (err) {
+    logger.error(err);
+    return [500];
+  }
+}
+
 async function putUsername(sessionUser, oldUsername, newUsername) {
   const [code, user] = await getOne({ 'user.username': oldUsername });
   if (!user) return [code];
@@ -483,6 +507,7 @@ module.exports = {
   validatePassword,
   validateUsername,
   put,
+  putPreferences,
   putUsername,
   putPassword,
   del,

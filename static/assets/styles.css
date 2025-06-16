@@ -967,6 +967,10 @@ input:checked + .slider:before {
 .flex-col {
   flex-direction: column;
 }
+.flex-col hr {
+  margin-left: 0;
+  margin-right: 0;
+}
 
 .flex-wrap {
   flex-wrap: wrap;

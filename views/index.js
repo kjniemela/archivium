@@ -2,12 +2,13 @@ const { ADDR_PREFIX, DEV_MODE } = require('../config');
 const Auth = require('../middleware/auth');
 const api = require('../api');
 const md5 = require('md5');
-const { render, universeLink, themes } = require('../templates');
+const { render, universeLink } = require('../templates');
 const { perms, Cond, getPfpUrl } = require('../api/utils');
 const fs = require('fs/promises');
 const logger = require('../logger');
 const ReCaptcha = require('../middleware/reCaptcha');
 const Theme = require('../middleware/theme');
+const themes = require("../themes");
 
 const pages = require('./pages');
 const forms = require('./forms');
