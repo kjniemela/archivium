@@ -76,15 +76,18 @@ block content
         option(value='default' selected=(universe.obj_data.theme === 'default')) #{T('Default')}
         option(value='glass' selected=(universe.obj_data.theme === 'glass')) #{T('Glass')}
         option(value='space' selected=(universe.obj_data.theme === 'space')) #{T('Space')}
+        option(value='custom' selected=(universe.obj_data.theme === 'custom')) #{T('Custom Theme')}
 
-    #backgroundImage-div.hidden
+    #customTheme.hidden.form-row-group
+      .inputGroup
+        label #{T('Use "Glass Pane" theme')}: 
+        label.switch
+          input#glass(type='checkbox' checked=Boolean((universe.obj_data.customTheme || {}).glass))
+          span.slider
+
       .inputGroup
         label #{T('Background Image URL')}: 
-        input#backgroundImage(type='text' value=universe.obj_data.backgroundImage)
-
-      .inputGroup
-        small(style={ 'grid-column': '2 / 4' })
-          i #{T('Optionally provide the URL for a background image, which will be displayed behind all pages of %s.', universe.title)}
+        input#backgroundImage(type='text' value=(universe.obj_data.customTheme || {}).backgroundImage)
 
     div
       input#obj_data(type='hidden' name='obj_data' value='{}')
@@ -92,15 +95,25 @@ block content
 
     script.
       const theme = document.querySelector('#theme');
+      const glass = document.querySelector('#glass');
       const backgroundImage = document.querySelector('#backgroundImage');
-      const backgroundImageDiv = document.querySelector('#backgroundImage-div');
+      const customThemeDiv = document.querySelector('#customTheme');
       function handleThemeChange() {
-        backgroundImageDiv.classList.toggle('hidden', theme.value !== 'glass');
+        customThemeDiv.classList.toggle('hidden', theme.value !== 'custom');
         updateObjData({ theme: theme.value });
       }
       theme.addEventListener('change', handleThemeChange);
+      glass.addEventListener('change', () => {
+        updateObjData({ customTheme: {
+          ...obj_data.customTheme ?? {},
+          glass: glass.checked
+        } });
+      });
       backgroundImage.addEventListener('change', () => {
-        updateObjData({ backgroundImage: backgroundImage.value });
+        updateObjData({ customTheme: {
+          ...obj_data.customTheme ?? {},
+          backgroundImage: backgroundImage.value
+        } });
       });
       handleThemeChange();
 

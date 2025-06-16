@@ -490,7 +490,7 @@ table td:not(:last-child), table th:not(:last-child) {
   white-space: nowrap;
 }
 
-form {
+form, .form-row-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;

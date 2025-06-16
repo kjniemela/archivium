@@ -16,6 +16,7 @@ function universeLink(req, uniShort) {
 }
 
 const themes = {
+  custom: {},
   default: {
     glass: false,
   },

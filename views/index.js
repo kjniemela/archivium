@@ -139,11 +139,11 @@ module.exports = function(app) {
   injectContext((req, res) => {
     if (res.templateData?.data?.universe) {
       const themeName = res.templateData.data.universe.obj_data.theme;
-      const backgroundImage = res.templateData.data.universe.obj_data.backgroundImage;
+      const customTheme = res.templateData.data.universe.obj_data.customTheme ?? {};
       const baseTheme = themes[themeName] ?? req.theme;
       req.theme = {
+        ...customTheme,
         ...baseTheme,
-        backgroundImage: backgroundImage ?? baseTheme.backgroundImage,
       };
     }
   }, (get) => {
