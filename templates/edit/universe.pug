@@ -73,8 +73,16 @@ block content
     .inputGroup
       label #{T('Theme')}: 
       select#theme
+        option(value=null selected=(!universe.obj_data.themey)) #{T('None')}
         each _, themeKey in themes
           option(value=themeKey selected=(universe.obj_data.theme === themeKey)) #{T(`theme_${themeKey}`)}
+
+    .inputGroup
+      small(style={ 'grid-column': '2 / 4' })
+        i 
+          | #{T('Note: selecting a theme from the list above will override the preferences of users visiting your universe.')}
+          br
+          | #{T('If this is not what you want to do, select "None".')}
 
     #customTheme.hidden.form-row-group
       .inputGroup
