@@ -69,6 +69,17 @@ footer {
   padding: 0.5rem;
   border: 1px solid #e9e9e933;
 }
+/* .glass-pane::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-image: url('');
+  opacity: 0.1;
+  z-index: -1;
+} */
 .page>.glass-pane {
   margin: -0.5rem;
   margin-top: 1.25rem;
@@ -272,12 +283,12 @@ header {
   top: -0.125rem;
 }
 
-.card.item-type div {
+/* .card.item-type div {
   height: 2.75rem;
   padding: 0.5rem;
   display: flex;
   align-items: center;
-}
+} */
 
 .cardLink {
   color: black;
@@ -1177,6 +1188,12 @@ input:checked + .slider:before {
 }
 .pa-2 {
   padding: 0.5rem;
+}
+.pa-3 {
+  padding: 0.75rem;
+}
+.pa-4 {
+  padding: 1rem;
 }
 
 .px-1 {

@@ -12,9 +12,9 @@ mixin typeCard(shortname, category)
         h2.mb-0.center= shortname ? capitalize(category[1]) : T('All Items')
         h2.mt-0.center (#{counts[shortname] || 0})
     if contextUser && (universe.author_permissions[contextUser.id] >= perms.WRITE)
-      div
-        a.cardBtn.link(href=`${universeLink(universe.shortname)}/items/create${shortname ? `?type=${shortname}` : ''}`) &#x2795; New
-        a.cardBtn.link(href=`${ADDR_PREFIX}/items?author=${contextUser.username}&universe=${universe.shortname}${shortname ? `&type=${shortname}` : ''}`) My #{shortname ? category[1] : 'Items'}
+      small.d-flex.gap-2.pa-3.align-baseline
+        a.link.link-animated(href=`${universeLink(universe.shortname)}/items/create${shortname ? `?type=${shortname}` : ''}`) &#x2795; New
+        a.link.link-animated(href=`${ADDR_PREFIX}/items?author=${contextUser.username}&universe=${universe.shortname}${shortname ? `&type=${shortname}` : ''}`) My #{shortname ? category[1] : 'Items'}
 
 block breadcrumbs
   if !displayUniverse  
@@ -44,7 +44,7 @@ block content
       |  #{formatDate(new Date(universe.created_at))}
       |  - Last updated #{formatDate(new Date(universe.updated_at))}
   
-  #action-bar.d-flex.justify-center.align-center.gap-2.mb-1
+  #action-bar.d-flex.flex-wrap.justify-center.align-center.gap-2.mb-1
     if contextUser
       script let isFollowing = #{universe.followers[contextUser.id]};
       script let universeShort = '#{universe.shortname}';
