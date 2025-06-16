@@ -21,7 +21,7 @@ mixin universeCard(universe)
         span #{universe.public ? T('Public') : T('Private')}
         if contextUser
           | —
-          a.follow-btn.link.link-animated(data-following=universe.followers[contextUser.id] data-universe-short=universe.shortname)
+          a.follow-btn.link.link-animated(data-following=universe.followers[contextUser.id] ? 'true' : 'false' data-universe-short=universe.shortname)
             | #{universe.followers[contextUser.id] ? T('Unfollow') : T('Follow')}
 
 .card-list

@@ -46,15 +46,14 @@ block content
   
   #action-bar.d-flex.justify-center.align-center.gap-2.mb-1
     if contextUser
-      script!= `isFollowing = ${universe.followers[contextUser.id]};`
-      script!= `universeShort = '${universe.shortname}';`
+      script let isFollowing = #{universe.followers[contextUser.id]};
+      script let universeShort = '#{universe.shortname}';
       a#follow-btn.link.link-animated
         if universe.followers[contextUser.id]
           | Unfollow
         else
           | Follow
         script.
-          let isFollowing = false;
           const followBtn = document.getElementById('follow-btn');
           followBtn.addEventListener('click', async () => {
             isFollowing = !isFollowing;
