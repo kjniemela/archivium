@@ -35,7 +35,7 @@ block scripts
 
 block content
   h1.center #{universe.title}
-  p#info-bar.center
+  p#info-bar.center.mb-1
     small Created by 
       if universe.owner
         a.link.link-animated( href=`${ADDR_PREFIX}/users/${universe.owner}` ) #{universe.owner}
@@ -43,41 +43,45 @@ block content
         | Deleted User
       |  #{formatDate(new Date(universe.created_at))}
       |  - Last updated #{formatDate(new Date(universe.updated_at))}
-      if contextUser
-        script!= `isFollowing = ${universe.followers[contextUser.id]};`
-        script!= `universeShort = '${universe.shortname}';`
-        |  - 
-        a#follow-btn.link.link-animated
-          if universe.followers[contextUser.id]
-            | Unfollow
-          else
-            | Follow
-          script.
-            let isFollowing = false;
-            const followBtn = document.getElementById('follow-btn');
-            followBtn.addEventListener('click', async () => {
+  
+  #action-bar.d-flex.justify-center.align-center.gap-2.mb-1
+    if contextUser
+      script!= `isFollowing = ${universe.followers[contextUser.id]};`
+      script!= `universeShort = '${universe.shortname}';`
+      a#follow-btn.link.link-animated
+        if universe.followers[contextUser.id]
+          | Unfollow
+        else
+          | Follow
+        script.
+          let isFollowing = false;
+          const followBtn = document.getElementById('follow-btn');
+          followBtn.addEventListener('click', async () => {
+            isFollowing = !isFollowing;
+            followBtn.classList.add('disabled');
+            followBtn.classList.remove('link-broken');
+            try {
+              await putJSON(`/api/universes/${universeShort}/follow`, { isFollowing: isFollowing });
+            } catch (err) {
+              console.error(err);
               isFollowing = !isFollowing;
-              followBtn.classList.add('disabled');
-              followBtn.classList.remove('link-broken');
-              try {
-                await putJSON(`/api/universes/${universeShort}/follow`, { isFollowing: isFollowing });
-              } catch (err) {
-                console.error(err);
-                isFollowing = !isFollowing;
-                followBtn.classList.add('link-broken');
-              } finally {
-                followBtn.innerText = isFollowing ? 'Unfollow' : 'Follow';
-                followBtn.classList.remove('disabled');
-              }
-            });
-        if universe.author_permissions[contextUser.id] >= perms.ADMIN
-          |  - 
-          a.link.link-animated(href=`${universeLink(universe.shortname)}/edit`) #{T('Edit')}
-          |  - 
-          a.link.link-animated(href=`${universeLink(universe.shortname)}/permissions`) #{T('Set Permissions')}
-        if universe.author_permissions[contextUser.id] >= perms.OWNER
-          |  - 
-          a.link.link-animated(href=`${universeLink(universe.shortname)}/delete`) #{T('Delete')}
+              followBtn.classList.add('link-broken');
+            } finally {
+              followBtn.innerText = isFollowing ? 'Unfollow' : 'Follow';
+              followBtn.classList.remove('disabled');
+            }
+          });
+      if universe.author_permissions[contextUser.id] >= perms.ADMIN
+        a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/edit`)
+          span.material-symbols-outlined edit
+          |  #{T('Edit')}
+        a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/permissions`)
+          span.material-symbols-outlined key_vertical
+          |  #{T('Set Permissions')}
+      if universe.author_permissions[contextUser.id] >= perms.OWNER
+        a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/delete`)
+          span.material-symbols-outlined delete
+          |  #{T('Delete')}
 
   hr
 
