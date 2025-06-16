@@ -142,10 +142,7 @@ module.exports = function(app) {
       const themeName = res.templateData.data.universe.obj_data.theme;
       const customTheme = res.templateData.data.universe.obj_data.customTheme ?? {};
       const baseTheme = themes[themeName] ?? req.theme;
-      req.theme = {
-        ...customTheme,
-        ...baseTheme,
-      };
+      req.theme = themeName === 'custom' ? customTheme : baseTheme;
     }
   }, (get) => {
     /* Universe Pages */
