@@ -314,10 +314,10 @@ header {
 }
 
 .color-error {
-  color: red;
+  color: red !important;
 }
 .color-success {
-  color: green;
+  color: green !important;
 }
 
 .userIcon {
@@ -739,10 +739,10 @@ h4, h5 {
 .link:focus, .link:hover {
   outline: none;
 }
-.link:focus.link-broken, .link:hover.link-broken {
+.link:focus(.link-broken, .color-error), .link:hover(.link-broken, .color-error) {
   color: red;
 }
-.link:focus:not(.link-broken).link-animated, .link:hover:not(.link-broken).link-animated {
+.link:focus:not(.link-broken, .color-error).link-animated, .link:hover:not(.link-broken, .color-error).link-animated {
   color: #069;
 }
 .link:focus:not(.link-broken):not(.link-animated), .link:hover:not(.link-broken):not(.link-animated) {
@@ -761,7 +761,7 @@ h4, h5 {
   background-size: 100% 0.125rem;
   background-position-y: bottom;
 }
-.link-animated.link-broken {
+.link-animated.link-broken, .link-animated.color-error {
   background-image: linear-gradient(red, red);
 }
 .link-background {
@@ -769,7 +769,7 @@ h4, h5 {
   border-radius: 50px;
   background: lightgray;
 }
-.link-broken.link-animated {
+.link-broken.link-animated, .link.color-error {
   color: red;
 }
 .link-broken:not(.link-animated) {

@@ -3,6 +3,18 @@ extends ../layout.pug
 block title
   title #{T('Edit %s', universe.title)}
 
+block breadcrumbs
+  if displayUniverse
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{universe.title}
+  else
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    |  / 
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    |  / 
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+  |  / 
+  span #{T('Edit')}
+
 block append styles
   link(rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css")
   style.
@@ -32,7 +44,9 @@ block content
     include /static/scripts/easyMDE.js
     include /static/scripts/shortname.js
 
-  h2 #{T('Edit %s', universe.title)}
+  .d-flex.justify-between.align-baseline
+    h2 #{T('Edit %s', universe.title)}
+    a.link.link-animated.color-error(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{T('Discard Changes')}
   form#edit(method='POST')
 
     .inputGroup
