@@ -330,6 +330,9 @@ header {
   margin-top: 1rem;
   margin-bottom: -2rem;
 }
+.error img {
+  border-radius: 0.5rem;
+}
 
 .color-error {
   color: red !important;
