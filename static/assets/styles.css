@@ -31,6 +31,16 @@ body {
   background-position: center top;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: -1;
+}
+
 main {
   margin: var(--page-margin-top) 0 2rem;
   flex-grow: 1;
@@ -128,8 +138,6 @@ header {
 
 @media only screen and (max-device-width: 480px) {
   body::before {
-    content: "";
-    position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
@@ -138,7 +146,6 @@ header {
     background-position: inherit;
     background-repeat: inherit;
     background-size: inherit;
-    z-index: -1;
   }
 
   .navbar {

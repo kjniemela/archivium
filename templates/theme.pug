@@ -1,12 +1,13 @@
 style
-  if theme.glass
+  if theme.glass || theme.background || theme.backgroundImage
     .
       .card.item-type {
-        backdrop-filter: blur(0.25rem);
+        backdrop-filter: blur(1rem);
+        background-color: #e9e9e99e;
       }
   if theme.background
     .
-      header, body {
+      header, body::before {
         background: #{theme.background};
       }
   if theme.backgroundImage

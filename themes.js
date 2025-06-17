@@ -4,7 +4,7 @@ const themes = {
   },
   glass: {
     glass: true,
-    background: 'radial-gradient(circle, #f0f0f0 0%, #8b8b8b 100%) 0 0',
+    background: 'radial-gradient(circle, #d2dbe5 0%, #718ea7 100%) 0 0',
   },
   space: {
     glass: true,
