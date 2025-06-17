@@ -1,6 +1,6 @@
 const pug = require('pug');
 const { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN } = require('../config');
-const { perms, getPfpUrl, tiers } = require('../api/utils');
+const { perms, getPfpUrl, tiers, plans, tierAllowance } = require('../api/utils');
 const { locale, lang, sprintf, T } = require('../locale');
 const api = require('../api');
 const path = require('path');
@@ -23,6 +23,7 @@ function contextData(req) {
     id: user.id,
     username: user.username,
     notifications: user.notifications,
+    plan: user.plan,
     pfpUrl: getPfpUrl(user),
   } : null;
 
@@ -44,7 +45,9 @@ function contextData(req) {
     locale: locale[lang],
     themes,
     theme: req.theme ?? themes.default,
+    plans,
     tiers,
+    tierAllowance,
     T,
     sprintf,
     validateUsername: api.user.validateUsername,
@@ -75,6 +78,7 @@ const templates = {
   universeList: compile('templates/list/universes.pug'),
   createUniverse: compile('templates/create/universe.pug'),
   editUniversePerms: compile('templates/edit/universePerms.pug'),
+  upgradeUniverse: compile('templates/edit/universeUpgrade.pug'),
   privateUniverse: compile('templates/view/privateUniverse.pug'),
 
   universeThread: compile('templates/view/universeThread.pug'),

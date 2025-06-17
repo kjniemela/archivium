@@ -75,7 +75,7 @@ block content
 
       hr.mt-4
 
-      if user.tier >= tiers.BETA
+      if user.plan >= plans.BETA
         h3 #{T('Change Preferences')}
         form#changePreferences
           .inputGroup

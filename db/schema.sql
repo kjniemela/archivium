@@ -34,9 +34,9 @@ CREATE TABLE user (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE useraccesstier (
+CREATE TABLE userplan (
   user_id INT NOT NULL,
-  tier TINYINT NOT NULL,
+  plan TINYINT NOT NULL,
   FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
 );
 

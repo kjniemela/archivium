@@ -1,8 +1,8 @@
 UPDATE schema_version SET version = 12, comment = 'Add access tiers & user theme', time = NOW();
 
-CREATE TABLE useraccesstier (
+CREATE TABLE userplan (
   user_id INT NOT NULL,
-  tier TINYINT NOT NULL,
+  plan TINYINT NOT NULL,
   FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
 );
 

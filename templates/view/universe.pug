@@ -77,6 +77,11 @@ block content
         a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/permissions`)
           span.material-symbols-outlined key_vertical
           |  #{T('Set Permissions')}
+        - console.log(tierAllowance, contextUser, tierAllowance[contextUser.plan], contextUser.plan, universe.tier)
+        if Math.max(...Object.keys(tierAllowance[contextUser.plan] || {})) > universe.tier
+          a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/upgrade`)
+            span.material-symbols-outlined workspace_premium
+            |  #{T('Upgrade')}
       if universe.author_permissions[contextUser.id] >= perms.OWNER
         a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/delete`)
           span.material-symbols-outlined delete
@@ -239,4 +244,3 @@ block content
                 .big-text.navbarText.pa-1.grow-0 #{T('New Story')}
         each story in stories
           +storyCard(story)
-        

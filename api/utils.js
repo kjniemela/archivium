@@ -12,11 +12,23 @@ const perms = {
   OWNER: 5,
 };
 
-const tiers = {
+const plans = {
   FREE: 0,
   PREMIUM: 1,
   BETA: 2,
   SUPER: 3,
+};
+
+const tiers = {
+  FREE: 0,
+  PREMIUM: 1,
+};
+
+const tierAllowance = {
+  [plans.FREE]: { [tiers.FREE]: 5 },
+  [plans.PREMIUM]: { [tiers.FREE]: 20, [tiers.PREMIUM]: 5 },
+  [plans.BETA]: { [tiers.FREE]: 5, [tiers.PREMIUM]: 3 },
+  [plans.SUPER]: { [tiers.FREE]: 999, [tiers.PREMIUM]: 999  },
 };
 
 async function executeQuery(query, values) {
@@ -229,7 +241,9 @@ function getPfpUrl(user) {
 
 module.exports = {
   perms,
+  plans,
   tiers,
+  tierAllowance,
   executeQuery,
   RollbackError,
   withTransaction,

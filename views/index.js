@@ -136,7 +136,7 @@ module.exports = function(app) {
   get('/stories/:shortname/:index', sites.ALL, pages.story.viewChapter);
   get('/stories/:shortname/:index/edit', sites.ALL, Auth.verifySessionOrRedirect, pages.story.editChapter);
   get('/stories/:shortname/:index/delete', sites.ALL, Auth.verifySessionOrRedirect, pages.story.deleteChapter);
-
+  
   get('/items', sites.NORMAL, pages.item.list);
 
   injectContext((req, res) => {
@@ -157,6 +157,7 @@ module.exports = function(app) {
     get('/universes/:universeShortname/discuss/:threadId', sites.NORMAL, Auth.verifySessionOrRedirect, pages.universe.discussionThread);
     get('/universes/:universeShortname/items', sites.NORMAL, pages.universe.itemList);
     get('/universes/:universeShortname/permissions', sites.NORMAL, Auth.verifySessionOrRedirect, pages.universe.editPerms);
+    get('/universes/:universeShortname/upgrade', sites.NORMAL, Auth.verifySessionOrRedirect, pages.universe.upgrade);
 
     /* Item Pages */
     get('/universes/:universeShortname/items/create', sites.NORMAL, Auth.verifySessionOrRedirect, pages.item.create);
@@ -171,6 +172,7 @@ module.exports = function(app) {
     get('/discuss/create', sites.DISPLAY, Auth.verifySessionOrRedirect, subdomain(pages.universe.createDiscussionThread, (sub) => ({ universeShortname: sub })));
     get('/discuss/:threadId', sites.DISPLAY, subdomain(pages.universe.discussionThread, (sub) => ({ universeShortname: sub })));
     get('/permissions', sites.DISPLAY, Auth.verifySessionOrRedirect, subdomain(pages.universe.editPerms, (sub) => ({ universeShortname: sub })));
+    get('/upgrade', sites.DISPLAY, Auth.verifySessionOrRedirect, subdomain(pages.universe.upgrade, (sub) => ({ universeShortname: sub })));
     
     get('/items', sites.DISPLAY, subdomain(pages.universe.itemList, (sub) => ({ universeShortname: sub })));
     get('/items/create', sites.DISPLAY, Auth.verifySessionOrRedirect, subdomain(pages.item.create, (sub) => ({ universeShortname: sub })));

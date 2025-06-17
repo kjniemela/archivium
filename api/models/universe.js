@@ -51,7 +51,8 @@ async function getMany(user, conditions, permissionLevel=perms.READ, options={})
         JSON_REMOVE(JSON_OBJECTAGG(
           IFNULL(fu.user_id, 'null__'),
           fu.is_following
-        ), '$.null__') AS followers
+        ), '$.null__') AS followers,
+        IFNULL(MAX(usu.tier), 0) AS tier
       FROM universe
       INNER JOIN authoruniverse AS au_filter
         ON universe.id = au_filter.universe_id AND (
@@ -61,6 +62,7 @@ async function getMany(user, conditions, permissionLevel=perms.READ, options={})
       LEFT JOIN user AS author ON author.id = au.user_id
       LEFT JOIN followeruniverse AS fu ON universe.id = fu.universe_id
       LEFT JOIN user AS owner ON universe.author_id = owner.id
+      LEFT JOIN usersponsoreduniverse AS usu ON universe.id = usu.universe_id
       ${conditionString}
       GROUP BY universe.id
       ORDER BY ${options.sort ? `${options.sort} ${options.sortDesc ? 'DESC' : 'ASC'}` : 'updated_at DESC'}`;

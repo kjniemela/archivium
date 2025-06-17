@@ -21,15 +21,15 @@ async function getOne(options, includeAuth=false, includeNotifs=false) {
     const queryString = `
       SELECT
         user.*,
-        (ui.user_id IS NOT NULL) as hasPfp,
-        uat.tier
-        ${includeNotifs ? ', COUNT(notif.id) as notifications' : ''}
+        (ui.user_id IS NOT NULL) AS hasPfp,
+        up.plan
+        ${includeNotifs ? ', COUNT(notif.id) AS notifications' : ''}
       FROM user
       LEFT JOIN userimage AS ui ON user.id = ui.user_id
-      LEFT JOIN useraccesstier AS uat ON user.id = uat.user_id
+      LEFT JOIN userplan AS up ON user.id = up.user_id
       ${includeNotifs ? 'LEFT JOIN sentnotification AS notif ON user.id = notif.user_id AND NOT notif.is_read' : ''}
       WHERE ${parsedOptions.strings.join(' AND ')}
-      GROUP BY user.id, uat.tier
+      GROUP BY user.id, up.plan
       LIMIT 1;
     `;
     const user = (await executeQuery(queryString, parsedOptions.values))[0];

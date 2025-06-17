@@ -1,0 +1,71 @@
+extends ../layout.pug
+
+block title
+  title #{T('Upgrade %s', universe.title)}
+
+block breadcrumbs
+  if displayUniverse
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{universe.title}
+  else
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    |  / 
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    |  / 
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+  |  / 
+  span #{T('Upgrade')}
+
+block scripts
+  script
+    include /static/scripts/fetchUtils.js
+
+block append styles
+  style.
+    .plan-grid {
+      display: grid;
+      gap: 0.625rem;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media only screen and ((max-device-width: 480px) or (max-width: 750px)) {
+      .plan-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+block content
+  script.
+    window.addEventListener('load', () => {
+      document.querySelectorAll('form .permission_level').forEach((select) => {
+        select.onchange = () => {
+          select.form.submit();
+        }
+      });
+    });
+
+  .d-flex.justify-between.align-baseline
+    h2 Upgrade #{universe.title}
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{T('Go back')}
+
+  .plan-grid
+    label.sheet
+      .d-flex.gap-2.align-center
+        input.radio(name='plan' type='radio' value=tiers.FREE checked=universe.tier === tiers.FREE)
+        h2 #{T('Free Tier')}
+
+      ul
+        li #{T('Unlimited items')}*
+        //- li #{T('Up to %s of images', '?mb')}
+        li #{T('Default theme only')}
+        li #{T('Image upload limits')}
+
+    label.sheet
+      .d-flex.gap-2.align-center
+        input.radio(name='plan' type='radio' value=tiers.PREMIUM checked=universe.tier === tiers.PREMIUM)
+        h2 #{T('Premium Tier')}
+
+      ul
+        li #{T('Unlimited items')}*
+        //- li #{T('Up to %s of images', '?mb')}
+        li #{T('Custom themes')}
+        li #{T('Higher upload limits')}

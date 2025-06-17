@@ -157,4 +157,11 @@ module.exports = {
     }
     res.prepareRender('editUniversePerms', { universe, users, requests, ownerCount });
   },
+
+  async upgrade(req, res) {
+    const [code1, universe] = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.ADMIN);
+    res.status(code1);
+    if (!universe) return;
+    res.prepareRender('upgradeUniverse', { universe });
+  },
 };
