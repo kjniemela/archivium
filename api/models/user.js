@@ -102,6 +102,7 @@ async function getByUniverseShortname(user, shortname) {
 }
 
 async function getSponsoredUniverses(user) {
+  if (!user) return [400];
   try {
     const queryString = `
       SELECT
