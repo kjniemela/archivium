@@ -114,29 +114,30 @@ block content
       input#obj_data(type='hidden' name='obj_data' value='{}')
       button(type='submit') #{T('Save Changes')}
 
-    script.
-      const theme = document.querySelector('#theme');
-      const glass = document.querySelector('#glass');
-      const backgroundImage = document.querySelector('#backgroundImage');
-      const customThemeDiv = document.querySelector('#customTheme');
-      function handleThemeChange() {
-        customThemeDiv.classList.toggle('hidden', theme.value !== 'custom');
-        updateObjData({ theme: theme.value });
-      }
-      theme.addEventListener('change', handleThemeChange);
-      glass.addEventListener('change', () => {
-        updateObjData({ customTheme: {
-          ...obj_data.customTheme ?? {},
-          glass: glass.checked
-        } });
-      });
-      backgroundImage.addEventListener('change', () => {
-        updateObjData({ customTheme: {
-          ...obj_data.customTheme ?? {},
-          backgroundImage: backgroundImage.value
-        } });
-      });
-      handleThemeChange();
+    if universe.tier >= tiers.PREMIUM
+      script.
+        const theme = document.querySelector('#theme');
+        const glass = document.querySelector('#glass');
+        const backgroundImage = document.querySelector('#backgroundImage');
+        const customThemeDiv = document.querySelector('#customTheme');
+        function handleThemeChange() {
+          customThemeDiv.classList.toggle('hidden', theme.value !== 'custom');
+          updateObjData({ theme: theme.value });
+        }
+        theme.addEventListener('change', handleThemeChange);
+        glass.addEventListener('change', () => {
+          updateObjData({ customTheme: {
+            ...obj_data.customTheme ?? {},
+            glass: glass.checked
+          } });
+        });
+        backgroundImage.addEventListener('change', () => {
+          updateObjData({ customTheme: {
+            ...obj_data.customTheme ?? {},
+            backgroundImage: backgroundImage.value
+          } });
+        });
+        handleThemeChange();
 
     small.color-error.hidden#validation-error
     if error
