@@ -468,12 +468,12 @@ header {
   border-radius: 0.25rem;
 }
 
-.gallery .itemKey.modal img {
+#gallery-fullscreen-modal.modal img {
   max-height: calc(95vh - 1rem);
   max-width: 95vw;
 }
 
-.gallery .itemKey.modal .label {
+#gallery-fullscreen-modal.modal .label {
   margin-top: 0.5rem;
 }
 

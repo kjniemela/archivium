@@ -20,6 +20,7 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
     modals[id] = newModal;
     if (show) showModal(id);
     (await anchor).appendChild(newModal);
+    return newModal;
   }
 
   function showModal(id) {
@@ -39,11 +40,19 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
     modalEl.classList.add('modal', 'hidden');
     modalEl.addEventListener('click', () => hideModal(id));
     const content = [...modalEl.children];
-    modalEl.innerHTML = '';
-    modalEl.appendChild(createElement('div', { classList: ['modal-content'], attrs: {onclick: (e) => e.stopPropagation()}, children: content }));
+    replaceContent(id, content);
     modals[id] = modalEl;
     (await anchor).appendChild(modalEl);
     if (show) showModal(id);
+    return modalEl;
+  }
+
+  function replaceContent(id, content) {
+    console.log(id, content)
+    const modalEl = document.getElementById(id);
+    modalEl.innerHTML = '';
+    if (!(content instanceof Array)) content = [content];
+    modalEl.appendChild(createElement('div', { classList: ['modal-content'], attrs: {onclick: (e) => e.stopPropagation()}, children: content }));
   }
 
   window.modal = modal;
@@ -51,4 +60,5 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
   window.hideModal = hideModal;
   window.removeModal = removeModal;
   window.loadModal = loadModal;
+  window.replaceContent = replaceContent;
 })();
