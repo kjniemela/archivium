@@ -56,7 +56,7 @@ const locale = {
     'Welcome to Archivium!': 'Välkommen till Archivium!',
     'Welcome to Archivium': 'Välkommen till Archivium',
     'Archivium is a worldbuilding tool, allowing you to organize everything about your world in one place.':
-      'Archivium är ett värktyg som tillåter dig att organisera allt möjligt om din värld på ett och samma ställe.',
+      'Archivium är ett verktyg som tillåter dig att organisera allt möjligt om din värld på ett och samma ställe.',
     'It\'s designed for creators who want to keep track of all the details that make their worlds unique — from characters and histories to maps and cultures.': '',
     'Whether you\'re developing a novel, designing a game, or just exploring new ideas, ': '',
     'Archivium offers a flexible space to collect, connect, and expand on your world\'s elements at your own pace.': '',
