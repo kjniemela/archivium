@@ -27,8 +27,8 @@ const tiers = {
 const tierAllowance = {
   [plans.FREE]: { total: 5 },
   [plans.PREMIUM]: { total: 20, [tiers.PREMIUM]: 5 },
-  [plans.BETA]: { total: 5, [tiers.PREMIUM]: 3 },
-  [plans.SUPER]: { total: 999, [tiers.PREMIUM]: 1  },
+  [plans.BETA]: { total: 5, [tiers.PREMIUM]: 1 },
+  [plans.SUPER]: { total: 999, [tiers.PREMIUM]: 99  },
 };
 
 async function executeQuery(query, values) {
