@@ -84,30 +84,31 @@ block content
         option(value='enabled' selected=(universe.discussion_open)) #{T('Anyone')}
         option(value='disabled' selected=(!universe.discussion_open)) #{T('Only with COMMENT permissions')}
 
-    .inputGroup
-      label #{T('Theme')}: 
-      select#theme
-        option(value=null selected=(!universe.obj_data.themey)) #{T('None')}
-        each _, themeKey in themes
-          option(value=themeKey selected=(universe.obj_data.theme === themeKey)) #{T(`theme_${themeKey}`)}
-
-    .inputGroup
-      small(style={ 'grid-column': '2 / 4' })
-        i 
-          | #{T('Note: selecting a theme from the list above will override the preferences of users visiting your universe.')}
-          br
-          | #{T('If this is not what you want to do, select "None".')}
-
-    #customTheme.hidden.form-row-group
+    if universe.tier >= tiers.PREMIUM
       .inputGroup
-        label #{T('Use "Glass Pane" theme')}: 
-        label.switch
-          input#glass(type='checkbox' checked=Boolean((universe.obj_data.customTheme || {}).glass))
-          span.slider
+        label #{T('Theme')}: 
+        select#theme
+          option(value=null selected=(!universe.obj_data.themey)) #{T('None')}
+          each _, themeKey in themes
+            option(value=themeKey selected=(universe.obj_data.theme === themeKey)) #{T(`theme_${themeKey}`)}
 
       .inputGroup
-        label #{T('Background Image URL')}: 
-        input#backgroundImage(type='text' value=(universe.obj_data.customTheme || {}).backgroundImage)
+        small(style={ 'grid-column': '2 / 4' })
+          i 
+            | #{T('Note: selecting a theme from the list above will override the preferences of users visiting your universe.')}
+            br
+            | #{T('If this is not what you want to do, select "None".')}
+
+      #customTheme.hidden.form-row-group
+        .inputGroup
+          label #{T('Use "Glass Pane" theme')}: 
+          label.switch
+            input#glass(type='checkbox' checked=Boolean((universe.obj_data.customTheme || {}).glass))
+            span.slider
+
+        .inputGroup
+          label #{T('Background Image URL')}: 
+          input#backgroundImage(type='text' value=(universe.obj_data.customTheme || {}).backgroundImage)
 
     div
       input#obj_data(type='hidden' name='obj_data' value='{}')

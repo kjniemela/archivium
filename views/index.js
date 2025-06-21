@@ -3,7 +3,7 @@ const Auth = require('../middleware/auth');
 const api = require('../api');
 const md5 = require('md5');
 const { render, universeLink } = require('../templates');
-const { perms, Cond, getPfpUrl } = require('../api/utils');
+const { perms, Cond, getPfpUrl, tiers } = require('../api/utils');
 const fs = require('fs/promises');
 const logger = require('../logger');
 const ReCaptcha = require('../middleware/reCaptcha');
@@ -141,8 +141,10 @@ module.exports = function(app) {
 
   renderContext((req, res) => {
     if (res.templateData?.data?.universe) {
-      const themeName = res.templateData.data.universe.obj_data.theme;
-      const customTheme = res.templateData.data.universe.obj_data.customTheme ?? {};
+      const universe = res.templateData.data.universe;
+      if (universe.tier < tiers.PREMIUM) return;
+      const themeName = universe.obj_data.theme;
+      const customTheme = universe.obj_data.customTheme ?? {};
       const baseTheme = themes[themeName] ?? req.theme;
       req.theme = themeName === 'custom' ? customTheme : baseTheme;
     }

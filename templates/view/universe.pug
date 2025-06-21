@@ -77,7 +77,7 @@ block content
         a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/permissions`)
           span.material-symbols-outlined key_vertical
           |  #{T('Set Permissions')}
-        if (contextUser.maxTier > universe.tier && couldUpgrade) || universe.author_permissions[contextUser.id] >= perms.OWNER
+        if (contextUser.maxTier > universe.tier && couldUpgrade) || (universe.author_permissions[contextUser.id] >= perms.OWNER && universe.tier === tiers.FREE)
           a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/upgrade`)
             span.material-symbols-outlined workspace_premium
             |  #{T('Upgrade')}
