@@ -37,6 +37,7 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
 
   async function loadModal(id, show=false) {
     const modalEl = document.getElementById(id);
+    if (!modalEl) return null;
     modalEl.classList.add('modal', 'hidden');
     modalEl.addEventListener('click', () => hideModal(id));
     const content = [...modalEl.children];
@@ -48,7 +49,6 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
   }
 
   function replaceContent(id, content) {
-    console.log(id, content)
     const modalEl = document.getElementById(id);
     modalEl.innerHTML = '';
     if (!(content instanceof Array)) content = [content];

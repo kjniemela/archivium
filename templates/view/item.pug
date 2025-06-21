@@ -198,7 +198,7 @@ block content
         #markdown-body
 
   script.
-    (async function() {
+    (function() {
       const body = document.getElementById('markdown-body');
       if (body) {
         loadMarkdown(body, '#{universe.shortname}', item.obj_data.body, { item }).then(async () => {
@@ -229,8 +229,7 @@ block content
       });
 
       const galleryItems = document.querySelectorAll('.gallery .itemKey');
-      const galleryFullscreenModal = await loadModal('gallery-fullscreen-modal');
-      galleryFullscreenModal.classList.add('gallery');
+      loadModal('gallery-fullscreen-modal');
       galleryItems.forEach((itemKey) => {
         const img = itemKey.querySelector('img');
 

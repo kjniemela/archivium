@@ -450,19 +450,19 @@ header {
   left: -0.25rem;
 }
 
-.gallery .itemKey {
+.gallery .itemKey, #gallery-fullscreen-modal .itemKey {
   display: flex;
   flex-direction: column;
   padding: 0;
 }
 
-.gallery img {
+.gallery img, #gallery-fullscreen-modal img {
   border: 3px inset silver;
   border-radius: 0.25rem;
   object-fit: contain;
 }
 
-.gallery .label {
+.gallery .label, #gallery-fullscreen-modal .label {
   padding: 0.5rem;
   background-color: white;
   border-radius: 0.25rem;
