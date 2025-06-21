@@ -52,9 +52,9 @@ block content
       div
       
       label.sheet.card(style={ display: 'unset', 'grid-column': 'unset' })
-        .d-flex.gap-2.align-center
+        .d-flex.gap-2.align-center.mb-9
           input.radio(name='tier' type='radio' value=tiers.FREE checked=Number(universe.tier) === tiers.FREE)
-          h2 #{T('Free Tier')}
+          h2.my-0 #{T('Free Tier')}
 
         ul
           li #{T('Unlimited items')}*
@@ -62,10 +62,16 @@ block content
           li #{T('Default theme only')}
           li #{T('Image upload limits')}
 
-      label.sheet.card(style={ display: 'unset', 'grid-column': 'unset' })
+      - const premiumDisabled = sponsored[tiers.PREMIUM] >= (tierAllowance[contextUser.plan][tiers.PREMIUM] || 0);
+      label.sheet.card(
+        style={ display: 'unset', 'grid-column': 'unset' }
+        class={ disabled: premiumDisabled }
+      )
         .d-flex.gap-2.align-center
-          input.radio(name='tier' type='radio' value=tiers.PREMIUM checked=universe.tier === tiers.PREMIUM)
-          h2 #{T('Premium Tier')}
+          input.radio(name='tier' type='radio' value=tiers.PREMIUM checked=universe.tier === tiers.PREMIUM disabled=premiumDisabled)
+          h2.my-0 #{T('Premium Tier')}
+        small 
+          i #{T('Upgrades used: %s / %s', sponsored[tiers.PREMIUM] || 0, tierAllowance[contextUser.plan][tiers.PREMIUM] || 0)}
 
         ul
           li #{T('Unlimited items')}*

@@ -275,6 +275,7 @@ header {
   border-radius: 0.25rem;
   position: relative;
   top: 0;
+  overflow: hidden;
 }
 
 .card.item-type {
@@ -285,9 +286,20 @@ header {
   overflow: hidden;
 }
 
-.card:hover {
+.card:not(.disabled):hover {
   box-shadow: 0 0.5rem 1rem 0 rgb(0 0 0 / 30%);
   top: -0.125rem;
+}
+
+.card.disabled::before {
+  content: '';
+  backdrop-filter: contrast(0.2) brightness(1.45);
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
 }
 
 /* .card.item-type div {
@@ -1018,12 +1030,12 @@ input:checked + .slider:before {
     }
   }
   
-  .card:hover .radio {
+  .card:hover .radio:not(:disabled) {
     border-color: silver;
+  }
     
-    &:checked {
-      border-color: green;
-    }
+  .card:hover .radio:not(:disabled):checked {
+    border-color: #069;
   }
 }
 
@@ -1210,6 +1222,21 @@ input:checked + .slider:before {
 }
 .mb-4 {
   margin-bottom: 1rem;
+}
+.mb-5 {
+  margin-bottom: 1.25rem;
+}
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+.mb-7 {
+  margin-bottom: 1.75rem;
+}
+.mb-8 {
+  margin-bottom: 2rem;
+}
+.mb-9 {
+  margin-bottom: 2.25rem;
 }
 
 .mt-0 {

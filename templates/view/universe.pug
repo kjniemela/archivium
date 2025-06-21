@@ -46,7 +46,7 @@ block content
   
   #action-bar.d-flex.flex-wrap.justify-center.align-center.gap-2.mb-1
     if contextUser
-      script let isFollowing = #{universe.followers[contextUser.id]};
+      script let isFollowing = #{universe.followers[contextUser.id] || false};
       script let universeShort = '#{universe.shortname}';
       a#follow-btn.link.link-animated
         if universe.followers[contextUser.id]
@@ -77,7 +77,7 @@ block content
         a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/permissions`)
           span.material-symbols-outlined key_vertical
           |  #{T('Set Permissions')}
-        if contextUser.maxTier > universe.tier
+        if (contextUser.maxTier > universe.tier && couldUpgrade) || universe.author_permissions[contextUser.id] >= perms.OWNER
           a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/upgrade`)
             span.material-symbols-outlined workspace_premium
             |  #{T('Upgrade')}

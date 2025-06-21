@@ -1,7 +1,7 @@
 const { ADDR_PREFIX } = require('../../config');
 const api = require('../../api');
 const { universeLink } = require('../../templates');
-const { perms, getPfpUrl } = require('../../api/utils');
+const { perms, getPfpUrl, tierAllowance } = require('../../api/utils');
 const logger = require('../../logger');
 
 module.exports = {
@@ -26,7 +26,8 @@ module.exports = {
   },
   
   async view(req, res) {
-    const [code1, universe] = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
+    const user = req.session.user;
+    const [code1, universe] = await api.universe.getOne(user, { shortname: req.params.universeShortname });
     res.status(code1);
     if (code1 === 403 || code1 === 401) {
       const [code, publicBody] = await api.universe.getPublicBodyByShortname(req.params.universeShortname);
@@ -37,11 +38,11 @@ module.exports = {
         return;
       }
       res.status(200);
-      const [, request] = await api.universe.getUserAccessRequest(req.session.user, req.params.universeShortname);
+      const [, request] = await api.universe.getUserAccessRequest(user, req.params.universeShortname);
       return res.prepareRender('privateUniverse', { shortname: req.params.universeShortname, hasRequested: Boolean(request), publicBody });
     }
     else if (!universe) return;
-    const [code2, authors] = await api.user.getByUniverseShortname(req.session.user, universe.shortname);
+    const [code2, authors] = await api.user.getByUniverseShortname(user, universe.shortname);
     res.status(code2);
     if (!authors) return;
     const authorMap = {};
@@ -51,13 +52,18 @@ module.exports = {
         pfpUrl: getPfpUrl(author),
       };
     });
-    const [code3, threads] = await api.discussion.getThreads(req.session.user, { 'discussion.universe_id': universe.id }, false, true);
+    const [code3, threads] = await api.discussion.getThreads(user, { 'discussion.universe_id': universe.id }, false, true);
     if (!threads) return res.status(code3);
-    const [code4, counts] = await api.item.getCountsByUniverse(req.session.user, universe, false);
+    const [code4, counts] = await api.item.getCountsByUniverse(user, universe, false);
     if (!counts) return res.status(code4);
-    const [code5, stories] = await api.story.getMany(req.session.user, { 'story.universe_id': universe.id });
+    const [code5, stories] = await api.story.getMany(user, { 'story.universe_id': universe.id });
     if (!stories) return res.status(code5);
-    res.prepareRender('universe', { universe, authors: authorMap, threads, counts, stories });
+    const [code6, sponsored] = await api.user.getSponsoredUniverses(user);
+    if (!sponsored) res.status(code6);
+    const couldUpgrade = sponsored.length === 0 || sponsored
+      .filter(row => row.tier > universe.tier)
+      .some(row => row.universes.length < tierAllowance[user.plan][row.tier]);
+    res.prepareRender('universe', { universe, authors: authorMap, threads, counts, stories, couldUpgrade });
   },
 
   async delete(req, res) {
@@ -162,9 +168,10 @@ module.exports = {
     const [code1, universe] = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.ADMIN);
     res.status(code1);
     if (!universe) return;
-    const [code2, sponsored] = await api.user.getSponsoredUniverses(req.session.user);
+    const [code2, sponsoredData] = await api.user.getSponsoredUniverses(req.session.user);
     res.status(code2);
-    if (!sponsored) return;
+    if (!sponsoredData) return;
+    const sponsored = sponsoredData.reduce((acc, row) => ({ ...acc, [row.tier]: row.universes.length }), {});
     res.prepareRender('upgradeUniverse', { universe, sponsored });
   },
 };
