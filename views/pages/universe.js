@@ -58,11 +58,12 @@ module.exports = {
     if (!counts) return res.status(code4);
     const [code5, stories] = await api.story.getMany(user, { 'story.universe_id': universe.id });
     if (!stories) return res.status(code5);
-    const [code6, sponsored] = await api.user.getSponsoredUniverses(user);
-    if (!sponsored) res.status(code6);
-    const couldUpgrade = sponsored.length === 0 || sponsored
-      .filter(row => row.tier > universe.tier)
-      .some(row => row.universes.length < tierAllowance[user.plan][row.tier]);
+    const [_, sponsored] = await api.user.getSponsoredUniverses(user);
+    const couldUpgrade = sponsored ? (
+      sponsored.length === 0 || sponsored
+        .filter(row => row.tier > universe.tier)
+        .some(row => row.universes.length < tierAllowance[user.plan][row.tier])
+    ) : false;
     res.prepareRender('universe', { universe, authors: authorMap, threads, counts, stories, couldUpgrade });
   },
 
