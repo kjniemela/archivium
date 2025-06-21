@@ -154,6 +154,8 @@ block content
             if img.label
               .mdLabel(data-val=img.label)
 
+      #gallery-fullscreen-modal
+
     if 'lineage' in item.obj_data && 'title' in item.obj_data.lineage
       .itemTab.hidden( data-tab='lineage' )
         each parent in item.parents
@@ -226,25 +228,17 @@ block content
         });
       });
 
-      const galleryModalState = {}
       const galleryItems = document.querySelectorAll('.gallery .itemKey');
-      galleryItems.forEach((itemKey, i) => {
-        galleryModalState[i] = false;
+      loadModal('gallery-fullscreen-modal');
+      galleryItems.forEach((itemKey) => {
         const img = itemKey.querySelector('img');
 
         img.onclick = (e) => {
           e.stopPropagation();
-          if (!galleryModalState[i]) {
-            itemKey.classList.add('modal');
-            galleryModalState[i] = true;
-          }
-        };
-
-        itemKey.onclick = () => {
-          if (galleryModalState[i]) {
-            itemKey.classList.remove('modal');
-            galleryModalState[i] = false;
-          }
+          const content = itemKey.cloneNode(true);
+          content.classList.remove('itemKey');
+          replaceContent('gallery-fullscreen-modal', content);
+          showModal('gallery-fullscreen-modal');
         };
       });
     })();

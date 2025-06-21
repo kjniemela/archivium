@@ -3,10 +3,22 @@ extends ../layout.pug
 block title
   title #{T('Edit %s', universe.title)}
 
+block breadcrumbs
+  if displayUniverse
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{universe.title}
+  else
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    |  / 
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    |  / 
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+  |  / 
+  span #{T('Edit')}
+
 block append styles
   link(rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css")
   style.
-    #cats td {
+    #cats td:not(:first-child) {
       padding: 0.125rem 0;
     }
 
@@ -32,16 +44,18 @@ block content
     include /static/scripts/easyMDE.js
     include /static/scripts/shortname.js
 
-  h2 #{T('Edit %s', universe.title)}
+  .d-flex.justify-between.align-baseline
+    h2 #{T('Edit %s', universe.title)}
+    a.link.link-animated.color-error(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{T('Discard Changes')}
   form#edit(method='POST')
 
     .inputGroup
       label(for='title') #{T('Title')}: 
-      input(id='title' type='text' name='title' value=universe.title)
+      input#title(type='text' name='title' value=universe.title)
 
     .inputGroup
       label(for='shortname') #{T('Shortname')}: 
-      input(id='shortname' type='text' name='shortname' value=universe.newShort)
+      input#shortname(type='text' name='shortname' value=universe.newShort)
 
     .inputGroup
       small(style={ 'grid-column': '2 / 4' })
@@ -54,25 +68,76 @@ block content
 
     .inputGroup
       label(for='visibility') #{T('Visibility')}: 
-      select(id='visibility' name='visibility')
+      select#visibility(name='visibility')
         option(value='public' selected=(universe.public)) #{T('Public')}
         option(value='private' selected=(!universe.public)) #{T('Private')}
 
     .inputGroup
       label(for='discussion_enabled') #{T('Discussion')}: 
-      select(id='discussion_enabled' name='discussion_enabled')
+      select#discussion_enabled(name='discussion_enabled')
         option(value='enabled' selected=(universe.discussion_enabled)) #{T('Enabled')}
         option(value='disabled' selected=(!universe.discussion_enabled)) #{T('Disabled')}
 
     .inputGroup
       label(for='discussion_open') #{T('Who can comment')}: 
-      select(id='discussion_open' name='discussion_open')
+      select#discussion_open(name='discussion_open')
         option(value='enabled' selected=(universe.discussion_open)) #{T('Anyone')}
         option(value='disabled' selected=(!universe.discussion_open)) #{T('Only with COMMENT permissions')}
 
+    if universe.tier >= tiers.PREMIUM
+      .inputGroup
+        label #{T('Theme')}: 
+        select#theme
+          option(value=null selected=(!universe.obj_data.themey)) #{T('None')}
+          each _, themeKey in themes
+            option(value=themeKey selected=(universe.obj_data.theme === themeKey)) #{T(`theme_${themeKey}`)}
+
+      .inputGroup
+        small(style={ 'grid-column': '2 / 4' })
+          i 
+            | #{T('Note: selecting a theme from the list above will override the preferences of users visiting your universe.')}
+            br
+            | #{T('If this is not what you want to do, select "None".')}
+
+      #customTheme.hidden.form-row-group
+        .inputGroup
+          label #{T('Use "Glass Pane" theme')}: 
+          label.switch
+            input#glass(type='checkbox' checked=Boolean((universe.obj_data.customTheme || {}).glass))
+            span.slider
+
+        .inputGroup
+          label #{T('Background Image URL')}: 
+          input#backgroundImage(type='text' value=(universe.obj_data.customTheme || {}).backgroundImage)
+
     div
-      input(id='obj_data' type='hidden' name='obj_data' value='{}')
+      input#obj_data(type='hidden' name='obj_data' value='{}')
       button(type='submit') #{T('Save Changes')}
+
+    if universe.tier >= tiers.PREMIUM
+      script.
+        const theme = document.querySelector('#theme');
+        const glass = document.querySelector('#glass');
+        const backgroundImage = document.querySelector('#backgroundImage');
+        const customThemeDiv = document.querySelector('#customTheme');
+        function handleThemeChange() {
+          customThemeDiv.classList.toggle('hidden', theme.value !== 'custom');
+          updateObjData({ theme: theme.value });
+        }
+        theme.addEventListener('change', handleThemeChange);
+        glass.addEventListener('change', () => {
+          updateObjData({ customTheme: {
+            ...obj_data.customTheme ?? {},
+            glass: glass.checked
+          } });
+        });
+        backgroundImage.addEventListener('change', () => {
+          updateObjData({ customTheme: {
+            ...obj_data.customTheme ?? {},
+            backgroundImage: backgroundImage.value
+          } });
+        });
+        handleThemeChange();
 
     small.color-error.hidden#validation-error
     if error
@@ -97,7 +162,7 @@ block content
     small
       b #{T('Note:')} 
       | #{T('be aware that removing or renaming item types will not update any existing items with that type.')}
-    table
+    table.sheet
       thead
         tr
           th #{T('Shortname')}
@@ -122,6 +187,9 @@ block content
     .d-flex.gap-2.mt-2
       button(type='button' onclick='addCat()') #{T('Add Type')}
       button(type='button' onclick='resetCats()') #{T('Reset to default types')}
+
+    .mt-2
+      button(type='submit') #{T('Save Changes')}
 
   #data(data-universe=universe)
   script.

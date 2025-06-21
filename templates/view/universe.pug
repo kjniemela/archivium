@@ -9,12 +9,12 @@ mixin typeCard(shortname, category)
   .card.item-type
     a.cardLink( href=`${universeLink(universe.shortname)}/items${shortname ? `?type=${shortname}` : ''}` )
       div(style={ 'background-color': shortname ? category[2] : '#f3f3f3' })
-        h2.mb-0(align='center')= shortname ? capitalize(category[1]) : T('All Items')
-        h2.mt-0(align='center') (#{counts[shortname] || 0})
+        h2.mb-0.center= shortname ? capitalize(category[1]) : T('All Items')
+        h2.mt-0.center (#{counts[shortname] || 0})
     if contextUser && (universe.author_permissions[contextUser.id] >= perms.WRITE)
-      div
-        a.cardBtn.link(href=`${universeLink(universe.shortname)}/items/create${shortname ? `?type=${shortname}` : ''}`) &#x2795; New
-        a.cardBtn.link(href=`${ADDR_PREFIX}/items?author=${contextUser.username}&universe=${universe.shortname}${shortname ? `&type=${shortname}` : ''}`) My #{shortname ? category[1] : 'Items'}
+      small.d-flex.gap-2.pa-3.align-baseline
+        a.link.link-animated(href=`${universeLink(universe.shortname)}/items/create${shortname ? `?type=${shortname}` : ''}`) &#x2795; New
+        a.link.link-animated(href=`${ADDR_PREFIX}/items?author=${contextUser.username}&universe=${universe.shortname}${shortname ? `&type=${shortname}` : ''}`) My #{shortname ? category[1] : 'Items'}
 
 block breadcrumbs
   if !displayUniverse  
@@ -35,7 +35,7 @@ block scripts
 
 block content
   h1.center #{universe.title}
-  p#info-bar.center
+  p#info-bar.center.mb-1
     small Created by 
       if universe.owner
         a.link.link-animated( href=`${ADDR_PREFIX}/users/${universe.owner}` ) #{universe.owner}
@@ -43,41 +43,52 @@ block content
         | Deleted User
       |  #{formatDate(new Date(universe.created_at))}
       |  - Last updated #{formatDate(new Date(universe.updated_at))}
-      if contextUser
-        script!= `isFollowing = ${universe.followers[contextUser.id]};`
-        script!= `universeShort = '${universe.shortname}';`
-        |  - 
-        a#follow-btn.link.link-animated
-          if universe.followers[contextUser.id]
-            | Unfollow
-          else
-            | Follow
-          script.
-            let isFollowing = false;
-            const followBtn = document.getElementById('follow-btn');
-            followBtn.addEventListener('click', async () => {
+  
+  #action-bar.d-flex.flex-wrap.justify-center.align-center.gap-2.mb-1
+    if contextUser
+      script let isFollowing = #{universe.followers[contextUser.id] || false};
+      script let universeShort = '#{universe.shortname}';
+      a#follow-btn.link.link-animated
+        if universe.followers[contextUser.id]
+          | Unfollow
+        else
+          | Follow
+        script.
+          const followBtn = document.getElementById('follow-btn');
+          followBtn.addEventListener('click', async () => {
+            isFollowing = !isFollowing;
+            followBtn.classList.add('disabled');
+            followBtn.classList.remove('link-broken');
+            try {
+              await putJSON(`/api/universes/${universeShort}/follow`, { isFollowing: isFollowing });
+            } catch (err) {
+              console.error(err);
               isFollowing = !isFollowing;
-              followBtn.classList.add('disabled');
-              followBtn.classList.remove('link-broken');
-              try {
-                await putJSON(`/api/universes/${universeShort}/follow`, { isFollowing: isFollowing });
-              } catch (err) {
-                console.error(err);
-                isFollowing = !isFollowing;
-                followBtn.classList.add('link-broken');
-              } finally {
-                followBtn.innerText = isFollowing ? 'Unfollow' : 'Follow';
-                followBtn.classList.remove('disabled');
-              }
-            });
-        if universe.author_permissions[contextUser.id] >= perms.ADMIN
-          |  - 
-          a.link.link-animated(href=`${universeLink(universe.shortname)}/edit`) #{T('Edit')}
-          |  - 
-          a.link.link-animated(href=`${universeLink(universe.shortname)}/permissions`) #{T('Set Permissions')}
-        if universe.author_permissions[contextUser.id] >= perms.OWNER
-          |  - 
-          a.link.link-animated(href=`${universeLink(universe.shortname)}/delete`) #{T('Delete')}
+              followBtn.classList.add('link-broken');
+            } finally {
+              followBtn.innerText = isFollowing ? 'Unfollow' : 'Follow';
+              followBtn.classList.remove('disabled');
+            }
+          });
+      if universe.author_permissions[contextUser.id] >= perms.ADMIN
+        a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/edit`)
+          span.material-symbols-outlined edit
+          |  #{T('Edit')}
+        a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/permissions`)
+          span.material-symbols-outlined key_vertical
+          |  #{T('Set Permissions')}
+        if (contextUser.maxTier > universe.tier && couldUpgrade) || (universe.author_permissions[contextUser.id] >= perms.OWNER && universe.tier === tiers.FREE)
+          a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/upgrade`)
+            span.material-symbols-outlined workspace_premium
+            |  #{T('Upgrade')}
+        else if universe.tier > tiers.FREE && (universe.author_permissions[contextUser.id] >= perms.OWNER || universe.sponsoring_user === contextUser.id)
+          a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/upgrade`)
+            span.material-symbols-outlined workspace_premium
+            |  #{T('Manage Sponsorship')}
+      if universe.author_permissions[contextUser.id] >= perms.OWNER
+        a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/delete`)
+          span.material-symbols-outlined delete
+          |  #{T('Delete')}
 
   hr
 
@@ -229,11 +240,10 @@ block content
     .hidden( data-tab='stories' )
       .card-list.mt-3
         if contextUser && universe.author_permissions[contextUser.id] >= perms.WRITE
-          .card.sheet( data-goto=`${ADDR_PREFIX}/stories/create` )
-            .d-flex.justify-center( style={ 'grid-column': '1 / 4' } )
-              a.link.d-flex.justify-center( href=`${ADDR_PREFIX}/stories/create` )
-                .navbarText.material-symbols-outlined.heavy.ma-0.pa-1.pr-0.grow-0( style={ 'font-size': '1.5rem' } onclick="showModal('new-tab-modal')" ) add
+          .card.sheet(data-goto=`${ADDR_PREFIX}/stories/create`)
+            .d-flex.justify-center(style={ 'grid-column': '1 / 4' })
+              a.link.d-flex.justify-center(href=`${ADDR_PREFIX}/stories/create`)
+                .navbarText.material-symbols-outlined.heavy.ma-0.pa-1.pr-0.grow-0(style={ 'font-size': '1.5rem' }) add
                 .big-text.navbarText.pa-1.grow-0 #{T('New Story')}
         each story in stories
           +storyCard(story)
-        

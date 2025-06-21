@@ -3,6 +3,22 @@ extends ../layout.pug
 block title
   title #{T('Edit %s', item.title)}
 
+block breadcrumbs
+  if displayUniverse
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{universe.title}
+  else
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    |  / 
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    |  / 
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+  |  / 
+  a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}/items?type=${item.item_type}`) #{capitalize(T(`${((universe.obj_data.cats || {})[item.item_type] || [, 'Missing Category'])[1]}`))}
+  |  / 
+  a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}/items/${item.shortname}`) #{item.title}
+  |  / 
+  span #{T('Edit')}
+
 block styles
   link(rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css")
 
@@ -28,7 +44,9 @@ block append save
     a.navbarBtnLink.navbarText(onclick='preview()') #{T('Preview')}
 
 block content
-  h2 Edit #{item.title}
+  .d-flex.justify-between.align-baseline
+    h2 Edit #{item.title}
+    a.link.link-animated.color-error(href=`${ADDR_PREFIX}/universes/${universe.shortname}/items/${item.shortname}`) #{T('Discard Changes')}
   form#edit(method='POST')
 
     .inputGroup
@@ -80,13 +98,13 @@ block content
       div#new-tab-modal
         script.
           function handleTypeChange() {
-            const type = getIdValue('new_tab_type');
+            const type = getIdValue('new-tab-type');
             const input = document.getElementById('new_tab');
             if (type === 'custom') input.classList.remove('hidden');
             else input.classList.add('hidden');
           }
           function addTabByType() {
-            const option = document.getElementById('new_tab_type').selectedOptions[0];
+            const option = document.getElementById('new-tab-type').selectedOptions[0];
             const type = option.value;
             if (!type) return;
             const name = type === 'custom' ? getIdValue('new_tab') : option.innerText;
@@ -95,7 +113,7 @@ block content
             hideModal('new-tab-modal');
           }
         .sheet.d-flex.flex-col.gap-1(style={ 'min-width': '20rem' })
-          select(id='new_tab_type' onchange='handleTypeChange()')
+          select#new-tab-type(onchange='handleTypeChange()')
             option(hidden disabled selected value) #{T('Tab Type')}...
             each type in ['body', 'lineage', 'location', 'timeline', 'gallery']
               option(value=type)= type === 'body' ? 'Main Text' : capitalize(T(type))

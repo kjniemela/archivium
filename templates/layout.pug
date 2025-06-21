@@ -14,6 +14,7 @@ html(lang='en')
       const icons  = [
         'edit', 'add', 'cancel', 'delete', 'settings', 'logout', 'person', 'notifications_active', 'notifications',
         'mark_email_unread', 'drafts', 'visibility_off', 'drag_indicator', 'arrow_forward_ios', 'arrow_back_ios',
+        'key_vertical', 'workspace_premium',
       ].sort();
     link(rel='stylesheet' href=`https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=${icons.join(',')}`)
     style.
@@ -26,6 +27,7 @@ html(lang='en')
       .material-symbols-outlined.heavy {
         font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 200, 'opsz' 16
       }
+    include theme.pug
     block styles
 
     script.
@@ -129,11 +131,14 @@ html(lang='en')
                 li.navbarBtn
                   a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/signup${curTemplate === 'login' ? '' : `?${encodedPath}`}`) #{T('Create Account')}
 
+    #modal-anchor
+
     main
       .page
-        #breadcrumbs
-          block breadcrumbs
-        block content
+        div(class={ 'glass-pane': theme.glass })
+          #breadcrumbs
+            block breadcrumbs
+          block content
 
     footer
       small.d-flex.justify-center.gap-4.flex-wrap
@@ -150,3 +155,8 @@ html(lang='en')
           | .
         span #{T('Open source on ')}
           a.link.link-animated(href='https://github.com/HMI-Studios/archivium' target='_blank') GitHub.
+        if theme.backgroundImage === '/static/assets/themes/space.jpg'
+          span
+            | Background by 
+            a.link.link-animated(href='https://www.vecteezy.com/free-photos/earth' target='_blank') Vecteezy
+            | .

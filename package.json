@@ -7,7 +7,7 @@
     "start": "node .",
     "test": "npx cypress run",
     "dev": "nodemon -e '.js,.pug' --delay 1000ms index.js",
-    "devl": "nodemon --ext \".js,.pug\" --legacy-watch --delay 1000ms index.js",
+    "devl": "nodemon --ext \".js,.pug\" --legacy-watch index.js",
     "db:backup": "node db/backup.js",
     "db:export": "node db/export.js",
     "db:import": "node db/import.js",

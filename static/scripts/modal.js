@@ -2,8 +2,13 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
 
 (function() {
   const modals = {};
+  const anchor = new Promise((resolve) => {
+    window.addEventListener('load', () => {
+      resolve(document.querySelector('#modal-anchor'));
+    });
+  });
 
-  function modal(id, children, show=false) {
+  async function modal(id, children, show=false) {
     if (id in modals) removeModal(id);
     if (!(children instanceof Array)) children = [children];
     const newModal = createElement('div', { attrs: {
@@ -14,6 +19,7 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
     ] });
     modals[id] = newModal;
     if (show) showModal(id);
+    (await anchor).appendChild(newModal);
     return newModal;
   }
 
@@ -29,15 +35,24 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
     modals[id].remove();
   }
 
-  function loadModal(id, show=false) {
+  async function loadModal(id, show=false) {
     const modalEl = document.getElementById(id);
+    if (!modalEl) return null;
     modalEl.classList.add('modal', 'hidden');
     modalEl.addEventListener('click', () => hideModal(id));
     const content = [...modalEl.children];
-    modalEl.innerHTML = '';
-    modalEl.appendChild(createElement('div', { classList: ['modal-content'], attrs: {onclick: (e) => e.stopPropagation()}, children: content }));
+    replaceContent(id, content);
     modals[id] = modalEl;
+    (await anchor).appendChild(modalEl);
     if (show) showModal(id);
+    return modalEl;
+  }
+
+  function replaceContent(id, content) {
+    const modalEl = document.getElementById(id);
+    modalEl.innerHTML = '';
+    if (!(content instanceof Array)) content = [content];
+    modalEl.appendChild(createElement('div', { classList: ['modal-content'], attrs: {onclick: (e) => e.stopPropagation()}, children: content }));
   }
 
   window.modal = modal;
@@ -45,4 +60,5 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
   window.hideModal = hideModal;
   window.removeModal = removeModal;
   window.loadModal = loadModal;
+  window.replaceContent = replaceContent;
 })();

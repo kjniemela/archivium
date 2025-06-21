@@ -1,0 +1,85 @@
+extends ../layout.pug
+
+block title
+  title #{T('Upgrade %s', universe.title)}
+
+block breadcrumbs
+  if displayUniverse
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{universe.title}
+  else
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    |  / 
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    |  / 
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+  |  / 
+  span #{T('Upgrade')}
+
+block scripts
+  script
+    include /static/scripts/fetchUtils.js
+
+block append styles
+  style.
+    .tier-grid {
+      display: grid;
+      gap: 0.625rem;
+      grid-template-columns: 1fr 16rem 16rem 1fr;
+    }
+
+    @media only screen and ((max-device-width: 480px) or (max-width: 800px)) {
+      .tier-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+block content
+  script.
+    window.addEventListener('load', () => {
+      document.querySelectorAll('form .permission_level').forEach((select) => {
+        select.onchange = () => {
+          select.form.submit();
+        }
+      });
+    });
+
+  .d-flex.justify-between.align-baseline
+    h2 Upgrade #{universe.title}
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{T('Go back')}
+
+  form(method='POST')
+    .tier-grid
+      div
+      
+      label.sheet.card(style={ display: 'unset', 'grid-column': 'unset' })
+        .d-flex.gap-2.align-center.mb-9
+          input.radio(name='tier' type='radio' value=tiers.FREE checked=Number(universe.tier) === tiers.FREE)
+          h2.my-0 #{T('Free Tier')}
+
+        ul
+          li #{T('Unlimited items')}*
+          //- li #{T('Up to %s of images', '?mb')}
+          li #{T('Default theme only')}
+          li #{T('Image upload limits')}
+
+      - const premiumDisabled = sponsored[tiers.PREMIUM] >= (tierAllowance[contextUser.plan][tiers.PREMIUM] || 0);
+      label.sheet.card(
+        style={ display: 'unset', 'grid-column': 'unset' }
+        class={ disabled: premiumDisabled }
+      )
+        .d-flex.gap-2.align-center
+          input.radio(name='tier' type='radio' value=tiers.PREMIUM checked=universe.tier === tiers.PREMIUM disabled=premiumDisabled)
+          h2.my-0 #{T('Premium Tier')}
+        small 
+          i #{T('Upgrades used: %s / %s', sponsored[tiers.PREMIUM] || 0, tierAllowance[contextUser.plan][tiers.PREMIUM] || 0)}
+
+        ul
+          li #{T('Unlimited items')}*
+          //- li #{T('Up to %s of images', '?mb')}
+          li #{T('Custom themes')}
+          li #{T('Higher upload limits')}
+
+      div
+    
+    .center
+      button.big-text.button.py-3.px-8(type='submit') #{T('Confirm Change')}

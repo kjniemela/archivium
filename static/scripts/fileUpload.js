@@ -5,7 +5,7 @@ if (!window.createElement) throw 'domUtils.js not loaded!';
 function uploadImage(baseUrl, container, callback) {
   const imageInput = createElement('input', { attrs: { type: 'file', accept: 'image/*', required: true } });
 
-  container.appendChild(modal('upload-image-modal', [
+  modal('upload-image-modal', [
     createElement('div', { classList: ['sheet', 'd-flex', 'flex-col', 'gap-1', 'align-center'], children: [
       createElement('h2', { attrs: {
         innerText: 'Upload Image',
@@ -23,5 +23,5 @@ function uploadImage(baseUrl, container, callback) {
         },
       } }),
     ] }),
-  ], true));
+  ], true);
 }

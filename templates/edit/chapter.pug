@@ -3,6 +3,17 @@ extends ../layout.pug
 block title
   title #{T('Edit %s', chapter.title)}
 
+block breadcrumbs
+  a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+  |  / 
+  a.link.link-animated(href=`${ADDR_PREFIX}/stories`) #{T('Stories')}
+  |  / 
+  a.link.link-animated(href=`${ADDR_PREFIX}/stories/${story.shortname}`) #{story.title}
+  |  / 
+  a.link.link-animated(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}`) #{chapter.title}
+  |  / 
+  span #{T('Edit')}
+
 block append styles
   link(rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css")
 
@@ -20,7 +31,9 @@ block content
     include /static/scripts/markdown/render.js
     include /static/scripts/easyMDE.js
 
-  h2 #{T('Edit %s', chapter.title)}
+  .d-flex.justify-between.align-baseline
+    h2 #{T('Edit %s', chapter.title)}
+    a.link.link-animated.color-error(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}`) #{T('Discard Changes')}
   form#edit(method='POST')
 
     .inputGroup

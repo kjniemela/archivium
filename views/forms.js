@@ -117,6 +117,14 @@ module.exports = {
     res.redirect(`${universeLink(req, params.universeShortname)}/permissions`);
   },
 
+  async sponsorUniverse(req, res) {
+    const { session, params, body } = req;
+    const [code] = await api.universe.putUserSponsoring(session.user, params.universeShortname, Number(body.tier));
+    res.status(code);
+    if (code !== 200) return;
+    res.redirect(`${universeLink(req, params.universeShortname)}/`);
+  },
+
   async createNote(req, res) {
     const { body, session } = req;
     const [code, data, uuid] = await api.note.post(session.user, {

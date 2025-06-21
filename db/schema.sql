@@ -30,7 +30,14 @@ CREATE TABLE user (
   verified BOOLEAN DEFAULT FALSE,
   suspect BOOLEAN DEFAULT FALSE,
   email_notifications BOOLEAN DEFAULT FALSE,
+  preferred_theme VARCHAR(16),
   PRIMARY KEY (id)
+);
+
+CREATE TABLE userplan (
+  user_id INT NOT NULL,
+  plan TINYINT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
 );
 
 CREATE TABLE userimage (
@@ -98,6 +105,14 @@ CREATE TABLE universe (
   obj_data TEXT NOT NULL,
   FOREIGN KEY (author_id) REFERENCES user (id),
   PRIMARY KEY (id)
+);
+
+CREATE TABLE usersponsoreduniverse (
+  user_id INT NOT NULL,
+  universe_id INT UNIQUE NOT NULL,
+  tier TINYINT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE,
+  FOREIGN KEY (universe_id) REFERENCES universe (id) ON DELETE CASCADE
 );
 
 CREATE TABLE discussion (

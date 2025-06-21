@@ -111,7 +111,7 @@ describe('Item spec', () => {
   it('goes to create a new item, sees that the correct type is preselected', () => {
     cy.visit('/universes/public-test-universe');
 
-    cy.get('.item-type a').contains('Characters').parent().parent().parent().find('.cardBtn').contains('New').click();-
+    cy.get('.item-type a').contains('Characters').parent().parent().parent().find('.link').contains('New').click();-
 
     cy.get('h2').contains('New Character for Public Test Universe').should('exist');
 

@@ -19,13 +19,17 @@ async function getOne(options, includeAuth=false, includeNotifs=false) {
     if (!options || Object.keys(options).length === 0) throw 'options required for api.get.user';
     const parsedOptions = parseData(options);
     const queryString = `
-      SELECT user.*, (ui.user_id IS NOT NULL) as hasPfp
-      ${includeNotifs ? ', COUNT(notif.id) as notifications' : ''}
+      SELECT
+        user.*,
+        (ui.user_id IS NOT NULL) AS hasPfp,
+        up.plan
+        ${includeNotifs ? ', COUNT(notif.id) AS notifications' : ''}
       FROM user
       LEFT JOIN userimage AS ui ON user.id = ui.user_id
+      LEFT JOIN userplan AS up ON user.id = up.user_id
       ${includeNotifs ? 'LEFT JOIN sentnotification AS notif ON user.id = notif.user_id AND NOT notif.is_read' : ''}
       WHERE ${parsedOptions.strings.join(' AND ')}
-      GROUP BY user.id
+      GROUP BY user.id, up.plan
       LIMIT 1;
     `;
     const user = (await executeQuery(queryString, parsedOptions.values))[0];
@@ -91,6 +95,27 @@ async function getByUniverseShortname(user, shortname) {
     `;
     const users = await executeQuery(queryString, [universe.id]);
     return [200, users];
+  } catch (err) {
+    logger.error(err);
+    return [500];
+  }
+}
+
+async function getSponsoredUniverses(user) {
+  if (!user) return [400];
+  try {
+    const queryString = `
+      SELECT
+        usu.tier,
+        JSON_ARRAYAGG(universe.title) AS universes,
+        JSON_ARRAYAGG(universe.shortname) AS universe_shorts
+      FROM usersponsoreduniverse AS usu
+      INNER JOIN universe ON usu.universe_id = universe.id
+      WHERE usu.user_id = ?
+      GROUP BY usu.tier;
+    `;
+    const universes = await executeQuery(queryString, [user.id]);
+    return [200, universes];
   } catch (err) {
     logger.error(err);
     return [500];
@@ -192,6 +217,30 @@ async function put(user_id, userIDToPut, { updated_at, verified }) {
       WHERE id = ?;
     `;
     return [200, await executeQuery(queryString, [...values, userIDToPut])];
+  } catch (err) {
+    logger.error(err);
+    return [500];
+  }
+}
+
+async function putPreferences(sessionUser, username, { preferred_theme }) {
+  if (!sessionUser) return [401];
+  const [code, user] = await getOne({ 'user.username': username }, true);
+  if (!user) return [code];
+  if (Number(sessionUser.id) !== Number(user.id)) return [403];
+  const changes = { preferred_theme };
+
+  try {
+    const keys = Object.keys(changes).filter(key => changes[key] !== undefined);
+    if (keys.length === 0) return [400];
+    const values = keys.map(key => changes[key]);
+    const queryString = `
+      UPDATE user
+      SET
+        ${keys.map(key => `${key} = ?`).join(', ')}
+      WHERE id = ?;
+    `;
+    return [200, await executeQuery(queryString, [...values, user.id])];
   } catch (err) {
     logger.error(err);
     return [500];
@@ -479,10 +528,12 @@ module.exports = {
   getOne,
   getMany,
   getByUniverseShortname,
+  getSponsoredUniverses,
   post,
   validatePassword,
   validateUsername,
   put,
+  putPreferences,
   putUsername,
   putPassword,
   del,
