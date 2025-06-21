@@ -81,7 +81,7 @@ module.exports = function(app) {
     };
   };
 
-  const injectContext = (context, callback) => {
+  const renderContext = (context, callback) => {
     const _get = (...args) => {
       const handler = args.pop();
       get(...args, async (req, res) => {
@@ -139,7 +139,7 @@ module.exports = function(app) {
   
   get('/items', sites.NORMAL, pages.item.list);
 
-  injectContext((req, res) => {
+  renderContext((req, res) => {
     if (res.templateData?.data?.universe) {
       const themeName = res.templateData.data.universe.obj_data.theme;
       const customTheme = res.templateData.data.universe.obj_data.customTheme ?? {};
@@ -201,6 +201,7 @@ module.exports = function(app) {
   post('/universes/:universeShortname/discuss/create', sites.NORMAL, Auth.verifySessionOrRedirect, forms.createUniverseThread);
   post('/universes/:universeShortname/discuss/:threadId/comment', sites.NORMAL, Auth.verifySessionOrRedirect, forms.commentOnThread);
   post('/universes/:universeShortname/permissions', sites.NORMAL, Auth.verifySessionOrRedirect, forms.editUniversePerms);
+  post('/universes/:universeShortname/upgrade', sites.NORMAL, Auth.verifySessionOrRedirect, forms.sponsorUniverse);
   post('/universes/:universeShortname/items/create', sites.NORMAL, Auth.verifySessionOrRedirect, forms.createItem);
   post('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, Auth.verifySessionOrRedirect, forms.editItem);
   post('/universes/:universeShortname/items/:itemShortname/comment', sites.NORMAL, Auth.verifySessionOrRedirect, forms.commentOnItem);
@@ -209,6 +210,7 @@ module.exports = function(app) {
   post('/discuss/create', sites.DISPLAY, Auth.verifySessionOrRedirect, subdomain(forms.createUniverseThread, (sub) => ({ universeShortname: sub })));
   post('/discuss/:threadId/comment', sites.DISPLAY, Auth.verifySessionOrRedirect, subdomain(forms.commentOnThread, (sub) => ({ universeShortname: sub })));
   post('/permissions', sites.DISPLAY, Auth.verifySessionOrRedirect, subdomain(forms.editUniversePerms, (sub) => ({ universeShortname: sub })));
+  post('/upgrade', sites.DISPLAY, Auth.verifySessionOrRedirect, subdomain(forms.sponsorUniverse, (sub) => ({ universeShortname: sub })));
   post('/items/create', sites.DISPLAY, Auth.verifySessionOrRedirect, subdomain(forms.createItem, (sub) => ({ universeShortname: sub })));
   post('/items/:itemShortname/edit', sites.DISPLAY, Auth.verifySessionOrRedirect, subdomain(forms.editItem, (sub) => ({ universeShortname: sub })));
   post('/items/:itemShortname/comment', sites.DISPLAY, Auth.verifySessionOrRedirect, subdomain(forms.commentOnItem, (sub) => ({ universeShortname: sub })));

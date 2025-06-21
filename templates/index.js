@@ -25,6 +25,7 @@ function contextData(req) {
     notifications: user.notifications,
     plan: user.plan,
     pfpUrl: getPfpUrl(user),
+    maxTier: Math.max(...Object.keys(tierAllowance[user.plan] || {}).filter(k => k !== 'total')),
   } : null;
 
   const searchQueries = new URLSearchParams(req.query);

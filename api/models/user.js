@@ -101,6 +101,26 @@ async function getByUniverseShortname(user, shortname) {
   }
 }
 
+async function getSponsoredUniverses(user) {
+  try {
+    const queryString = `
+      SELECT
+        usu.tier,
+        JSON_ARRAYAGG(universe.title) AS universes,
+        JSON_ARRAYAGG(universe.shortname) AS universe_shorts
+      FROM usersponsoreduniverse AS usu
+      INNER JOIN universe ON usu.universe_id = universe.id
+      WHERE usu.user_id = ?
+      GROUP BY usu.tier;
+    `;
+    const universes = await executeQuery(queryString, [user.id]);
+    return [200, universes];
+  } catch (err) {
+    logger.error(err);
+    return [500];
+  }
+}
+
 /**
  * 
  * @param {*} userData 
@@ -507,6 +527,7 @@ module.exports = {
   getOne,
   getMany,
   getByUniverseShortname,
+  getSponsoredUniverses,
   post,
   validatePassword,
   validateUsername,

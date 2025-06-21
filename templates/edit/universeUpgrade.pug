@@ -21,14 +21,14 @@ block scripts
 
 block append styles
   style.
-    .plan-grid {
+    .tier-grid {
       display: grid;
       gap: 0.625rem;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 16rem 16rem 1fr;
     }
 
-    @media only screen and ((max-device-width: 480px) or (max-width: 750px)) {
-      .plan-grid {
+    @media only screen and ((max-device-width: 480px) or (max-width: 800px)) {
+      .tier-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -47,25 +47,33 @@ block content
     h2 Upgrade #{universe.title}
     a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{T('Go back')}
 
-  .plan-grid
-    label.sheet
-      .d-flex.gap-2.align-center
-        input.radio(name='plan' type='radio' value=tiers.FREE checked=universe.tier === tiers.FREE)
-        h2 #{T('Free Tier')}
+  form(method='POST')
+    .tier-grid
+      div
+      
+      label.sheet.card(style={ display: 'unset', 'grid-column': 'unset' })
+        .d-flex.gap-2.align-center
+          input.radio(name='tier' type='radio' value=tiers.FREE checked=Number(universe.tier) === tiers.FREE)
+          h2 #{T('Free Tier')}
 
-      ul
-        li #{T('Unlimited items')}*
-        //- li #{T('Up to %s of images', '?mb')}
-        li #{T('Default theme only')}
-        li #{T('Image upload limits')}
+        ul
+          li #{T('Unlimited items')}*
+          //- li #{T('Up to %s of images', '?mb')}
+          li #{T('Default theme only')}
+          li #{T('Image upload limits')}
 
-    label.sheet
-      .d-flex.gap-2.align-center
-        input.radio(name='plan' type='radio' value=tiers.PREMIUM checked=universe.tier === tiers.PREMIUM)
-        h2 #{T('Premium Tier')}
+      label.sheet.card(style={ display: 'unset', 'grid-column': 'unset' })
+        .d-flex.gap-2.align-center
+          input.radio(name='tier' type='radio' value=tiers.PREMIUM checked=universe.tier === tiers.PREMIUM)
+          h2 #{T('Premium Tier')}
 
-      ul
-        li #{T('Unlimited items')}*
-        //- li #{T('Up to %s of images', '?mb')}
-        li #{T('Custom themes')}
-        li #{T('Higher upload limits')}
+        ul
+          li #{T('Unlimited items')}*
+          //- li #{T('Up to %s of images', '?mb')}
+          li #{T('Custom themes')}
+          li #{T('Higher upload limits')}
+
+      div
+    
+    .center
+      button.big-text.button.py-3.px-8(type='submit') #{T('Confirm Change')}

@@ -109,7 +109,7 @@ CREATE TABLE universe (
 
 CREATE TABLE usersponsoreduniverse (
   user_id INT NOT NULL,
-  universe_id INT NOT NULL,
+  universe_id INT UNIQUE NOT NULL,
   tier TINYINT NOT NULL,
   FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE,
   FOREIGN KEY (universe_id) REFERENCES universe (id) ON DELETE CASCADE

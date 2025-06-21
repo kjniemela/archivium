@@ -982,9 +982,6 @@ input:checked + .slider:before {
   font-size: inherit;
   margin: 0;
   position: relative;
-  /* position: absolute;
-  right: 1.125rem;
-  top: 1.125rem; */
 }
 
 @supports(-webkit-appearance: none) or (-moz-appearance: none) or (appearance: none) { 
@@ -999,7 +996,7 @@ input:checked + .slider:before {
     height: 1.5rem;
     outline: none;
     transition: background 0.2s ease-out, border-color 0.2s ease-out;
-    width: 1.5rem; 
+    width: 1.5rem;
 
     &::after {
       border: 0.125rem solid #fff;
@@ -1008,12 +1005,10 @@ input:checked + .slider:before {
       content: '';
       display: block;
       height: 0.75rem;
-      left: 24%;
+      left: 0.275rem;
       position: absolute;
       top: 50%;
-      transform: 
-        rotate(45deg)
-        translate(-50%, -50%);
+      transform: rotate(45deg) translate(-50%, -50%);
       width: 0.375rem;
     }
 

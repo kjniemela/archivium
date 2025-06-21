@@ -1,11 +1,11 @@
 SELECT 
-    user.id, user.username, user.email, user.updated_at,
+    user.id, user.username, user.email, user.created_at, user.updated_at,
     (user.created_at = user.updated_at) AS once,
     user.verified AS veri,
     user.suspect AS sus,
-    universes.count AS unis,
-    items.count AS items,
-    comments.count AS comments
+    COALESCE(MAX(universes.count), 0) AS unis,
+    COALESCE(MAX(items.count), 0) AS items,
+    COALESCE(MAX(comments.count), 0) AS comments
 FROM user
 LEFT JOIN (
     SELECT DISTINCT au.user_id, COUNT(au.universe_id) AS count, JSON_ARRAYAGG(universe.title) AS titles

@@ -1,4 +1,4 @@
-const { executeQuery, parseData, perms, withTransaction } = require('../utils');
+const { executeQuery, parseData, perms, withTransaction, tiers, tierAllowance } = require('../utils');
 const logger = require('../../logger');
 
 let api;
@@ -52,7 +52,8 @@ async function getMany(user, conditions, permissionLevel=perms.READ, options={})
           IFNULL(fu.user_id, 'null__'),
           fu.is_following
         ), '$.null__') AS followers,
-        IFNULL(MAX(usu.tier), 0) AS tier
+        usu.tier AS tier,
+        usu.user_id AS sponsoring_user
       FROM universe
       INNER JOIN authoruniverse AS au_filter
         ON universe.id = au_filter.universe_id AND (
@@ -317,6 +318,48 @@ async function putUserFollowing(user, shortname, isFollowing) {
   }
 }
 
+async function putUserSponsoring(user, shortname, tier) {
+  if (!user) return [401];
+  const [code, universe] = await getOne(user, { shortname }, perms.ADMIN);
+  if (!universe) return [code];
+  if (universe.sponsoring_user !== null && universe.sponsoring_user !== user.id) {
+    const [code, universe] = await getOne(user, { shortname }, perms.OWNER);
+    if (!universe) return [code];
+  }
+  if (universe.tier === tier) return [200];
+
+  let query;
+  if (tier === tiers.FREE) {
+    if (universe.tier === null) return [200];
+    query = executeQuery(`DELETE FROM usersponsoreduniverse WHERE universe_id = ?`, [ universe.id ]);
+  } else {
+    const [code, sponsored] = await api.user.getSponsoredUniverses(user);
+    if (!sponsored) return [code];
+    const sponsoredAtTier = sponsored.filter(row => row.tier === tier)[0]?.universes.length;
+    if (sponsoredAtTier >= tierAllowance[user.plan][tier] ?? 0) return [402];
+    if (universe.tier === null) {
+      query = executeQuery(`
+        INSERT INTO usersponsoreduniverse (universe_id, user_id, tier) VALUES (?, ?, ?)`,
+        [ universe.id, user.id, tier ],
+      );
+    } else {
+      query = executeQuery(`
+        UPDATE usersponsoreduniverse 
+        SET user_id = ? AND tier = ?
+        WHERE universe_id = ?;`,
+        [ user.id, tier, universe.id ],
+      );
+    }
+  }
+
+  try {
+    return [200, await query];
+  } catch (err) {
+    logger.error(err);
+    return [500];
+  }
+}
+
 async function getUserAccessRequest(user, shortname) {
   if (!user) return [401];
   
@@ -443,6 +486,7 @@ module.exports = {
   put,
   putPermissions,
   putUserFollowing,
+  putUserSponsoring,
   getUserAccessRequest,
   getAccessRequests,
   putAccessRequest,

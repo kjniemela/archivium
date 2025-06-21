@@ -162,6 +162,9 @@ module.exports = {
     const [code1, universe] = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.ADMIN);
     res.status(code1);
     if (!universe) return;
-    res.prepareRender('upgradeUniverse', { universe });
+    const [code2, sponsored] = await api.user.getSponsoredUniverses(req.session.user);
+    res.status(code2);
+    if (!sponsored) return;
+    res.prepareRender('upgradeUniverse', { universe, sponsored });
   },
 };
