@@ -184,7 +184,7 @@ const locale = {
   }
 };
 
-const lang = 'sv';
+const lang = 'en';
 
 function sprintf(format, ...args) {
   let i = 0;
