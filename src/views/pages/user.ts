@@ -6,7 +6,7 @@ import { render } from '../../templates';
 import { perms, Cond, getPfpUrl } from '../../api/utils';
 import fs from 'fs/promises';
 import logger from '../../logger';
-import { PageHandler } from '..';
+import { RouteHandler } from '..';
 
 export default {
   /* User Pages */
@@ -132,4 +132,4 @@ export default {
       });
     }
   },
-} satisfies Record<string, PageHandler>;
+} satisfies Record<string, RouteHandler>;

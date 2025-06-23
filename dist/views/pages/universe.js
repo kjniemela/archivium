@@ -79,13 +79,13 @@ exports.default = {
             return res.redirect(`${config_1.ADDR_PREFIX}/universes`);
         res.prepareRender('deleteUniverse', { universe });
     },
-    async edit(req, res, error, body) {
+    async edit(req, res) {
         const [code, fetchedUniverse] = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, utils_1.perms.WRITE);
         res.status(code);
         if (!fetchedUniverse)
             return;
-        const universe = { ...fetchedUniverse, ...(body ?? {}), shortname: fetchedUniverse.shortname, newShort: body?.shortname ?? fetchedUniverse.shortname };
-        res.prepareRender('editUniverse', { universe, error });
+        const universe = { ...fetchedUniverse, ...(req.body ?? {}), shortname: fetchedUniverse.shortname, newShort: req.body?.shortname ?? fetchedUniverse.shortname };
+        res.prepareRender('editUniverse', { universe, error: res.error });
     },
     async createDiscussionThread(req, res) {
         const [code, universe] = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, utils_1.perms.READ);

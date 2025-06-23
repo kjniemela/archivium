@@ -4,7 +4,7 @@ import { universeLink } from '../../templates';
 import { perms, getPfpUrl } from '../../api/utils';
 import logger from '../../logger';
 import { T } from '../../locale';
-import { PageHandler } from '..';
+import { RouteHandler } from '..';
 
 export default {
   async list(req, res) {
@@ -45,12 +45,12 @@ export default {
     res.prepareRender('deleteStory', { story });
   },
 
-  async edit(req, res, error, body) {
+  async edit(req, res) {
     const [code, fetchedStory] = await api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }, perms.WRITE);
     res.status(code);
     if (!fetchedStory) return;
-    const story = {...fetchedStory, ...(body ?? {}), shortname: fetchedStory.shortname, newShort: body?.shortname ?? fetchedStory.shortname};
-    res.prepareRender('editStory', { story, error });
+    const story = {...fetchedStory, ...(req.body ?? {}), shortname: fetchedStory.shortname, newShort: req.body?.shortname ?? fetchedStory.shortname};
+    res.prepareRender('editStory', { story, error: res.error });
   },
 
   async createChapter(req, res) {
@@ -97,14 +97,14 @@ export default {
     res.prepareRender('deleteChapter', { chapter });
   },
 
-  async editChapter(req, res, error, body) {
+  async editChapter(req, res) {
     const [code1, story] = await api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }, perms.WRITE);
     res.status(code1);
     if (!story) return;
     const [code2, fetchedChapter] = await api.story.getChapter(req.session.user, req.params.shortname, req.params.index, perms.WRITE);
     res.status(code2);
     if (!fetchedChapter) return;
-    const chapter = { ...fetchedChapter, ...(body ?? {}) };
-    res.prepareRender('editChapter', { story, chapter, error });
+    const chapter = { ...fetchedChapter, ...(req.body ?? {}) };
+    res.prepareRender('editChapter', { story, chapter, error: res.error });
   },
-} satisfies Record<string, PageHandler>;
+} satisfies Record<string, RouteHandler>;

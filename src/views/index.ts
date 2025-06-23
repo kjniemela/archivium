@@ -17,8 +17,8 @@ import forms from './forms';
 type Method = 'get' | 'post';
 type Site = 'DISPLAY' | 'NORMAL' | 'ALL';
 type SiteCheck = (req: Request) => boolean;
-export type PageHandler = (req: Request, res: Response, error?: any, body?: any) => Promise<void> | void;
-type RouterFn = (...args: [string, SiteCheck, Handler[], PageHandler]) => void;
+type RouterFn = (...args: [string, SiteCheck, Handler[], RouteHandler]) => void;
+export type RouteHandler = (req: Request, res: Response) => Promise<void> | void;
 
 const sites: Record<Site, SiteCheck> = {
   DISPLAY: (req) => !!req.headers['x-subdomain'],
@@ -37,7 +37,7 @@ export default function(app: Express) {
 
   app.use(Theme);
 
-  const doRender: PageHandler = async (req, res) => {
+  const doRender: RouteHandler = async (req, res) => {
     if (res.statusCode === 302) return; // We did a redirect, no need to render.
     if (res.statusCode === 401) { // We don't have permission to be here, redirect to login page.
       const pageQuery = new URLSearchParams();
@@ -66,7 +66,7 @@ export default function(app: Express) {
     }
   };
 
-  function use(method: Method, path: string, site: SiteCheck, middleware: Handler[], handler: PageHandler): void {
+  function use(method: Method, path: string, site: SiteCheck, middleware: Handler[], handler: RouteHandler): void {
     if (!(['get', 'post', 'put'].includes(method))) throw `Illegal method: ${method}`;
     app[method](`${ADDR_PREFIX}${path}`, ...middleware, async (req, res, next) => {
       if (site(req)) {
@@ -79,7 +79,7 @@ export default function(app: Express) {
   const get: RouterFn = (...args) => use('get', ...args);
   const post: RouterFn = (...args) => use('post', ...args);
 
-  const subdomain = (page: PageHandler, params: (subdomain: string) => { [param: string]: string }): PageHandler => {
+  const subdomain = (page: RouteHandler, params: (subdomain: string) => { [param: string]: string }): RouteHandler => {
     return async (req, res) => {
       let subdomain = req.headers['x-subdomain'];
       if (subdomain instanceof Array) subdomain = subdomain[0];
@@ -88,8 +88,8 @@ export default function(app: Express) {
     };
   };
 
-  const renderContext = (context: PageHandler, callback: (getFn: RouterFn, postFn: RouterFn) => void): void => {
-    const _use = (method: Method, path: string, site: SiteCheck, middleware: Handler[], handler: PageHandler) => {
+  const renderContext = (context: RouteHandler, callback: (getFn: RouterFn, postFn: RouterFn) => void): void => {
+    const _use = (method: Method, path: string, site: SiteCheck, middleware: Handler[], handler: RouteHandler) => {
       use(method, path, site, middleware, async (req, res) => {
         await handler(req, res);
         await context(req, res);

@@ -2,7 +2,7 @@ import api from '../../api';
 import { Cond, perms } from '../../api/utils';
 import fs from 'fs/promises';
 import { ADDR_PREFIX } from '../../config';
-import { PageHandler } from '..';
+import { RouteHandler } from '..';
 
 export default {
   /* Terms and Agreements */
@@ -121,4 +121,4 @@ export default {
       res.prepareRender('search', { items: [], universes: [], notes: [], search: '' });
     }
   },
-} satisfies Record<string, PageHandler>;
+} satisfies Record<string, RouteHandler>;

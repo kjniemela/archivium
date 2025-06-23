@@ -3,7 +3,7 @@ import api from '../../api';
 import { universeLink } from '../../templates';
 import { perms, getPfpUrl, tierAllowance } from '../../api/utils';
 import logger from '../../logger';
-import { PageHandler } from '..';
+import { RouteHandler } from '..';
 
 export default {
   async list(req, res) {
@@ -84,12 +84,12 @@ export default {
     res.prepareRender('deleteUniverse', { universe });
   },
 
-  async edit(req, res, error, body) {
+  async edit(req, res) {
     const [code, fetchedUniverse] = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.WRITE);
     res.status(code);
     if (!fetchedUniverse) return;
-    const universe = {...fetchedUniverse, ...(body ?? {}), shortname: fetchedUniverse.shortname, newShort: body?.shortname ?? fetchedUniverse.shortname};
-    res.prepareRender('editUniverse', { universe, error });
+    const universe = {...fetchedUniverse, ...(req.body ?? {}), shortname: fetchedUniverse.shortname, newShort: req.body?.shortname ?? fetchedUniverse.shortname};
+    res.prepareRender('editUniverse', { universe, error: res.error });
   },
  
   async createDiscussionThread(req, res) {
@@ -191,4 +191,4 @@ export default {
     const sponsored = sponsoredData.reduce((acc, row) => ({ ...acc, [row.tier]: row.universes.length }), {});
     res.prepareRender('upgradeUniverse', { universe, sponsored });
   },
-} satisfies Record<string, PageHandler>;
+} satisfies Record<string, RouteHandler>;

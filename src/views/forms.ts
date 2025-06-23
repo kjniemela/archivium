@@ -1,4 +1,4 @@
-import { PageHandler } from ".";
+import { RouteHandler } from ".";
 
 import { ADDR_PREFIX } from '../config';
 import api from '../api';
@@ -43,13 +43,14 @@ export default {
       discussion_enabled: req.body.discussion_enabled === 'enabled',
       discussion_open: req.body.discussion_open === 'enabled',
     }
-    const [code, errOrId] = await api.universe.put(req.session.user, req.params.universeShortname, req.body);
+    const [code, errorOrId] = await api.universe.put(req.session.user, req.params.universeShortname, req.body);
     res.status(code);
     if (code !== 200) {
-      await pages.universe.edit(req, res, errOrId, req.body);
+      res.error = errorOrId;
+      await pages.universe.edit(req, res);
       return;
     } else {
-      const [code, universe] = await api.universe.getOne(req.session.user, { 'universe.id': errOrId }, perms.READ);
+      const [code, universe] = await api.universe.getOne(req.session.user, { 'universe.id': errorOrId }, perms.READ);
       res.status(code);
       if (!universe) return;
       res.redirect(`${universeLink(req, universe.shortname)}`);
@@ -204,7 +205,8 @@ export default {
     const [code, errorOrShortname] = await api.story.put(req.session.user, req.params.shortname, req.body);
     res.status(code);
     if (code !== 200) {
-      await pages.story.edit(req, res, errorOrShortname, req.body);
+      res.error = errorOrShortname;
+      await pages.story.edit(req, res);
       return;
     } else {
       res.redirect(`${ADDR_PREFIX}/stories/${errorOrShortname}`);
@@ -219,7 +221,8 @@ export default {
     const [code, errorOrIndex] = await api.story.putChapter(req.session.user, req.params.shortname, req.params.index, req.body);
     res.status(code);
     if (code !== 200) {
-      await pages.story.editChapter(req, res, errorOrIndex, req.body);
+      res.error = errorOrIndex;
+      await pages.story.editChapter(req, res);
       return;
     } else {
       res.redirect(`${ADDR_PREFIX}/stories/${req.params.shortname}/${errorOrIndex}`);
@@ -265,4 +268,4 @@ export default {
       return res.prepareRender('resetPassword', { error: 'This password reset link seems to be broken or expired — try requesting a new one.' });
     }
   },
-} satisfies Record<string, PageHandler>;
+} satisfies Record<string, RouteHandler>;

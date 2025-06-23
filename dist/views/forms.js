@@ -44,14 +44,15 @@ exports.default = {
             discussion_enabled: req.body.discussion_enabled === 'enabled',
             discussion_open: req.body.discussion_open === 'enabled',
         };
-        const [code, errOrId] = await api_1.default.universe.put(req.session.user, req.params.universeShortname, req.body);
+        const [code, errorOrId] = await api_1.default.universe.put(req.session.user, req.params.universeShortname, req.body);
         res.status(code);
         if (code !== 200) {
-            await pages_1.default.universe.edit(req, res, errOrId, req.body);
+            res.error = errorOrId;
+            await pages_1.default.universe.edit(req, res);
             return;
         }
         else {
-            const [code, universe] = await api_1.default.universe.getOne(req.session.user, { 'universe.id': errOrId }, utils_1.perms.READ);
+            const [code, universe] = await api_1.default.universe.getOne(req.session.user, { 'universe.id': errorOrId }, utils_1.perms.READ);
             res.status(code);
             if (!universe)
                 return;
@@ -205,7 +206,8 @@ exports.default = {
         const [code, errorOrShortname] = await api_1.default.story.put(req.session.user, req.params.shortname, req.body);
         res.status(code);
         if (code !== 200) {
-            await pages_1.default.story.edit(req, res, errorOrShortname, req.body);
+            res.error = errorOrShortname;
+            await pages_1.default.story.edit(req, res);
             return;
         }
         else {
@@ -220,7 +222,8 @@ exports.default = {
         const [code, errorOrIndex] = await api_1.default.story.putChapter(req.session.user, req.params.shortname, req.params.index, req.body);
         res.status(code);
         if (code !== 200) {
-            await pages_1.default.story.editChapter(req, res, errorOrIndex, req.body);
+            res.error = errorOrIndex;
+            await pages_1.default.story.editChapter(req, res);
             return;
         }
         else {

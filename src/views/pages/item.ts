@@ -2,7 +2,7 @@ import api from '../../api';
 import { universeLink } from '../../templates';
 import { perms, Cond, getPfpUrl } from '../../api/utils';
 import logger from '../../logger';
-import { PageHandler } from '..';
+import { RouteHandler } from '..';
 
 export default {
   async list(req, res) {
@@ -149,4 +149,4 @@ export default {
     if (!item) return res.redirect(`${universeLink(req, req.params.universeShortname)}/items`);
     res.prepareRender('deleteItem', { item });
   },
-} satisfies Record<string, PageHandler>;
+} satisfies Record<string, RouteHandler>;

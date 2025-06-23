@@ -41,13 +41,13 @@ exports.default = {
             return res.redirect(`${config_1.ADDR_PREFIX}/stories`);
         res.prepareRender('deleteStory', { story });
     },
-    async edit(req, res, error, body) {
+    async edit(req, res) {
         const [code, fetchedStory] = await api_1.default.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }, utils_1.perms.WRITE);
         res.status(code);
         if (!fetchedStory)
             return;
-        const story = { ...fetchedStory, ...(body ?? {}), shortname: fetchedStory.shortname, newShort: body?.shortname ?? fetchedStory.shortname };
-        res.prepareRender('editStory', { story, error });
+        const story = { ...fetchedStory, ...(req.body ?? {}), shortname: fetchedStory.shortname, newShort: req.body?.shortname ?? fetchedStory.shortname };
+        res.prepareRender('editStory', { story, error: res.error });
     },
     async createChapter(req, res) {
         const [code, story] = await api_1.default.story.getOne(req.session.user, { 'story.shortname': req.params.shortname });
@@ -94,7 +94,7 @@ exports.default = {
         chapter.storyShort = req.params.shortname;
         res.prepareRender('deleteChapter', { chapter });
     },
-    async editChapter(req, res, error, body) {
+    async editChapter(req, res) {
         const [code1, story] = await api_1.default.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }, utils_1.perms.WRITE);
         res.status(code1);
         if (!story)
@@ -103,7 +103,7 @@ exports.default = {
         res.status(code2);
         if (!fetchedChapter)
             return;
-        const chapter = { ...fetchedChapter, ...(body ?? {}) };
-        res.prepareRender('editChapter', { story, chapter, error });
+        const chapter = { ...fetchedChapter, ...(req.body ?? {}) };
+        res.prepareRender('editChapter', { story, chapter, error: res.error });
     },
 };

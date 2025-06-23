@@ -1,6 +1,4 @@
-import { PageHandler } from '..';
-import api from '../../api';
-import { perms, Cond } from '../../api/utils';
+import { RouteHandler } from '..';
 
 import misc from './misc';
 import user from './user';
@@ -10,12 +8,12 @@ import universe from './universe';
 
 type PageCategory = 'misc' | 'user' | 'item' | 'story' | 'universe';
 
-const pages: Record<PageCategory, Record<string, PageHandler>> = {
+const pages = {
   misc,
   user,
   item,
   story,
   universe,
-};
+} satisfies Record<PageCategory, Record<string, RouteHandler>>;
 
 export default pages;
