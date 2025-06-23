@@ -4,6 +4,14 @@ let api;
 function setApi(_api) {
     api = _api;
 }
+/**
+ *
+ * @param {*} user
+ * @param {*} options
+ * @param {*} canPost
+ * @param {*} includeExtra
+ * @returns {Promise<[number, QueryResult]>}
+ */
 async function getThreads(user, options, canPost = false, includeExtra = false) {
     try {
         const parsedOptions = parseData(options);
@@ -60,6 +68,14 @@ async function getThreads(user, options, canPost = false, includeExtra = false) 
         return [500];
     }
 }
+/**
+ *
+ * @param {*} user
+ * @param {*} threadId
+ * @param {*} validate
+ * @param {*} inclCommenters
+ * @returns {Promise<[number, QueryResult, QueryResult?]>}
+ */
 async function getCommentsByThread(user, threadId, validate = true, inclCommenters = false) {
     try {
         if (validate) {
@@ -97,7 +113,7 @@ async function getCommentsByThread(user, threadId, validate = true, inclCommente
  * This assumes you have already validated access to the item!
  * @param {*} itemId
  * @param {*} inclCommenters
- * @returns
+ * @returns {Promise<[number, QueryResult, QueryResult?]>}
  */
 async function getCommentsByItem(itemId, inclCommenters = false) {
     try {
@@ -129,7 +145,7 @@ async function getCommentsByItem(itemId, inclCommenters = false) {
  * This assumes you have already validated access to the chapter!
  * @param {*} chapterId
  * @param {*} inclCommenters
- * @returns
+ * @returns {Promise<[number, QueryResult, QueryResult?]>}
  */
 async function getCommentsByChapter(chapterId, inclCommenters = false) {
     try {
@@ -186,6 +202,13 @@ async function forEachUserToNotify(thread, callback) {
         }
     }
 }
+/**
+ *
+ * @param {*} user
+ * @param {*} threadId
+ * @param {{ body: string, reply_to?: number }} payload
+ * @returns
+ */
 async function postCommentToThread(user, threadId, { body, reply_to }) {
     const [code, threads] = await getThreads(user, { 'discussion.id': threadId }, true);
     const thread = threads[0];

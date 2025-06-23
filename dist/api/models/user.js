@@ -50,7 +50,7 @@ async function getOne(options, includeAuth = false, includeNotifs = false) {
  * @param {*} options
  * @returns {Promise<[status, data]>}
  */
-async function getMany(options, includeEmail = false) {
+async function getMany(options = null, includeEmail = false) {
     try {
         const parsedOptions = parseData(options);
         let queryString;
@@ -102,6 +102,11 @@ async function getByUniverseShortname(user, shortname) {
         return [500];
     }
 }
+/**
+ *
+ * @param {*} user
+ * @returns {Promise<[number, QueryResult]>}
+ */
 async function getSponsoredUniverses(user) {
     if (!user)
         return [400];

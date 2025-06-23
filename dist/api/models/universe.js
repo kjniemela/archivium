@@ -22,11 +22,9 @@ async function getOne(user, options, permissionLevel = perms.READ) {
 /**
  * base function for fetching universes from database
  * @param {*} user
- * @param {*} conditions
- * @param {number} permission_level
- * @returns
+ * @returns {Promise<[number, QueryResult]>}
  */
-async function getMany(user, conditions, permissionLevel = perms.READ, options = {}) {
+async function getMany(user, conditions = {}, permissionLevel = perms.READ, options = {}) {
     if (options.sort && !options.forceSort) {
         const validSorts = { 'title': true, 'created_at': true, 'updated_at': true };
         if (!validSorts[options.sort]) {
@@ -123,6 +121,11 @@ async function getEventsByUniverseShortname(user, shortname, permissionsRequired
         return [500];
     }
 }
+/**
+ *
+ * @param {*} shortname
+ * @returns {Promise<[number, QueryResult]>}
+ */
 async function getPublicBodyByShortname(shortname) {
     try {
         const queryString = `SELECT obj_data FROM universe WHERE shortname = ?`;
@@ -154,6 +157,12 @@ function validateShortname(shortname, reservedShortnames = []) {
     }
     return null;
 }
+/**
+ *
+ * @param {*} user
+ * @param {*} body
+ * @returns {Promise<[number, QueryResult]>}
+ */
 async function post(user, body) {
     try {
         const { title, shortname, public, discussion_enabled, discussion_open, obj_data } = body;

@@ -7,6 +7,11 @@ function setApi(_api) {
 /**
  * These methods should only be called from scripts or safe routes, no validation is being done here!
  */
+/**
+ *
+ * @param {*} id
+ * @returns {Promise<[number, QueryResult]>}
+ */
 async function getOne(id) {
     try {
         const [code, newsletters] = await getMany({ id });
@@ -22,6 +27,10 @@ async function getOne(id) {
         return [500];
     }
 }
+/**
+ *
+ * @returns {Promise<[number, QueryResult]>}
+ */
 async function getMany(conditions) {
     const parsedConds = parseData(conditions ?? {});
     try {

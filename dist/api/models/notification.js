@@ -144,6 +144,11 @@ async function notify(target, notifType, message) {
         return [500];
     }
 }
+/**
+ *
+ * @param {*} user
+ * @returns {Promise<[number, QueryResult]>}
+ */
 async function getSentNotifications(user) {
     if (!user)
         return [401];
@@ -215,6 +220,11 @@ async function putSettings(user, changes) {
         return [500];
     }
 }
+/**
+ *
+ * @param {*} user
+ * @returns {Promise<[number, QueryResult]>}
+ */
 async function getTypeSettings(user) {
     if (!user)
         return [401];

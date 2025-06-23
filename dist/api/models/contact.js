@@ -44,6 +44,13 @@ async function getOne(sessionUser, targetID) {
         return [500];
     }
 }
+/**
+ *
+ * @param {*} user
+ * @param {*} includePending
+ * @param {*} includeAccepted
+ * @returns {Promise<[number, QueryResult]>}
+ */
 async function getAll(user, includePending = true, includeAccepted = true) {
     if (!(includePending || includeAccepted))
         return [400];

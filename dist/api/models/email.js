@@ -80,6 +80,12 @@ async function sendVerifyLink({ id, username, email }) {
     await sendTemplateEmail(templates.VERIFY, email, { username, verifyEmailLink });
     return false;
 }
+/**
+ *
+ * @param {*} sessionUser
+ * @param {*} username
+ * @returns {Promise<[number, QueryResult]>}
+ */
 async function trySendVerifyLink(sessionUser, username) {
     if (!sessionUser)
         return [401];
@@ -101,6 +107,11 @@ async function sendPasswordReset({ id, username, email }) {
     const resetPasswordLink = `https://${DOMAIN}${ADDR_PREFIX}/reset-password/${resetKey}`;
     await sendTemplateEmail(templates.RESET, email, { username, resetPasswordLink });
 }
+/**
+ *
+ * @param {*} user
+ * @returns {Promise<[number, Date]>}
+ */
 async function trySendPasswordReset(user) {
     const now = new Date();
     const timeout = 60 * 1000;

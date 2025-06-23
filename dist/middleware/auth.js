@@ -61,8 +61,7 @@ const verifySessionOrRedirect = async (req, res, next) => {
         next();
     }
     else {
-        const iterableQuery = Object.keys(req.query).map(key => [key, req.query[key]]);
-        const searchQueries = new URLSearchParams(iterableQuery);
+        const searchQueries = new URLSearchParams(req.query);
         const pageQuery = new URLSearchParams();
         pageQuery.append('page', req.path);
         if (searchQueries.toString())

@@ -199,6 +199,12 @@ async function postBoard(user, { title, shortname }, universeShortname) {
         return [500];
     }
 }
+/**
+ *
+ * @param {*} user
+ * @param {*} param1
+ * @returns {Promise<[number, QueryResult, number]>}
+ */
 async function post(user, { title, body, public, tags }) {
     if (!user)
         return [401];

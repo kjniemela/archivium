@@ -13,6 +13,14 @@ async function getOne(user, conditions, permissionsRequired = perms.READ, option
         return [404];
     return [200, story];
 }
+/**
+ *
+ * @param {*} user
+ * @param {*} conditions
+ * @param {*} permissionsRequired
+ * @param {*} options
+ * @returns {Promise<[number, QueryResult]>}
+ */
 async function getMany(user, conditions, permissionsRequired = perms.READ, options = {}) {
     if (permissionsRequired >= perms.WRITE) {
         if (!user)

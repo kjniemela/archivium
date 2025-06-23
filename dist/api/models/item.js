@@ -123,6 +123,14 @@ function getQuery(selects = [], permsCond = undefined, whereConds = undefined, o
     }
     return query;
 }
+/**
+ *
+ * @param {*} user
+ * @param {*} conditions
+ * @param {*} permissionsRequired
+ * @param {*} options
+ * @returns {Promise<[number, QueryResult]>}
+ */
 async function getMany(user, conditions, permissionsRequired = perms.READ, options = {}) {
     if (options.type) {
         if (!conditions)
@@ -276,6 +284,13 @@ async function getByUniverseAndItemShortnames(user, universeShortname, itemShort
     };
     return await getOne(user, conditions, permissionsRequired, basicOnly, { includeData: true });
 }
+/**
+ *
+ * @param {*} user
+ * @param {*} universe
+ * @param {*} validate
+ * @returns {Promise<[number, QueryResult]>}
+ */
 async function getCountsByUniverse(user, universe, validate = true) {
     if (!universe.public && validate) {
         if (!user)
@@ -384,12 +399,12 @@ async function save(user, universeShortname, itemShortname, body, jsonMode = fal
         body.obj_data.gallery = { title: gallery.title };
     }
     let code;
-    let data;
+    let errorOrId;
     body.obj_data = JSON.stringify(body.obj_data);
     // Actually save item
-    [code, errOrId] = await put(user, universeShortname, itemShortname, body);
+    [code, errorOrId] = await put(user, universeShortname, itemShortname, body);
     if (code !== 200) {
-        return [code, errOrId];
+        return [code, errorOrId];
     }
     const [itemCode, item] = await getOne(user, { 'item.id': errOrId }, perms.WRITE);
     if (!item)
@@ -606,12 +621,15 @@ async function put(user, universeShortname, itemShortname, changes) {
         await delTags(user, universeShortname, itemShortname, Object.keys(tagLookup));
     }
     try {
+        if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
+            // The item shortname has changed, we need to update all links to it to reflect this
+            const shortnameError = api.universe.validateShortname(shortname);
+            if (shortnameError) {
+                return [400, shortnameError];
+            }
+        }
         await withTransaction(async (conn) => {
             if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
-                // The item shortname has changed, we need to update all links to it to reflect this
-                const shortnameError = api.universe.validateShortname(shortname);
-                if (shortnameError)
-                    return [400, shortnameError];
                 await conn.execute('UPDATE itemlink SET to_item_short = ? WHERE to_item_short = ?', [shortname, item.shortname]);
             }
             const queryString = `
