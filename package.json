@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node .",
     "test": "npx cypress run",
+    "build": "npx tsc",
+    "clean": "npx tsc --build --clean",
+    "build:dev": "npx tsc --watch",
     "dev": "nodemon -e '.js,.pug' --watch dist --delay 1000ms dist/index.js",
     "devl": "nodemon --ext \".js,.pug\" --legacy-watch dist/index.js",
     "db:backup": "node db/backup.js",
