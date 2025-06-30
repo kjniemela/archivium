@@ -70,7 +70,8 @@ import loadViews from './views';
 loadViews(app);
 
 // Load api routes
-require('./api/routes')(app, upload);
+import loadRoutes from './api/routes';
+loadRoutes(app, upload);
 
 
 /* 

@@ -206,7 +206,7 @@ async function forEachUserToNotify(thread, callback) {
  * @param {*} user 
  * @param {*} threadId 
  * @param {{ body: string, reply_to?: number }} payload 
- * @returns 
+ * @returns {Promise<[number, QueryResult?]>}
  */
 async function postCommentToThread(user, threadId, { body, reply_to }) {
   const [code, threads] = await getThreads(user, { 'discussion.id': threadId }, true);

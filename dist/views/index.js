@@ -14,6 +14,7 @@ const theme_1 = __importDefault(require("../middleware/theme"));
 const themes_1 = __importDefault(require("../themes"));
 const pages_1 = __importDefault(require("./pages"));
 const forms_1 = __importDefault(require("./forms"));
+const errors_1 = require("../errors");
 const sites = {
     DISPLAY: (req) => !!req.headers['x-subdomain'],
     NORMAL: (req) => !req.headers['x-subdomain'],
@@ -63,11 +64,17 @@ function default_1(app) {
         }
     };
     function use(method, path, site, middleware, handler) {
-        if (!(['get', 'post', 'put'].includes(method)))
-            throw `Illegal method: ${method}`;
         app[method](`${config_1.ADDR_PREFIX}${path}`, ...middleware, async (req, res, next) => {
             if (site(req)) {
-                await handler(req, res);
+                try {
+                    await handler(req, res);
+                }
+                catch (err) {
+                    logger_1.default.error(err);
+                    if (err instanceof errors_1.RequestError) {
+                        res.status(err.CODE);
+                    }
+                }
                 await doRender(req, res);
             }
             next();
@@ -78,9 +85,12 @@ function default_1(app) {
     const subdomain = (page, params) => {
         return async (req, res) => {
             let subdomain = req.headers['x-subdomain'];
-            if (subdomain instanceof Array)
+            if (subdomain instanceof Array) {
                 subdomain = subdomain[0];
-            req.params = { ...req.params, ...params(subdomain) };
+            }
+            if (subdomain) {
+                req.params = { ...req.params, ...params(subdomain) };
+            }
             await page(req, res);
         };
     };

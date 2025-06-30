@@ -56,7 +56,8 @@ app.use(`${config_1.ADDR_PREFIX}/static`, express_1.default.static(path_1.defaul
 const views_1 = __importDefault(require("./views"));
 (0, views_1.default)(app);
 // Load api routes
-require('./api/routes')(app, upload);
+const routes_1 = __importDefault(require("./api/routes"));
+(0, routes_1.default)(app, upload);
 /*
   ACCOUNT ROUTES
 */

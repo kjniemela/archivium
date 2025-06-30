@@ -23,9 +23,10 @@ async function getOne(user, options, permissionLevel=perms.READ) {
 /**
  * base function for fetching universes from database
  * @param {*} user 
+ * @param {Object | null} conditions
  * @returns {Promise<[number, QueryResult]>}
  */
-async function getMany(user, conditions={}, permissionLevel=perms.READ, options={}) {
+async function getMany(user, conditions=null, permissionLevel=perms.READ, options={}) {
 
   if (options.sort && !options.forceSort) {
     const validSorts = { 'title': true, 'created_at': true, 'updated_at': true };

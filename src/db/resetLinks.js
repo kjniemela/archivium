@@ -1,5 +1,5 @@
 const db = require(".");
-const { handleLinks } = require("../api/models/item");
+const { handleLinks } = require("../api/new-api/models/item");
 const { executeQuery } = require("../api/utils");
 
 async function main() {

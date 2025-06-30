@@ -1,20 +1,27 @@
-const pug = require('pug');
-const { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN } = require('../config');
-const { perms, getPfpUrl, tiers, plans, tierAllowance } = require('../api/utils');
-const { locale, lang, sprintf, T } = require('../locale');
-const api = require('../api');
-const path = require('path');
-const themes = require('../themes');
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.universeLink = universeLink;
+exports.render = render;
+const pug_1 = __importDefault(require("pug"));
+const config_1 = require("../config");
+const utils_1 = require("../api/utils");
+const locale_1 = require("../locale");
+const api_1 = __importDefault(require("../api"));
+const path_1 = __importDefault(require("path"));
+const themes_1 = __importDefault(require("../themes"));
 function universeLink(req, uniShort) {
     const displayUniverse = req.headers['x-subdomain'];
     if (displayUniverse) {
         if (displayUniverse === uniShort)
-            return ADDR_PREFIX;
+            return config_1.ADDR_PREFIX;
         else
-            return `https://${DOMAIN}${ADDR_PREFIX}/universes/${uniShort}`;
+            return `https://${config_1.DOMAIN}${config_1.ADDR_PREFIX}/universes/${uniShort}`;
     }
     else {
-        return `${ADDR_PREFIX}/universes/${uniShort}`;
+        return `${config_1.ADDR_PREFIX}/universes/${uniShort}`;
     }
 }
 // Basic context information to be sent to the templates
@@ -25,8 +32,8 @@ function contextData(req) {
         username: user.username,
         notifications: user.notifications,
         plan: user.plan,
-        pfpUrl: getPfpUrl(user),
-        maxTier: Math.max(...Object.keys(tierAllowance[user.plan] || {}).filter(k => k !== 'total')),
+        pfpUrl: (0, utils_1.getPfpUrl)(user),
+        maxTier: Math.max(...Object.keys(utils_1.tierAllowance[user.plan] || {}).filter(k => k !== 'total').map(k => Number(k))),
     } : null;
     const searchQueries = new URLSearchParams(req.query);
     const pageQuery = new URLSearchParams();
@@ -35,31 +42,31 @@ function contextData(req) {
         pageQuery.append('search', searchQueries.toString());
     return {
         contextUser,
-        DOMAIN,
-        ADDR_PREFIX,
-        VAPID_PUBLIC_KEY,
+        DOMAIN: config_1.DOMAIN,
+        ADDR_PREFIX: config_1.ADDR_PREFIX,
+        VAPID_PUBLIC_KEY: config_1.VAPID_PUBLIC_KEY,
         encodedPath: pageQuery.toString(),
         displayUniverse: req.headers['x-subdomain'],
         universeLink: universeLink.bind(null, req),
         searchQueries: searchQueries.toString(),
-        perms,
-        locale: locale[lang],
-        themes,
-        theme: req.theme ?? themes.default,
-        plans,
-        tiers,
-        tierAllowance,
-        T,
-        sprintf,
-        validateUsername: api.user.validateUsername,
-        validateShortname: api.universe.validateShortname,
+        perms: utils_1.perms,
+        locale: locale_1.locale[locale_1.lang],
+        themes: themes_1.default,
+        theme: req.theme ?? themes_1.default.default,
+        plans: utils_1.plans,
+        tiers: utils_1.tiers,
+        tierAllowance: utils_1.tierAllowance,
+        T: locale_1.T,
+        sprintf: locale_1.sprintf,
+        validateUsername: api_1.default.user.validateUsername,
+        validateShortname: api_1.default.universe.validateShortname,
     };
 }
 const pugOptions = {
-    basedir: path.join(__dirname, '..'),
+    basedir: path_1.default.join(__dirname, '..'),
 };
 function compile(file) {
-    return pug.compileFile(file, pugOptions);
+    return pug_1.default.compileFile(file, pugOptions);
 }
 // compile templates
 const templates = {
@@ -116,7 +123,3 @@ function render(req, template, context = {}) {
             curTemplate: template,
         });
 }
-module.exports = {
-    render,
-    universeLink,
-};

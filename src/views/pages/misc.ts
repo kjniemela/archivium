@@ -1,21 +1,25 @@
 import api from '../../api';
+import { UserModel } from '../../api/new-api/models';
 import { Cond, perms } from '../../api/utils';
 import fs from 'fs/promises';
 import { ADDR_PREFIX } from '../../config';
 import { RouteHandler } from '..';
+import path from 'path';
+
+const staticDir = path.join(__dirname, '../../static');
 
 export default {
   /* Terms and Agreements */
   async privacyPolicy(_, res) {
-    const content = (await fs.readFile('static/privacy_policy.md')).toString();
+    const content = (await fs.readFile(path.join(staticDir, 'privacy_policy.md'))).toString();
     res.prepareRender('docs', { content });
   },
   async termsOfService(_, res) {
-    const content = (await fs.readFile('static/ToS.md')).toString();
+    const content = (await fs.readFile(path.join(staticDir, 'ToS.md'))).toString();
     res.prepareRender('docs', { content });
   },
   async codeOfConduct(_, res) {
-    const content = (await fs.readFile('static/code_of_conduct.md')).toString();
+    const content = (await fs.readFile(path.join(staticDir, 'code_of_conduct.md'))).toString();
     res.prepareRender('docs', { content });
   },
 

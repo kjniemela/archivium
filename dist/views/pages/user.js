@@ -54,9 +54,6 @@ exports.default = {
             const [_, contact] = await api_1.default.contact.getOne(req.session.user, user.id);
             user.isContact = contact !== undefined;
         }
-        else {
-            user.isMe = true;
-        }
         res.prepareRender('user', {
             user,
             items,

@@ -5,13 +5,14 @@
     "module": "commonjs",
     "skipLibCheck": true,
     "strict": false,
+    "strictNullChecks": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "lib": ["ESNext"],
     "rootDir": "src",
     "outDir": "dist",
-    "allowJs": true
+    "allowJs": true,
   },
   "include": ["src"]
 }

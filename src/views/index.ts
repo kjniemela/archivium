@@ -4,8 +4,7 @@ import Auth from '../middleware/auth';
 import api from '../api';
 import md5 from 'md5';
 import { render, universeLink } from '../templates';
-import { perms, Cond, getPfpUrl, tiers } from '../api/utils';
-import fs from 'fs/promises';
+import { tiers } from '../api/utils';
 import logger from '../logger';
 import ReCaptcha from '../middleware/reCaptcha';
 import Theme from '../middleware/theme';
@@ -13,6 +12,7 @@ import themes from '../themes';
 
 import pages from './pages';
 import forms from './forms';
+import { RequestError } from '../errors';
 
 type Method = 'get' | 'post';
 type Site = 'DISPLAY' | 'NORMAL' | 'ALL';
@@ -67,10 +67,16 @@ export default function(app: Express) {
   };
 
   function use(method: Method, path: string, site: SiteCheck, middleware: Handler[], handler: RouteHandler): void {
-    if (!(['get', 'post', 'put'].includes(method))) throw `Illegal method: ${method}`;
     app[method](`${ADDR_PREFIX}${path}`, ...middleware, async (req, res, next) => {
       if (site(req)) {
-        await handler(req, res);
+        try {
+          await handler(req, res);
+        } catch (err) {
+          logger.error(err);
+          if (err instanceof RequestError) {
+            res.status(err.CODE);
+          }
+        }
         await doRender(req, res);
       }
       next();
@@ -82,8 +88,12 @@ export default function(app: Express) {
   const subdomain = (page: RouteHandler, params: (subdomain: string) => { [param: string]: string }): RouteHandler => {
     return async (req, res) => {
       let subdomain = req.headers['x-subdomain'];
-      if (subdomain instanceof Array) subdomain = subdomain[0];
-      req.params = { ...req.params, ...params(subdomain) };
+      if (subdomain instanceof Array) {
+        subdomain = subdomain[0];
+      }
+      if (subdomain) {
+        req.params = { ...req.params, ...params(subdomain) };
+      }
       await page(req, res);
     };
   };

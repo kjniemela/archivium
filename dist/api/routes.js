@@ -1,10 +1,18 @@
-const { ADDR_PREFIX } = require('../config');
-const Auth = require('../middleware/auth');
-const api = require('.');
-const logger = require('../logger');
-const { perms, executeQuery, getPfpUrl } = require('./utils');
-module.exports = function (app, upload) {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
+const config_1 = require("../config");
+const _1 = __importDefault(require("."));
+const logger_1 = __importDefault(require("../logger"));
+const utils_1 = require("./utils");
+function default_1(app, upload) {
     class APIRoute {
+        path;
+        methodFuncs;
+        children;
         constructor(path, methodFuncs, children) {
             this.path = path;
             this.methodFuncs = methodFuncs ?? {};
@@ -58,217 +66,217 @@ module.exports = function (app, upload) {
     const apiRoutes = new APIRoute('/api', {}, [
         new APIRoute('/*'),
         new APIRoute('/notifications', {}, [
-            new APIRoute('/subscribe', { POST: (req) => api.notification.subscribe(req.session.user, req.body) }),
-            new APIRoute('/unsubscribe', { POST: (req) => api.notification.unsubscribe(req.session.user, req.body) }),
-            new APIRoute('/mark-all', { PUT: (req) => api.notification.markAllRead(req.session.user, req.body?.isRead ?? true) }),
+            new APIRoute('/subscribe', { POST: (req) => _1.default.notification.subscribe(req.session.user, req.body) }),
+            new APIRoute('/unsubscribe', { POST: (req) => _1.default.notification.unsubscribe(req.session.user, req.body) }),
+            new APIRoute('/mark-all', { PUT: (req) => _1.default.notification.markAllRead(req.session.user, req.body?.isRead ?? true) }),
             new APIRoute('/sent', {}, [
-                new APIRoute('/:id', { PUT: (req) => api.notification.markRead(req.session.user, req.params.id, req.body.isRead) }),
+                new APIRoute('/:id', { PUT: (req) => _1.default.notification.markRead(req.session.user, req.params.id, req.body.isRead) }),
             ]),
         ]),
-        new APIRoute('/is-subscribed', { POST: (req) => api.notification.isSubscribed(req.session.user, req.body) }),
-        new APIRoute('/users', { GET: () => api.user.getMany() }, [
+        new APIRoute('/is-subscribed', { POST: (req) => _1.default.notification.isSubscribed(req.session.user, req.body) }),
+        new APIRoute('/users', { GET: () => _1.default.user.getMany() }, [
             new APIRoute('/:username', {
-                GET: (req) => api.user.getOne({ 'user.username': req.params.username }),
-                DELETE: (req) => api.user.del(req.session.user, req.params.username, req.body.password),
+                GET: (req) => _1.default.user.getOne({ 'user.username': req.params.username }),
+                DELETE: (req) => _1.default.user.del(req.session.user, req.params.username, req.body.password),
             }, [
-                new APIRoute('/send-verify-link', { GET: (req) => api.email.trySendVerifyLink(req.session.user, req.params.username) }),
+                new APIRoute('/send-verify-link', { GET: (req) => _1.default.email.trySendVerifyLink(req.session.user, req.params.username) }),
                 new APIRoute('/notes', {
-                    GET: (req) => api.note.getByUsername(req.session.user, req.params.username),
-                    POST: (req) => api.note.post(req.session.user, req.body),
+                    GET: (req) => _1.default.note.getByUsername(req.session.user, req.params.username),
+                    POST: (req) => _1.default.note.post(req.session.user, req.body),
                 }, [
                     new APIRoute('/:uuid', {
-                        GET: (req) => api.note.getOne(req.session.user, req.params.uuid),
-                        DELETE: (req) => api.note.del(req.session.user, req.params.uuid),
+                        GET: (req) => _1.default.note.getOne(req.session.user, req.params.uuid),
+                        DELETE: (req) => _1.default.note.del(req.session.user, req.params.uuid),
                     }),
                 ]),
                 new APIRoute('/universes', {
                     GET: async (req) => {
-                        const [code, user] = await api.user.getOne({ 'user.username': req.params.username });
+                        const [code, user] = await _1.default.user.getOne({ 'user.username': req.params.username });
                         if (user)
-                            return api.universe.getManyByAuthorId(req.session.user, user.id);
+                            return _1.default.universe.getManyByAuthorId(req.session.user, user.id);
                         else
                             return [code];
                     }
                 }),
                 new APIRoute('/pfp', {
-                    GET: (req) => frmtData(api.user.image.getByUsername(req.params.username), (image) => [image?.data, (res) => {
+                    GET: (req) => frmtData(_1.default.user.image.getByUsername(req.params.username), (image) => [image?.data, (res) => {
                             if (!image)
                                 return;
                             res.contentType(image.mimetype);
                             if (req.query.download === '1')
                                 res.setHeader('Content-Disposition', `attachment; filename="${image.name}"`);
                         }]),
-                    DELETE: (req) => api.user.image.del(req.session.user, req.params.username),
+                    DELETE: (req) => _1.default.user.image.del(req.session.user, req.params.username),
                 }, [
                     new APIRoute('/upload', {
                         middleware: [upload.single('image')],
-                        POST: (req) => api.user.image.post(req.session.user, req.file, req.params.username),
+                        POST: (req) => _1.default.user.image.post(req.session.user, req.file, req.params.username),
                     }),
                 ]),
-                new APIRoute('/username', { PUT: (req) => api.user.putUsername(req.session.user, req.params.username, req.body.username) }),
-                new APIRoute('/password', { PUT: (req) => api.user.putPassword(req.session.user, req.params.username, req.body) }),
-                new APIRoute('/notif-settings', { PUT: (req) => api.notification.putSettings((req.session?.user?.username === req.params.username) ? req.session.user : null, req.body.username) }),
-                new APIRoute('/preferences', { PUT: (req) => api.user.putPreferences(req.session.user, req.params.username, req.body) }),
+                new APIRoute('/username', { PUT: (req) => _1.default.user.putUsername(req.session.user, req.params.username, req.body.username) }),
+                new APIRoute('/password', { PUT: (req) => _1.default.user.putPassword(req.session.user, req.params.username, req.body) }),
+                new APIRoute('/notif-settings', { PUT: (req) => _1.default.notification.putSettings((req.session?.user?.username === req.params.username) ? req.session.user : null, req.body.username) }),
+                new APIRoute('/preferences', { PUT: (req) => _1.default.user.putPreferences(req.session.user, req.params.username, req.body) }),
             ]),
         ]),
         new APIRoute('/contacts', {
-            GET: (req) => api.contact.getAll(req.session.user),
-            POST: (req) => api.contact.post(req.session.user, req.body.username),
-            PUT: (req) => api.contact.put(req.session.user, req.body.username, req.body.accepted),
-            DELETE: (req) => api.contact.delByUsername(req.session.user, req.body.username),
+            GET: (req) => _1.default.contact.getAll(req.session.user),
+            POST: (req) => _1.default.contact.post(req.session.user, req.body.username),
+            PUT: (req) => _1.default.contact.put(req.session.user, req.body.username, req.body.accepted),
+            DELETE: (req) => _1.default.contact.delByUsername(req.session.user, req.body.username),
         }, [
-            new APIRoute('/accepted', { GET: (req) => api.contact.getAll(req.session.user, false) }),
-            new APIRoute('/pending', { GET: (req) => api.contact.getAll(req.session.user, true, false) }),
+            new APIRoute('/accepted', { GET: (req) => _1.default.contact.getAll(req.session.user, false) }),
+            new APIRoute('/pending', { GET: (req) => _1.default.contact.getAll(req.session.user, true, false) }),
         ]),
         new APIRoute('/stories', {
-            GET: (req) => api.story.getMany(req.session.user),
-            POST: (req) => api.story.post(req.session.user, req.body),
+            GET: (req) => _1.default.story.getMany(req.session.user),
+            POST: (req) => _1.default.story.post(req.session.user, req.body),
         }, [
             new APIRoute('/:shortname', {
-                GET: (req) => api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }),
-                PUT: (req) => api.story.put(req.session.user, req.params.shortname, req.body),
-                DELETE: (req) => api.story.del(req.session.user, req.params.shortname),
+                GET: (req) => _1.default.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }),
+                PUT: (req) => _1.default.story.put(req.session.user, req.params.shortname, req.body),
+                DELETE: (req) => _1.default.story.del(req.session.user, req.params.shortname),
             }, [
                 new APIRoute('/:index', {
-                    GET: (req) => api.story.getChapter(req.session.user, req.params.shortname, req.params.index),
-                    PUT: (req) => api.story.putChapter(req.session.user, req.params.shortname, req.params.index, req.body),
-                    DELETE: (req) => api.story.delChapter(req.session.user, req.params.shortname, req.params.index),
+                    GET: (req) => _1.default.story.getChapter(req.session.user, req.params.shortname, req.params.index),
+                    PUT: (req) => _1.default.story.putChapter(req.session.user, req.params.shortname, req.params.index, req.body),
+                    DELETE: (req) => _1.default.story.delChapter(req.session.user, req.params.shortname, req.params.index),
                 }, []),
             ]),
         ]),
         new APIRoute('/universes', {
-            GET: (req) => api.universe.getMany(req.session.user),
-            POST: (req) => api.universe.post(req.session.user, req.body),
+            GET: (req) => _1.default.universe.getMany(req.session.user),
+            POST: (req) => _1.default.universe.post(req.session.user, req.body),
         }, [
             new APIRoute('/:universeShortName', {
-                GET: (req) => api.universe.getOne(req.session.user, { shortname: req.params.universeShortName }),
-                DELETE: (req) => api.universe.del(req.session.user, req.params.universeShortName),
+                GET: (req) => _1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortName }),
+                DELETE: (req) => _1.default.universe.del(req.session.user, req.params.universeShortName),
             }, [
                 new APIRoute('/notes', {
-                    GET: (req) => api.note.getBoardsByUniverseShortname(req.session.user, req.params.universeShortName),
-                    POST: (req) => api.note.postBoard(req.session.user, req.body, req.params.universeShortName),
+                    GET: (req) => _1.default.note.getBoardsByUniverseShortname(req.session.user, req.params.universeShortName),
+                    POST: (req) => _1.default.note.postBoard(req.session.user, req.body, req.params.universeShortName),
                 }, [
                     new APIRoute('/:boardShortname', {
-                        GET: (req) => api.note.getByBoardShortname(req.session.user, req.params.boardShortname),
-                        POST: (req) => api.note.linkToBoard(req.session.user, req.params.boardShortname, req.body.uuid),
+                        GET: (req) => _1.default.note.getByBoardShortname(req.session.user, req.params.boardShortname),
+                        POST: (req) => _1.default.note.linkToBoard(req.session.user, req.params.boardShortname, req.body.uuid),
                     }, [
                         new APIRoute('/:uuid', {
-                            GET: (req) => frmtData(api.note.getByBoardShortname(req.session.user, req.params.boardShortname, { 'note.uuid': req.params.uuid }, { fullBody: true, connections: true, limit: 1 }), (notes) => notes[0]),
+                            GET: (req) => frmtData(_1.default.note.getByBoardShortname(req.session.user, req.params.boardShortname, { 'note.uuid': req.params.uuid }, { fullBody: true, connections: true, limit: 1 }), (notes) => notes[0]),
                         }),
                     ]),
                 ]),
                 new APIRoute('/items', {
-                    GET: (req) => api.item.getByUniverseShortname(req.session.user, req.params.universeShortName),
-                    POST: (req) => api.item.post(req.session.user, req.body, req.params.universeShortName),
+                    GET: (req) => _1.default.item.getByUniverseShortname(req.session.user, req.params.universeShortName),
+                    POST: (req) => _1.default.item.post(req.session.user, req.body, req.params.universeShortName),
                 }, [
                     new APIRoute('/:itemShortName', {
-                        GET: (req) => api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortName, req.params.itemShortName),
-                        PUT: (req) => api.item.save(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body, true),
-                        DELETE: (req) => api.item.del(req.session.user, req.params.universeShortName, req.params.itemShortName),
+                        GET: (req) => _1.default.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortName, req.params.itemShortName),
+                        PUT: (req) => _1.default.item.save(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body, true),
+                        DELETE: (req) => _1.default.item.del(req.session.user, req.params.universeShortName, req.params.itemShortName),
                     }, [
                         new APIRoute('/notes', {
-                            GET: (req) => api.note.getByItemShortname(req.session.user, req.params.universeShortName, req.params.itemShortName),
+                            GET: (req) => _1.default.note.getByItemShortname(req.session.user, req.params.universeShortName, req.params.itemShortName),
                             POST: async (req) => {
-                                const [code, data, uuid] = await api.note.post(req.session.user, req.body);
-                                await api.note.linkToItem(req.session.user, req.params.universeShortName, req.params.itemShortName, uuid);
+                                const [code, data, uuid] = await _1.default.note.post(req.session.user, req.body);
+                                await _1.default.note.linkToItem(req.session.user, req.params.universeShortName, req.params.itemShortName, uuid);
                                 return [code, data];
                             },
                         }, [
                             new APIRoute('/:uuid', {
-                                GET: (req) => frmtData(api.note.getByItemShortname(req.session.user, req.params.universeShortName, req.params.itemShortName, { 'note.uuid': req.params.uuid }, { fullBody: true, connections: true, limit: 1 }), (notes) => notes[0]),
+                                GET: (req) => frmtData(_1.default.note.getByItemShortname(req.session.user, req.params.universeShortName, req.params.itemShortName, { 'note.uuid': req.params.uuid }, { fullBody: true, connections: true, limit: 1 }), (notes) => notes[0]),
                             }),
                         ]),
                         new APIRoute('/data', {
-                            PUT: (req) => api.item.putData(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body),
+                            PUT: (req) => _1.default.item.putData(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body),
                         }),
                         new APIRoute('/subscribe', {
-                            PUT: (req) => api.item.subscribeNotifs(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body.isSubscribed),
+                            PUT: (req) => _1.default.item.subscribeNotifs(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body.isSubscribed),
                         }),
                         new APIRoute('/tags', {
-                            PUT: (req) => api.item.putTags(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body.tags),
-                            DELETE: (req) => api.item.delTags(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body.tags),
+                            PUT: (req) => _1.default.item.putTags(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body.tags),
+                            DELETE: (req) => _1.default.item.delTags(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body.tags),
                         }),
                         new APIRoute('/snooze', {
-                            PUT: (req) => api.item.snoozeUntil(req.session.user, req.params.universeShortName, req.params.itemShortName),
+                            PUT: (req) => _1.default.item.snoozeUntil(req.session.user, req.params.universeShortName, req.params.itemShortName),
                         }),
                         new APIRoute('/gallery', {}, [
                             new APIRoute('/upload', {
                                 middleware: [upload.single('image')],
-                                POST: (req) => api.item.image.post(req.session.user, req.file, req.params.universeShortName, req.params.itemShortName),
+                                POST: (req) => _1.default.item.image.post(req.session.user, req.file, req.params.universeShortName, req.params.itemShortName),
                             }),
                             new APIRoute('/images', {
-                                GET: (req) => api.item.image.getManyByItemShort(req.session.user, req.params.universeShortName, req.params.itemShortName),
+                                GET: (req) => _1.default.item.image.getManyByItemShort(req.session.user, req.params.universeShortName, req.params.itemShortName),
                             }, [
                                 new APIRoute('/:id', {
-                                    GET: (req) => frmtData(api.item.image.getOneByItemShort(req.session.user, req.params.universeShortName, req.params.itemShortName, { id: req.params.id }), (image) => [image?.data, (res) => {
+                                    GET: (req) => frmtData(_1.default.item.image.getOneByItemShort(req.session.user, req.params.universeShortName, req.params.itemShortName, { id: req.params.id }), (image) => [image?.data, (res) => {
                                             if (!image)
                                                 return;
                                             res.contentType(image.mimetype);
                                             if (req.query.download === '1')
                                                 res.setHeader('Content-Disposition', `attachment; filename="${image.name}"`);
                                         }]),
-                                    PUT: (req) => api.item.image.putLabel(req.session.user, req.params.id, req.body.label),
+                                    PUT: (req) => _1.default.item.image.putLabel(req.session.user, req.params.id, req.body.label),
                                 }),
                             ]),
                         ]),
                         new APIRoute('/comments', {
                             GET: async (req) => {
-                                const [_, item] = await api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortName, req.params.itemShortName);
-                                return await api.discussion.getCommentsByItem(item.id);
+                                const [_, item] = await _1.default.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortName, req.params.itemShortName);
+                                return await _1.default.discussion.getCommentsByItem(item.id);
                             },
                         }, [
                             new APIRoute('/:commentId', {
-                                DELETE: (req) => api.discussion.deleteItemComment(req.session.user, req.params.universeShortName, req.params.itemShortName, req.params.commentId),
+                                DELETE: (req) => _1.default.discussion.deleteItemComment(req.session.user, req.params.universeShortName, req.params.itemShortName, req.params.commentId),
                             }),
                         ]),
                     ]),
                 ]),
                 new APIRoute('/events', {
-                    GET: (req) => api.universe.getEventsByUniverseShortname(req.session.user, req.params.universeShortName),
+                    GET: (req) => _1.default.universe.getEventsByUniverseShortname(req.session.user, req.params.universeShortName),
                 }, []),
                 new APIRoute('/follow', {
-                    PUT: (req) => api.universe.putUserFollowing(req.session.user, req.params.universeShortName, req.body.isFollowing),
+                    PUT: (req) => _1.default.universe.putUserFollowing(req.session.user, req.params.universeShortName, req.body.isFollowing),
                 }),
                 new APIRoute('/discussion', {
-                    GET: (req) => api.discussion.getThreads(req.session.user, { 'universe.shortname': req.params.universeShortName }, false, true),
-                    POST: (req) => api.discussion.postThread(req.session.user, req.params.universeShortName, req.body),
+                    GET: (req) => _1.default.discussion.getThreads(req.session.user, { 'universe.shortname': req.params.universeShortName }, false, true),
+                    POST: (req) => _1.default.discussion.postThread(req.session.user, req.params.universeShortName, req.body),
                 }, [
                     new APIRoute('/:discussionId', {
-                        GET: (req) => api.discussion.getCommentsByThread(req.session.user, req.params.discussionId),
+                        GET: (req) => _1.default.discussion.getCommentsByThread(req.session.user, req.params.discussionId),
                     }, [
                         new APIRoute('/:commentId', {
-                            DELETE: (req) => api.discussion.deleteThreadComment(req.session.user, req.params.discussionId, req.params.commentId),
+                            DELETE: (req) => _1.default.discussion.deleteThreadComment(req.session.user, req.params.discussionId, req.params.commentId),
                         }),
                         new APIRoute('/subscribe', {
-                            PUT: (req) => api.discussion.subscribeToThread(req.session.user, req.params.discussionId, req.body.isSubscribed),
+                            PUT: (req) => _1.default.discussion.subscribeToThread(req.session.user, req.params.discussionId, req.body.isSubscribed),
                         }),
                     ]),
                 ]),
                 new APIRoute('/perms', {
                     PUT: async (req) => {
-                        const [_, user] = await api.user.getOne({ 'user.username': req.body.username });
-                        return await api.universe.putPermissions(req.session.user, req.params.universeShortName, user, req.body.permission_level);
+                        const [_, user] = await _1.default.user.getOne({ 'user.username': req.body.username });
+                        return await _1.default.universe.putPermissions(req.session.user, req.params.universeShortName, user, req.body.permission_level);
                     },
                 }),
                 new APIRoute('/request', {
                     PUT: async (req) => {
-                        const [code, data] = await api.universe.putAccessRequest(req.session.user, req.params.universeShortName, req.body.permissionLevel);
+                        const [code, data] = await _1.default.universe.putAccessRequest(req.session.user, req.params.universeShortName, req.body.permissionLevel);
                         if (data) {
-                            const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [req.params.universeShortName]))[0];
+                            const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [req.params.universeShortName]))[0];
                             if (universe) {
-                                const [, target] = await api.user.getOne({ 'user.id': universe.author_id });
+                                const [, target] = await _1.default.user.getOne({ 'user.id': universe.author_id });
                                 const permText = {
-                                    [perms.READ]: 'read',
-                                    [perms.COMMENT]: 'comment',
-                                    [perms.WRITE]: 'write',
-                                    [perms.ADMIN]: 'admin',
-                                    [perms.OWNER]: 'owner',
+                                    [utils_1.perms.READ]: 'read',
+                                    [utils_1.perms.COMMENT]: 'comment',
+                                    [utils_1.perms.WRITE]: 'write',
+                                    [utils_1.perms.ADMIN]: 'admin',
+                                    [utils_1.perms.OWNER]: 'owner',
                                 };
                                 if (target) {
-                                    await api.notification.notify(target, api.notification.types.UNIVERSE, {
+                                    await _1.default.notification.notify(target, _1.default.notification.types.UNIVERSE, {
                                         title: 'Universe Access Request',
                                         body: `${req.session.user.username} is requesting ${permText[req.body.permissionLevel]} permissions on your universe ${universe.title}.`,
-                                        icon: getPfpUrl(req.session.user),
+                                        icon: (0, utils_1.getPfpUrl)(req.session.user),
                                         clickUrl: `/universes/${req.params.universeShortName}/permissions`,
                                     });
                                 }
@@ -279,15 +287,15 @@ module.exports = function (app, upload) {
                 }, [
                     new APIRoute('/:requestingUser', {
                         DELETE: async (req) => {
-                            const [_, user] = await api.user.getOne({ 'user.username': req.params.requestingUser ?? null });
-                            return await api.universe.delAccessRequest(req.session.user, req.params.universeShortName, user);
+                            const [_, user] = await _1.default.user.getOne({ 'user.username': req.params.requestingUser ?? null });
+                            return await _1.default.universe.delAccessRequest(req.session.user, req.params.universeShortName, user);
                         },
                     }),
                 ]),
             ]),
         ]),
         new APIRoute('/writable-items', {
-            GET: async (req) => api.item.getMany(req.session.user, null, perms.WRITE),
+            GET: async (req) => _1.default.item.getMany(req.session.user, null, utils_1.perms.WRITE),
         }),
         new APIRoute('/exists', { POST: async (req) => {
                 try {
@@ -297,7 +305,7 @@ module.exports = function (app, upload) {
                             tuples.push([universe, item]);
                         }
                     }
-                    const results = await Promise.all(tuples.map(args => api.item.exists(req.session.user, ...args)));
+                    const results = await Promise.all(tuples.map(args => _1.default.item.exists(req.session.user, ...args)));
                     const resultMap = {};
                     for (let i = 0; i < results.length; i++) {
                         const [code, data] = results[i];
@@ -311,10 +319,10 @@ module.exports = function (app, upload) {
                     return [200, resultMap];
                 }
                 catch (err) {
-                    logger.error(err);
+                    logger_1.default.error(err);
                     return [500];
                 }
             } }),
     ]);
-    apiRoutes.setup(ADDR_PREFIX);
-};
+    apiRoutes.setup(config_1.ADDR_PREFIX);
+}

@@ -7,18 +7,20 @@ const api_1 = __importDefault(require("../../api"));
 const utils_1 = require("../../api/utils");
 const promises_1 = __importDefault(require("fs/promises"));
 const config_1 = require("../../config");
+const path_1 = __importDefault(require("path"));
+const staticDir = path_1.default.join(__dirname, '../../static');
 exports.default = {
     /* Terms and Agreements */
     async privacyPolicy(_, res) {
-        const content = (await promises_1.default.readFile('static/privacy_policy.md')).toString();
+        const content = (await promises_1.default.readFile(path_1.default.join(staticDir, 'privacy_policy.md'))).toString();
         res.prepareRender('docs', { content });
     },
     async termsOfService(_, res) {
-        const content = (await promises_1.default.readFile('static/ToS.md')).toString();
+        const content = (await promises_1.default.readFile(path_1.default.join(staticDir, 'ToS.md'))).toString();
         res.prepareRender('docs', { content });
     },
     async codeOfConduct(_, res) {
-        const content = (await promises_1.default.readFile('static/code_of_conduct.md')).toString();
+        const content = (await promises_1.default.readFile(path_1.default.join(staticDir, 'code_of_conduct.md'))).toString();
         res.prepareRender('docs', { content });
     },
     /* Home Page */

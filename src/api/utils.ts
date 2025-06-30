@@ -1,44 +1,51 @@
-const db = require('../db');
-const _ = require('lodash');
-const md5 = require('md5');
-const logger = require('../logger');
+import db from '../db';
+import _ from 'lodash';
+import md5 from 'md5';
+import logger from '../logger';
+import { QueryResult, RowDataPacket } from 'mysql2/promise';
 
-const perms = {
-  NONE: 0,
-  READ: 1,
-  COMMENT: 2,
-  WRITE: 3,
-  ADMIN: 4,
-  OWNER: 5,
-};
+export enum perms {
+  NONE,
+  READ,
+  COMMENT,
+  WRITE,
+  ADMIN,
+  OWNER,
+}
 
-const plans = {
-  FREE: 0,
+export enum plans {
+  FREE,
+  PREMIUM,
+  BETA,
+  SUPER,
+}
+
+export const paidTiers = {
   PREMIUM: 1,
-  BETA: 2,
-  SUPER: 3,
-};
+} as const;
+type ValueOf<T> = T[keyof T];
+type PaidTier = ValueOf<typeof paidTiers>;
 
-const tiers = {
+export const tiers = {
   FREE: 0,
-  PREMIUM: 1,
-};
+  ...paidTiers,
+} as const;
 
-const tierAllowance = {
-  [plans.FREE]: { total: 5 },
+export const tierAllowance: Record<plans, Record<PaidTier | 'total', number>> = {
+  [plans.FREE]: { total: 5, [tiers.PREMIUM]: 0 },
   [plans.PREMIUM]: { total: 20, [tiers.PREMIUM]: 5 },
   [plans.BETA]: { total: 5, [tiers.PREMIUM]: 1 },
   [plans.SUPER]: { total: 999, [tiers.PREMIUM]: 99  },
 };
 
-async function executeQuery(query, values) {
-  const [ results ] = await db.execute(query, values);
+export async function executeQuery<T extends QueryResult = RowDataPacket[]>(query: string, values: any[]) {
+  const [ results ] = await db.execute<T>(query, values);
   return results;
 }
 
-class RollbackError extends Error {}
+export class RollbackError extends Error {}
 
-async function withTransaction(callback) {
+export async function withTransaction(callback) {
   const connection = await db.getConnection();
   try {
     await connection.beginTransaction();
@@ -57,15 +64,30 @@ async function withTransaction(callback) {
   }
 }
 
-const parseData = (options) => {
-  return _.reduce(options, (parsed, value, key) => {
-    parsed.strings.push(`${key} = ?`);
-    parsed.values.push(value);
-    return parsed;
-  }, { strings: [], values: [] });
-};
+export const parseData = (conditions: { [key: string]: any }) => {
+  const keys = Object.keys(conditions).filter(key => conditions[key] !== undefined);
+  const values = keys.map(key => conditions[key]);
+  const strings = keys.map(key => `${key as string} = ?`);
+  return { strings, values };
+}
 
-class QueryBuilder {
+type SelectCol = string | string[] | SelectParams[];
+type SelectParams = [SelectCol, string | null, string | null] | [SelectCol, string | null] | [SelectCol];
+
+export type Result<T> = Promise<[number, T?]>;
+
+export class QueryBuilder {
+   table: string | null;
+   selects: {};
+   selectValues: {};
+   joins: any[];
+   whereCond: Cond | null;
+   groups: {};
+   order: any[];
+   orderDesc: any[];
+   resultLimit: number | null;
+   unions: any[];
+
    constructor() {
     this.table = null;
     this.selects = {};
@@ -79,9 +101,10 @@ class QueryBuilder {
     this.unions = [];
    }
 
-   select(col, selectAs=null, value=null) {
+   select(...args: SelectParams) {
+    const [col, selectAs, value] = args;
     if (col instanceof Array) {
-      col.forEach(args => {
+      col.forEach((args: string | SelectParams) => {
         if (args instanceof Array) this.select(...args);
         else this.select(args);
       });
@@ -138,10 +161,10 @@ class QueryBuilder {
     return this;
    }
 
-   compile() {
+   compile(): [string, any[]] {
     const selectCols = Object.keys(this.selects);
     let queryStr = '';
-    let values = [];
+    let values: any[] = [];
     if (selectCols.length) {
       if (!this.table) throw 'No table specified!';
       queryStr += `SELECT ${selectCols.map(col => {
@@ -180,7 +203,7 @@ class QueryBuilder {
       }
     } else if (this.unions.length) {
       const unionData = this.unions.map(query => query.compile());
-      const strs = [];
+      const strs: string[] = [];
       for (const [str, vals] of unionData) {
         strs.push(str);
         values = values.concat(vals);
@@ -196,38 +219,45 @@ class QueryBuilder {
    }
 }
 
-class Cond {
-  constructor(check, value=undefined) {
+export class Cond {
+  check?: string;
+  value?: any;
+  constructor(check?: string, value?: any) {
     this.check = check;
     this.value = value;
   }
 
-  or(cond, value=undefined) {
+  or(cond?: string | Cond, value=undefined) {
     if (!(cond instanceof Cond)) return this.or(new Cond(cond, value));
     if (cond && !(cond.check || cond instanceof MultiCond)) return this;
     return new MultiCond('OR', this, cond);
   }
 
-  and(cond, value=undefined) {
+  and(cond?: string | Cond, value=undefined) {
     if (!(cond instanceof Cond)) return this.and(new Cond(cond, value));
     if (cond && !(cond.check || cond instanceof MultiCond)) return this;
     return new MultiCond('AND', this, cond);
   }
 
-  export() {
+  export(): [string | undefined, any[]] {
     return [this.check, [this.value]];
   }
 }
 
+export type CondType = 'AND' | 'OR';
+
 class MultiCond extends Cond {
-  constructor(type, a, b) {
+  type: CondType;
+  a: Cond;
+  b: Cond;
+  constructor(type: CondType, a: Cond, b: Cond) {
     super();
     this.type = type;
     this.a = a;
     this.b = b;
   }
 
-  export() {
+  export(): [string, any[]] {
     const [aStr, aValues] = this.a.export();
     const [bStr, bValues] = this.b.export();
     if (!(aStr && bStr)) return [`${aStr || bStr || ''}`, [...aValues, ...bValues]];
@@ -235,20 +265,6 @@ class MultiCond extends Cond {
   }
 }
 
-function getPfpUrl(user) {
+export function getPfpUrl(user) {
   return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email)}.jpg`;
 }
-
-module.exports = {
-  perms,
-  plans,
-  tiers,
-  tierAllowance,
-  executeQuery,
-  RollbackError,
-  withTransaction,
-  parseData,
-  QueryBuilder,
-  Cond,
-  getPfpUrl,
-};

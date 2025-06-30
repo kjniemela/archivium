@@ -1,12 +1,26 @@
-const { ADDR_PREFIX } = require('../config');
-const Auth = require('../middleware/auth');
-const api = require('.');
-const logger = require('../logger');
-const { perms, executeQuery, getPfpUrl } = require('./utils');
+import { Express, Handler, Request, Response } from 'express';
+import { ADDR_PREFIX } from '../config';
+import Auth from '../middleware/auth';
+import api from '.';
+import logger from '../logger';
+import { perms, executeQuery, getPfpUrl, Result } from './utils';
+import { Multer } from 'multer';
 
-module.exports = function(app, upload) {
+type RouteMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export type APIRouteHandler = (req: Request, res: Response) => Result<any>;
+type MethodFuncs = {
+  [method in RouteMethod]?: APIRouteHandler;
+} & {
+  middleware?: Handler[];
+};
+
+export default function(app: Express, upload: Multer) {
   class APIRoute {
-    constructor(path, methodFuncs, children) {
+    path: string;
+    methodFuncs: MethodFuncs;
+    children: APIRoute[];
+
+    constructor(path: string, methodFuncs?: MethodFuncs, children?: APIRoute[]) {
       this.path = path;
       this.methodFuncs = methodFuncs ?? {};
       this.children = children ?? [];

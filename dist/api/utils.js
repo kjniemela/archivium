@@ -1,39 +1,53 @@
-const db = require('../db');
-const _ = require('lodash');
-const md5 = require('md5');
-const logger = require('../logger');
-const perms = {
-    NONE: 0,
-    READ: 1,
-    COMMENT: 2,
-    WRITE: 3,
-    ADMIN: 4,
-    OWNER: 5,
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-const plans = {
-    FREE: 0,
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Cond = exports.QueryBuilder = exports.parseData = exports.RollbackError = exports.tierAllowance = exports.tiers = exports.paidTiers = exports.plans = exports.perms = void 0;
+exports.executeQuery = executeQuery;
+exports.withTransaction = withTransaction;
+exports.getPfpUrl = getPfpUrl;
+const db_1 = __importDefault(require("../db"));
+const md5_1 = __importDefault(require("md5"));
+const logger_1 = __importDefault(require("../logger"));
+var perms;
+(function (perms) {
+    perms[perms["NONE"] = 0] = "NONE";
+    perms[perms["READ"] = 1] = "READ";
+    perms[perms["COMMENT"] = 2] = "COMMENT";
+    perms[perms["WRITE"] = 3] = "WRITE";
+    perms[perms["ADMIN"] = 4] = "ADMIN";
+    perms[perms["OWNER"] = 5] = "OWNER";
+})(perms || (exports.perms = perms = {}));
+var plans;
+(function (plans) {
+    plans[plans["FREE"] = 0] = "FREE";
+    plans[plans["PREMIUM"] = 1] = "PREMIUM";
+    plans[plans["BETA"] = 2] = "BETA";
+    plans[plans["SUPER"] = 3] = "SUPER";
+})(plans || (exports.plans = plans = {}));
+exports.paidTiers = {
     PREMIUM: 1,
-    BETA: 2,
-    SUPER: 3,
 };
-const tiers = {
+exports.tiers = {
     FREE: 0,
-    PREMIUM: 1,
+    ...exports.paidTiers,
 };
-const tierAllowance = {
-    [plans.FREE]: { total: 5 },
-    [plans.PREMIUM]: { total: 20, [tiers.PREMIUM]: 5 },
-    [plans.BETA]: { total: 5, [tiers.PREMIUM]: 1 },
-    [plans.SUPER]: { total: 999, [tiers.PREMIUM]: 99 },
+exports.tierAllowance = {
+    [plans.FREE]: { total: 5, [exports.tiers.PREMIUM]: 0 },
+    [plans.PREMIUM]: { total: 20, [exports.tiers.PREMIUM]: 5 },
+    [plans.BETA]: { total: 5, [exports.tiers.PREMIUM]: 1 },
+    [plans.SUPER]: { total: 999, [exports.tiers.PREMIUM]: 99 },
 };
 async function executeQuery(query, values) {
-    const [results] = await db.execute(query, values);
+    const [results] = await db_1.default.execute(query, values);
     return results;
 }
 class RollbackError extends Error {
 }
+exports.RollbackError = RollbackError;
 async function withTransaction(callback) {
-    const connection = await db.getConnection();
+    const connection = await db_1.default.getConnection();
     try {
         await connection.beginTransaction();
         await callback(connection);
@@ -41,7 +55,7 @@ async function withTransaction(callback) {
     }
     catch (err) {
         await connection.rollback();
-        logger.warn('Transaction rolled back.');
+        logger_1.default.warn('Transaction rolled back.');
         if (!(err instanceof RollbackError)) {
             throw err;
         }
@@ -50,14 +64,24 @@ async function withTransaction(callback) {
         connection.release();
     }
 }
-const parseData = (options) => {
-    return _.reduce(options, (parsed, value, key) => {
-        parsed.strings.push(`${key} = ?`);
-        parsed.values.push(value);
-        return parsed;
-    }, { strings: [], values: [] });
+const parseData = (conditions) => {
+    const keys = Object.keys(conditions).filter(key => conditions[key] !== undefined);
+    const values = keys.map(key => conditions[key]);
+    const strings = keys.map(key => `${key} = ?`);
+    return { strings, values };
 };
+exports.parseData = parseData;
 class QueryBuilder {
+    table;
+    selects;
+    selectValues;
+    joins;
+    whereCond;
+    groups;
+    order;
+    orderDesc;
+    resultLimit;
+    unions;
     constructor() {
         this.table = null;
         this.selects = {};
@@ -70,9 +94,10 @@ class QueryBuilder {
         this.resultLimit = null;
         this.unions = [];
     }
-    select(col, selectAs = null, value = null) {
+    select(...args) {
+        const [col, selectAs, value] = args;
         if (col instanceof Array) {
-            col.forEach(args => {
+            col.forEach((args) => {
                 if (args instanceof Array)
                     this.select(...args);
                 else
@@ -187,8 +212,11 @@ class QueryBuilder {
         return await executeQuery(queryStr, values);
     }
 }
+exports.QueryBuilder = QueryBuilder;
 class Cond {
-    constructor(check, value = undefined) {
+    check;
+    value;
+    constructor(check, value) {
         this.check = check;
         this.value = value;
     }
@@ -210,7 +238,11 @@ class Cond {
         return [this.check, [this.value]];
     }
 }
+exports.Cond = Cond;
 class MultiCond extends Cond {
+    type;
+    a;
+    b;
     constructor(type, a, b) {
         super();
         this.type = type;
@@ -226,18 +258,5 @@ class MultiCond extends Cond {
     }
 }
 function getPfpUrl(user) {
-    return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email)}.jpg`;
+    return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${(0, md5_1.default)(user.email)}.jpg`;
 }
-module.exports = {
-    perms,
-    plans,
-    tiers,
-    tierAllowance,
-    executeQuery,
-    RollbackError,
-    withTransaction,
-    parseData,
-    QueryBuilder,
-    Cond,
-    getPfpUrl,
-};

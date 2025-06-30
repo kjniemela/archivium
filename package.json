@@ -8,7 +8,7 @@
     "test": "npx cypress run",
     "build": "npx tsc",
     "clean": "npx tsc --build --clean",
-    "build:dev": "npx tsc --watch",
+    "build:dev": "npx tsc --build --clean && npx tsc --watch",
     "dev": "nodemon -e '.js,.pug' --watch dist --delay 1000ms dist/index.js",
     "devl": "nodemon --ext \".js,.pug\" --legacy-watch dist/index.js",
     "db:backup": "node db/backup.js",
@@ -50,8 +50,11 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
+    "@types/lodash": "^4.17.18",
+    "@types/md5": "^2.3.5",
     "@types/multer": "^1.4.13",
     "@types/node-cron": "^3.0.11",
+    "@types/pug": "^2.0.10",
     "cypress": "^13.15.2",
     "nodemon": "^2.0.15"
   }

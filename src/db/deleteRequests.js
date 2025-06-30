@@ -1,6 +1,6 @@
 const db = require(".");
 const api = require("../api");
-const { doDeleteUser } = require("../api/models/user");
+const { doDeleteUser } = require("../api/new-api/models/user");
 const { executeQuery } = require("../api/utils");
 const { askQuestion } = require("./import");
 

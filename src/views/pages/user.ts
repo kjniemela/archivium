@@ -51,10 +51,8 @@ export default {
     if (req.session.user?.id !== user.id) {
       const [_, contact] = await api.contact.getOne(req.session.user, user.id);
       user.isContact = contact !== undefined;
-    } else {
-      user.isMe = true;
     }
-    res.prepareRender('user', { 
+    res.prepareRender('user', {
       user,
       items,
       pfpUrl: getPfpUrl(user),

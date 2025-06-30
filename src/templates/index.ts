@@ -1,12 +1,13 @@
-const pug = require('pug');
-const { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN } = require('../config');
-const { perms, getPfpUrl, tiers, plans, tierAllowance } = require('../api/utils');
-const { locale, lang, sprintf, T } = require('../locale');
-const api = require('../api');
-const path = require('path');
-const themes = require('../themes');
+import pug from 'pug';
+import { Request } from 'express';
+import { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN } from '../config';
+import { perms, getPfpUrl, tiers, plans, tierAllowance } from '../api/utils';
+import { locale, lang, sprintf, T } from '../locale';
+import api from '../api';
+import path from 'path';
+import themes from '../themes';
 
-function universeLink(req, uniShort) {
+export function universeLink(req: Request, uniShort) {
   const displayUniverse = req.headers['x-subdomain'];
   if (displayUniverse) {
     if (displayUniverse === uniShort) return ADDR_PREFIX;
@@ -25,7 +26,7 @@ function contextData(req) {
     notifications: user.notifications,
     plan: user.plan,
     pfpUrl: getPfpUrl(user),
-    maxTier: Math.max(...Object.keys(tierAllowance[user.plan] || {}).filter(k => k !== 'total')),
+    maxTier: Math.max(...Object.keys(tierAllowance[user.plan] || {}).filter(k => k !== 'total').map(k => Number(k))),
   } : null;
 
   const searchQueries = new URLSearchParams(req.query);
@@ -116,7 +117,7 @@ const templates = {
   resetPassword: compile('templates/edit/resetPassword.pug'),
 };
 
-function render(req, template, context = {}) {
+export function render(req: Request, template, context = {}) {
   if (template in templates) return templates[template]({ ...context, ...contextData(req), curTemplate: template });
   else return templates.error({
     code: 404,
@@ -125,8 +126,3 @@ function render(req, template, context = {}) {
     curTemplate: template,
   });
 }
-
-module.exports = {
-  render,
-  universeLink,
-};
