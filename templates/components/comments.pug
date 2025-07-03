@@ -3,9 +3,9 @@ div
     each comment in comments
       .sheet.d-flex.gap-4.align-start
         if comment.author_id
-          img.userIcon(alt=commenters[comment.author_id].username, src=commenters[comment.author_id].pfpUrl)
+          img.userIcon.shrink-0(alt=commenters[comment.author_id].username, src=commenters[comment.author_id].pfpUrl)
         if comment.body
-          .d-flex.flex-col.grow-1
+          .d-flex.flex-col.grow-1.overflow-hidden
             .d-flex.align-baseline
               if comment.author_id
                 a.link.link-animated(href=`/users/${commenters[comment.author_id].username}`) 

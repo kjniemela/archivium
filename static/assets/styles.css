@@ -347,6 +347,7 @@ header {
 .userIcon {
   display: inline-flex;
   position: relative;
+  flex-shrink: 0;
 }
 
 .userIcon img, img.userIcon {
@@ -1341,4 +1342,8 @@ input:checked + .slider:before {
 
 .scroll-x {
   overflow-x: auto;
+}
+
+.overflow-hidden {
+    overflow: hidden;
 }
