@@ -530,7 +530,7 @@ export class ItemAPI {
     }
   }
 
-  async save(user: User, universeShortname: string, itemShortname: string, body, jsonMode=false): Promise<number | string> {
+  async save(user: User, universeShortname: string, itemShortname: string, body, jsonMode=false): Promise<number> {
     // Handle tags
     if (!jsonMode) body.tags = body.tags?.split(' ') ?? [];
 
@@ -558,9 +558,9 @@ export class ItemAPI {
     body.obj_data = JSON.stringify(body.obj_data);
 
     // Actually save item
-    const errorOrId = await this.put(user, universeShortname, itemShortname, body);
+    const itemId = await this.put(user, universeShortname, itemShortname, body);
 
-    const item = await this.getOne(user, { 'item.id': errorOrId }, perms.WRITE);
+    const item = await this.getOne(user, { 'item.id': itemId }, perms.WRITE);
 
     // Handle lineage data
     if (lineage) {
@@ -746,7 +746,12 @@ export class ItemAPI {
     return await executeQuery(queryString, values) as { event_id: number, timeline_id: number }[];
   }
 
-  async put(user, universeShortname, itemShortname, changes): Promise<number | string> {
+  async put(
+    user: User,
+    universeShortname: string,
+    itemShortname: string,
+    changes: { title: string, shortname: string, item_type: string, obj_data: string, tags: string[] }
+  ): Promise<number> {
     const { title, shortname, item_type, obj_data, tags } = changes;
 
     if (!title || !obj_data) throw new ValidationError('Missing required fields');
@@ -770,35 +775,32 @@ export class ItemAPI {
       await this.delTags(user, universeShortname, itemShortname, Object.keys(tagLookup));
     }
 
-    try {
-      if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
-        // The item shortname has changed, we need to update all links to it to reflect this
-        const shortnameError = this.api.universe.validateShortname(shortname);
-        if (shortnameError) throw new ValidationError(shortnameError);
-      }
-
-      await withTransaction(async (conn) => {
-        if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
-          await conn.execute('UPDATE itemlink SET to_item_short = ? WHERE to_item_short = ?', [shortname, item.shortname]);
-        }
-    
-        const queryString = `
-          UPDATE item
-          SET
-            title = ?,
-            shortname = ?,
-            item_type = ?,
-            obj_data = ?,
-            updated_at = ?,
-            last_updated_by = ?
-          WHERE id = ?;
-        `;
-        await conn.execute(queryString, [ title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), new Date(), user.id, item.id ])
-      });
-      return item.id;
-    } catch (err) {
-      throw new ModelError(err);
+    if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
+      // The item shortname has changed, we need to update all links to it to reflect this
+      const shortnameError = this.api.universe.validateShortname(shortname);
+      if (shortnameError) throw new ValidationError(shortnameError);
     }
+
+    await withTransaction(async (conn) => {
+      if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
+        await conn.execute('UPDATE itemlink SET to_item_short = ? WHERE to_item_short = ?', [shortname, item.shortname]);
+      }
+  
+      const queryString = `
+        UPDATE item
+        SET
+          title = ?,
+          shortname = ?,
+          item_type = ?,
+          obj_data = ?,
+          updated_at = ?,
+          last_updated_by = ?
+        WHERE id = ?;
+      `;
+      await conn.execute(queryString, [ title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), new Date(), user.id, item.id ])
+    });
+
+    return item.id;
   }
 
   async putData(user: User, universeShortname: string, itemShortname: string, changes): Promise<ResultSetHeader> {
@@ -857,37 +859,29 @@ export class ItemAPI {
   }
 
   async putTags(user: User, universeShortname: string, itemShortname: string, tags: string[]): Promise<ResultSetHeader | void> {
-    if (!tags || tags.length === 0) throw new ValidationError('Missing required fields');
+    if (tags.length === 0) return; // Nothing to do
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE, true);
-    try {
-      const tagLookup = {};
-      item.tags?.forEach(tag => {
-        tagLookup[tag] = true;
-      });
-      const filteredTags = tags.filter(tag => !tagLookup[tag]);
-      const valueString = filteredTags.map(() => `(?, ?)`).join(',');
-      const valueArray = filteredTags.reduce((arr, tag) => [...arr, item.id, tag], []);
-      if (!valueString) return;
-      const queryString = `INSERT INTO tag (item_id, tag) VALUES ${valueString};`;
-      const data = await executeQuery<ResultSetHeader>(queryString, valueArray);
-      return data;
-    } catch (e) {
-      throw new ModelError(e);
-    }
+    const tagLookup = {};
+    item.tags?.forEach(tag => {
+      tagLookup[tag] = true;
+    });
+    const filteredTags = tags.filter(tag => !tagLookup[tag]);
+    const valueString = filteredTags.map(() => `(?, ?)`).join(',');
+    const valueArray = filteredTags.reduce((arr, tag) => [...arr, item.id, tag], []);
+    if (!valueString) return;
+    const queryString = `INSERT INTO tag (item_id, tag) VALUES ${valueString};`;
+    const data = await executeQuery<ResultSetHeader>(queryString, valueArray);
+    return data;
   }
 
   async delTags(user: User, universeShortname: string, itemShortname: string, tags: string[]): Promise<ResultSetHeader | void> {
-    if (!tags || tags.length === 0) throw new ValidationError('Missing required fields');
+    if (tags.length === 0) return; // Nothing to do
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE, true);
-    try {
-      const whereString = tags.map(() => `tag = ?`).join(' OR ');
-      if (!whereString) return;
-      const queryString = `DELETE FROM tag WHERE item_id = ? AND (${whereString});`;
-      const data = await executeQuery<ResultSetHeader>(queryString, [ item.id, ...tags ]);
-      return data;
-    } catch (e) {
-      throw new ModelError(e);
-    }
+    const whereString = tags.map(() => `tag = ?`).join(' OR ');
+    if (!whereString) return;
+    const queryString = `DELETE FROM tag WHERE item_id = ? AND (${whereString});`;
+    const data = await executeQuery<ResultSetHeader>(queryString, [ item.id, ...tags ]);
+    return data;
   }
 
   async snoozeUntil(user: User, universeShortname: string, itemShortname: string): Promise<ResultSetHeader> {
