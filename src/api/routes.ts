@@ -39,12 +39,22 @@ export default function(app: Express, upload: Multer) {
         req.isApiRequest = true;
         const method = req.method.toUpperCase();
         if (method in this.methodFuncs) {
-          const [status, data] = await this.methodFuncs[method](req, res);
-          res.status(status);
-          if (data !== undefined) {
-            if (data instanceof Buffer) res.send(data);
-            else res.json(data);
-          } else res.json(null);
+          try {
+            const data = await this.methodFuncs[method](req, res);
+            res.status(200);
+            if (data !== undefined) {
+              if (data instanceof Buffer) res.send(data);
+              else res.json(data);
+            } else res.json(null);
+          } catch (err) {
+            logger.error(err);
+            res.status(err.code ?? 500);
+            if (err.data) {
+              res.json(err.data);
+            } else {
+              res.end();
+            }
+          }
         } else {
           res.status(405);
         }
