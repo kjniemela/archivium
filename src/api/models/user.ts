@@ -1,9 +1,13 @@
-import { executeQuery, parseData, withTransaction, perms, Result } from '../utils';
+import { executeQuery, parseData, withTransaction, perms, plans } from '../utils';
 import utils from '../../lib/hashUtils';
 import logger from '../../logger';
 import { SITE_OWNER_EMAIL } from '../../config';
 import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { API } from '..';
+import { RequestError, ModelError, ValidationError, UnauthorizedError, ForbiddenError, NotFoundError } from '../../errors';
+import { HttpStatusCode } from 'axios';
+
+export type UserSponsoredUniverses = { tier: number, universes: string[], universe_shorts: string[] }[];
 
 export type UserImage = {
   user_id: number,
@@ -15,7 +19,8 @@ export type UserImage = {
 export type User = {
   id: number,
   username: string,
-  email: string,
+  email?: string,
+  pfpUrl?: string,
   password?: string,
   salt?: string,
   created_at: Date,
@@ -25,6 +30,9 @@ export type User = {
   email_notifications: boolean,
   preferred_theme: string | null,
   isContact?: boolean,
+  hasPfp?: boolean,
+  plan?: plans, 
+  notifications?: number,
 };
 
 export class UserImageAPI {
@@ -34,10 +42,10 @@ export class UserImageAPI {
     this.user = user;
   }
 
-  async getByUsername(username: string): Result<UserImage> {
+  async getByUsername(username: string): Promise<UserImage | undefined> {
     try {
-      const [code, user] = await this.user.getOne({ 'user.username': username });
-      if (!user) return [code];
+      const user = await this.user.getOne({ 'user.username': username });
+      if (!user) throw new NotFoundError();
       let queryString = `
         SELECT 
           user_id, name, mimetype, data
@@ -45,21 +53,19 @@ export class UserImageAPI {
         WHERE user_id = ?;
       `;
       const image = (await executeQuery(queryString, [user.id]))[0] as UserImage | undefined;
-      return [200, image];
+      return image;
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  async post(sessionUser, file: Express.Multer.File, username) {
-    if (!file) return [400];
-    if (!sessionUser) return [401];
-    if (sessionUser.username !== username) return [403];
+  async post(sessionUser: User, file: Express.Multer.File | undefined, username: string): Promise<ResultSetHeader> {
+    if (!file) throw new ValidationError('No file provided');
+    if (!sessionUser) throw new UnauthorizedError();
+    if (sessionUser.username !== username) throw new ForbiddenError();
 
     const { originalname, buffer, mimetype } = file;
-    const [code, user] = await this.user.getOne({ 'user.username': username });
-    if (!user) return [code];
+    const user = await this.user.getOne({ 'user.username': username });
 
     try {
       let data;
@@ -68,26 +74,20 @@ export class UserImageAPI {
         const queryString = `INSERT INTO userimage (user_id, name, mimetype, data) VALUES (?, ?, ?, ?);`;
         [ data ] = await conn.execute(queryString, [ user.id, originalname.substring(0, 64), mimetype, buffer ]);
       });
-      return [201, data];
+      return data;
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
-
   }
 
-  async del(sessionUser, username) {
+  async del(sessionUser: User, username: string): Promise<ResultSetHeader> {
     try {
-      if (!sessionUser) return [401];
-      if (sessionUser.username !== username) return [403];
-      
-      const [code, user] = await this.user.getOne({ 'user.username': username });
-      if (!user) return [code];
-
-      return [200, await executeQuery(`DELETE FROM userimage WHERE user_id = ?;`, [user.id])];
+      if (!sessionUser) throw new UnauthorizedError();
+      if (sessionUser.username !== username) throw new ForbiddenError();
+      const user = await this.user.getOne({ 'user.username': username });
+      return await executeQuery<ResultSetHeader>(`DELETE FROM userimage WHERE user_id = ?;`, [user.id]);
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 }
@@ -105,11 +105,11 @@ export class UserAPI {
    * returns a "safe" version of the user object with password data removed unless the includeAuth parameter is true
    * @param {*} options 
    * @param {boolean} includeAuth 
-   * @returns {Promise<[number, User?]>}
+   * @returns {Promise<User>}
    */
-  async getOne(options: any, includeAuth: boolean=false, includeNotifs=false): Promise<[number, User?]> {
+  async getOne(options: any, includeAuth: boolean=false, includeNotifs=false): Promise<User> {
     try {
-      if (!options || Object.keys(options).length === 0) throw 'options required for api.get.user';
+      if (!options || Object.keys(options).length === 0) throw new ValidationError('options required for api.get.user');
       const parsedOptions = parseData(options);
       const queryString = `
         SELECT
@@ -126,24 +126,23 @@ export class UserAPI {
         LIMIT 1;
       `;
       const user = (await executeQuery(queryString, parsedOptions.values))[0] as User;
-      if (!user) return [404];
+      if (!user) throw new NotFoundError();
       if (!includeAuth) {
         delete user.password;
         delete user.salt;
       }
-      return [200, user];
+      return user;
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
   /**
    * 
    * @param {*} options
-   * @returns {Promise<[number, User?]>}
+   * @returns {Promise<User[]>}
    */
-  async getMany(options: any=null, includeEmail=false): Promise<[number, User[]?]> {
+  async getMany(options: any=null, includeEmail=false): Promise<User[]> {
     try {
       const parsedOptions = parseData(options);
       let queryString;
@@ -157,18 +156,15 @@ export class UserAPI {
       `;
       else queryString = `SELECT id, username, created_at, updated_at ${includeEmail ? ', email' : ''} FROM user;`;
       const users = await executeQuery(queryString, parsedOptions.values) as User[];
-      return [200, users];
+      return users;
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  async getByUniverseShortname(user, shortname) {
-
-    const [code, universe] = await this.api.universe.getOne(user, { shortname });
-    if (!universe) return [code];
-
+  async getByUniverseShortname(user: User, shortname: string): Promise<(User & { items_authored: number })[]> {
+    const universe = await this.api.universe.getOne(user, { shortname });
+    if (!universe) throw new NotFoundError();
     try {
       const queryString = `
         SELECT 
@@ -186,21 +182,15 @@ export class UserAPI {
         WHERE au.universe_id = ?
         GROUP BY user.id;
       `;
-      const users = await executeQuery(queryString, [universe.id]);
-      return [200, users];
+      const users = await executeQuery(queryString, [universe.id]) as (User & { items_authored: number })[];
+      return users;
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  /**
-   * 
-   * @param {*} user 
-   * @returns {Promise<[number, QueryResult]>}
-   */
-  async getSponsoredUniverses(user: any): Promise<[number, RowDataPacket[]?]> {
-    if (!user) return [400];
+  async getSponsoredUniverses(user: User): Promise<UserSponsoredUniverses> {
+    if (!user) throw new ValidationError('User required');
     try {
       const queryString = `
         SELECT
@@ -212,11 +202,10 @@ export class UserAPI {
         WHERE usu.user_id = ?
         GROUP BY usu.tier;
       `;
-      const universes = await executeQuery(queryString, [user.id]);
-      return [200, universes];
+      const universes = await executeQuery(queryString, [user.id]) as UserSponsoredUniverses;
+      return universes;
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
@@ -318,21 +307,18 @@ export class UserAPI {
       `;
       return [200, await executeQuery(queryString, [...values, userIDToPut])];
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  async putPreferences(sessionUser, username, { preferred_theme }) {
-    if (!sessionUser) return [401];
-    const [code, user] = await this.getOne({ 'user.username': username }, true);
-    if (!user) return [code];
-    if (Number(sessionUser.id) !== Number(user.id)) return [403];
+  async putPreferences(sessionUser: User, username: string, { preferred_theme }): Promise<ResultSetHeader> {
+    if (!sessionUser) throw new UnauthorizedError();
+    const user = await this.getOne({ 'user.username': username }, true);
+    if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
     const changes = { preferred_theme };
-
     try {
       const keys = Object.keys(changes).filter(key => changes[key] !== undefined);
-      if (keys.length === 0) return [400];
+      if (keys.length === 0) throw new ValidationError('No changes provided');
       const values = keys.map(key => changes[key]);
       const queryString = `
         UPDATE user
@@ -340,21 +326,18 @@ export class UserAPI {
           ${keys.map(key => `${key} = ?`).join(', ')}
         WHERE id = ?;
       `;
-      return [200, await executeQuery(queryString, [...values, user.id])];
+      return await executeQuery<ResultSetHeader>(queryString, [...values, user.id]);
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  async putUsername(sessionUser, oldUsername, newUsername) {
-    const [code, user] = await this.getOne({ 'user.username': oldUsername });
-    if (!user) return [code];
-    if (Number(sessionUser.id) !== Number(user.id)) return [403];
-
+  async putUsername(sessionUser: User, oldUsername: string, newUsername: string): Promise<Date | ResultSetHeader | string> {
+    const user = await this.getOne({ 'user.username': oldUsername });
+    if (!user) throw new NotFoundError();
+    if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
     const validationError = this.validateUsername(newUsername);
-    if (validationError) return [400, validationError];
-
+    if (validationError) throw new ValidationError(validationError);
     const now = new Date();
     const cutoffInterval = 30 * 24 * 60 * 60 * 1000; // 30 Days
     const cutoffDate = new Date(now.getTime() - cutoffInterval);
@@ -364,8 +347,10 @@ export class UserAPI {
       WHERE changed_for = ? AND changed_at >= ?
       ORDER BY changed_at DESC;
     `, [user.id, cutoffDate]);
-    if (recentChanges.length > 0) return [429, new Date(recentChanges[0].changed_at.getTime() + cutoffInterval)];
-
+    if (recentChanges.length > 0) {
+      const tryAgainOn = new Date(recentChanges[0].changed_at.getTime() + cutoffInterval);
+      throw new RequestError('Username recently changed', { code: HttpStatusCode.TooManyRequests, data: tryAgainOn });
+    }
     try {
       const queryString = `
         UPDATE user
@@ -373,7 +358,7 @@ export class UserAPI {
           username = ?
         WHERE id = ?;
       `;
-      const data = await executeQuery(queryString, [newUsername, user.id]);
+      const data = await executeQuery<ResultSetHeader>(queryString, [newUsername, user.id]);
       await executeQuery(`
         INSERT INTO usernamechange (
           changed_for,
@@ -382,36 +367,30 @@ export class UserAPI {
           changed_at
         ) VALUES (?, ?, ?, ?)
       `, [user.id, oldUsername, newUsername, new Date()]);
-      return [200, data];
+      return data;
     } catch (err) {
-      if (err.code === 'ER_DUP_ENTRY') return [400, 'Username already taken.'];
-      logger.error(err);
-      return [500];
+      if (err.code === 'ER_DUP_ENTRY') throw new ValidationError('Username already taken.');
+      throw new ModelError(err);
     }
   }
 
-  async putPassword(sessionUser, username, { oldPassword, newPassword }) {
-    const [code, user] = await this.getOne({ 'user.username': username }, true);
-    if (!user) return [code];
-    if (Number(sessionUser.id) !== Number(user.id)) return [403];
-
+  async putPassword(sessionUser: User, username: string, { oldPassword, newPassword }): Promise<ResultSetHeader> {
+    const user = await this.getOne({ 'user.username': username }, true);
+    if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
     const isCorrectLogin = this.validatePassword(oldPassword, user.password, user.salt);
-    if (!isCorrectLogin) return [401];
-
+    if (!isCorrectLogin) throw new UnauthorizedError('Incorrect password');
     const salt = utils.createRandom32String();
-
     try {
-      const data = await executeQuery(`
+      const data = await executeQuery<ResultSetHeader>(`
         UPDATE user
         SET
           salt = ?,
           password = ?
         WHERE id = ?
       `, [salt, utils.createHash(newPassword, salt), user.id]);
-      return [200, data];
+      return data;
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
@@ -461,32 +440,30 @@ export class UserAPI {
       });
       return [200];
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  async del(sessionUser, username, password): Result<string> {
-    if (!sessionUser) return [401];
+  async del(sessionUser, username, password): Promise<void> {
+    if (!sessionUser) throw new UnauthorizedError();
     try {  
-      const [status, user] = await this.getOne({ 'user.username': username }, true);
+      const user = await this.getOne({ 'user.username': username }, true);
       if (user) {
         if (sessionUser.id !== user.id) {
-          return [403, 'Can\'t delete user you\'re not logged in as!'];
+          throw new ForbiddenError('Can\'t delete user you\'re not logged in as!');
         }
         const isCorrectLogin = this.validatePassword(password, user.password, user.salt);
         if (!isCorrectLogin) {
-          return [403, 'Password incorrect!'];
+          throw new ForbiddenError('Password incorrect!');
         }
         await executeQuery('INSERT INTO userdeleterequest (user_id) VALUES (?);', [user.id]);
         await this.api.email.sendTemplateEmail(this.api.email.templates.DELETE, SITE_OWNER_EMAIL, { username });
-        return [200];
+        return;
       } else {
-        return [status];
+        throw new NotFoundError();
       }
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
@@ -502,8 +479,7 @@ export class UserAPI {
 
       return [200, request];
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
@@ -515,17 +491,16 @@ export class UserAPI {
     return verificationKey;
   }
 
-  async verifyUser(verificationKey) {
+  async verifyUser(verificationKey: string): Promise<number> {
     const records = await executeQuery('SELECT user_id FROM userverification WHERE verification_key = ?;', [verificationKey]);
-    if (records.length === 0) return [404];
-    const [code, user] = await this.getOne({ id: records[0].user_id });
-    if (!user) return [code];
+    if (records.length === 0) throw new NotFoundError('No such verification key');
+    const user = await this.getOne({ id: records[0].user_id });
     await this.put(user.id, user.id, { verified: true });
     await executeQuery('DELETE FROM userverification WHERE user_id = ?;', [user.id]);
 
     logger.info(`User ${user.username} (${user.email}) verified!`);
 
-    return [200, user.id];
+    return user.id;
   }
 
   async preparePasswordReset(userId) {
@@ -538,11 +513,10 @@ export class UserAPI {
     return resetKey;
   }
 
-  async resetPassword(resetKey, newPassword) {
+  async resetPassword(resetKey: string, newPassword: string): Promise<number> {
     const records = await executeQuery('SELECT user_id FROM userpasswordreset WHERE reset_key = ? AND expires_at > NOW();', [resetKey]);
-    if (records.length === 0) return [404];
-    const [code, user] = await this.getOne({ id: records[0].user_id });
-    if (!user) return [code];
+    if (records.length === 0) throw new NotFoundError();
+    const user = await this.getOne({ id: records[0].user_id });
 
     const salt = utils.createRandom32String();
     const newHashedPass = utils.createHash(newPassword, salt);
@@ -554,6 +528,6 @@ export class UserAPI {
 
     logger.info(`Reset password for user ${user.username}.`);
 
-    return [200, user.id];
+    return user.id;
   }
 }

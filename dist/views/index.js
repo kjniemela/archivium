@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,19 +42,34 @@ const auth_1 = __importDefault(require("../middleware/auth"));
 const templates_1 = require("../templates");
 const utils_1 = require("../api/utils");
 const logger_1 = __importDefault(require("../logger"));
-const reCaptcha_1 = __importDefault(require("../middleware/reCaptcha"));
+const ReCaptcha = __importStar(require("../middleware/reCaptcha"));
 const theme_1 = __importDefault(require("../middleware/theme"));
 const themes_1 = __importDefault(require("../themes"));
 const pages_1 = __importDefault(require("./pages"));
 const forms_1 = __importDefault(require("./forms"));
 const errors_1 = require("../errors");
+const axios_1 = require("axios");
 const sites = {
     DISPLAY: (req) => !!req.headers['x-subdomain'],
     NORMAL: (req) => !req.headers['x-subdomain'],
     ALL: () => true,
 };
 function default_1(app) {
-    app.use((_, res, next) => {
+    app.use((req, res, next) => {
+        req.getQueryParam = (key) => {
+            const value = req.query[key];
+            if (typeof value !== 'string' && value !== undefined) {
+                throw new errors_1.RequestError(`Query parameter "${key}" is required and must be a string`, { code: axios_1.HttpStatusCode.BadRequest });
+            }
+            return value;
+        };
+        req.getQueryParamAsNumber = (key) => {
+            const value = req.getQueryParam(key);
+            if (value !== undefined && value.trim() === '' || isNaN(Number(value))) {
+                throw new errors_1.RequestError(`Parameter ${key} expected to be numeric, but wasn't`, { code: axios_1.HttpStatusCode.BadRequest });
+            }
+            return Number(value);
+        };
         res.set('Content-Type', 'text/html; charset=utf-8');
         res.prepareRender = (template, data = {}) => {
             res.templateData = { template, data };
@@ -72,7 +120,10 @@ function default_1(app) {
                 catch (err) {
                     logger_1.default.error(err);
                     if (err instanceof errors_1.RequestError) {
-                        res.status(err.CODE);
+                        res.status(err.code);
+                    }
+                    if (err.cause) {
+                        logger_1.default.error(err.cause); // TODO might not be required?
                     }
                 }
                 await doRender(req, res);
@@ -204,7 +255,7 @@ function default_1(app) {
     });
     /* POST Handlers */
     post('/settings/notifications', sites.ALL, [auth_1.default.verifySessionOrRedirect], forms_1.default.notificationSettings);
-    post('/forgot-password', sites.ALL, [reCaptcha_1.default.verifyReCaptcha], forms_1.default.passwordResetRequest);
+    post('/forgot-password', sites.ALL, [ReCaptcha.verifyReCaptcha], forms_1.default.passwordResetRequest);
     post('/reset-password/:key', sites.ALL, [], forms_1.default.resetPassword);
     post('/notes/create', sites.ALL, [auth_1.default.verifySessionOrRedirect], forms_1.default.createNote);
     post('/notes/edit', sites.ALL, [auth_1.default.verifySessionOrRedirect], forms_1.default.editNote);

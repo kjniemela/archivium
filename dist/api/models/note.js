@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NoteAPI = void 0;
 const crypto_1 = __importDefault(require("crypto"));
 const utils_1 = require("../utils");
-const logger_1 = __importDefault(require("../../logger"));
+const errors_1 = require("../../errors");
 class NoteAPI {
     api;
     constructor(api) {
@@ -15,21 +15,18 @@ class NoteAPI {
     async getOne(user, uuid) {
         // Direct note access is only allowed for our own notes.
         if (!user)
-            return [401];
+            throw new errors_1.UnauthorizedError();
         try {
-            const [code, notes] = await this.getMany(user, { 'note.uuid': uuid }, { limit: 1, fullBody: true, connections: true });
-            if (!notes)
-                return [code];
+            const notes = await this.getMany(user, { 'note.uuid': uuid }, { limit: 1, fullBody: true, connections: true });
             const note = notes[0];
             if (!note)
-                return [404];
+                throw new errors_1.NotFoundError();
             if (note.author_id !== user.id)
-                return [403];
-            return [200, note];
+                throw new errors_1.ForbiddenError();
+            return note;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     /**
@@ -47,11 +44,11 @@ class NoteAPI {
         try {
             const parsedConds = (0, utils_1.parseData)(conditions ?? {});
             if (user) {
-                parsedConds.strings.push('(note.public OR note.author_id = ?)');
+                parsedConds.strings.push('(note.is_public OR note.author_id = ?)');
                 parsedConds.values.push(user.id);
             }
             else {
-                parsedConds.strings.push('note.public');
+                parsedConds.strings.push('note.is_public');
             }
             if (options?.search) {
                 parsedConds.strings.push('(note.title LIKE ? OR note.body LIKE ? OR tag.tags LIKE ?)');
@@ -64,7 +61,7 @@ class NoteAPI {
             const queryString = `
         SELECT DISTINCT
           note.id, note.uuid, note.title,
-          note.public, note.author_id,
+          note.is_public, note.author_id,
           note.created_at, note.updated_at,
           tag.tags,
           ${options?.fullBody ? 'note.body' : 'SUBSTRING(note.body, 1, 255) AS body'}
@@ -104,32 +101,28 @@ class NoteAPI {
                 notes[0].items = (notes[0].items ?? []).filter(val => val[0] !== null);
                 notes[0].boards = (notes[0].boards ?? []).filter(val => val[0] !== null);
             }
-            return [200, notes];
+            return notes;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async getByUsername(sessionUser, username, conditions, options) {
         try {
-            const [code, user] = await this.api.user.getOne({ 'user.username': username });
+            const user = await this.api.user.getOne({ 'user.username': username });
             if (!user)
-                return [code];
-            const [_, notes] = await this.getMany(sessionUser, { ...(conditions ?? {}), 'note.author_id': user.id }, options ?? {});
-            return [200, notes];
+                throw new errors_1.NotFoundError();
+            const notes = await this.getMany(sessionUser, { ...(conditions ?? {}), 'note.author_id': user.id }, options ?? {});
+            return notes;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async getByItemShortname(user, universeShortname, itemShortname, conditions, options, inclAuthors = false) {
         try {
-            const [code, item] = await this.api.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.READ, true);
-            if (!item)
-                return [code];
-            const [_, notes] = await this.getMany(user, { ...conditions ?? {}, 'itemnote.item_id': item?.id }, { ...options ?? {} });
+            const item = await this.api.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.READ, true);
+            const notes = await this.getMany(user, { ...conditions ?? {}, 'itemnote.item_id': item?.id }, { ...options ?? {} });
             if (inclAuthors) {
                 const queryString2 = `
           SELECT user.id, user.username, user.email
@@ -139,39 +132,34 @@ class NoteAPI {
           WHERE itemnote.item_id = ?
           GROUP BY user.id`;
                 const users = await (0, utils_1.executeQuery)(queryString2, [item.id]);
-                return [200, notes, users];
+                return [notes, users];
             }
-            return [200, notes];
+            return [notes];
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async getBoardsByUniverseShortname(user, shortname) {
         try {
-            const [code, universe] = await this.api.universe.getOne(user, { 'universe.shortname': shortname }, utils_1.perms.READ);
-            if (!universe)
-                return [code];
+            const universe = await this.api.universe.getOne(user, { 'universe.shortname': shortname }, utils_1.perms.READ);
             const boards = await (0, utils_1.executeQuery)('SELECT * FROM noteboard WHERE universe_id = ?', [universe.id]);
-            return [200, boards];
+            return boards;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
-    async getByBoardShortname(user, shortname, conditions, options, validate = true, inclAuthors = false) {
+    async getByBoardShortname(user, shortname, conditions = null, options = null, validate = true, inclAuthors = false) {
         try {
-            const board = await (0, utils_1.executeQuery)('SELECT * FROM noteboard WHERE shortname = ?', [shortname]);
+            const boards = await (0, utils_1.executeQuery)('SELECT * FROM noteboard WHERE shortname = ?', [shortname]);
+            const board = boards[0];
             if (!board)
-                return [404];
+                throw new errors_1.NotFoundError();
             if (validate) {
-                const [code, universe] = await this.api.universe.getOne(user, { 'universe.id': board.universe_id }, utils_1.perms.READ);
-                if (!universe)
-                    return [code];
+                await this.api.universe.getOne(user, { 'universe.id': board.universe_id }, utils_1.perms.READ); // Make sure we have permission to see the universe
             }
-            const [_, notes] = await this.getMany(user, { ...conditions ?? {}, 'boardnote.board_id': board.id }, { ...options ?? {} });
+            const notes = await this.getMany(user, { ...conditions ?? {}, 'boardnote.board_id': board.id }, { ...options ?? {} });
             if (inclAuthors) {
                 const queryString2 = `
           SELECT user.id, user.username, user.email
@@ -181,76 +169,63 @@ class NoteAPI {
           WHERE boardnote.board_id = ?
           GROUP BY user.id`;
                 const users = await (0, utils_1.executeQuery)(queryString2, [board.id]);
-                return [200, notes, users];
+                return [notes, users];
             }
-            return [200, notes];
+            return notes;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async postBoard(user, { title, shortname }, universeShortname) {
         if (!user)
-            return [401];
+            throw new errors_1.UnauthorizedError();
         try {
-            const [code, universe] = await api.universe.getOne(user, { 'universe.shortname': universeShortname }, utils_1.perms.WRITE);
-            if (!universe)
-                return [code];
+            const universe = await this.api.universe.getOne(user, { 'universe.shortname': universeShortname }, utils_1.perms.WRITE);
             const queryString = `INSERT INTO noteboard (title, shortname, universe_id) VALUES (?, ?, ?);`;
             const data = await (0, utils_1.executeQuery)(queryString, [title, shortname, universe.id]);
-            return [201, data];
+            return data;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
-    /**
-     *
-     * @param {*} user
-     * @param {*} param1
-     * @returns {Promise<[number, QueryResult, number]>}
-     */
-    async post(user, { title, body, public, tags }) {
+    async post(user, { title, body, is_public, tags }) {
         if (!user)
-            return [401];
+            throw new errors_1.UnauthorizedError();
+        const uuid = crypto_1.default.randomUUID();
         try {
-            const uuid = crypto_1.default.randomUUID();
-            const queryString = `INSERT INTO note (uuid, title, body, public, author_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?);`;
-            const data = await (0, utils_1.executeQuery)(queryString, [uuid, title, body, public, user.id, new Date(), new Date()]);
+            const queryString = `INSERT INTO note (uuid, title, body, is_public, author_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?);`;
+            await (0, utils_1.executeQuery)(queryString, [uuid, title, body, is_public, user.id, new Date(), new Date()]);
             const trimmedTags = tags.map(tag => tag[0] === '#' ? tag.substring(1) : tag);
-            putTags(user, uuid, trimmedTags);
-            return [201, data, uuid];
+            this.putTags(user, uuid, trimmedTags);
+            return uuid;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async put(user, uuid, changes) {
-        const { title, body, public, items, boards, tags } = changes;
-        const [code, note] = await getOne(user, uuid);
-        if (!note)
-            return [code];
+        const { title, body, is_public, items, boards, tags } = changes;
+        const note = await this.getOne(user, uuid);
         try {
             const queryString = `
         UPDATE note
         SET
           title = ?,
           body = ?,
-          public = ?
+          is_public = ?
         WHERE uuid = ?;
       `;
-            const data = await (0, utils_1.executeQuery)(queryString, [title, body, public, note.uuid]);
+            const data = await (0, utils_1.executeQuery)(queryString, [title, body, is_public, note.uuid]);
             await (0, utils_1.executeQuery)('DELETE FROM itemnote WHERE note_id = ?', [note.id]);
             for (const { item, universe } of items ?? []) {
-                await linkToItem(user, universe, item, uuid);
+                await this.linkToItem(user, universe, item, uuid);
             }
             if (tags) {
                 const trimmedTags = tags.map(tag => tag[0] === '#' ? tag.substring(1) : tag);
                 // If tags list is provided, we can just as well handle it here
-                await putTags(user, uuid, trimmedTags);
+                await this.putTags(user, uuid, trimmedTags);
                 const tagLookup = {};
                 note.tags?.forEach(tag => {
                     tagLookup[tag] = true;
@@ -258,63 +233,50 @@ class NoteAPI {
                 trimmedTags.forEach(tag => {
                     delete tagLookup[tag];
                 });
-                await delTags(user, uuid, Object.keys(tagLookup));
+                await this.delTags(user, uuid, Object.keys(tagLookup));
             }
-            return [200, data];
+            return data;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async linkToBoard(user, boardShortname, noteUuid) {
         if (!noteUuid)
-            return [400];
+            throw new errors_1.ValidationError('Note UUID is required');
         if (!user)
-            return [401];
-        const board = await (0, utils_1.executeQuery)('SELECT * FROM noteboard WHERE shortname = ?', [boardShortname]);
+            throw new errors_1.UnauthorizedError();
+        const board = (await (0, utils_1.executeQuery)('SELECT * FROM noteboard WHERE shortname = ?', [boardShortname]))[0];
         if (!board)
-            return [404];
-        const [code2, note] = await getOne(user, noteUuid);
-        if (!note)
-            return [code2];
+            throw new errors_1.NotFoundError();
+        const note = await this.getOne(user, noteUuid);
         try {
             const queryString = `INSERT INTO boardnote (board_id, note_id) VALUES (?, ?)`;
             await (0, utils_1.executeQuery)(queryString, [board.id, note.id]);
-            return [201];
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async linkToItem(user, universeShortname, itemShortname, noteUuid) {
         if (!noteUuid)
-            return [400];
+            throw new errors_1.ValidationError('Note UUID is required');
         if (!user)
-            return [401];
-        const [code, item] = await api.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE, true);
-        if (!item)
-            return [code];
-        const [code2, note] = await getOne(user, noteUuid);
-        if (!note)
-            return [code2];
+            throw new errors_1.UnauthorizedError();
+        const item = await this.api.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE, true);
+        const note = await this.getOne(user, noteUuid);
         try {
             const queryString = `INSERT INTO itemnote (item_id, note_id) VALUES (?, ?)`;
             await (0, utils_1.executeQuery)(queryString, [item.id, note.id]);
-            return [201];
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async putTags(user, uuid, tags) {
         if (!tags || tags.length === 0)
-            return [400];
-        const [code, note] = await getOne(user, uuid);
-        if (!note)
-            return [code];
+            throw new errors_1.ValidationError('No tags provided!');
+        const note = await this.getOne(user, uuid);
         try {
             const tagLookup = {};
             note.tags?.forEach(tag => {
@@ -324,51 +286,44 @@ class NoteAPI {
             const valueString = filteredTags.map(() => `(?, ?)`).join(',');
             const valueArray = filteredTags.reduce((arr, tag) => [...arr, note.id, tag], []);
             if (!valueString)
-                return [200];
+                return false;
             const queryString = `INSERT INTO notetag (note_id, tag) VALUES ${valueString};`;
             const data = await (0, utils_1.executeQuery)(queryString, valueArray);
-            return [201, data];
+            return true;
         }
         catch (e) {
-            logger_1.default.error(e);
-            return [500];
+            throw new errors_1.ModelError(e);
         }
     }
     async delTags(user, uuid, tags) {
         if (!tags || tags.length === 0)
-            return [400];
-        const [code, note] = await getOne(user, uuid);
-        if (!note)
-            return [code];
+            throw new errors_1.ValidationError('No tags provided!');
+        const note = await this.getOne(user, uuid);
         try {
             const whereString = tags.map(() => `tag = ?`).join(' OR ');
             if (!whereString)
-                return [200];
+                return false;
             const queryString = `DELETE FROM notetag WHERE note_id = ? AND (${whereString});`;
             const data = await (0, utils_1.executeQuery)(queryString, [note.id, ...tags]);
-            return [200, data];
+            return true;
         }
         catch (e) {
-            logger_1.default.error(e);
-            return [500];
+            throw new errors_1.ModelError(e);
         }
     }
     async del(user, uuid) {
         if (!user)
-            return [401];
+            throw new errors_1.UnauthorizedError();
         try {
-            const [code, note] = await getOne(user, uuid);
-            if (!note)
-                return [code];
+            const note = await this.getOne(user, uuid);
             // getOne will only return a note if we own it, but it doesn't hurt to double check for clarity
             if (note.author_id !== user.id)
-                return [403];
+                throw new errors_1.ForbiddenError();
             const data = await (0, utils_1.executeQuery)('DELETE FROM note WHERE uuid = ?', [uuid]);
-            return [200, data];
+            return data;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
 }

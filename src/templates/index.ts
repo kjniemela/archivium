@@ -6,6 +6,7 @@ import { locale, lang, sprintf, T } from '../locale';
 import api from '../api';
 import path from 'path';
 import themes from '../themes';
+import logger from '../logger';
 
 export function universeLink(req: Request, uniShort) {
   const displayUniverse = req.headers['x-subdomain'];
@@ -66,6 +67,7 @@ function compile(file) {
 }
 
 // compile templates
+logger.info('Compiling templates...');
 const templates = {
   error: compile('templates/error.pug'),
   docs: compile('templates/displayMd.pug'),

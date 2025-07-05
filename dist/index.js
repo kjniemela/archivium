@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -11,10 +44,13 @@ const cookieParser_1 = __importDefault(require("./middleware/cookieParser"));
 const multer_1 = __importDefault(require("multer"));
 // const bodyParser = require('body-parser');
 const auth_1 = __importDefault(require("./middleware/auth"));
-const reCaptcha_1 = __importDefault(require("./middleware/reCaptcha"));
+const ReCaptcha = __importStar(require("./middleware/reCaptcha"));
 const node_cron_1 = __importDefault(require("node-cron"));
 const backup_1 = __importDefault(require("./db/backup"));
+// Logging
+const logger_1 = __importDefault(require("./logger"));
 const config_1 = require("./config");
+logger_1.default.info('Server starting...');
 const app = (0, express_1.default)();
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.json());
@@ -23,9 +59,6 @@ app.use(auth_1.default.createSession);
 // Configure multer storage
 const storage = multer_1.default.memoryStorage();
 const upload = (0, multer_1.default)({ storage: storage });
-// Logging
-const logger_1 = __importDefault(require("./logger"));
-logger_1.default.info('Server starting...');
 // Cron Jobs
 node_cron_1.default.schedule('0 0 * * *', () => {
     logger_1.default.info('Running daily DB export...');
@@ -57,6 +90,7 @@ const views_1 = __importDefault(require("./views"));
 (0, views_1.default)(app);
 // Load api routes
 const routes_1 = __importDefault(require("./api/routes"));
+const utils_1 = require("./api/utils");
 (0, routes_1.default)(app, upload);
 /*
   ACCOUNT ROUTES
@@ -95,7 +129,7 @@ app.get(`${config_1.ADDR_PREFIX}/logout`, async (req, res, next) => {
 });
 app.post(`${config_1.ADDR_PREFIX}/login`, async (req, res, next) => {
     try {
-        const [errCode, user] = await api_1.default.user.getOne({ 'user.username': req.body.username }, true);
+        const user = await api_1.default.user.getOne({ 'user.username': req.body.username }, true).catch(utils_1.handleNotFoundAsNull);
         if (user) {
             req.loginId = user.id;
             const isCorrectLogin = api_1.default.user.validatePassword(req.body.password, user.password, user.salt);
@@ -122,7 +156,7 @@ app.post(`${config_1.ADDR_PREFIX}/login`, async (req, res, next) => {
     }
     next();
 });
-app.post(`${config_1.ADDR_PREFIX}/signup`, reCaptcha_1.default.verifyReCaptcha, async (req, res, next) => {
+app.post(`${config_1.ADDR_PREFIX}/signup`, ReCaptcha.verifyReCaptcha, async (req, res, next) => {
     try {
         const data = await api_1.default.user.post(req.body);
         try {

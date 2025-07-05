@@ -8,6 +8,8 @@ const utils_1 = require("../utils");
 const hashUtils_1 = __importDefault(require("../../lib/hashUtils"));
 const logger_1 = __importDefault(require("../../logger"));
 const config_1 = require("../../config");
+const errors_1 = require("../../errors");
+const axios_1 = require("axios");
 class UserImageAPI {
     user;
     constructor(user) {
@@ -15,9 +17,9 @@ class UserImageAPI {
     }
     async getByUsername(username) {
         try {
-            const [code, user] = await this.user.getOne({ 'user.username': username });
+            const user = await this.user.getOne({ 'user.username': username });
             if (!user)
-                return [code];
+                throw new errors_1.NotFoundError();
             let queryString = `
         SELECT 
           user_id, name, mimetype, data
@@ -25,24 +27,21 @@ class UserImageAPI {
         WHERE user_id = ?;
       `;
             const image = (await (0, utils_1.executeQuery)(queryString, [user.id]))[0];
-            return [200, image];
+            return image;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async post(sessionUser, file, username) {
         if (!file)
-            return [400];
+            throw new errors_1.ValidationError('No file provided');
         if (!sessionUser)
-            return [401];
+            throw new errors_1.UnauthorizedError();
         if (sessionUser.username !== username)
-            return [403];
+            throw new errors_1.ForbiddenError();
         const { originalname, buffer, mimetype } = file;
-        const [code, user] = await this.user.getOne({ 'user.username': username });
-        if (!user)
-            return [code];
+        const user = await this.user.getOne({ 'user.username': username });
         try {
             let data;
             await (0, utils_1.withTransaction)(async (conn) => {
@@ -50,27 +49,23 @@ class UserImageAPI {
                 const queryString = `INSERT INTO userimage (user_id, name, mimetype, data) VALUES (?, ?, ?, ?);`;
                 [data] = await conn.execute(queryString, [user.id, originalname.substring(0, 64), mimetype, buffer]);
             });
-            return [201, data];
+            return data;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async del(sessionUser, username) {
         try {
             if (!sessionUser)
-                return [401];
+                throw new errors_1.UnauthorizedError();
             if (sessionUser.username !== username)
-                return [403];
-            const [code, user] = await this.user.getOne({ 'user.username': username });
-            if (!user)
-                return [code];
-            return [200, await (0, utils_1.executeQuery)(`DELETE FROM userimage WHERE user_id = ?;`, [user.id])];
+                throw new errors_1.ForbiddenError();
+            const user = await this.user.getOne({ 'user.username': username });
+            return await (0, utils_1.executeQuery)(`DELETE FROM userimage WHERE user_id = ?;`, [user.id]);
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
 }
@@ -86,12 +81,12 @@ class UserAPI {
      * returns a "safe" version of the user object with password data removed unless the includeAuth parameter is true
      * @param {*} options
      * @param {boolean} includeAuth
-     * @returns {Promise<[number, User?]>}
+     * @returns {Promise<User>}
      */
     async getOne(options, includeAuth = false, includeNotifs = false) {
         try {
             if (!options || Object.keys(options).length === 0)
-                throw 'options required for api.get.user';
+                throw new errors_1.ValidationError('options required for api.get.user');
             const parsedOptions = (0, utils_1.parseData)(options);
             const queryString = `
         SELECT
@@ -109,22 +104,21 @@ class UserAPI {
       `;
             const user = (await (0, utils_1.executeQuery)(queryString, parsedOptions.values))[0];
             if (!user)
-                return [404];
+                throw new errors_1.NotFoundError();
             if (!includeAuth) {
                 delete user.password;
                 delete user.salt;
             }
-            return [200, user];
+            return user;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     /**
      *
      * @param {*} options
-     * @returns {Promise<[number, User?]>}
+     * @returns {Promise<User[]>}
      */
     async getMany(options = null, includeEmail = false) {
         try {
@@ -142,17 +136,16 @@ class UserAPI {
             else
                 queryString = `SELECT id, username, created_at, updated_at ${includeEmail ? ', email' : ''} FROM user;`;
             const users = await (0, utils_1.executeQuery)(queryString, parsedOptions.values);
-            return [200, users];
+            return users;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async getByUniverseShortname(user, shortname) {
-        const [code, universe] = await this.api.universe.getOne(user, { shortname });
+        const universe = await this.api.universe.getOne(user, { shortname });
         if (!universe)
-            return [code];
+            throw new errors_1.NotFoundError();
         try {
             const queryString = `
         SELECT 
@@ -171,21 +164,15 @@ class UserAPI {
         GROUP BY user.id;
       `;
             const users = await (0, utils_1.executeQuery)(queryString, [universe.id]);
-            return [200, users];
+            return users;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
-    /**
-     *
-     * @param {*} user
-     * @returns {Promise<[number, QueryResult]>}
-     */
     async getSponsoredUniverses(user) {
         if (!user)
-            return [400];
+            throw new errors_1.ValidationError('User required');
         try {
             const queryString = `
         SELECT
@@ -198,11 +185,10 @@ class UserAPI {
         GROUP BY usu.tier;
       `;
             const universes = await (0, utils_1.executeQuery)(queryString, [user.id]);
-            return [200, universes];
+            return universes;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     post({ username, email, password, hp }) {
@@ -293,23 +279,20 @@ class UserAPI {
             return [200, await (0, utils_1.executeQuery)(queryString, [...values, userIDToPut])];
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async putPreferences(sessionUser, username, { preferred_theme }) {
         if (!sessionUser)
-            return [401];
-        const [code, user] = await this.getOne({ 'user.username': username }, true);
-        if (!user)
-            return [code];
+            throw new errors_1.UnauthorizedError();
+        const user = await this.getOne({ 'user.username': username }, true);
         if (Number(sessionUser.id) !== Number(user.id))
-            return [403];
+            throw new errors_1.ForbiddenError();
         const changes = { preferred_theme };
         try {
             const keys = Object.keys(changes).filter(key => changes[key] !== undefined);
             if (keys.length === 0)
-                return [400];
+                throw new errors_1.ValidationError('No changes provided');
             const values = keys.map(key => changes[key]);
             const queryString = `
         UPDATE user
@@ -317,22 +300,21 @@ class UserAPI {
           ${keys.map(key => `${key} = ?`).join(', ')}
         WHERE id = ?;
       `;
-            return [200, await (0, utils_1.executeQuery)(queryString, [...values, user.id])];
+            return await (0, utils_1.executeQuery)(queryString, [...values, user.id]);
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async putUsername(sessionUser, oldUsername, newUsername) {
-        const [code, user] = await this.getOne({ 'user.username': oldUsername });
+        const user = await this.getOne({ 'user.username': oldUsername });
         if (!user)
-            return [code];
+            throw new errors_1.NotFoundError();
         if (Number(sessionUser.id) !== Number(user.id))
-            return [403];
+            throw new errors_1.ForbiddenError();
         const validationError = this.validateUsername(newUsername);
         if (validationError)
-            return [400, validationError];
+            throw new errors_1.ValidationError(validationError);
         const now = new Date();
         const cutoffInterval = 30 * 24 * 60 * 60 * 1000; // 30 Days
         const cutoffDate = new Date(now.getTime() - cutoffInterval);
@@ -342,8 +324,10 @@ class UserAPI {
       WHERE changed_for = ? AND changed_at >= ?
       ORDER BY changed_at DESC;
     `, [user.id, cutoffDate]);
-        if (recentChanges.length > 0)
-            return [429, new Date(recentChanges[0].changed_at.getTime() + cutoffInterval)];
+        if (recentChanges.length > 0) {
+            const tryAgainOn = new Date(recentChanges[0].changed_at.getTime() + cutoffInterval);
+            throw new errors_1.RequestError('Username recently changed', { code: axios_1.HttpStatusCode.TooManyRequests, data: tryAgainOn });
+        }
         try {
             const queryString = `
         UPDATE user
@@ -360,24 +344,21 @@ class UserAPI {
           changed_at
         ) VALUES (?, ?, ?, ?)
       `, [user.id, oldUsername, newUsername, new Date()]);
-            return [200, data];
+            return data;
         }
         catch (err) {
             if (err.code === 'ER_DUP_ENTRY')
-                return [400, 'Username already taken.'];
-            logger_1.default.error(err);
-            return [500];
+                throw new errors_1.ValidationError('Username already taken.');
+            throw new errors_1.ModelError(err);
         }
     }
     async putPassword(sessionUser, username, { oldPassword, newPassword }) {
-        const [code, user] = await this.getOne({ 'user.username': username }, true);
-        if (!user)
-            return [code];
+        const user = await this.getOne({ 'user.username': username }, true);
         if (Number(sessionUser.id) !== Number(user.id))
-            return [403];
+            throw new errors_1.ForbiddenError();
         const isCorrectLogin = this.validatePassword(oldPassword, user.password, user.salt);
         if (!isCorrectLogin)
-            return [401];
+            throw new errors_1.UnauthorizedError('Incorrect password');
         const salt = hashUtils_1.default.createRandom32String();
         try {
             const data = await (0, utils_1.executeQuery)(`
@@ -387,11 +368,10 @@ class UserAPI {
           password = ?
         WHERE id = ?
       `, [salt, hashUtils_1.default.createHash(newPassword, salt), user.id]);
-            return [200, data];
+            return data;
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     /**
@@ -438,34 +418,32 @@ class UserAPI {
             return [200];
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async del(sessionUser, username, password) {
         if (!sessionUser)
-            return [401];
+            throw new errors_1.UnauthorizedError();
         try {
-            const [status, user] = await this.getOne({ 'user.username': username }, true);
+            const user = await this.getOne({ 'user.username': username }, true);
             if (user) {
                 if (sessionUser.id !== user.id) {
-                    return [403, 'Can\'t delete user you\'re not logged in as!'];
+                    throw new errors_1.ForbiddenError('Can\'t delete user you\'re not logged in as!');
                 }
                 const isCorrectLogin = this.validatePassword(password, user.password, user.salt);
                 if (!isCorrectLogin) {
-                    return [403, 'Password incorrect!'];
+                    throw new errors_1.ForbiddenError('Password incorrect!');
                 }
                 await (0, utils_1.executeQuery)('INSERT INTO userdeleterequest (user_id) VALUES (?);', [user.id]);
                 await this.api.email.sendTemplateEmail(this.api.email.templates.DELETE, config_1.SITE_OWNER_EMAIL, { username });
-                return [200];
+                return;
             }
             else {
-                return [status];
+                throw new errors_1.NotFoundError();
             }
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async getDeleteRequest(user) {
@@ -478,8 +456,7 @@ class UserAPI {
             return [200, request];
         }
         catch (err) {
-            logger_1.default.error(err);
-            return [500];
+            throw new errors_1.ModelError(err);
         }
     }
     async prepareVerification(userId) {
@@ -490,14 +467,12 @@ class UserAPI {
     async verifyUser(verificationKey) {
         const records = await (0, utils_1.executeQuery)('SELECT user_id FROM userverification WHERE verification_key = ?;', [verificationKey]);
         if (records.length === 0)
-            return [404];
-        const [code, user] = await this.getOne({ id: records[0].user_id });
-        if (!user)
-            return [code];
+            throw new errors_1.NotFoundError('No such verification key');
+        const user = await this.getOne({ id: records[0].user_id });
         await this.put(user.id, user.id, { verified: true });
         await (0, utils_1.executeQuery)('DELETE FROM userverification WHERE user_id = ?;', [user.id]);
         logger_1.default.info(`User ${user.username} (${user.email}) verified!`);
-        return [200, user.id];
+        return user.id;
     }
     async preparePasswordReset(userId) {
         const resetKey = hashUtils_1.default.createRandom32String();
@@ -509,10 +484,8 @@ class UserAPI {
     async resetPassword(resetKey, newPassword) {
         const records = await (0, utils_1.executeQuery)('SELECT user_id FROM userpasswordreset WHERE reset_key = ? AND expires_at > NOW();', [resetKey]);
         if (records.length === 0)
-            return [404];
-        const [code, user] = await this.getOne({ id: records[0].user_id });
-        if (!user)
-            return [code];
+            throw new errors_1.NotFoundError();
+        const user = await this.getOne({ id: records[0].user_id });
         const salt = hashUtils_1.default.createRandom32String();
         const newHashedPass = hashUtils_1.default.createHash(newPassword, salt);
         await (0, utils_1.withTransaction)(async (conn) => {
@@ -521,7 +494,7 @@ class UserAPI {
             await conn.execute('DELETE FROM userpasswordreset WHERE user_id = ?;', [user.id]);
         });
         logger_1.default.info(`Reset password for user ${user.username}.`);
-        return [200, user.id];
+        return user.id;
     }
 }
 exports.UserAPI = UserAPI;

@@ -2,7 +2,8 @@ import db from '../db';
 import _ from 'lodash';
 import md5 from 'md5';
 import logger from '../logger';
-import { QueryResult, RowDataPacket } from 'mysql2/promise';
+import { PoolConnection, QueryResult, RowDataPacket } from 'mysql2/promise';
+import { NotFoundError } from '../errors';
 
 export enum perms {
   NONE,
@@ -24,12 +25,13 @@ export const paidTiers = {
   PREMIUM: 1,
 } as const;
 type ValueOf<T> = T[keyof T];
-type PaidTier = ValueOf<typeof paidTiers>;
+export type PaidTier = ValueOf<typeof paidTiers>;
 
 export const tiers = {
   FREE: 0,
   ...paidTiers,
 } as const;
+export type Tier = ValueOf<typeof tiers>;
 
 export const tierAllowance: Record<plans, Record<PaidTier | 'total', number>> = {
   [plans.FREE]: { total: 5, [tiers.PREMIUM]: 0 },
@@ -38,14 +40,14 @@ export const tierAllowance: Record<plans, Record<PaidTier | 'total', number>> = 
   [plans.SUPER]: { total: 999, [tiers.PREMIUM]: 99  },
 };
 
-export async function executeQuery<T extends QueryResult = RowDataPacket[]>(query: string, values: any[]) {
+export async function executeQuery<T extends QueryResult = RowDataPacket[]>(query: string, values: any[] = []) {
   const [ results ] = await db.execute<T>(query, values);
   return results;
 }
 
 export class RollbackError extends Error {}
 
-export async function withTransaction(callback) {
+export async function withTransaction(callback: (conn: PoolConnection) => Promise<void>) {
   const connection = await db.getConnection();
   try {
     await connection.beginTransaction();
@@ -71,10 +73,17 @@ export const parseData = (conditions: { [key: string]: any }) => {
   return { strings, values };
 }
 
-type SelectCol = string | string[] | SelectParams[];
-type SelectParams = [SelectCol, string | null, string | null] | [SelectCol, string | null] | [SelectCol];
-
-export type Result<T> = Promise<[number, T?]>;
+export type BaseOptions = {
+  search?: string;
+  sort?: string;
+  forceSort?: boolean;
+  sortDesc?: boolean;
+  limit?: number,
+  groupBy?: string[],
+  where?: Cond,
+  select?: [string, string?, (string | string[])?][],
+  join?: ['INNER' | 'LEFT' | 'RIGHT', string | [string, string], Cond?][]
+};
 
 export class QueryBuilder {
    table: string | null;
@@ -101,17 +110,9 @@ export class QueryBuilder {
     this.unions = [];
    }
 
-   select(...args: SelectParams) {
-    const [col, selectAs, value] = args;
-    if (col instanceof Array) {
-      col.forEach((args: string | SelectParams) => {
-        if (args instanceof Array) this.select(...args);
-        else this.select(args);
-      });
-    } else {
-      this.selects[col] = selectAs;
-      this.selectValues[col] = value;
-    }
+   select(col: string, selectAs: string | null = null, value: any | any[] = null) {
+    this.selects[col] = selectAs;
+    this.selectValues[col] = value;
     return this;
    }
 
@@ -120,7 +121,7 @@ export class QueryBuilder {
     return this;
    }
 
-   join(type, table, on) {
+   join(type: 'INNER' | 'LEFT' | 'RIGHT', table: string | [string, string], on?: Cond) {
     this.joins.push([type, table, on]);
    }
 
@@ -227,13 +228,13 @@ export class Cond {
     this.value = value;
   }
 
-  or(cond?: string | Cond, value=undefined) {
+  or(cond?: string | Cond, value?) {
     if (!(cond instanceof Cond)) return this.or(new Cond(cond, value));
     if (cond && !(cond.check || cond instanceof MultiCond)) return this;
     return new MultiCond('OR', this, cond);
   }
 
-  and(cond?: string | Cond, value=undefined) {
+  and(cond?: string | Cond, value?) {
     if (!(cond instanceof Cond)) return this.and(new Cond(cond, value));
     if (cond && !(cond.check || cond instanceof MultiCond)) return this;
     return new MultiCond('AND', this, cond);
@@ -267,4 +268,11 @@ class MultiCond extends Cond {
 
 export function getPfpUrl(user) {
   return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email)}.jpg`;
+}
+
+export function handleNotFoundAsNull(error: any): null {
+  if (error instanceof NotFoundError) {
+    return null;
+  }
+  throw error;
 }

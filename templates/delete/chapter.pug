@@ -3,9 +3,9 @@ extends ../layout.pug
 block content
   script.
     async function deleteChapter() {
-      const response = await fetch(`/api/stories/#{chapter.storyShort}/#{chapter.chapter_number}`, { method: 'DELETE' })
+      const response = await fetch(`/api/stories/#{storyShort}/#{chapter.chapter_number}`, { method: 'DELETE' })
       if (response.ok) {
-        window.location.href = `#{ADDR_PREFIX}/stories/#{chapter.storyShort}`;
+        window.location.href = `#{ADDR_PREFIX}/stories/#{storyShort}`;
       } else {
         const errSpan = document.getElementById('error');
         errSpan.innerText = await response.json();
@@ -23,7 +23,7 @@ block content
     
     .d-flex.align-center.gap-2
       button.color-error(onclick='deleteChapter()') #{T('Delete Chapter')}
-      a.link.link-animated(href=`${ADDR_PREFIX}/stories/${chapter.storyShort}/${chapter.chapter_number}`) #{T('Go Back')}
+      a.link.link-animated(href=`${ADDR_PREFIX}/stories/${storyShort}/${chapter.chapter_number}`) #{T('Go Back')}
 
     div
       span#error(style={ color: 'red', 'font-size': 'small' })

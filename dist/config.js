@@ -1,19 +1,22 @@
-require('dotenv').config();
-const { PORT, DOMAIN, ADDR_PREFIX, DEV_MODE, SITE_OWNER_EMAIL, MAILERSEND_API_KEY, OPENAI_API_KEY, RECAPTCHA_KEY, ARCHIVIUM_DB_HOST, ARCHIVIUM_DB_USER, ARCHIVIUM_DB_PASSWORD, ARCHIVIUM_DB, WEB_PUSH_ENABLED, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, } = process.env;
-module.exports.PORT = Number(PORT);
-module.exports.DOMAIN = DOMAIN;
-module.exports.ADDR_PREFIX = ADDR_PREFIX;
-module.exports.DEV_MODE = DEV_MODE === 'true';
-module.exports.SITE_OWNER_EMAIL = SITE_OWNER_EMAIL;
-module.exports.MAILERSEND_API_KEY = MAILERSEND_API_KEY;
-module.exports.OPENAI_API_KEY = OPENAI_API_KEY;
-module.exports.RECAPTCHA_KEY = RECAPTCHA_KEY;
-module.exports.WEB_PUSH_ENABLED = WEB_PUSH_ENABLED === 'true';
-module.exports.VAPID_PUBLIC_KEY = VAPID_PUBLIC_KEY;
-module.exports.VAPID_PRIVATE_KEY = VAPID_PRIVATE_KEY;
-module.exports.DB_CONFIG = {
-    host: ARCHIVIUM_DB_HOST,
-    user: ARCHIVIUM_DB_USER,
-    password: ARCHIVIUM_DB_PASSWORD,
-    database: ARCHIVIUM_DB,
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DB_CONFIG = exports.VAPID_PRIVATE_KEY = exports.VAPID_PUBLIC_KEY = exports.WEB_PUSH_ENABLED = exports.ARCHIVIUM_DB = exports.ARCHIVIUM_DB_PASSWORD = exports.ARCHIVIUM_DB_USER = exports.ARCHIVIUM_DB_HOST = exports.RECAPTCHA_KEY = exports.OPENAI_API_KEY = exports.MAILERSEND_API_KEY = exports.SITE_OWNER_EMAIL = exports.DEV_MODE = exports.ADDR_PREFIX = exports.DOMAIN = exports.PORT = void 0;
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+function formatEnv(env) {
+    env.PORT = Number(env.PORT);
+    env.DEV_MODE = env.DEV_MODE === 'true';
+    env.WEB_PUSH_ENABLED = env.WEB_PUSH_ENABLED === 'true';
+    return env;
+}
+_a = formatEnv({ ...process.env }), exports.PORT = _a.PORT, exports.DOMAIN = _a.DOMAIN, exports.ADDR_PREFIX = _a.ADDR_PREFIX, exports.DEV_MODE = _a.DEV_MODE, exports.SITE_OWNER_EMAIL = _a.SITE_OWNER_EMAIL, exports.MAILERSEND_API_KEY = _a.MAILERSEND_API_KEY, exports.OPENAI_API_KEY = _a.OPENAI_API_KEY, exports.RECAPTCHA_KEY = _a.RECAPTCHA_KEY, exports.ARCHIVIUM_DB_HOST = _a.ARCHIVIUM_DB_HOST, exports.ARCHIVIUM_DB_USER = _a.ARCHIVIUM_DB_USER, exports.ARCHIVIUM_DB_PASSWORD = _a.ARCHIVIUM_DB_PASSWORD, exports.ARCHIVIUM_DB = _a.ARCHIVIUM_DB, exports.WEB_PUSH_ENABLED = _a.WEB_PUSH_ENABLED, exports.VAPID_PUBLIC_KEY = _a.VAPID_PUBLIC_KEY, exports.VAPID_PRIVATE_KEY = _a.VAPID_PRIVATE_KEY;
+exports.DB_CONFIG = {
+    host: exports.ARCHIVIUM_DB_HOST,
+    user: exports.ARCHIVIUM_DB_USER,
+    password: exports.ARCHIVIUM_DB_PASSWORD,
+    database: exports.ARCHIVIUM_DB,
 };

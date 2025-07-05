@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import api from '../api';
 import { ADDR_PREFIX } from '../config';
 import logger from '../logger';
-import { ResultSetHeader } from 'mysql2';
+import { ResultSetHeader } from 'mysql2/promise';
+import { Session } from '../api/models/session';
 
 const createSession = async (req: Request, res: Response, next: NextFunction) => {
   if (req.cookies['archiviumuid']) {
@@ -25,7 +26,7 @@ const createSession = async (req: Request, res: Response, next: NextFunction) =>
   }
 
   const { insertId } = await api.session.post() as ResultSetHeader;
-  const session = await api.session.getOne({ id: insertId });
+  const session = await api.session.getOne({ id: insertId }) as Session; // We just created this session, so it must exist.
   res.cookie('archiviumuid', session.hash, {
     httpOnly: true,
     secure: true,

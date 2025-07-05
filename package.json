@@ -11,12 +11,12 @@
     "build:dev": "npx tsc --build --clean && npx tsc --watch",
     "dev": "nodemon -e '.js,.pug' --watch dist --delay 1000ms dist/index.js",
     "devl": "nodemon --ext \".js,.pug\" --legacy-watch dist/index.js",
-    "db:backup": "node db/backup.js",
-    "db:export": "node db/export.js",
-    "db:import": "node db/import.js",
-    "db:clean": "node db/updateSchema.js",
-    "db:reset": "node db/generate",
-    "db:upgrade": "node db/upgrade"
+    "db:backup": "node dist/db/backup.js",
+    "db:export": "node dist/db/export.js",
+    "db:import": "node dist/db/import.js",
+    "db:clean": "node dist/db/updateSchema.js",
+    "db:reset": "node dist/db/generate",
+    "db:upgrade": "node dist/db/upgrade"
   },
   "repository": {
     "type": "git",
@@ -30,7 +30,7 @@
   },
   "homepage": "https://archivium.net",
   "dependencies": {
-    "axios": "^1.9.0",
+    "axios": "^1.10.0",
     "dotenv": "^16.4.7",
     "express": "^4.18.0",
     "handlebars": "^4.7.8",

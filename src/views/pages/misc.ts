@@ -27,17 +27,13 @@ export default {
   async home(req, res) {
     const user = req.session.user;
     if (user) {
-      const [code1, universes] = await api.universe.getMany(user, null, perms.WRITE);
-      res.status(code1);
-      if (!universes) return;
-      const [code2, followedUniverses] = await api.universe.getMany(user, {
+      const universes = await api.universe.getMany(user, null, perms.WRITE);
+      const followedUniverses = await api.universe.getMany(user, {
         strings: ['fu.user_id = ?', 'fu.is_following = ?'],
         values: [user.id, true],
       }, perms.READ);
-      res.status(code2);
-      if (!followedUniverses) return;
       const followedUniverseIds = `(${followedUniverses.map(universe => universe.id).join(',')})`;
-      const [code3, recentlyUpdated] = followedUniverses.length > 0 ? await api.item.getMany(user, null, perms.READ, {
+      const recentlyUpdated = followedUniverses.length > 0 ? await api.item.getMany(user, null, perms.READ, {
         sort: 'updated_at',
         sortDesc: true,
         limit: 8,
@@ -46,8 +42,7 @@ export default {
         where: new Cond(`item.universe_id IN ${followedUniverseIds}`)
           .and(new Cond('lub.id <> ?', user.id).or(new Cond('item.last_updated_by IS NULL').and('item.author_id <> ?', user.id))),
       }) : [200, []];
-      res.status(code3);
-      const [code4, oldestUpdated] = await api.item.getMany(user, null, perms.WRITE, {
+      const oldestUpdated = await api.item.getMany(user, null, perms.WRITE, {
         sort: `GREATEST(IFNULL(snooze.snoozed_at, '1000-01-01'), IFNULL(item.updated_at, '1000-01-01'))`,
         sortDesc: false,
         forceSort: true,
@@ -56,11 +51,6 @@ export default {
         where: new Cond('item.updated_at < DATE_SUB(NOW(), INTERVAL 2 DAY)'),
         groupBy: ['snooze.snoozed_at'],
       });
-      res.status(code4);
-      if (!oldestUpdated) return;
-      // if (universes.length === 1) {
-      //   res.redirect(`${ADDR_PREFIX}/universes/${universes[0].shortname}`);
-      // }
       return res.prepareRender('home', { universes, followedUniverses, recentlyUpdated, oldestUpdated });
     }
     res.prepareRender('home', { universes: [] })
@@ -68,11 +58,7 @@ export default {
 
   /* Newsletter */
   async news(req, res) {
-    const [code, newsletter] = await api.newsletter.getOne(req.params.id);
-    if (!newsletter) {
-      res.status(code);
-      return;
-    };
+    const newsletter = await api.newsletter.getOne(Number(req.params.id));
     res.prepareRender('docs', {
       title: newsletter.title,
       content: newsletter.body,
@@ -93,10 +79,8 @@ export default {
   /* Note pages */
   async notes(req, res) {
     const user = req.session.user;
-    const [code, notes] = await api.note.getByUsername(user, user.username);
+    const notes = await api.note.getByUsername(user, user.username);
     const noteAuthors = { [user.id]: user };
-    res.status(code);
-    if (!notes) return;
     res.prepareRender('notes', {
       notes,
       noteAuthors,
@@ -106,21 +90,12 @@ export default {
 
   /* Misc pages */
   async search(req, res) {
-    const search = req.query.search;
+    const search = req.getQueryParam('search');
     if (search) {
-      const [code1, universes] = await api.universe.getMany(req.session.user, { strings: ['title LIKE ?'], values: [`%${search}%`] });
-      res.status(code1);
-      if (!universes) return;
-      const [code2, items] = await api.item.getMany(req.session.user, null, perms.READ, { search });
-      res.status(code2);
-      if (!items) return;
-      let notes, code3;
-      if (req.session.user) {
-        [code3, notes] = await api.note.getByUsername(req.session.user, req.session.user.username, null, { search });
-        res.status(code3);
-        if (!notes) return;
-      }
-      res.prepareRender('search', { items, universes, notes: notes ?? [], search });
+      const universes = await api.universe.getMany(req.session.user, { strings: ['title LIKE ?'], values: [`%${search}%`] });
+      const items = await api.item.getMany(req.session.user, null, perms.READ, { search });
+      const notes = req.session.user ? await api.note.getByUsername(req.session.user, req.session.user.username, null, { search }) : [];
+      res.prepareRender('search', { items, universes, notes, search });
     } else {
       res.prepareRender('search', { items: [], universes: [], notes: [], search: '' });
     }

@@ -25,7 +25,7 @@ const createSession = async (req, res, next) => {
         }
     }
     const { insertId } = await api_1.default.session.post();
-    const session = await api_1.default.session.getOne({ id: insertId });
+    const session = await api_1.default.session.getOne({ id: insertId }); // We just created this session, so it must exist.
     res.cookie('archiviumuid', session.hash, {
         httpOnly: true,
         secure: true,

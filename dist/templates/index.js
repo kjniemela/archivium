@@ -12,6 +12,7 @@ const locale_1 = require("../locale");
 const api_1 = __importDefault(require("../api"));
 const path_1 = __importDefault(require("path"));
 const themes_1 = __importDefault(require("../themes"));
+const logger_1 = __importDefault(require("../logger"));
 function universeLink(req, uniShort) {
     const displayUniverse = req.headers['x-subdomain'];
     if (displayUniverse) {
@@ -69,6 +70,7 @@ function compile(file) {
     return pug_1.default.compileFile(file, pugOptions);
 }
 // compile templates
+logger_1.default.info('Compiling templates...');
 const templates = {
     error: compile('templates/error.pug'),
     docs: compile('templates/displayMd.pug'),

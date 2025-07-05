@@ -1,40 +1,57 @@
-import { HttpStatusCode } from "axios";
+import { HttpStatusCode } from 'axios';
 
 export class RequestError extends Error {
-  readonly CODE: number = HttpStatusCode.InternalServerError;
+  readonly code: number = HttpStatusCode.InternalServerError;
+  readonly data: any;
 
-  constructor(msg?: string, code?: number) {
-    super(msg);
+  constructor(msgOrError?: string | Error, { cause, code, data }: { cause?: Error, code?: number, data?: any } = {}) {
+    if (msgOrError instanceof Error) {
+      super(msgOrError.message, { cause: msgOrError });
+    } else {
+      super(msgOrError);
+    }
     if (code) {
-      this.CODE = code;
+      this.code = code;
+    }
+    if (data) {
+      this.data = data;
     }
   }
 }
 
 export class ModelError extends RequestError {
-  constructor(msg?: string) {
-    super(msg);
+  constructor(msgOrError?: string | Error, { cause, data }: { cause?: Error, data?: any } = {}) {
+    super(msgOrError, { cause, data });
+  }
+}
+
+export class RateLimitError extends ModelError {
+  readonly code: number = HttpStatusCode.TooManyRequests;
+  declare readonly data: Date;
+  
+  constructor(tryAgain?: Date) {
+    super('Rate limit exceeded, try again at:', { data: tryAgain });
   }
 }
 
 export class ValidationError extends ModelError {
-  readonly CODE: number = HttpStatusCode.BadRequest;
+  readonly code: number = HttpStatusCode.BadRequest;
 }
 
 export class UnauthorizedError extends ModelError {
-  readonly CODE: number = HttpStatusCode.Unauthorized;
+  readonly code: number = HttpStatusCode.Unauthorized;
 }
 
 export class PremiumOnlyError extends ModelError {
-  readonly CODE: number = HttpStatusCode.PaymentRequired;
+  readonly code: number = HttpStatusCode.PaymentRequired;
 }
 
 export class ForbiddenError extends ModelError {
-  readonly CODE: number = HttpStatusCode.Forbidden;
+  readonly code: number = HttpStatusCode.Forbidden;
 }
 
 export class NotFoundError extends ModelError {
-  readonly CODE: number = HttpStatusCode.NotFound;
+  readonly code: number = HttpStatusCode.NotFound;
 }
 
 

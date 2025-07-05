@@ -3,17 +3,16 @@ import Auth from '../../middleware/auth';
 import api from '../../api';
 import md5 from 'md5';
 import { render } from '../../templates';
-import { perms, Cond, getPfpUrl } from '../../api/utils';
+import { perms, Cond, getPfpUrl, handleNotFoundAsNull } from '../../api/utils';
 import fs from 'fs/promises';
 import logger from '../../logger';
 import { RouteHandler } from '..';
+import { NotFoundError } from '../../errors';
 
 export default {
   /* User Pages */
   async contactList(req, res) {
-    const [code, contacts] = await api.contact.getAll(req.session.user);
-    res.status(code);
-    if (!contacts) return;
+    const contacts = await api.contact.getAll(req.session.user);
     const gravatarContacts = contacts.map(user => ({
       ...user,
       pfpUrl: getPfpUrl(user),
@@ -25,13 +24,9 @@ export default {
   },
 
   async profilePage(req, res) {
-    const [code1, user] = await api.user.getOne({ 'user.username': req.params.username });
-    res.status(code1);
-    if (!user) return;
-    const [code2, universes] = await api.universe.getManyByAuthorId(req.session.user, user.id);
-    res.status(code2);
-    if (!universes) return;
-    const [code3, recentlyUpdated] = await api.item.getMany(req.session.user, null, perms.READ, {
+    const user = await api.user.getOne({ 'user.username': req.params.username });
+    const universes = await api.universe.getManyByAuthorId(req.session.user, user.id);
+    const recentlyUpdated = await api.item.getMany(req.session.user, null, perms.READ, {
       sort: 'updated_at',
       sortDesc: true,
       limit: 15,
@@ -40,17 +35,15 @@ export default {
       where: new Cond('item.author_id = ?', user.id)
         .and(new Cond('lub.id = ?', user.id).or('item.last_updated_by IS NULL')),
     });
-    res.status(code3);
-    const [code4, items] = await api.item.getByAuthorUsername(req.session.user, user.username, perms.READ, {
+    const items = await api.item.getByAuthorUsername(req.session.user, user.username, perms.READ, {
       sort: 'updated_at',
       sortDesc: true,
       limit: 15
     });
-    res.status(code4);
     if (!items) return;
     if (req.session.user?.id !== user.id) {
-      const [_, contact] = await api.contact.getOne(req.session.user, user.id);
-      user.isContact = contact !== undefined;
+      const contact = await api.contact.getOne(req.session.user, user.id).catch(handleNotFoundAsNull);
+      user.isContact = contact !== null;
     }
     res.prepareRender('user', {
       user,
@@ -62,11 +55,8 @@ export default {
   },
   
   async settings(req, res) {
-    const [code, user] = await api.user.getOne({ 'user.id': req.session.user.id });
-    res.status(code);
-    if (!user) return;
-    const [code2, typeSettingData] = await api.notification.getTypeSettings(user);
-    res.status(code2);
+    const user = await api.user.getOne({ 'user.id': req.session.user.id });
+    const typeSettingData = await api.notification.getTypeSettings(user);
     if (!typeSettingData) return;
     const typeSettings = {};
     for (const setting of typeSettingData) {
@@ -91,8 +81,8 @@ export default {
       res.redirect(`${ADDR_PREFIX}/`);
       return;
     }
-    const [code, data] = await api.email.trySendVerifyLink(req.session.user, req.session.user.username);
-    if (data && data.alreadyVerified) {
+    const data = await api.email.trySendVerifyLink(req.session.user, req.session.user.username);
+    if (data && !(data instanceof Date) && data.alreadyVerified) {
       res.redirect(`${ADDR_PREFIX}${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
       return;
     }
@@ -105,24 +95,23 @@ export default {
   },
 
   async verifyUser(req, res) {
-    const [code, userId] = await api.user.verifyUser(req.params.key)
-    res.status(code);
-    if (code === 200) {
-      const [_, user] = await api.user.getOne({ id: userId });
-      if (user) {
-        // TODO should we send a welcome email?
-        // api.email.sendTemplateEmail(api.email.templates.WELCOME, req.body.email, { username: user.username });
-        return res.redirect(`${ADDR_PREFIX}/`);
+    const userId = await api.user.verifyUser(req.params.key);
+    const user = await api.user.getOne({ id: userId });
+    try {
+      // TODO should we send a welcome email?
+      // api.email.sendTemplateEmail(api.email.templates.WELCOME, req.body.email, { username: user.username });
+      return res.redirect(`${ADDR_PREFIX}/`);
+    } catch (e) {
+      if (e instanceof NotFoundError) {
+        return res.redirect(`${ADDR_PREFIX}/verify?reason=bad_key`);
       }
-    } else {
-      return res.redirect(`${ADDR_PREFIX}/verify?reason=bad_key`);
+      throw e;
     }
   },
 
   async notifications(req, res) {
     if (req.session.user) {
-      const [code, notifications] = await api.notification.getSentNotifications(req.session.user);
-      res.status(code);
+      const notifications = await api.notification.getSentNotifications(req.session.user);
       if (!notifications) return;
       res.prepareRender('notifications', {
         read: notifications.filter(notif => notif.is_read),

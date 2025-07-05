@@ -1,19 +1,25 @@
-import { ResultSetHeader } from 'mysql2';
+import { ResultSetHeader } from 'mysql2/promise';
 import express from 'express';
 import path from 'path';
 import api from './api';
 import { render } from './templates';
 
+
 import CookieParser from './middleware/cookieParser';
 import multer from 'multer';
 // const bodyParser = require('body-parser');
 import Auth from './middleware/auth';
-import ReCaptcha from './middleware/reCaptcha';
+import * as ReCaptcha from './middleware/reCaptcha';
 
 import cron from 'node-cron';
 import backup from './db/backup';
 
+// Logging
+import logger from './logger';
+
 import { PORT, DOMAIN, ADDR_PREFIX, DEV_MODE } from './config';
+
+logger.info('Server starting...');
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -25,11 +31,6 @@ app.use(Auth.createSession);
 // Configure multer storage
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
-
-// Logging
-import logger from './logger';
-logger.info('Server starting...');
 
 
 // Cron Jobs
@@ -71,6 +72,7 @@ loadViews(app);
 
 // Load api routes
 import loadRoutes from './api/routes';
+import { handleNotFoundAsNull } from './api/utils';
 loadRoutes(app, upload);
 
 
@@ -113,7 +115,7 @@ app.get(`${ADDR_PREFIX}/logout`, async (req, res, next) => {
 
 app.post(`${ADDR_PREFIX}/login`, async (req, res, next) => {
   try {  
-    const [errCode, user] = await api.user.getOne({ 'user.username': req.body.username }, true);
+    const user = await api.user.getOne({ 'user.username': req.body.username }, true).catch(handleNotFoundAsNull);
     if (user) {
       req.loginId = user.id;
       const isCorrectLogin = api.user.validatePassword(req.body.password, user.password, user.salt);

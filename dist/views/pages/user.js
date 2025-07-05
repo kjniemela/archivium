@@ -7,13 +7,11 @@ const config_1 = require("../../config");
 const api_1 = __importDefault(require("../../api"));
 const md5_1 = __importDefault(require("md5"));
 const utils_1 = require("../../api/utils");
+const errors_1 = require("../../errors");
 exports.default = {
     /* User Pages */
     async contactList(req, res) {
-        const [code, contacts] = await api_1.default.contact.getAll(req.session.user);
-        res.status(code);
-        if (!contacts)
-            return;
+        const contacts = await api_1.default.contact.getAll(req.session.user);
         const gravatarContacts = contacts.map(user => ({
             ...user,
             pfpUrl: (0, utils_1.getPfpUrl)(user),
@@ -24,15 +22,9 @@ exports.default = {
         });
     },
     async profilePage(req, res) {
-        const [code1, user] = await api_1.default.user.getOne({ 'user.username': req.params.username });
-        res.status(code1);
-        if (!user)
-            return;
-        const [code2, universes] = await api_1.default.universe.getManyByAuthorId(req.session.user, user.id);
-        res.status(code2);
-        if (!universes)
-            return;
-        const [code3, recentlyUpdated] = await api_1.default.item.getMany(req.session.user, null, utils_1.perms.READ, {
+        const user = await api_1.default.user.getOne({ 'user.username': req.params.username });
+        const universes = await api_1.default.universe.getManyByAuthorId(req.session.user, user.id);
+        const recentlyUpdated = await api_1.default.item.getMany(req.session.user, null, utils_1.perms.READ, {
             sort: 'updated_at',
             sortDesc: true,
             limit: 15,
@@ -41,18 +33,16 @@ exports.default = {
             where: new utils_1.Cond('item.author_id = ?', user.id)
                 .and(new utils_1.Cond('lub.id = ?', user.id).or('item.last_updated_by IS NULL')),
         });
-        res.status(code3);
-        const [code4, items] = await api_1.default.item.getByAuthorUsername(req.session.user, user.username, utils_1.perms.READ, {
+        const items = await api_1.default.item.getByAuthorUsername(req.session.user, user.username, utils_1.perms.READ, {
             sort: 'updated_at',
             sortDesc: true,
             limit: 15
         });
-        res.status(code4);
         if (!items)
             return;
         if (req.session.user?.id !== user.id) {
-            const [_, contact] = await api_1.default.contact.getOne(req.session.user, user.id);
-            user.isContact = contact !== undefined;
+            const contact = await api_1.default.contact.getOne(req.session.user, user.id).catch(utils_1.handleNotFoundAsNull);
+            user.isContact = contact !== null;
         }
         res.prepareRender('user', {
             user,
@@ -63,12 +53,8 @@ exports.default = {
         });
     },
     async settings(req, res) {
-        const [code, user] = await api_1.default.user.getOne({ 'user.id': req.session.user.id });
-        res.status(code);
-        if (!user)
-            return;
-        const [code2, typeSettingData] = await api_1.default.notification.getTypeSettings(user);
-        res.status(code2);
+        const user = await api_1.default.user.getOne({ 'user.id': req.session.user.id });
+        const typeSettingData = await api_1.default.notification.getTypeSettings(user);
         if (!typeSettingData)
             return;
         const typeSettings = {};
@@ -93,8 +79,8 @@ exports.default = {
             res.redirect(`${config_1.ADDR_PREFIX}/`);
             return;
         }
-        const [code, data] = await api_1.default.email.trySendVerifyLink(req.session.user, req.session.user.username);
-        if (data && data.alreadyVerified) {
+        const data = await api_1.default.email.trySendVerifyLink(req.session.user, req.session.user.username);
+        if (data && !(data instanceof Date) && data.alreadyVerified) {
             res.redirect(`${config_1.ADDR_PREFIX}${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
             return;
         }
@@ -106,24 +92,23 @@ exports.default = {
         });
     },
     async verifyUser(req, res) {
-        const [code, userId] = await api_1.default.user.verifyUser(req.params.key);
-        res.status(code);
-        if (code === 200) {
-            const [_, user] = await api_1.default.user.getOne({ id: userId });
-            if (user) {
-                // TODO should we send a welcome email?
-                // api.email.sendTemplateEmail(api.email.templates.WELCOME, req.body.email, { username: user.username });
-                return res.redirect(`${config_1.ADDR_PREFIX}/`);
-            }
+        const userId = await api_1.default.user.verifyUser(req.params.key);
+        const user = await api_1.default.user.getOne({ id: userId });
+        try {
+            // TODO should we send a welcome email?
+            // api.email.sendTemplateEmail(api.email.templates.WELCOME, req.body.email, { username: user.username });
+            return res.redirect(`${config_1.ADDR_PREFIX}/`);
         }
-        else {
-            return res.redirect(`${config_1.ADDR_PREFIX}/verify?reason=bad_key`);
+        catch (e) {
+            if (e instanceof errors_1.NotFoundError) {
+                return res.redirect(`${config_1.ADDR_PREFIX}/verify?reason=bad_key`);
+            }
+            throw e;
         }
     },
     async notifications(req, res) {
         if (req.session.user) {
-            const [code, notifications] = await api_1.default.notification.getSentNotifications(req.session.user);
-            res.status(code);
+            const notifications = await api_1.default.notification.getSentNotifications(req.session.user);
             if (!notifications)
                 return;
             res.prepareRender('notifications', {

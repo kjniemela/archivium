@@ -1,4 +1,7 @@
-module.exports.defaultUniverseData = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.defaultItemData = exports.defaultUniverseData = void 0;
+exports.defaultUniverseData = {
     cats: {
         article: ['article', 'articles', '#deddca'],
         character: ['character', 'characters', '#F44336'],
@@ -11,7 +14,7 @@ module.exports.defaultUniverseData = {
         organization: ['organization', 'organizations', '#9262df']
     }
 };
-module.exports.defaultItemData = {
+exports.defaultItemData = {
     article: {
         body: '# Markdown Test\n\n- **Bold**\n- *Italics*\n- _Italics 2_\n- __Underline__\n- ~~Strikethrough~~\n- [Link](@test-character)\n- Lists',
     },

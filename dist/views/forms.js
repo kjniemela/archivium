@@ -9,6 +9,7 @@ const templates_1 = require("../templates");
 const utils_1 = require("../api/utils");
 const logger_1 = __importDefault(require("../logger"));
 const pages_1 = __importDefault(require("./pages"));
+const errors_1 = require("../errors");
 exports.default = {
     async notificationSettings(req, res) {
         const { body, session } = req;
@@ -19,154 +20,141 @@ exports.default = {
                 delete body[`notif_${type}_${method}`];
             }
         }
-        const [code, data] = await api_1.default.notification.putSettings(session.user, body);
-        res.status(code);
+        await api_1.default.notification.putSettings(session.user, body);
         return res.redirect(`${config_1.ADDR_PREFIX}/settings`);
     },
     async createUniverse(req, res) {
-        const [code, data] = await api_1.default.universe.post(req.session.user, {
-            ...req.body,
-            obj_data: decodeURIComponent(req.body.obj_data),
-            public: req.body.visibility === 'public',
-            discussion_enabled: req.body.discussion_enabled === 'enabled',
-            discussion_open: req.body.discussion_open === 'enabled',
-        });
-        res.status(code);
-        if (code === 201)
+        try {
+            await api_1.default.universe.post(req.session.user, {
+                ...req.body,
+                obj_data: decodeURIComponent(req.body.obj_data),
+                is_public: req.body.visibility === 'public',
+                discussion_enabled: req.body.discussion_enabled === 'enabled',
+                discussion_open: req.body.discussion_open === 'enabled',
+            });
+            res.status(201);
             return res.redirect(`${(0, templates_1.universeLink)(req, req.body.shortname)}/`);
-        res.prepareRender('createUniverse', { error: data, ...req.body });
+        }
+        catch (err) {
+            if (err instanceof errors_1.ModelError) {
+                res.prepareRender('createUniverse', { error: err.message, ...req.body });
+                return;
+            }
+            throw err;
+        }
     },
     async editUniverse(req, res) {
         req.body = {
             ...req.body,
             obj_data: decodeURIComponent(req.body.obj_data),
-            public: req.body.visibility === 'public',
+            is_public: req.body.visibility === 'public',
             discussion_enabled: req.body.discussion_enabled === 'enabled',
             discussion_open: req.body.discussion_open === 'enabled',
         };
-        const [code, errorOrId] = await api_1.default.universe.put(req.session.user, req.params.universeShortname, req.body);
-        res.status(code);
-        if (code !== 200) {
-            res.error = errorOrId;
-            await pages_1.default.universe.edit(req, res);
-            return;
-        }
-        else {
-            const [code, universe] = await api_1.default.universe.getOne(req.session.user, { 'universe.id': errorOrId }, utils_1.perms.READ);
-            res.status(code);
-            if (!universe)
-                return;
+        try {
+            const id = await api_1.default.universe.put(req.session.user, req.params.universeShortname, req.body);
+            const universe = await api_1.default.universe.getOne(req.session.user, { 'universe.id': id }, utils_1.perms.READ);
             res.redirect(`${(0, templates_1.universeLink)(req, universe.shortname)}`);
+        }
+        catch (err) {
+            if (err instanceof errors_1.ModelError) {
+                res.error = err.message;
+                await pages_1.default.universe.edit(req, res);
+                return;
+            }
+            throw err;
         }
     },
     async createUniverseThread(req, res) {
-        const [code1, data] = await api_1.default.discussion.postUniverseThread(req.session.user, req.params.universeShortname, { title: req.body.title });
-        res.status(code1);
-        if (code1 === 201) {
+        try {
+            const { insertId } = await api_1.default.discussion.postUniverseThread(req.session.user, req.params.universeShortname, { title: req.body.title });
             if (req.body.comment) {
-                const [code2, _] = await api_1.default.discussion.postCommentToThread(req.session.user, data.insertId, { body: req.body.comment });
-                res.status(code2);
+                await api_1.default.discussion.postCommentToThread(req.session.user, insertId, { body: req.body['comment'] });
             }
-            return res.redirect(`${(0, templates_1.universeLink)(req, req.params.universeShortname)}/discuss/${data.insertId}`);
+            return res.redirect(`${(0, templates_1.universeLink)(req, req.params.universeShortname)}/discuss/${insertId}`);
         }
-        const [code3, universe] = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
-        res.status(code3);
-        if (code3 !== 200)
-            return;
-        res.prepareRender('createUniverseThread', { error: data, ...req.body, universe });
+        catch (err) {
+            if (err instanceof errors_1.ModelError) {
+                const universe = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
+                res.prepareRender('createUniverseThread', { error: err.message, ...req.body, universe });
+                return;
+            }
+        }
     },
     async commentOnThread(req, res) {
-        const [code, _] = await api_1.default.discussion.postCommentToThread(req.session.user, req.params.threadId, req.body);
-        res.status(code);
+        await api_1.default.discussion.postCommentToThread(req.session.user, Number(req.params.threadId), req.body);
         return res.redirect(`${(0, templates_1.universeLink)(req, req.params.universeShortname)}/discuss/${req.params.threadId}#post-comment`);
     },
     async createItem(req, res) {
-        const [userCode, data] = await api_1.default.item.post(req.session.user, {
-            ...req.body,
-        }, req.params.universeShortname);
-        res.status(userCode);
-        if (userCode === 201)
+        try {
+            await api_1.default.item.post(req.session.user, {
+                ...req.body,
+            }, req.params.universeShortname);
             return res.redirect(`${(0, templates_1.universeLink)(req, req.params.universeShortname)}/items/${req.body.shortname}`);
-        const [code, universe] = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
-        res.status(code);
-        if (code !== 200)
-            return;
-        res.prepareRender('createItem', { error: data, ...req.body, universe });
+        }
+        catch (err) {
+            if (err instanceof errors_1.ModelError) {
+                const universe = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
+                res.prepareRender('createItem', { error: err.message, ...req.body, universe });
+                return;
+            }
+            throw err;
+        }
     },
     async editItem(req, res) {
-        const [code, errorOrId] = await api_1.default.item.save(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);
-        res.status(code);
-        if (code !== 200) {
-            res.error = errorOrId;
-            await pages_1.default.item.edit(req, res);
-            return;
-        }
-        else {
-            const [code, item] = await api_1.default.item.getOne(req.session.user, { 'item.id': errorOrId }, utils_1.perms.READ, true);
-            res.status(code);
-            if (!item)
-                return;
+        try {
+            const id = await api_1.default.item.save(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);
+            const item = await api_1.default.item.getOne(req.session.user, { 'item.id': id }, utils_1.perms.READ, true);
             res.redirect(`${(0, templates_1.universeLink)(req, req.params.universeShortname)}/items/${item.shortname}`);
+        }
+        catch (err) {
+            if (err instanceof errors_1.ModelError) {
+                res.error = err.message;
+                await pages_1.default.item.edit(req, res);
+                return;
+            }
+            throw err;
         }
     },
     async commentOnItem(req, res) {
-        const [code, _] = await api_1.default.discussion.postCommentToItem(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);
-        res.status(code);
+        await api_1.default.discussion.postCommentToItem(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);
         res.redirect(`${(0, templates_1.universeLink)(req, req.params.universeShortname)}/items/${req.params.itemShortname}?tab=comments#post-comment`);
     },
     async editUniversePerms(req, res) {
         const { session, params, body } = req;
-        const [_, user] = await api_1.default.user.getOne({ 'user.username': req.body.username });
-        const [code] = await api_1.default.universe.putPermissions(session.user, params.universeShortname, user, body.permission_level);
-        res.status(code);
-        if (code !== 200)
-            return;
+        const user = await api_1.default.user.getOne({ 'user.username': req.body.username });
+        await api_1.default.universe.putPermissions(session.user, params.universeShortname, user, body.permission_level);
         res.redirect(`${(0, templates_1.universeLink)(req, params.universeShortname)}/permissions`);
     },
     async sponsorUniverse(req, res) {
         const { session, params, body } = req;
-        const [code] = await api_1.default.universe.putUserSponsoring(session.user, params.universeShortname, Number(body.tier));
-        res.status(code);
-        if (code !== 200)
-            return;
+        await api_1.default.universe.putUserSponsoring(session.user, params.universeShortname, Number(body.tier));
         res.redirect(`${(0, templates_1.universeLink)(req, params.universeShortname)}/`);
     },
     async createNote(req, res) {
         const { body, session } = req;
-        const [code, data, uuid] = await api_1.default.note.post(session.user, {
+        const uuid = await api_1.default.note.post(session.user, {
             title: body.note_title,
-            public: body.note_public === 'on',
+            is_public: body.note_public === 'on',
             body: body.note_body,
             tags: body.note_tags?.split(' ') ?? [],
         });
         let nextPage;
         if (body.note_item && body.note_universe) {
-            const [code, data] = await api_1.default.note.linkToItem(session.user, body.note_universe, body.note_item, uuid);
-            if (code !== 201) {
-                logger_1.default.error(`Error ${code}: ${data}`);
-                return;
-            }
+            await api_1.default.note.linkToItem(session.user, body.note_universe, body.note_item, uuid);
             nextPage = nextPage || `${(0, templates_1.universeLink)(req, body.note_universe)}/items/${body.note_item}?tab=notes&note=${uuid}`;
         }
         if (body.note_board && body.note_universe) {
-            const [code, data] = await api_1.default.note.linkToBoard(session.user, body.note_board, uuid);
-            if (code !== 201) {
-                logger_1.default.error(`Error ${code}: ${data}`);
-                return;
-            }
+            await api_1.default.note.linkToBoard(session.user, body.note_board, uuid);
             nextPage = nextPage || `${(0, templates_1.universeLink)(req, body.note_universe)}/notes/${body.note_board}?note=${uuid}`;
         }
-        res.status(code);
-        if (code === 201)
-            return res.redirect(nextPage || `${config_1.ADDR_PREFIX}/notes?note=${uuid}`);
-        logger_1.default.error(`Error ${code}: ${data}`);
-        // res.prepareRender('createUniverse', { error: data, ...req.body });
+        return res.redirect(nextPage || `${config_1.ADDR_PREFIX}/notes?note=${uuid}`);
     },
     async editNote(req, res) {
         const { body, session } = req;
-        const [code, data] = await api_1.default.note.put(session.user, body.note_uuid, {
+        await api_1.default.note.put(session.user, body.note_uuid, {
             title: body.note_title,
-            public: body.note_public === 'on',
+            is_public: body.note_public === 'on',
             body: body.note_body,
             items: body.items,
             boards: body.boards,
@@ -179,39 +167,42 @@ exports.default = {
         if (body.note_board && body.note_universe) {
             nextPage = nextPage || `${(0, templates_1.universeLink)(req, body.note_universe)}/notes/${body.note_board}?note=${body.note_uuid}`;
         }
-        res.status(code);
-        if (code === 200) {
-            res.redirect(nextPage || `${config_1.ADDR_PREFIX}/notes?note=${body.note_uuid}`);
-            return;
-        }
-        logger_1.default.error(`Error ${code}: ${data}`);
-        // res.prepareRender('createUniverse', { error: data, ...req.body });
+        res.redirect(nextPage || `${config_1.ADDR_PREFIX}/notes?note=${body.note_uuid}`);
     },
     async createStory(req, res) {
-        const [code, data] = await api_1.default.story.post(req.session.user, {
-            ...req.body,
-            public: req.body.drafts_public === 'public',
-        });
-        res.status(code);
-        if (code === 201)
+        try {
+            await api_1.default.story.post(req.session.user, {
+                ...req.body,
+                is_public: req.body.drafts_public === 'public',
+            });
             return res.redirect(`${config_1.ADDR_PREFIX}/stories/${req.body.shortname}`);
-        const [_, universes] = await api_1.default.universe.getMany(req.session.user, null, utils_1.perms.WRITE);
-        res.prepareRender('createStory', { universes: universes ?? [], error: data, ...req.body });
+        }
+        catch (err) {
+            if (err instanceof errors_1.ModelError) {
+                res.error = err.message;
+                const universes = await api_1.default.universe.getMany(req.session.user, null, utils_1.perms.WRITE);
+                res.prepareRender('createStory', { universes: universes ?? [], error: err.message, ...req.body });
+                return;
+            }
+            throw err;
+        }
     },
     async editStory(req, res) {
         req.body = {
             ...req.body,
             drafts_public: req.body.drafts_public === 'on',
         };
-        const [code, errorOrShortname] = await api_1.default.story.put(req.session.user, req.params.shortname, req.body);
-        res.status(code);
-        if (code !== 200) {
-            res.error = errorOrShortname;
-            await pages_1.default.story.edit(req, res);
-            return;
+        try {
+            const shortname = await api_1.default.story.put(req.session.user, req.params.shortname, req.body);
+            res.redirect(`${config_1.ADDR_PREFIX}/stories/${shortname}`);
         }
-        else {
-            res.redirect(`${config_1.ADDR_PREFIX}/stories/${errorOrShortname}`);
+        catch (err) {
+            if (err instanceof errors_1.ModelError) {
+                res.error = err.message;
+                await pages_1.default.story.edit(req, res);
+                return;
+            }
+            throw err;
         }
     },
     async editChapter(req, res) {
@@ -219,37 +210,41 @@ exports.default = {
             ...req.body,
             is_published: req.body.is_published === 'on',
         };
-        const [code, errorOrIndex] = await api_1.default.story.putChapter(req.session.user, req.params.shortname, req.params.index, req.body);
-        res.status(code);
-        if (code !== 200) {
-            res.error = errorOrIndex;
-            await pages_1.default.story.editChapter(req, res);
-            return;
+        try {
+            const index = await api_1.default.story.putChapter(req.session.user, req.params.shortname, Number(req.params.index), req.body);
+            res.redirect(`${config_1.ADDR_PREFIX}/stories/${req.params.shortname}/${index}`);
         }
-        else {
-            res.redirect(`${config_1.ADDR_PREFIX}/stories/${req.params.shortname}/${errorOrIndex}`);
+        catch (err) {
+            if (err instanceof errors_1.ModelError) {
+                res.error = err.message;
+                await pages_1.default.story.editChapter(req, res);
+                return;
+            }
+            throw err;
         }
     },
     async commentOnChapter(req, res) {
-        const [code, _] = await api_1.default.discussion.postCommentToChapter(req.session.user, req.params.shortname, req.params.index, req.body);
-        res.status(code);
+        await api_1.default.discussion.postCommentToChapter(req.session.user, req.params.shortname, Number(req.params.index), req.body);
         res.redirect(`${config_1.ADDR_PREFIX}/stories/${req.params.shortname}/${req.params.index}#post-comment`);
     },
     async passwordResetRequest(req, res) {
         const { body } = req;
-        const [code, user] = await api_1.default.user.getOne({ email: body.email });
-        if (user) {
-            const [code2, data] = await api_1.default.email.trySendPasswordReset(user);
-            if (code2 === 429) {
-                return res.prepareRender('forgotPassword', { error: `Please wait ${(data.getDate() - new Date().getTime()) / 1000} seconds before trying again.` });
-            }
-            else {
-                return res.prepareRender('forgotPassword', { success: 'Email sent!' });
-            }
+        try {
+            const user = await api_1.default.user.getOne({ email: body.email });
+            await api_1.default.email.trySendPasswordReset(user);
+            return res.prepareRender('forgotPassword', { success: 'Email sent!' });
         }
-        else {
-            res.status(code);
-            return res.prepareRender('forgotPassword', { error: `Error: ${code}` });
+        catch (err) {
+            if (err instanceof errors_1.ModelError) {
+                res.status(err.code);
+                if (err instanceof errors_1.RateLimitError) {
+                    return res.prepareRender('forgotPassword', { error: `Please wait ${(err.data.getDate() - new Date().getTime()) / 1000} seconds before trying again.` });
+                }
+                else {
+                    return res.prepareRender('forgotPassword', { error: `Error ${err.code}: ${err.message}` });
+                }
+            }
+            throw err;
         }
     },
     async resetPassword(req, res) {
@@ -258,16 +253,18 @@ exports.default = {
             res.status(400);
             return res.prepareRender('resetPassword', { error: 'New password and confirmation do not match.' });
         }
-        const [code, userId] = await api_1.default.user.resetPassword(req.params.key, body.newPassword);
-        res.status(code);
-        if (code === 200) {
-            const [_, user] = await api_1.default.user.getOne({ id: userId });
-            if (user) {
-                return res.redirect(`${config_1.ADDR_PREFIX}/`);
-            }
+        try {
+            const userId = await api_1.default.user.resetPassword(req.params.key, body.newPassword);
+            const user = await api_1.default.user.getOne({ id: userId });
+            res.redirect(`${config_1.ADDR_PREFIX}/users/${user.username}`);
         }
-        else {
-            return res.prepareRender('resetPassword', { error: 'This password reset link seems to be broken or expired — try requesting a new one.' });
+        catch (err) {
+            logger_1.default.error(err);
+            if (err instanceof errors_1.ModelError) {
+                res.status(err.code);
+                return res.prepareRender('resetPassword', { error: 'This password reset link seems to be broken or expired — try requesting a new one.' });
+            }
+            throw err;
         }
     },
 };

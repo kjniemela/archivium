@@ -1,4 +1,6 @@
-module.exports.defaultUniverseData = {
+import { Item } from "../../api/models/item";
+
+export const defaultUniverseData = {
   cats: {
     article: ['article', 'articles', '#deddca'],
     character: ['character', 'characters', '#F44336'],
@@ -12,11 +14,11 @@ module.exports.defaultUniverseData = {
   }
 };
 
-module.exports.defaultItemData = {
+export const defaultItemData = {
   article: {
     body: '# Markdown Test\n\n- **Bold**\n- *Italics*\n- _Italics 2_\n- __Underline__\n- ~~Strikethrough~~\n- [Link](@test-character)\n- Lists',
   },
-  character(age=0, parent=null, child=null) {
+  character(age=0, parent: Item | null = null, child: Item | null = null) {
     return {
       body: 'This is a test character.',
       lineage: {

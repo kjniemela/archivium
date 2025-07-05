@@ -7,9 +7,11 @@ exports.Cond = exports.QueryBuilder = exports.parseData = exports.RollbackError 
 exports.executeQuery = executeQuery;
 exports.withTransaction = withTransaction;
 exports.getPfpUrl = getPfpUrl;
+exports.handleNotFoundAsNull = handleNotFoundAsNull;
 const db_1 = __importDefault(require("../db"));
 const md5_1 = __importDefault(require("md5"));
 const logger_1 = __importDefault(require("../logger"));
+const errors_1 = require("../errors");
 var perms;
 (function (perms) {
     perms[perms["NONE"] = 0] = "NONE";
@@ -39,7 +41,7 @@ exports.tierAllowance = {
     [plans.BETA]: { total: 5, [exports.tiers.PREMIUM]: 1 },
     [plans.SUPER]: { total: 999, [exports.tiers.PREMIUM]: 99 },
 };
-async function executeQuery(query, values) {
+async function executeQuery(query, values = []) {
     const [results] = await db_1.default.execute(query, values);
     return results;
 }
@@ -94,20 +96,9 @@ class QueryBuilder {
         this.resultLimit = null;
         this.unions = [];
     }
-    select(...args) {
-        const [col, selectAs, value] = args;
-        if (col instanceof Array) {
-            col.forEach((args) => {
-                if (args instanceof Array)
-                    this.select(...args);
-                else
-                    this.select(args);
-            });
-        }
-        else {
-            this.selects[col] = selectAs;
-            this.selectValues[col] = value;
-        }
+    select(col, selectAs = null, value = null) {
+        this.selects[col] = selectAs;
+        this.selectValues[col] = value;
         return this;
     }
     from(table) {
@@ -220,14 +211,14 @@ class Cond {
         this.check = check;
         this.value = value;
     }
-    or(cond, value = undefined) {
+    or(cond, value) {
         if (!(cond instanceof Cond))
             return this.or(new Cond(cond, value));
         if (cond && !(cond.check || cond instanceof MultiCond))
             return this;
         return new MultiCond('OR', this, cond);
     }
-    and(cond, value = undefined) {
+    and(cond, value) {
         if (!(cond instanceof Cond))
             return this.and(new Cond(cond, value));
         if (cond && !(cond.check || cond instanceof MultiCond))
@@ -259,4 +250,10 @@ class MultiCond extends Cond {
 }
 function getPfpUrl(user) {
     return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${(0, md5_1.default)(user.email)}.jpg`;
+}
+function handleNotFoundAsNull(error) {
+    if (error instanceof errors_1.NotFoundError) {
+        return null;
+    }
+    throw error;
 }

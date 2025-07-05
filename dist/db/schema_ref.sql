@@ -3,7 +3,7 @@
 
 -- Schema version history
 CREATE TABLE schema_version (
-  version INTEGER PRIMARY KEY,
+  version INTEGER,
   comment TEXT NOT NULL,
   time TIMESTAMP
 );

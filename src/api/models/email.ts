@@ -1,12 +1,14 @@
 import { MailerSend, EmailParams, Recipient, Sender } from 'mailersend';
 import { DOMAIN, ADDR_PREFIX, DEV_MODE, MAILERSEND_API_KEY } from '../../config';
 import logger from '../../logger';
-import { executeQuery, Result } from '../utils';
+import { executeQuery } from '../utils';
 import fs from 'fs';
 import path from 'path';
 import mjml from 'mjml';
 import Handlebars from 'handlebars';
 import { API } from '..';
+import { User } from './user';
+import { ForbiddenError, ModelError, RateLimitError, UnauthorizedError, ValidationError } from '../../errors';
 
 const renderTemplate = (templateName, data) => {
   const templatePath = path.join(__dirname, '../../mjml', `${templateName}.mjml`);
@@ -82,7 +84,9 @@ export class EmailAPI {
     });
   }
 
-  async sendVerifyLink({ id, username, email }) {
+  async sendVerifyLink({ id, username, email }: { id: number, username: string, email?: string }) {
+    if (!email) email = await this.api.user.getOne({ id }).then(user => user.email);
+    if (!email) throw new ValidationError('Error not provided and couldn\'t be fetched.');
     const verificationKey = await this.api.user.prepareVerification(id);
     if (DEV_MODE) {
       // Can't send emails in dev mode, just auto-verify them instead.
@@ -95,10 +99,10 @@ export class EmailAPI {
     return false;
   }
 
-  async trySendVerifyLink(sessionUser, username): Result<Date | { alreadyVerified: boolean }> {
-    if (!sessionUser) return [401];
-    if (sessionUser.username != username) return [403];
-    if (sessionUser.verified) return [200, { alreadyVerified: true }];
+  async trySendVerifyLink(sessionUser: User, username: string): Promise<{ alreadyVerified: boolean }> {
+    if (!sessionUser) throw new UnauthorizedError();
+    if (sessionUser.username != username) throw new ForbiddenError();
+    if (sessionUser.verified) return { alreadyVerified: true };
 
     const now = new Date();
     const timeout = 60 * 1000;
@@ -107,11 +111,11 @@ export class EmailAPI {
       'SELECT * FROM sentemail WHERE recipient = ? AND topic = ? AND sent_at >= ? ORDER BY sent_at DESC;',
       [sessionUser.email, 'verify', cutoff],
     );
-    if (recentEmails.length > 0) return [429, new Date(recentEmails[0].sent_at.getTime() + timeout)];
+    if (recentEmails.length > 0) throw new RateLimitError(new Date(recentEmails[0].sent_at.getTime() + timeout));
 
     const alreadyVerified = await this.sendVerifyLink(sessionUser);
 
-    return [200, { alreadyVerified }];
+    return { alreadyVerified };
   }
 
   async sendPasswordReset({ id, username, email }) {
@@ -121,12 +125,9 @@ export class EmailAPI {
     await this.sendTemplateEmail(this.templates.RESET, email, { username, resetPasswordLink });
   }
 
-  /**
-   * 
-   * @param {*} user 
-   * @returns {Promise<[number, Date]>}
-   */
-  async trySendPasswordReset(user) {
+  async trySendPasswordReset(user: User): Promise<void> {
+    if (!user.email) throw new ValidationError('Email not provided.');
+
     const now = new Date();
     const timeout = 60 * 1000;
     const cutoff = new Date(now.getTime() - timeout);
@@ -134,10 +135,9 @@ export class EmailAPI {
       'SELECT * FROM sentemail WHERE recipient = ? AND topic = ? AND sent_at >= ? ORDER BY sent_at DESC;',
       [user.email, 'reset', cutoff],
     );
-    if (recentEmails.length > 0) return [429, new Date(recentEmails[0].sent_at.getTime() + timeout)];
+    if (recentEmails.length > 0) throw new RateLimitError(new Date(recentEmails[0].sent_at.getTime() + timeout));
 
-    await this.sendPasswordReset(user);
-
-    return [200];
+    const { id, username, email } = user;
+    await this.sendPasswordReset({ id, username, email });
   }
 }

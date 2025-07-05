@@ -6,13 +6,14 @@ import md5 from 'md5';
 import { render, universeLink } from '../templates';
 import { tiers } from '../api/utils';
 import logger from '../logger';
-import ReCaptcha from '../middleware/reCaptcha';
+import * as ReCaptcha from '../middleware/reCaptcha';
 import Theme from '../middleware/theme';
 import themes from '../themes';
 
 import pages from './pages';
 import forms from './forms';
 import { RequestError } from '../errors';
+import { HttpStatusCode } from 'axios';
 
 type Method = 'get' | 'post';
 type Site = 'DISPLAY' | 'NORMAL' | 'ALL';
@@ -27,13 +28,29 @@ const sites: Record<Site, SiteCheck> = {
 };
 
 export default function(app: Express) {
-  app.use((_, res, next) => {
+  app.use((req, res, next) => {
+    req.getQueryParam = (key: string): string | undefined => {
+      const value = req.query[key];
+      if (typeof value !== 'string' && value !== undefined) {
+        throw new RequestError(`Query parameter "${key}" is required and must be a string`, { code: HttpStatusCode.BadRequest });
+      }
+      return value;
+    };
+    req.getQueryParamAsNumber = (key: string): number | undefined => {
+      const value = req.getQueryParam(key);
+      if (value !== undefined && value.trim() === '' || isNaN(Number(value))) {
+        throw new RequestError(`Parameter ${key} expected to be numeric, but wasn't`, { code: HttpStatusCode.BadRequest });
+      }
+      return Number(value);
+    };
+
     res.set('Content-Type', 'text/html; charset=utf-8');
     res.prepareRender = (template, data={}) => {
       res.templateData = { template, data };
     };
     next();
   });
+  
 
   app.use(Theme);
 
@@ -74,7 +91,10 @@ export default function(app: Express) {
         } catch (err) {
           logger.error(err);
           if (err instanceof RequestError) {
-            res.status(err.CODE);
+            res.status(err.code);
+          }
+          if (err.cause) {
+            logger.error(err.cause); // TODO might not be required?
           }
         }
         await doRender(req, res);

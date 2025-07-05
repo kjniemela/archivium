@@ -1,6 +1,8 @@
+import { EnumDeclaration } from "typescript";
 import { API } from "..";
-import { Result } from "../utils";
 import { User } from "./user";
+import { ResultSetHeader } from "mysql2";
+import { ForbiddenError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from "../../errors";
 
 const { executeQuery, parseData } = require('../utils');
 const { WEB_PUSH_ENABLED, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, ADDR_PREFIX, DOMAIN } = require('../../config');
@@ -24,60 +26,89 @@ export type NotificationSubscription = {
   push_keys: {},
 };
 
+export type SentNotification = {
+  id: number,
+  title: string,
+  body: string,
+  icon_url: string | null,
+  click_url: string | null,
+  notif_type: string,
+  user_id: number,
+  sent_at: Date,
+  is_read: boolean,
+};
+
+export type NotificationTypeSetting = {
+  id: number,
+  user_id: number,
+  notif_type: string,
+  notif_method: string,
+  is_enabled: boolean,
+};
+
+enum methods {
+  WEB,
+  PUSH,
+  EMAIL,
+};
+
 export class NotificationAPI {
   readonly api: API;
+  readonly types = {
+    CONTACTS: 'contacts',
+    UNIVERSE: 'universe',
+    COMMENTS: 'comments',
+    FEATURES: 'features',
+  } as const;
+  readonly methods = methods;
 
   constructor(api: API) {
     this.api = api;
   }
 
-  async getOne(user: User, endpoint: string): Result<NotificationSubscription> {
+  async getOne(user: User, endpoint: string): Promise<NotificationSubscription> {
     const endpointHash = md5(endpoint);
 
     try {
       const subscription = (await executeQuery('SELECT * FROM notificationsubscription WHERE user_id = ? AND endpoint_hash = ?', [user.id, endpointHash]))[0];
-      return [200, subscription];
+      return subscription;
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  async getByEndpoint(endpoint: string): Result<NotificationSubscription> {
+  async getByEndpoint(endpoint: string): Promise<NotificationSubscription> {
     const endpointHash = md5(endpoint);
 
     try {
       const subscription = (await executeQuery('SELECT * FROM notificationsubscription WHERE endpoint_hash = ?', [endpointHash]))[0];
-      return [200, subscription];
+      return subscription;
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  async getByUser(user: User): Result<NotificationSubscription[]> {
+  async getByUser(user: User): Promise<NotificationSubscription[]> {
     try {
       const subscriptions = await executeQuery('SELECT * FROM notificationsubscription WHERE user_id = ?', [user.id]);
-      return [200, subscriptions];
+      return subscriptions;
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  async isSubscribed(user: User, subscriptionData): Result<boolean> {
+  async isSubscribed(user: User, subscriptionData): Promise<boolean> {
     const { endpoint } = subscriptionData;
-    if (!endpoint || !user) return [200, false];
-    const [_, subscription] = await this.getByEndpoint(endpoint);
-    return [200, Boolean(subscription && subscription.user_id === user.id)];
+    if (!endpoint || !user) return false;
+    const subscription = await this.getByEndpoint(endpoint);
+    return Boolean(subscription && subscription.user_id === user.id);
   }
 
-  async subscribe(user: User, subscriptionData): Result<NotificationSubscription | string> {
-    if (!user) return [401];
+  async subscribe(user: User, subscriptionData): Promise<string> {
+    if (!user) throw new UnauthorizedError();
     const { endpoint, keys } = subscriptionData;
-    if (!endpoint || !keys) return [400];
-    const [code, subscription] = await this.getByEndpoint(endpoint);
-    if (code !== 200) return [code, subscription];
+    if (!endpoint || !keys) throw new ValidationError('Missing subscription data');
+    const subscription = await this.getByEndpoint(endpoint);
     const endpointHash = md5(endpoint);
     try {
       if (!subscription) {
@@ -94,35 +125,32 @@ export class NotificationAPI {
       } else {
         logger.info(`Duplicate subscription ignored for ${user.username}`);
       }
-      return [201, endpointHash];
+      return endpointHash;
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  async unsubscribe(user: User, subscriptionData) {
-    if (!user) return [401];
+  async unsubscribe(user: User, subscriptionData): Promise<NotificationSubscription> {
+    if (!user) throw new UnauthorizedError();
     const { endpoint, keys } = subscriptionData;
-    if (!endpoint || !keys) return [400];
-    const [code, subscription] = await this.getByEndpoint(endpoint);
-    if (code !== 200) return [code, subscription];
-    if (subscription && subscription.user_id === user.id) {
+    if (!endpoint || !keys) throw new ValidationError('Missing subscription data');
+    const subscription = await this.getByEndpoint(endpoint);
+    if (subscription.user_id === user.id) {
       const endpointHash = md5(endpoint);
       await executeQuery('DELETE FROM notificationsubscription WHERE user_id = ? AND endpoint_hash = ?', [user.id, endpointHash]);
       logger.info(`Unsubscribed ${user.username}`);
-      return [200];
+      return subscription;
     } else {
-      return [404];
+      throw new ForbiddenError();
     }
   }
 
-  async notify(target, notifType, message) {
+  async notify(target: User, notifType: string, message: { title: string, body: string, icon?: string, clickUrl?: string }): Promise<void> {
     const { title, body, icon, clickUrl } = message;
-    if (!title || !body) return [400];
+    if (!title || !body) throw new ValidationError('Missing notification data');
 
-    const [code, settings] = await this.getTypeSettings(target);
-    if (!settings) return [code];
+    const settings = await this.getTypeSettings(target);
     const enabledMethods = settings.filter(s => s.notif_type === notifType).reduce((acc, val) => ({ ...acc, [val.notif_method]: Boolean(val.is_enabled) }), {});
 
     const autoMark = enabledMethods[methods.WEB] === false;
@@ -140,8 +168,7 @@ export class NotificationAPI {
     const payload = JSON.stringify({ id: insertId, title, body, icon, clickUrl });
     try {
       if (WEB_PUSH_ENABLED && enabledMethods[methods.PUSH]) {
-        const [code, subscriptions] = await this.getByUser(target);
-        if (!subscriptions) return [code];
+        const subscriptions = await this.getByUser(target);
         for (const { push_endpoint, push_keys } of subscriptions) {
           await webpush.sendNotification({ endpoint: push_endpoint, keys: push_keys }, payload).catch(err => {
             logger.error(err);
@@ -153,11 +180,8 @@ export class NotificationAPI {
       if (enabledMethods[methods.EMAIL] && target.email_notifications) {
         await this.api.email.sendTemplateEmail(this.api.email.templates.NOTIFY, target.email, { title, body, icon, clickUrl: `https://${DOMAIN}${ADDR_PREFIX}${clickUrl}` });
       }
-
-      return [200, true];
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
@@ -166,42 +190,37 @@ export class NotificationAPI {
    * @param {*} user 
    * @returns {Promise<[number, QueryResult]>}
    */
-  async getSentNotifications(user) {
-    if (!user) return [401];
+  async getSentNotifications(user: User): Promise<SentNotification[]> {
+    if (!user) throw new UnauthorizedError();
     try {
       const notifications = await executeQuery('SELECT * FROM sentnotification WHERE user_id = ? ORDER BY sent_at DESC', [user.id]);
-      return [200, notifications];
+      return notifications;
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  async markRead(user: User, id, isRead) {
-    if (!(typeof isRead === 'boolean')) return [400];
-    if (!user) return [401];
+  async markRead(user: User, id: number, isRead: boolean): Promise<void> {
+    if (!(typeof isRead === 'boolean')) throw new ValidationError('Invalid read status');
+    if (!user) throw new UnauthorizedError();
     try {
       const data = await executeQuery('UPDATE sentnotification SET is_read = ? WHERE id = ? AND user_id = ?', [isRead, id, user.id]);
-      if (data.changedRows === 0) return [404];
-      return [200];
+      if (data.changedRows === 0) throw new NotFoundError();
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  async markAllRead(user: User, isRead) {
-    if (!user) return [401];
+  async markAllRead(user: User, isRead: boolean): Promise<void> {
+    if (!user) throw new UnauthorizedError();
     try {
       await executeQuery('UPDATE sentnotification SET is_read = ? WHERE user_id = ?', [isRead, user.id]);
-      return [200];
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  async putNotificationType(user: User, type, method, enabled) {
+  async putNotificationType(user: User, type: string, method: number, enabled: boolean): Promise<void> {
     const setting = (await executeQuery('SELECT is_enabled FROM notificationtype WHERE user_id = ? AND notif_type = ? AND notif_method = ?', [user.id, type, method]))[0];
     const wasEnabled = Boolean(setting?.is_enabled);
     if (!setting) {
@@ -211,54 +230,33 @@ export class NotificationAPI {
     }
   }
 
-  async putSettings(user: User, changes) {
-    if (!user) return [401];
+  async putSettings(user: User, changes): Promise<void> {
+    if (!user) throw new UnauthorizedError();
 
     if ('email_notifs' in changes) {
       await executeQuery('UPDATE user SET email_notifications = ? WHERE id = ?', [Boolean(changes.email_notifs), user.id]);
     }
 
     try {
-      for (const type of Object.values(types)) {
-        for (const method of Object.values(methods)) {
+      for (const type of Object.values(this.types)) {
+        for (const method of Object.values(methods).filter(val => typeof val === 'number')) { // Required because of how typescript handles enums
           if (`${type}_${method}` in changes) {
             await this.putNotificationType(user, type, method, changes[`${type}_${method}`]);
           }
         }
       }
-      return [200];
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 
-  /**
-   * 
-   * @param {*} user 
-   * @returns {Promise<[number, QueryResult]>}
-   */
-  async getTypeSettings(user) {
-    if (!user) return [401];
+  async getTypeSettings(user: User): Promise<NotificationTypeSetting[]> {
+    if (!user) throw new UnauthorizedError();
     try {
       const settings = await executeQuery('SELECT * FROM notificationtype WHERE user_id = ?', [user.id]);
-      return [200, settings];
+      return settings;
     } catch (err) {
-      logger.error(err);
-      return [500];
+      throw new ModelError(err);
     }
   }
 }
-
-export const types = {
-  CONTACTS: 'contacts',
-  UNIVERSE: 'universe',
-  COMMENTS: 'comments',
-  FEATURES: 'features',
-} as const;
-
-export enum methods {
-  WEB,
-  PUSH,
-  EMAIL,
-};

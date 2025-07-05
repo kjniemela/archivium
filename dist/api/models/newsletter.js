@@ -1,66 +1,51 @@
-const { executeQuery, parseData } = require('../utils');
-const logger = require('../../logger');
-let api;
-function setApi(_api) {
-    api = _api;
-}
-/**
- * These methods should only be called from scripts or safe routes, no validation is being done here!
- */
-/**
- *
- * @param {*} id
- * @returns {Promise<[number, QueryResult]>}
- */
-async function getOne(id) {
-    try {
-        const [code, newsletters] = await getMany({ id });
-        if (!newsletters)
-            return [code];
-        const newsletter = newsletters[0];
-        if (!newsletter)
-            return [404];
-        return [200, newsletter];
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.NewsletterAPI = void 0;
+const utils_1 = require("../utils");
+const errors_1 = require("../../errors");
+class NewsletterAPI {
+    api;
+    constructor(api) {
+        this.api = api;
     }
-    catch (err) {
-        logger.error(err);
-        return [500];
+    /**
+     * These methods should only be called from scripts or safe routes, no validation is being done here!
+     */
+    async getOne(id) {
+        try {
+            const newsletters = await this.getMany({ id });
+            const newsletter = newsletters[0];
+            if (!newsletter)
+                throw new errors_1.NotFoundError('Newsletter not found');
+            return newsletter;
+        }
+        catch (err) {
+            throw new errors_1.ModelError(err);
+        }
     }
-}
-/**
- *
- * @returns {Promise<[number, QueryResult]>}
- */
-async function getMany(conditions) {
-    const parsedConds = parseData(conditions ?? {});
-    try {
-        const subscription = await executeQuery(`
-      SELECT *
-      FROM newsletter
-      ${conditions ? `WHERE ${parsedConds.strings.join(' AND ')}` : ''}
-      ORDER BY created_at DESC
-    `, parsedConds.values);
-        return [200, subscription];
+    async getMany(conditions) {
+        try {
+            const parsedConds = (0, utils_1.parseData)(conditions ?? {});
+            const subscription = await (0, utils_1.executeQuery)(`
+        SELECT *
+        FROM newsletter
+        ${conditions ? `WHERE ${parsedConds.strings.join(' AND ')}` : ''}
+        ORDER BY created_at DESC
+      `, parsedConds.values);
+            return subscription;
+        }
+        catch (err) {
+            throw new errors_1.ModelError(err);
+        }
     }
-    catch (err) {
-        logger.error(err);
-        return [500];
-    }
-}
-async function post({ title, preview, body }) {
-    try {
-        const queryString = `INSERT INTO newsletter (title, preview, body, created_at) VALUES (?, ?, ?, ?);`;
-        const data = await executeQuery(queryString, [title, preview, body, new Date()]);
-        return [201, data];
-    }
-    catch (err) {
-        logger.error(err);
-        return [500];
+    async post({ title, preview, body }) {
+        try {
+            const queryString = `INSERT INTO newsletter (title, preview, body, created_at) VALUES (?, ?, ?, ?);`;
+            return await (0, utils_1.executeQuery)(queryString, [title, preview, body, new Date()]);
+        }
+        catch (err) {
+            throw new errors_1.ModelError(err);
+        }
     }
 }
-module.exports = {
-    setApi,
-    getOne,
-    getMany,
-    post,
-};
+exports.NewsletterAPI = NewsletterAPI;

@@ -3,7 +3,7 @@
 
 -- Schema version history
 CREATE TABLE schema_version (
-  version INTEGER PRIMARY KEY,
+  version INTEGER,
   comment TEXT NOT NULL,
   time TIMESTAMP
 );
@@ -99,7 +99,7 @@ CREATE TABLE universe (
   author_id INT,
   created_at TIMESTAMP NOT NULL,
   updated_at TIMESTAMP NOT NULL,
-  public BOOLEAN NOT NULL,
+  is_public BOOLEAN NOT NULL,
   discussion_enabled BOOLEAN NOT NULL,
   discussion_open BOOLEAN NOT NULL,
   obj_data TEXT NOT NULL,
@@ -153,7 +153,7 @@ CREATE TABLE note (
   uuid VARCHAR(36) UNIQUE,
   title VARCHAR(64),
   body TEXT NOT NULL,
-  public BOOLEAN,
+  is_public BOOLEAN,
   author_id INT NOT NULL,
   created_at TIMESTAMP NOT NULL,
   updated_at TIMESTAMP NOT NULL,
@@ -164,7 +164,7 @@ CREATE TABLE noteboard (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(64) NOT NULL,
   shortname VARCHAR(64) UNIQUE NOT NULL,
-  public BOOLEAN,
+  is_public BOOLEAN,
   universe_id INT NOT NULL,
   FOREIGN KEY (universe_id) REFERENCES universe (id) -- when boards are implemented we will either have to add on delete cascade here, OR make universe_id nullable
 );

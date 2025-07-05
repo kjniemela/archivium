@@ -12,6 +12,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const mjml_1 = __importDefault(require("mjml"));
 const handlebars_1 = __importDefault(require("handlebars"));
+const errors_1 = require("../../errors");
 const renderTemplate = (templateName, data) => {
     const templatePath = path_1.default.join(__dirname, '../../mjml', `${templateName}.mjml`);
     const mjmlRaw = fs_1.default.readFileSync(templatePath, 'utf-8');
@@ -85,6 +86,10 @@ class EmailAPI {
         });
     }
     async sendVerifyLink({ id, username, email }) {
+        if (!email)
+            email = await this.api.user.getOne({ id }).then(user => user.email);
+        if (!email)
+            throw new errors_1.ValidationError('Error not provided and couldn\'t be fetched.');
         const verificationKey = await this.api.user.prepareVerification(id);
         if (config_1.DEV_MODE) {
             // Can't send emails in dev mode, just auto-verify them instead.
@@ -97,39 +102,36 @@ class EmailAPI {
     }
     async trySendVerifyLink(sessionUser, username) {
         if (!sessionUser)
-            return [401];
+            throw new errors_1.UnauthorizedError();
         if (sessionUser.username != username)
-            return [403];
+            throw new errors_1.ForbiddenError();
         if (sessionUser.verified)
-            return [200, { alreadyVerified: true }];
+            return { alreadyVerified: true };
         const now = new Date();
         const timeout = 60 * 1000;
         const cutoff = new Date(now.getTime() - timeout);
         const recentEmails = await (0, utils_1.executeQuery)('SELECT * FROM sentemail WHERE recipient = ? AND topic = ? AND sent_at >= ? ORDER BY sent_at DESC;', [sessionUser.email, 'verify', cutoff]);
         if (recentEmails.length > 0)
-            return [429, new Date(recentEmails[0].sent_at.getTime() + timeout)];
+            throw new errors_1.RateLimitError(new Date(recentEmails[0].sent_at.getTime() + timeout));
         const alreadyVerified = await this.sendVerifyLink(sessionUser);
-        return [200, { alreadyVerified }];
+        return { alreadyVerified };
     }
     async sendPasswordReset({ id, username, email }) {
         const resetKey = await this.api.user.preparePasswordReset(id);
         const resetPasswordLink = `https://${config_1.DOMAIN}${config_1.ADDR_PREFIX}/reset-password/${resetKey}`;
         await this.sendTemplateEmail(this.templates.RESET, email, { username, resetPasswordLink });
     }
-    /**
-     *
-     * @param {*} user
-     * @returns {Promise<[number, Date]>}
-     */
     async trySendPasswordReset(user) {
+        if (!user.email)
+            throw new errors_1.ValidationError('Email not provided.');
         const now = new Date();
         const timeout = 60 * 1000;
         const cutoff = new Date(now.getTime() - timeout);
         const recentEmails = await (0, utils_1.executeQuery)('SELECT * FROM sentemail WHERE recipient = ? AND topic = ? AND sent_at >= ? ORDER BY sent_at DESC;', [user.email, 'reset', cutoff]);
         if (recentEmails.length > 0)
-            return [429, new Date(recentEmails[0].sent_at.getTime() + timeout)];
-        await this.sendPasswordReset(user);
-        return [200];
+            throw new errors_1.RateLimitError(new Date(recentEmails[0].sent_at.getTime() + timeout));
+        const { id, username, email } = user;
+        await this.sendPasswordReset({ id, username, email });
     }
 }
 exports.EmailAPI = EmailAPI;

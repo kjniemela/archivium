@@ -1,72 +1,77 @@
-const mysql = require('mysql2/promise');
-const { DB_CONFIG } = require('../../config');
-const { loadSchema, askQuestion } = require('../import');
-const api = require('../../api');
-const { perms } = require('../../api/utils');
-const db = require('..');
-const { defaultUniverseData, defaultItemData } = require('./defaults');
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const promise_1 = __importDefault(require("mysql2/promise"));
+const config_1 = require("../../config");
+const import_1 = require("../import");
+const api_1 = __importDefault(require("../../api"));
+const utils_1 = require("../../api/utils");
+const __1 = __importDefault(require(".."));
+const defaults_js_1 = require("./defaults.js");
 async function createUser(username, email, password) {
     if (!email)
         email = `${username}@archivium.net`;
     if (!password)
         password = username;
-    const data = await api.user.post({ username, email, password });
-    const [_, user] = await api.user.getOne({ 'user.id': data.insertId });
+    const data = await api_1.default.user.post({ username, email, password });
+    const user = await api_1.default.user.getOne({ 'user.id': data.insertId });
     return user;
 }
 async function createContact(requester, target, accept = true) {
-    await api.contact.post(requester, target.username);
+    await api_1.default.contact.post(requester, target.username);
     if (accept) {
-        await api.contact.put(requester, target.username, true);
+        await api_1.default.contact.put(requester, target.username, true);
     }
 }
-async function createUniverse(owner, title, shortname, public = true, discussion_enabled = false, discussion_open = false) {
-    const [, data] = await api.universe.post(owner, { title, shortname, public, discussion_enabled, discussion_open, obj_data: defaultUniverseData });
-    const [, universe] = await api.universe.getOne(owner, { 'universe.id': data[0].insertId });
+async function createUniverse(owner, title, shortname, is_public = true, discussion_enabled = false, discussion_open = false) {
+    const [data] = await api_1.default.universe.post(owner, { title, shortname, is_public, discussion_enabled, discussion_open, obj_data: defaults_js_1.defaultUniverseData });
+    const universe = await api_1.default.universe.getOne(owner, { 'universe.id': data.insertId });
     return universe;
 }
-async function createStory(owner, title, shortname, summary, public, universe) {
-    const [, data] = await api.story.post(owner, { title, shortname, summary, public, universe: universe.shortname });
-    const [, story] = await api.story.getOne(owner, { 'story.id': data.insertId });
+async function createStory(owner, title, shortname, summary, is_public, universe) {
+    const data = await api_1.default.story.post(owner, { title, shortname, summary, is_public, universe: universe.shortname });
+    const story = await api_1.default.story.getOne(owner, { 'story.id': data.insertId });
     return story;
 }
 async function createChapter(owner, story, title, summary, body = '', isPublished = false) {
-    const [, , index] = await api.story.postChapter(owner, story.shortname, { title, summary });
-    const [, chapter] = await api.story.getChapter(owner, story.shortname, index);
-    await api.story.putChapter(owner, story.shortname, chapter.chapter_number, { is_published: isPublished, body });
+    const [, index] = await api_1.default.story.postChapter(owner, story.shortname, { title, summary });
+    const chapter = await api_1.default.story.getChapter(owner, story.shortname, index);
+    await api_1.default.story.putChapter(owner, story.shortname, chapter.chapter_number, { is_published: isPublished, body });
     return chapter;
 }
 async function setUniversePerms(owner, universe, user, permsLvl) {
-    await api.universe.putPermissions(owner, universe.shortname, user, permsLvl);
+    await api_1.default.universe.putPermissions(owner, universe.shortname, user, permsLvl);
 }
 async function createItem(owner, universe, title, shortname, item_type, obj_data, tags = ['testing'], parent_id = null) {
-    const [, data] = await api.item.post(owner, { title, shortname, item_type, parent_id, obj_data: {} }, universe.shortname);
-    await api.item.save(owner, universe.shortname, shortname, { title, tags, obj_data }, true);
-    const [, item] = await api.item.getOne(owner, { 'item.id': data.insertId });
+    const data = await api_1.default.item.post(owner, { title, shortname, item_type, parent_id, obj_data: {} }, universe.shortname);
+    await api_1.default.item.save(owner, universe.shortname, shortname, { title, tags, obj_data }, true);
+    const item = await api_1.default.item.getOne(owner, { 'item.id': data.insertId });
     return item;
 }
 async function setFollowingUniverse(follower, universe, isFollowing = true) {
-    await api.universe.putUserFollowing(follower, universe.shortname, isFollowing);
+    await api_1.default.universe.putUserFollowing(follower, universe.shortname, isFollowing);
 }
 async function createDiscussionThread(poster, universe, title) {
-    const [, data] = await api.discussion.postUniverseThread(poster, universe.shortname, { title });
-    const [, threads] = await api.discussion.getThreads(poster, { 'discussion.id': data.insertId });
+    const data = await api_1.default.discussion.postUniverseThread(poster, universe.shortname, { title });
+    const threads = await api_1.default.discussion.getThreads(poster, { 'discussion.id': data.insertId });
     return threads[0];
 }
 async function postComment(poster, thread, comment) {
-    await api.discussion.postCommentToThread(poster, thread.id, { body: comment });
+    await api_1.default.discussion.postCommentToThread(poster, thread.id, { body: comment });
 }
-async function createNote(owner, title, body, public, tags, items = [], boards = []) {
-    const [, , uuid] = await api.note.post(owner, { title, body, public, tags });
-    const [, note] = await api.note.getOne(owner, uuid);
+async function createNote(owner, title, body, is_public, tags, items = [], boards = []) {
+    const uuid = await api_1.default.note.post(owner, { title, body, is_public, tags });
+    const note = await api_1.default.note.getOne(owner, uuid);
     for (const item of items) {
-        await api.note.linkToItem(owner, item.universe_short, item.shortname, uuid);
+        await api_1.default.note.linkToItem(owner, item.universe_short, item.shortname, uuid);
     }
     return note;
 }
 async function main() {
-    const schemaConn = await mysql.createConnection({ ...DB_CONFIG, multipleStatements: true });
-    await loadSchema(schemaConn, false);
+    const schemaConn = await promise_1.default.createConnection({ ...config_1.DB_CONFIG, multipleStatements: true });
+    await (0, import_1.loadSchema)(schemaConn, false);
     console.log('Generating testing database...');
     const loremIpsum = `
     Lorem ipsum odor amet, consectetuer adipiscing elit. Eleifend pellentesque eu; ipsum hendrerit facilisis luctus mauris netus.
@@ -101,21 +106,21 @@ async function main() {
     const privateUniverse = await createUniverse(users.testowner, 'Private Test Universe', 'private-test-universe', false, true);
     const chatroomUniverse = await createUniverse(users.testowner, 'Chatroom', 'chatroom', true, true, true);
     console.log('Setting permissions...');
-    await setUniversePerms(users.testowner, publicUniverse, users.testadmin, perms.ADMIN);
-    await setUniversePerms(users.testowner, privateUniverse, users.testadmin, perms.ADMIN);
-    await setUniversePerms(users.testowner, chatroomUniverse, users.testadmin, perms.ADMIN);
-    await setUniversePerms(users.testadmin, publicUniverse, users.testwriter, perms.WRITE);
-    await setUniversePerms(users.testadmin, privateUniverse, users.testwriter, perms.WRITE);
-    await setUniversePerms(users.testadmin, privateUniverse, users.testcommenter, perms.COMMENT);
-    await setUniversePerms(users.testadmin, privateUniverse, users.testreader, perms.READ);
-    await setUniversePerms(users.testowner, chatroomUniverse, users.testuser, perms.ADMIN);
+    await setUniversePerms(users.testowner, publicUniverse, users.testadmin, utils_1.perms.ADMIN);
+    await setUniversePerms(users.testowner, privateUniverse, users.testadmin, utils_1.perms.ADMIN);
+    await setUniversePerms(users.testowner, chatroomUniverse, users.testadmin, utils_1.perms.ADMIN);
+    await setUniversePerms(users.testadmin, publicUniverse, users.testwriter, utils_1.perms.WRITE);
+    await setUniversePerms(users.testadmin, privateUniverse, users.testwriter, utils_1.perms.WRITE);
+    await setUniversePerms(users.testadmin, privateUniverse, users.testcommenter, utils_1.perms.COMMENT);
+    await setUniversePerms(users.testadmin, privateUniverse, users.testreader, utils_1.perms.READ);
+    await setUniversePerms(users.testowner, chatroomUniverse, users.testuser, utils_1.perms.ADMIN);
     console.log('Creating items...');
-    const testArticle = await createItem(users.testwriter, publicUniverse, 'Test Article', 'test-article', 'article', defaultItemData.article);
-    const testParent = await createItem(users.testwriter, publicUniverse, 'Test Parent', 'test-parent', 'character', defaultItemData.character(1));
-    const testChild = await createItem(users.testwriter, publicUniverse, 'Test Child', 'test-child', 'character', defaultItemData.character(47));
-    const testCharacter = await createItem(users.testwriter, publicUniverse, 'Test Character', 'test-character', 'character', defaultItemData.character(25, testParent, testChild));
-    const testEvent = await createItem(users.testwriter, publicUniverse, 'Test Event', 'test-event', 'event', defaultItemData.event);
-    const testTimeline = await createItem(users.testwriter, publicUniverse, 'Test Timeline', 'test-timeline', 'timeline', defaultItemData.timeline([
+    const testArticle = await createItem(users.testwriter, publicUniverse, 'Test Article', 'test-article', 'article', defaults_js_1.defaultItemData.article);
+    const testParent = await createItem(users.testwriter, publicUniverse, 'Test Parent', 'test-parent', 'character', defaults_js_1.defaultItemData.character(1));
+    const testChild = await createItem(users.testwriter, publicUniverse, 'Test Child', 'test-child', 'character', defaults_js_1.defaultItemData.character(47));
+    const testCharacter = await createItem(users.testwriter, publicUniverse, 'Test Character', 'test-character', 'character', defaults_js_1.defaultItemData.character(25, testParent, testChild));
+    const testEvent = await createItem(users.testwriter, publicUniverse, 'Test Event', 'test-event', 'event', defaults_js_1.defaultItemData.event);
+    const testTimeline = await createItem(users.testwriter, publicUniverse, 'Test Timeline', 'test-timeline', 'timeline', defaults_js_1.defaultItemData.timeline([
         testEvent, testCharacter, testParent, testChild,
     ]));
     console.log('Following universes...');
@@ -157,7 +162,7 @@ async function main() {
     await createNote(users.testwriter, 'Private Test Note', loremIpsum, false, ['test', 'private']);
     await createNote(users.testwriter, 'Private Article Note', loremIpsum, false, ['article', 'private'], [testArticle]);
     schemaConn.end();
-    db.end();
+    __1.default.end();
 }
 if (require.main === module) {
     main();
