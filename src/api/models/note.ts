@@ -279,7 +279,7 @@ export class NoteAPI {
   }
 
   async putTags(user: User, uuid: string, tags: string[]): Promise<boolean> {
-    if (!tags || tags.length === 0) throw new ValidationError('No tags provided!');
+    if (tags.length === 0) return false;
     const note = await this.getOne(user, uuid);
     const tagLookup = {};
     note.tags?.forEach(tag => {
@@ -295,7 +295,7 @@ export class NoteAPI {
   }
 
   async delTags(user: User, uuid: string, tags: string[]): Promise<boolean> {
-    if (!tags || tags.length === 0) throw new ValidationError('No tags provided!');
+    if (tags.length === 0) return false;
     const note = await this.getOne(user, uuid);
     const whereString = tags.map(() => `tag = ?`).join(' OR ');
     if (!whereString) return false;
