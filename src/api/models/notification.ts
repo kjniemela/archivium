@@ -69,32 +69,20 @@ export class NotificationAPI {
   async getOne(user: User, endpoint: string): Promise<NotificationSubscription> {
     const endpointHash = md5(endpoint);
 
-    try {
-      const subscription = (await executeQuery('SELECT * FROM notificationsubscription WHERE user_id = ? AND endpoint_hash = ?', [user.id, endpointHash]))[0];
-      return subscription;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const subscription = (await executeQuery('SELECT * FROM notificationsubscription WHERE user_id = ? AND endpoint_hash = ?', [user.id, endpointHash]))[0];
+    return subscription;
   }
 
   async getByEndpoint(endpoint: string): Promise<NotificationSubscription> {
     const endpointHash = md5(endpoint);
 
-    try {
-      const subscription = (await executeQuery('SELECT * FROM notificationsubscription WHERE endpoint_hash = ?', [endpointHash]))[0];
-      return subscription;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const subscription = (await executeQuery('SELECT * FROM notificationsubscription WHERE endpoint_hash = ?', [endpointHash]))[0];
+    return subscription;
   }
 
   async getByUser(user: User): Promise<NotificationSubscription[]> {
-    try {
-      const subscriptions = await executeQuery('SELECT * FROM notificationsubscription WHERE user_id = ?', [user.id]);
-      return subscriptions;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const subscriptions = await executeQuery('SELECT * FROM notificationsubscription WHERE user_id = ?', [user.id]);
+    return subscriptions;
   }
 
   async isSubscribed(user: User, subscriptionData): Promise<boolean> {
@@ -110,25 +98,21 @@ export class NotificationAPI {
     if (!endpoint || !keys) throw new ValidationError('Missing subscription data');
     const subscription = await this.getByEndpoint(endpoint);
     const endpointHash = md5(endpoint);
-    try {
-      if (!subscription) {
-        await executeQuery('INSERT INTO notificationsubscription (user_id, endpoint_hash, push_endpoint, push_keys) VALUES (?, ?, ?, ?)', [
-          user.id,
-          endpointHash,
-          endpoint,
-          keys,
-        ]);
-        logger.info(`New subscription added for ${user.username}`);
-      } else if (subscription.user_id !== user.id) {
-        await executeQuery('UPDATE notificationsubscription SET user_id = ? WHERE endpoint_hash = ?', [user.id, endpointHash]);
-        logger.info(`Subscription user changed to ${user.username}`);
-      } else {
-        logger.info(`Duplicate subscription ignored for ${user.username}`);
-      }
-      return endpointHash;
-    } catch (err) {
-      throw new ModelError(err);
+    if (!subscription) {
+      await executeQuery('INSERT INTO notificationsubscription (user_id, endpoint_hash, push_endpoint, push_keys) VALUES (?, ?, ?, ?)', [
+        user.id,
+        endpointHash,
+        endpoint,
+        keys,
+      ]);
+      logger.info(`New subscription added for ${user.username}`);
+    } else if (subscription.user_id !== user.id) {
+      await executeQuery('UPDATE notificationsubscription SET user_id = ? WHERE endpoint_hash = ?', [user.id, endpointHash]);
+      logger.info(`Subscription user changed to ${user.username}`);
+    } else {
+      logger.info(`Duplicate subscription ignored for ${user.username}`);
     }
+    return endpointHash;
   }
 
   async unsubscribe(user: User, subscriptionData): Promise<NotificationSubscription> {
@@ -166,22 +150,18 @@ export class NotificationAPI {
     ]);
 
     const payload = JSON.stringify({ id: insertId, title, body, icon, clickUrl });
-    try {
-      if (WEB_PUSH_ENABLED && enabledMethods[methods.PUSH]) {
-        const subscriptions = await this.getByUser(target);
-        for (const { push_endpoint, push_keys } of subscriptions) {
-          await webpush.sendNotification({ endpoint: push_endpoint, keys: push_keys }, payload).catch(err => {
-            logger.error(err);
-            // subscriptions.splice(index, 1); // Remove invalid subscriptions
-          });
-        }
+    if (WEB_PUSH_ENABLED && enabledMethods[methods.PUSH]) {
+      const subscriptions = await this.getByUser(target);
+      for (const { push_endpoint, push_keys } of subscriptions) {
+        await webpush.sendNotification({ endpoint: push_endpoint, keys: push_keys }, payload).catch(err => {
+          logger.error(err);
+          // subscriptions.splice(index, 1); // Remove invalid subscriptions
+        });
       }
-    
-      if (enabledMethods[methods.EMAIL] && target.email_notifications) {
-        await this.api.email.sendTemplateEmail(this.api.email.templates.NOTIFY, target.email, { title, body, icon, clickUrl: `https://${DOMAIN}${ADDR_PREFIX}${clickUrl}` });
-      }
-    } catch (err) {
-      throw new ModelError(err);
+    }
+
+    if (enabledMethods[methods.EMAIL] && target.email_notifications) {
+      await this.api.email.sendTemplateEmail(this.api.email.templates.NOTIFY, target.email, { title, body, icon, clickUrl: `https://${DOMAIN}${ADDR_PREFIX}${clickUrl}` });
     }
   }
 
@@ -192,32 +172,20 @@ export class NotificationAPI {
    */
   async getSentNotifications(user: User): Promise<SentNotification[]> {
     if (!user) throw new UnauthorizedError();
-    try {
-      const notifications = await executeQuery('SELECT * FROM sentnotification WHERE user_id = ? ORDER BY sent_at DESC', [user.id]);
-      return notifications;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const notifications = await executeQuery('SELECT * FROM sentnotification WHERE user_id = ? ORDER BY sent_at DESC', [user.id]);
+    return notifications;
   }
 
   async markRead(user: User, id: number, isRead: boolean): Promise<void> {
     if (!(typeof isRead === 'boolean')) throw new ValidationError('Invalid read status');
     if (!user) throw new UnauthorizedError();
-    try {
-      const data = await executeQuery('UPDATE sentnotification SET is_read = ? WHERE id = ? AND user_id = ?', [isRead, id, user.id]);
-      if (data.changedRows === 0) throw new NotFoundError();
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const data = await executeQuery('UPDATE sentnotification SET is_read = ? WHERE id = ? AND user_id = ?', [isRead, id, user.id]);
+    if (data.changedRows === 0) throw new NotFoundError();
   }
 
   async markAllRead(user: User, isRead: boolean): Promise<void> {
     if (!user) throw new UnauthorizedError();
-    try {
-      await executeQuery('UPDATE sentnotification SET is_read = ? WHERE user_id = ?', [isRead, user.id]);
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    await executeQuery('UPDATE sentnotification SET is_read = ? WHERE user_id = ?', [isRead, user.id]);
   }
 
   async putNotificationType(user: User, type: string, method: number, enabled: boolean): Promise<void> {
@@ -237,26 +205,18 @@ export class NotificationAPI {
       await executeQuery('UPDATE user SET email_notifications = ? WHERE id = ?', [Boolean(changes.email_notifs), user.id]);
     }
 
-    try {
-      for (const type of Object.values(this.types)) {
-        for (const method of Object.values(methods).filter(val => typeof val === 'number')) { // Required because of how typescript handles enums
-          if (`${type}_${method}` in changes) {
-            await this.putNotificationType(user, type, method, changes[`${type}_${method}`]);
-          }
+    for (const type of Object.values(this.types)) {
+      for (const method of Object.values(methods).filter(val => typeof val === 'number')) { // Required because of how typescript handles enums
+        if (`${type}_${method}` in changes) {
+          await this.putNotificationType(user, type, method, changes[`${type}_${method}`]);
         }
       }
-    } catch (err) {
-      throw new ModelError(err);
     }
   }
 
   async getTypeSettings(user: User): Promise<NotificationTypeSetting[]> {
     if (!user) throw new UnauthorizedError();
-    try {
-      const settings = await executeQuery('SELECT * FROM notificationtype WHERE user_id = ?', [user.id]);
-      return settings;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const settings = await executeQuery('SELECT * FROM notificationtype WHERE user_id = ?', [user.id]);
+    return settings;
   }
 }

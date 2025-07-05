@@ -12,40 +12,25 @@ class NewsletterAPI {
      * These methods should only be called from scripts or safe routes, no validation is being done here!
      */
     async getOne(id) {
-        try {
-            const newsletters = await this.getMany({ id });
-            const newsletter = newsletters[0];
-            if (!newsletter)
-                throw new errors_1.NotFoundError('Newsletter not found');
-            return newsletter;
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+        const newsletters = await this.getMany({ id });
+        const newsletter = newsletters[0];
+        if (!newsletter)
+            throw new errors_1.NotFoundError('Newsletter not found');
+        return newsletter;
     }
     async getMany(conditions) {
-        try {
-            const parsedConds = (0, utils_1.parseData)(conditions ?? {});
-            const subscription = await (0, utils_1.executeQuery)(`
+        const parsedConds = (0, utils_1.parseData)(conditions ?? {});
+        const subscription = await (0, utils_1.executeQuery)(`
         SELECT *
         FROM newsletter
         ${conditions ? `WHERE ${parsedConds.strings.join(' AND ')}` : ''}
         ORDER BY created_at DESC
       `, parsedConds.values);
-            return subscription;
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+        return subscription;
     }
     async post({ title, preview, body }) {
-        try {
-            const queryString = `INSERT INTO newsletter (title, preview, body, created_at) VALUES (?, ?, ?, ?);`;
-            return await (0, utils_1.executeQuery)(queryString, [title, preview, body, new Date()]);
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+        const queryString = `INSERT INTO newsletter (title, preview, body, created_at) VALUES (?, ?, ?, ?);`;
+        return await (0, utils_1.executeQuery)(queryString, [title, preview, body, new Date()]);
     }
 }
 exports.NewsletterAPI = NewsletterAPI;

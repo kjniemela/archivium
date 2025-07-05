@@ -29,16 +29,28 @@ function default_1(app, upload) {
                 req.isApiRequest = true;
                 const method = req.method.toUpperCase();
                 if (method in this.methodFuncs) {
-                    const [status, data] = await this.methodFuncs[method](req, res);
-                    res.status(status);
-                    if (data !== undefined) {
-                        if (data instanceof Buffer)
-                            res.send(data);
+                    try {
+                        const data = await this.methodFuncs[method](req, res);
+                        res.status(200);
+                        if (data !== undefined) {
+                            if (data instanceof Buffer)
+                                res.send(data);
+                            else
+                                res.json(data);
+                        }
                         else
-                            res.json(data);
+                            res.json(null);
                     }
-                    else
-                        res.json(null);
+                    catch (err) {
+                        logger_1.default.error(err);
+                        res.status(err.code ?? 500);
+                        if (err.data) {
+                            res.json(err.data);
+                        }
+                        else {
+                            res.end();
+                        }
+                    }
                 }
                 else {
                     res.status(405);

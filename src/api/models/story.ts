@@ -1,9 +1,8 @@
 import { BaseOptions, executeQuery, parseData, perms, withTransaction } from '../utils';
-import logger from '../../logger';
 import { API } from '..';
 import { User } from './user';
 import { ResultSetHeader } from 'mysql2/promise';
-import { ModelError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
+import { NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
 
 export type Story = {
   id: number,
@@ -43,14 +42,14 @@ export class StoryAPI {
     this.api = api;
   }
 
-  async getOne(user, conditions, permissionsRequired=perms.READ, options={}): Promise<Story> {
+  async getOne(user, conditions, permissionsRequired = perms.READ, options = {}): Promise<Story> {
     const stories = await this.getMany(user, conditions, permissionsRequired, options);
     const story = stories[0];
     if (!story) throw new NotFoundError();
     return story;
   }
 
-  async getMany(user, conditions: any = null, permissionsRequired=perms.READ, options: BaseOptions = {}): Promise<Story[]> {
+  async getMany(user, conditions: any = null, permissionsRequired = perms.READ, options: BaseOptions = {}): Promise<Story[]> {
     if (permissionsRequired >= perms.WRITE) {
       if (!user) throw new UnauthorizedError();
       conditions = {
@@ -74,8 +73,7 @@ export class StoryAPI {
       }
     }
 
-    try {
-      const stories = await executeQuery(`
+    const stories = await executeQuery(`
         SELECT
           story.*,
           author.username AS author,
@@ -104,24 +102,17 @@ export class StoryAPI {
         ${conditionString}
         GROUP BY story.id${user ? ', au_filter.user_id' : ''}
         ORDER BY ${options.sort ? `${options.sort} ${options.sortDesc ? 'DESC' : 'ASC'}` : 'updated_at DESC'}
-      `, [ ...(user ? [user.id, perms.WRITE, user.id] : []), ...parsedConditions?.values ?? [] ]) as Story[];
-      return stories;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+      `, [...(user ? [user.id, perms.WRITE, user.id] : []), ...parsedConditions?.values ?? []]) as Story[];
+    return stories;
   }
 
-  async getChapter(user: User, shortname: string, index: number, permissionsRequired=perms.READ): Promise<Chapter> {
+  async getChapter(user: User, shortname: string, index: number, permissionsRequired = perms.READ): Promise<Chapter> {
     const story = await this.getOne(user, { 'story.shortname': shortname }, permissionsRequired);
 
-    try {
-      const chapters = await executeQuery('SELECT * FROM storychapter WHERE story_id = ? AND chapter_number = ?', [story.id, index]) as Chapter[];
-      const chapter = chapters[0];
-      if (!chapter) throw new NotFoundError();
-      return chapter;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const chapters = await executeQuery('SELECT * FROM storychapter WHERE story_id = ? AND chapter_number = ?', [story.id, index]) as Chapter[];
+    const chapter = chapters[0];
+    if (!chapter) throw new NotFoundError();
+    return chapter;
   }
 
   async post(user: User, payload): Promise<ResultSetHeader> {
@@ -142,7 +133,7 @@ export class StoryAPI {
       return data;
     } catch (err) {
       if (err.code === 'ER_DUP_ENTRY') throw new ValidationError(`Shortname "${shortname}" already in use in this universe, please choose another.`);
-      throw new ModelError(err);
+      throw err;
     }
   }
 
@@ -153,15 +144,11 @@ export class StoryAPI {
 
     const story = await this.getOne(user, { 'story.shortname': shortname }, perms.WRITE);
 
-    try {
-      const data = await executeQuery<ResultSetHeader>(`
+    const data = await executeQuery<ResultSetHeader>(`
         INSERT INTO storychapter (title, summary, chapter_number, body, story_id, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `, [title, summary ?? null, story.chapter_count + 1, '', story.id, new Date(), new Date()]);
-      return [data, story.chapter_count + 1];
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    return [data, story.chapter_count + 1];
   }
 
   /**
@@ -184,7 +171,7 @@ export class StoryAPI {
       await conn.execute('UPDATE storychapter SET chapter_number = 0 WHERE story_id = ?', [story.id]);
       for (let i = 0; i < orderedIndexes.length; i++) {
         const oldIndex = orderedIndexes[i];
-        await conn.execute('UPDATE storychapter SET chapter_number = ? WHERE id = ?', [i+1, ids[oldIndex]]);
+        await conn.execute('UPDATE storychapter SET chapter_number = ? WHERE id = ?', [i + 1, ids[oldIndex]]);
         newIndexes[ids[oldIndex]] = i + 1;
       }
     });
@@ -198,12 +185,11 @@ export class StoryAPI {
 
     const story = await this.getOne(user, { 'story.shortname': storyShortname }, perms.WRITE);
 
-    try {
-      if (order) {
-        await this.reorderChapters(story, order);
-      }
-      if (title || shortname || summary || drafts_public) {
-        await executeQuery(`
+    if (order) {
+      await this.reorderChapters(story, order);
+    }
+    if (title || shortname || summary || drafts_public) {
+      await executeQuery(`
           UPDATE story
           SET
             title = ?,
@@ -213,11 +199,8 @@ export class StoryAPI {
             updated_at = ?
           WHERE id = ?
         `, [title ?? story.title, shortname ?? story.shortname, summary ?? story.summary, drafts_public ?? story.drafts_public, new Date(), story.id]);
-      }
-      return shortname ?? story.shortname;
-    } catch (err) {
-      throw new ModelError(err);
     }
+    return shortname ?? story.shortname;
   }
 
   async putChapter(user: User, shortname: string, index: number, payload): Promise<number> {
@@ -232,7 +215,7 @@ export class StoryAPI {
 
       // We need to make sure published chapters are grouped together
       const story = await this.getOne(user, { 'story.shortname': shortname }, perms.WRITE);
-      
+
       const published = Object.keys(story.chapters).reduce((acc, key) => ({ ...acc, [key]: story.chapters[key].is_published }), {});
       delete published[index];
       const publishedIndexes = Object.keys(published).filter(ch => published[ch]);
@@ -242,8 +225,7 @@ export class StoryAPI {
       index = newIndexes[chapter.id];
     }
 
-    try {
-      await executeQuery(`
+    await executeQuery(`
         UPDATE storychapter
         SET
           title = ?,
@@ -254,50 +236,37 @@ export class StoryAPI {
           updated_at = ?
         WHERE id = ?
       `, [title ?? chapter.title, summary ?? chapter.summary, body ?? chapter.body, is_published ?? chapter.is_published, publishDate ?? chapter.created_at, new Date(), chapter.id]);
-      return index;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    return index;
   }
 
   async del(user: User, shortname: string): Promise<void> {
     const story = await this.getOne(user, { 'story.shortname': shortname }, perms.OWNER);
-    
-    try {
-      await withTransaction(async (conn) => {
-        await conn.execute(`
+
+    await withTransaction(async (conn) => {
+      await conn.execute(`
           DELETE comment
           FROM comment
           INNER JOIN storychaptercomment AS scc ON scc.comment_id = comment.id
           INNER JOIN storychapter ON scc.chapter_id = storychapter.id
           WHERE storychapter.story_id = ?;
         `, [story.id]);
-        await conn.execute(`DELETE FROM story WHERE id = ?;`, [story.id]);
-      });
-      return;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+      await conn.execute(`DELETE FROM story WHERE id = ?;`, [story.id]);
+    });
   }
 
   async delChapter(user: User, shortname: string, index: number): Promise<void> {
     const chapter = await this.getChapter(user, shortname, index, perms.OWNER);
-    
-    try {
-      await withTransaction(async (conn) => {
-        await conn.execute(`
+
+    await withTransaction(async (conn) => {
+      await conn.execute(`
           DELETE comment
           FROM comment
           INNER JOIN storychaptercomment AS scc ON scc.comment_id = comment.id
           WHERE scc.chapter_id = ?;
         `, [chapter.id]);
-        await conn.execute(`DELETE FROM storychapter WHERE id = ?;`, [chapter.id]);
-      });
-      const story = await this.getOne(user, { 'story.shortname': shortname }, perms.OWNER);
-      await this.reorderChapters(story, Object.keys(story.chapters).sort((a, b) => Number(a) - Number(b)));
-      return;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+      await conn.execute(`DELETE FROM storychapter WHERE id = ?;`, [chapter.id]);
+    });
+    const story = await this.getOne(user, { 'story.shortname': shortname }, perms.OWNER);
+    await this.reorderChapters(story, Object.keys(story.chapters).sort((a, b) => Number(a) - Number(b)));
   }
 }

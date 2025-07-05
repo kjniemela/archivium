@@ -55,21 +55,16 @@ class ItemImageAPI {
         return image;
     }
     async getMany(options, inclData = true) {
-        try {
-            const parsedOptions = (0, utils_1.parseData)(options);
-            let queryString = `
-        SELECT 
-          id, item_id, name, mimetype, label ${inclData ? ', data' : ''}
-        FROM itemimage
-      `;
-            if (options)
-                queryString += ` WHERE ${parsedOptions.strings.join(' AND ')}`;
-            const images = await (0, utils_1.executeQuery)(queryString, parsedOptions.values);
-            return images;
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+        const parsedOptions = (0, utils_1.parseData)(options);
+        let queryString = `
+      SELECT 
+        id, item_id, name, mimetype, label ${inclData ? ', data' : ''}
+      FROM itemimage
+    `;
+        if (options)
+            queryString += ` WHERE ${parsedOptions.strings.join(' AND ')}`;
+        const images = await (0, utils_1.executeQuery)(queryString, parsedOptions.values);
+        return images;
     }
     async getManyByItemShort(user, universeShortname, itemShortname, options, inclData = false) {
         const item = await this.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.READ, true);
@@ -87,34 +82,24 @@ class ItemImageAPI {
         return await (0, utils_1.executeQuery)(queryString, [item.id, originalname.substring(0, 64), mimetype, buffer, '']);
     }
     async putLabel(user, imageId, label) {
-        try {
-            if (!user)
-                throw new errors_1.UnauthorizedError();
-            const images = await this.getMany({ id: imageId }, false);
-            const image = images && images[0];
-            if (!image)
-                throw new errors_1.NotFoundError();
-            await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
-            return await (0, utils_1.executeQuery)(`UPDATE itemimage SET label = ? WHERE id = ?;`, [label, imageId]);
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+        if (!user)
+            throw new errors_1.UnauthorizedError();
+        const images = await this.getMany({ id: imageId }, false);
+        const image = images && images[0];
+        if (!image)
+            throw new errors_1.NotFoundError();
+        await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
+        return await (0, utils_1.executeQuery)(`UPDATE itemimage SET label = ? WHERE id = ?;`, [label, imageId]);
     }
     async del(user, imageId) {
-        try {
-            if (!user)
-                throw new errors_1.UnauthorizedError();
-            const images = await this.getMany({ id: imageId }, false);
-            const image = images && images[0];
-            if (!image)
-                throw new errors_1.NotFoundError();
-            await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
-            await (0, utils_1.executeQuery)(`DELETE FROM itemimage WHERE id = ?;`, [imageId]);
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+        if (!user)
+            throw new errors_1.UnauthorizedError();
+        const images = await this.getMany({ id: imageId }, false);
+        const image = images && images[0];
+        if (!image)
+            throw new errors_1.NotFoundError();
+        await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
+        await (0, utils_1.executeQuery)(`DELETE FROM itemimage WHERE id = ?;`, [imageId]);
     }
 }
 class ItemAPI {
@@ -237,37 +222,36 @@ class ItemAPI {
                 delete options.sort;
             }
         }
-        try {
-            let permsCond = new utils_1.Cond();
-            if (permissionsRequired <= utils_1.perms.READ)
-                permsCond = permsCond.or('universe.is_public = ?', 1);
-            if (user)
-                permsCond = permsCond.or(new utils_1.Cond('au_filter.user_id = ?', user.id)
-                    .and('au_filter.permission_level >= ?', permissionsRequired));
-            let whereConds = new utils_1.Cond();
-            if (conditions) {
-                for (let i = 0; i < conditions.strings.length; i++) {
-                    whereConds = whereConds.and(conditions.strings[i], conditions.values[i]);
-                }
+        let permsCond = new utils_1.Cond();
+        if (permissionsRequired <= utils_1.perms.READ)
+            permsCond = permsCond.or('universe.is_public = ?', 1);
+        if (user)
+            permsCond = permsCond.or(new utils_1.Cond('au_filter.user_id = ?', user.id)
+                .and('au_filter.permission_level >= ?', permissionsRequired));
+        let whereConds = new utils_1.Cond();
+        if (conditions) {
+            for (let i = 0; i < conditions.strings.length; i++) {
+                whereConds = whereConds.and(conditions.strings[i], conditions.values[i]);
             }
-            if (options.where)
-                whereConds = whereConds.and(options.where);
-            const selects = [
-                ...(options.select ?? []),
-                ...(options.includeData ? [['item.obj_data']] : []),
-            ];
-            const joins = [
-                ...(options.join ?? []),
-            ];
-            if (options.search) {
-                const searchCond = new utils_1.Cond('item.title LIKE ?', `%${options.search}%`)
-                    .or('item.shortname LIKE ?', `%${options.search}%`)
-                    .or('search_tag.tag = ?', options.search)
-                    .or('search_tag.tag LIKE ?', `%${options.search}%`)
-                    .or(`JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body')) LIKE ?`, `%${options.search}%`);
-                whereConds = whereConds.and(searchCond);
-                selects.push([`LOCATE(?, JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body'))) AS match_pos`, undefined, options.search]);
-                selects.push([`
+        }
+        if (options.where)
+            whereConds = whereConds.and(options.where);
+        const selects = [
+            ...(options.select ?? []),
+            ...(options.includeData ? [['item.obj_data']] : []),
+        ];
+        const joins = [
+            ...(options.join ?? []),
+        ];
+        if (options.search) {
+            const searchCond = new utils_1.Cond('item.title LIKE ?', `%${options.search}%`)
+                .or('item.shortname LIKE ?', `%${options.search}%`)
+                .or('search_tag.tag = ?', options.search)
+                .or('search_tag.tag LIKE ?', `%${options.search}%`)
+                .or(`JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body')) LIKE ?`, `%${options.search}%`);
+            whereConds = whereConds.and(searchCond);
+            selects.push([`LOCATE(?, JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body'))) AS match_pos`, undefined, options.search]);
+            selects.push([`
           CASE
             WHEN LOCATE(?, JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body'))) > 0
             THEN SUBSTRING(
@@ -277,22 +261,18 @@ class ItemAPI {
             )
             ELSE NULL
           END AS snippet`,
-                    undefined, [options.search, options.search],
-                ]);
-            }
-            const query = getQuery(selects, permsCond, whereConds, options);
-            for (const join of joins) {
-                query.join(...join);
-            }
-            if (options.search) {
-                query.innerJoin(['tag', 'search_tag'], new utils_1.Cond('search_tag.item_id = item.id'));
-            }
-            const data = await query.execute();
-            return data;
+                undefined, [options.search, options.search],
+            ]);
         }
-        catch (err) {
-            throw new errors_1.ModelError(err);
+        const query = getQuery(selects, permsCond, whereConds, options);
+        for (const join of joins) {
+            query.join(...join);
         }
+        if (options.search) {
+            query.innerJoin(['tag', 'search_tag'], new utils_1.Cond('search_tag.item_id = item.id'));
+        }
+        const data = await query.execute();
+        return data;
     }
     async getByAuthorUsername(user, username, permissionsRequired, options) {
         const conditions = {
@@ -368,19 +348,14 @@ class ItemAPI {
             if (!(universe.author_permissions[user.id] >= utils_1.perms.READ))
                 throw new errors_1.ForbiddenError();
         }
-        try {
-            const data = await (0, utils_1.executeQuery)('SELECT item_type, COUNT(*) AS count FROM item WHERE universe_id = ? GROUP BY item_type', [universe.id]);
-            const counts = {};
-            let total = 0;
-            for (const row of data) {
-                counts[row.item_type] = row.count;
-                total += row.count;
-            }
-            return [counts, total];
+        const data = await (0, utils_1.executeQuery)('SELECT item_type, COUNT(*) AS count FROM item WHERE universe_id = ? GROUP BY item_type', [universe.id]);
+        const counts = {};
+        let total = 0;
+        for (const row of data) {
+            counts[row.item_type] = row.count;
+            total += row.count;
         }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+        return [counts, total];
     }
     async forEachUserToNotify(item, callback) {
         const targetIDs = (await (0, utils_1.executeQuery)(`SELECT user_id FROM itemnotification WHERE item_id = ? AND is_enabled`, [item.id])).map(row => row.user_id);
@@ -436,7 +411,7 @@ class ItemAPI {
         catch (err) {
             if (err.code === 'ER_DUP_ENTRY')
                 throw new errors_1.ValidationError(`Shortname "${shortname}" already in use in this universe, please choose another.`);
-            throw new errors_1.ModelError(err);
+            throw err;
         }
     }
     async save(user, universeShortname, itemShortname, body, jsonMode = false) {
@@ -466,8 +441,8 @@ class ItemAPI {
         }
         body.obj_data = JSON.stringify(body.obj_data);
         // Actually save item
-        const errorOrId = await this.put(user, universeShortname, itemShortname, body);
-        const item = await this.getOne(user, { 'item.id': errorOrId }, utils_1.perms.WRITE);
+        const itemId = await this.put(user, universeShortname, itemShortname, body);
+        const item = await this.getOne(user, { 'item.id': itemId }, utils_1.perms.WRITE);
         // Handle lineage data
         if (lineage) {
             const [existingParents, existingChildren] = [{}, {}];
@@ -566,12 +541,7 @@ class ItemAPI {
     }
     async getLinks(user, universeShortname, itemShortname) {
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE, true);
-        try {
-            return await this._getLinks(item);
-        }
-        catch (e) {
-            throw new errors_1.ModelError(e);
-        }
+        return await this._getLinks(item);
     }
     async handleLinks(item, objData) {
         if (objData.body) {
@@ -671,35 +641,30 @@ class ItemAPI {
             });
             await this.delTags(user, universeShortname, itemShortname, Object.keys(tagLookup));
         }
-        try {
+        if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
+            // The item shortname has changed, we need to update all links to it to reflect this
+            const shortnameError = this.api.universe.validateShortname(shortname);
+            if (shortnameError)
+                throw new errors_1.ValidationError(shortnameError);
+        }
+        await (0, utils_1.withTransaction)(async (conn) => {
             if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
-                // The item shortname has changed, we need to update all links to it to reflect this
-                const shortnameError = this.api.universe.validateShortname(shortname);
-                if (shortnameError)
-                    throw new errors_1.ValidationError(shortnameError);
+                await conn.execute('UPDATE itemlink SET to_item_short = ? WHERE to_item_short = ?', [shortname, item.shortname]);
             }
-            await (0, utils_1.withTransaction)(async (conn) => {
-                if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
-                    await conn.execute('UPDATE itemlink SET to_item_short = ? WHERE to_item_short = ?', [shortname, item.shortname]);
-                }
-                const queryString = `
-          UPDATE item
-          SET
-            title = ?,
-            shortname = ?,
-            item_type = ?,
-            obj_data = ?,
-            updated_at = ?,
-            last_updated_by = ?
-          WHERE id = ?;
-        `;
-                await conn.execute(queryString, [title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), new Date(), user.id, item.id]);
-            });
-            return item.id;
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+            const queryString = `
+        UPDATE item
+        SET
+          title = ?,
+          shortname = ?,
+          item_type = ?,
+          obj_data = ?,
+          updated_at = ?,
+          last_updated_by = ?
+        WHERE id = ?;
+      `;
+            await conn.execute(queryString, [title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), new Date(), user.id, item.id]);
+        });
+        return item.id;
     }
     async putData(user, universeShortname, itemShortname, changes) {
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE);
@@ -708,13 +673,8 @@ class ItemAPI {
             ...changes,
         };
         await this.handleLinks(item, item.obj_data);
-        try {
-            const queryString = `UPDATE item SET obj_data = ?, updated_at = ?, last_updated_by = ? WHERE id = ?;`;
-            return await (0, utils_1.executeQuery)(queryString, [JSON.stringify(item.obj_data), new Date(), user.id, item.id]);
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+        const queryString = `UPDATE item SET obj_data = ?, updated_at = ?, last_updated_by = ? WHERE id = ?;`;
+        return await (0, utils_1.executeQuery)(queryString, [JSON.stringify(item.obj_data), new Date(), user.id, item.id]);
     }
     // TODO - how should permissions work on this?
     async exists(user, universeShortname, itemShortname) {
@@ -748,87 +708,62 @@ class ItemAPI {
         return data;
     }
     async putTags(user, universeShortname, itemShortname, tags) {
-        if (!tags || tags.length === 0)
-            throw new errors_1.ValidationError('Missing required fields');
+        if (tags.length === 0)
+            return; // Nothing to do
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE, true);
-        try {
-            const tagLookup = {};
-            item.tags?.forEach(tag => {
-                tagLookup[tag] = true;
-            });
-            const filteredTags = tags.filter(tag => !tagLookup[tag]);
-            const valueString = filteredTags.map(() => `(?, ?)`).join(',');
-            const valueArray = filteredTags.reduce((arr, tag) => [...arr, item.id, tag], []);
-            if (!valueString)
-                return;
-            const queryString = `INSERT INTO tag (item_id, tag) VALUES ${valueString};`;
-            const data = await (0, utils_1.executeQuery)(queryString, valueArray);
-            return data;
-        }
-        catch (e) {
-            throw new errors_1.ModelError(e);
-        }
+        const tagLookup = {};
+        item.tags?.forEach(tag => {
+            tagLookup[tag] = true;
+        });
+        const filteredTags = tags.filter(tag => !tagLookup[tag]);
+        const valueString = filteredTags.map(() => `(?, ?)`).join(',');
+        const valueArray = filteredTags.reduce((arr, tag) => [...arr, item.id, tag], []);
+        if (!valueString)
+            return;
+        const queryString = `INSERT INTO tag (item_id, tag) VALUES ${valueString};`;
+        const data = await (0, utils_1.executeQuery)(queryString, valueArray);
+        return data;
     }
     async delTags(user, universeShortname, itemShortname, tags) {
-        if (!tags || tags.length === 0)
-            throw new errors_1.ValidationError('Missing required fields');
+        if (tags.length === 0)
+            return; // Nothing to do
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE, true);
-        try {
-            const whereString = tags.map(() => `tag = ?`).join(' OR ');
-            if (!whereString)
-                return;
-            const queryString = `DELETE FROM tag WHERE item_id = ? AND (${whereString});`;
-            const data = await (0, utils_1.executeQuery)(queryString, [item.id, ...tags]);
-            return data;
-        }
-        catch (e) {
-            throw new errors_1.ModelError(e);
-        }
+        const whereString = tags.map(() => `tag = ?`).join(' OR ');
+        if (!whereString)
+            return;
+        const queryString = `DELETE FROM tag WHERE item_id = ? AND (${whereString});`;
+        const data = await (0, utils_1.executeQuery)(queryString, [item.id, ...tags]);
+        return data;
     }
     async snoozeUntil(user, universeShortname, itemShortname) {
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE);
         const snooze = (await (0, utils_1.executeQuery)(`SELECT * FROM snooze WHERE item_id = ${item.id} AND snoozed_by = ${user.id};`))[0];
         const now = new Date();
-        try {
-            if (snooze) {
-                return await (0, utils_1.executeQuery)(`UPDATE snooze SET snoozed_at = ? WHERE item_id = ? AND snoozed_by = ?;`, [now, item.id, user.id]);
-            }
-            else {
-                return await (0, utils_1.executeQuery)(`INSERT INTO snooze (item_id, snoozed_at, snoozed_by) VALUES (?, ?, ?);`, [item.id, now, user.id]);
-            }
+        if (snooze) {
+            return await (0, utils_1.executeQuery)(`UPDATE snooze SET snoozed_at = ? WHERE item_id = ? AND snoozed_by = ?;`, [now, item.id, user.id]);
         }
-        catch (err) {
-            throw new errors_1.ModelError(err);
+        else {
+            return await (0, utils_1.executeQuery)(`INSERT INTO snooze (item_id, snoozed_at, snoozed_by) VALUES (?, ?, ?);`, [item.id, now, user.id]);
         }
     }
     async subscribeNotifs(user, universeShortname, itemShortname, isSubscribed) {
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.READ);
-        try {
-            return await (0, utils_1.executeQuery)(`
+        return await (0, utils_1.executeQuery)(`
         INSERT INTO itemnotification (item_id, user_id, is_enabled) VALUES (?, ?, ?)
         ON DUPLICATE KEY UPDATE is_enabled = ?
       `, [item.id, user.id, isSubscribed, isSubscribed]);
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
     }
     async del(user, universeShortname, itemShortname) {
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.OWNER, true);
-        try {
-            await (0, utils_1.withTransaction)(async (conn) => {
-                await conn.execute(`
+        await (0, utils_1.withTransaction)(async (conn) => {
+            await conn.execute(`
           DELETE comment
           FROM comment
           INNER JOIN itemcomment AS ic ON ic.comment_id = comment.id
           WHERE ic.item_id = ?;
         `, [item.id]);
-                await conn.execute(`DELETE FROM item WHERE id = ?;`, [item.id]);
-            });
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+            await conn.execute(`DELETE FROM item WHERE id = ?;`, [item.id]);
+        });
     }
 }
 exports.ItemAPI = ItemAPI;

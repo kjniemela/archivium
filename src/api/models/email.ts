@@ -8,7 +8,7 @@ import mjml from 'mjml';
 import Handlebars from 'handlebars';
 import { API } from '..';
 import { User } from './user';
-import { ForbiddenError, ModelError, RateLimitError, UnauthorizedError, ValidationError } from '../../errors';
+import { ForbiddenError, RateLimitError, UnauthorizedError, ValidationError } from '../../errors';
 
 const renderTemplate = (templateName, data) => {
   const templatePath = path.join(__dirname, '../../mjml', `${templateName}.mjml`);

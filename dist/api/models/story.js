@@ -38,8 +38,7 @@ class StoryAPI {
                 delete options.sort;
             }
         }
-        try {
-            const stories = await (0, utils_1.executeQuery)(`
+        const stories = await (0, utils_1.executeQuery)(`
         SELECT
           story.*,
           author.username AS author,
@@ -69,24 +68,15 @@ class StoryAPI {
         GROUP BY story.id${user ? ', au_filter.user_id' : ''}
         ORDER BY ${options.sort ? `${options.sort} ${options.sortDesc ? 'DESC' : 'ASC'}` : 'updated_at DESC'}
       `, [...(user ? [user.id, utils_1.perms.WRITE, user.id] : []), ...parsedConditions?.values ?? []]);
-            return stories;
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+        return stories;
     }
     async getChapter(user, shortname, index, permissionsRequired = utils_1.perms.READ) {
         const story = await this.getOne(user, { 'story.shortname': shortname }, permissionsRequired);
-        try {
-            const chapters = await (0, utils_1.executeQuery)('SELECT * FROM storychapter WHERE story_id = ? AND chapter_number = ?', [story.id, index]);
-            const chapter = chapters[0];
-            if (!chapter)
-                throw new errors_1.NotFoundError();
-            return chapter;
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+        const chapters = await (0, utils_1.executeQuery)('SELECT * FROM storychapter WHERE story_id = ? AND chapter_number = ?', [story.id, index]);
+        const chapter = chapters[0];
+        if (!chapter)
+            throw new errors_1.NotFoundError();
+        return chapter;
     }
     async post(user, payload) {
         if (!user)
@@ -111,7 +101,7 @@ class StoryAPI {
         catch (err) {
             if (err.code === 'ER_DUP_ENTRY')
                 throw new errors_1.ValidationError(`Shortname "${shortname}" already in use in this universe, please choose another.`);
-            throw new errors_1.ModelError(err);
+            throw err;
         }
     }
     async postChapter(user, shortname, payload) {
@@ -121,16 +111,11 @@ class StoryAPI {
         if (!title)
             throw new errors_1.ValidationError('Title is required.');
         const story = await this.getOne(user, { 'story.shortname': shortname }, utils_1.perms.WRITE);
-        try {
-            const data = await (0, utils_1.executeQuery)(`
+        const data = await (0, utils_1.executeQuery)(`
         INSERT INTO storychapter (title, summary, chapter_number, body, story_id, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `, [title, summary ?? null, story.chapter_count + 1, '', story.id, new Date(), new Date()]);
-            return [data, story.chapter_count + 1];
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+        return [data, story.chapter_count + 1];
     }
     /**
      * This assumes we have write access to the provided story!
@@ -162,12 +147,11 @@ class StoryAPI {
             throw new errors_1.UnauthorizedError();
         const { title, shortname, summary, drafts_public, order } = payload;
         const story = await this.getOne(user, { 'story.shortname': storyShortname }, utils_1.perms.WRITE);
-        try {
-            if (order) {
-                await this.reorderChapters(story, order);
-            }
-            if (title || shortname || summary || drafts_public) {
-                await (0, utils_1.executeQuery)(`
+        if (order) {
+            await this.reorderChapters(story, order);
+        }
+        if (title || shortname || summary || drafts_public) {
+            await (0, utils_1.executeQuery)(`
           UPDATE story
           SET
             title = ?,
@@ -177,12 +161,8 @@ class StoryAPI {
             updated_at = ?
           WHERE id = ?
         `, [title ?? story.title, shortname ?? story.shortname, summary ?? story.summary, drafts_public ?? story.drafts_public, new Date(), story.id]);
-            }
-            return shortname ?? story.shortname;
         }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+        return shortname ?? story.shortname;
     }
     async putChapter(user, shortname, index, payload) {
         if (!user)
@@ -202,8 +182,7 @@ class StoryAPI {
             const newIndexes = await this.reorderChapters(story, indexes);
             index = newIndexes[chapter.id];
         }
-        try {
-            await (0, utils_1.executeQuery)(`
+        await (0, utils_1.executeQuery)(`
         UPDATE storychapter
         SET
           title = ?,
@@ -214,50 +193,34 @@ class StoryAPI {
           updated_at = ?
         WHERE id = ?
       `, [title ?? chapter.title, summary ?? chapter.summary, body ?? chapter.body, is_published ?? chapter.is_published, publishDate ?? chapter.created_at, new Date(), chapter.id]);
-            return index;
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+        return index;
     }
     async del(user, shortname) {
         const story = await this.getOne(user, { 'story.shortname': shortname }, utils_1.perms.OWNER);
-        try {
-            await (0, utils_1.withTransaction)(async (conn) => {
-                await conn.execute(`
+        await (0, utils_1.withTransaction)(async (conn) => {
+            await conn.execute(`
           DELETE comment
           FROM comment
           INNER JOIN storychaptercomment AS scc ON scc.comment_id = comment.id
           INNER JOIN storychapter ON scc.chapter_id = storychapter.id
           WHERE storychapter.story_id = ?;
         `, [story.id]);
-                await conn.execute(`DELETE FROM story WHERE id = ?;`, [story.id]);
-            });
-            return;
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+            await conn.execute(`DELETE FROM story WHERE id = ?;`, [story.id]);
+        });
     }
     async delChapter(user, shortname, index) {
         const chapter = await this.getChapter(user, shortname, index, utils_1.perms.OWNER);
-        try {
-            await (0, utils_1.withTransaction)(async (conn) => {
-                await conn.execute(`
+        await (0, utils_1.withTransaction)(async (conn) => {
+            await conn.execute(`
           DELETE comment
           FROM comment
           INNER JOIN storychaptercomment AS scc ON scc.comment_id = comment.id
           WHERE scc.chapter_id = ?;
         `, [chapter.id]);
-                await conn.execute(`DELETE FROM storychapter WHERE id = ?;`, [chapter.id]);
-            });
-            const story = await this.getOne(user, { 'story.shortname': shortname }, utils_1.perms.OWNER);
-            await this.reorderChapters(story, Object.keys(story.chapters).sort((a, b) => Number(a) - Number(b)));
-            return;
-        }
-        catch (err) {
-            throw new errors_1.ModelError(err);
-        }
+            await conn.execute(`DELETE FROM storychapter WHERE id = ?;`, [chapter.id]);
+        });
+        const story = await this.getOne(user, { 'story.shortname': shortname }, utils_1.perms.OWNER);
+        await this.reorderChapters(story, Object.keys(story.chapters).sort((a, b) => Number(a) - Number(b)));
     }
 }
 exports.StoryAPI = StoryAPI;

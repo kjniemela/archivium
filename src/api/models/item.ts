@@ -54,7 +54,7 @@ export type Item = {
   last_activity?: Date,
 };
 
-function getQuery(selects: [string, string?, (string | string[])?][]=[], permsCond?: Cond, whereConds?: Cond, options: ItemOptions={}) {
+function getQuery(selects: [string, string?, (string | string[])?][] = [], permsCond?: Cond, whereConds?: Cond, options: ItemOptions = {}) {
   const query = new QueryBuilder()
     .select('item.id')
     .select('item.title')
@@ -111,23 +111,19 @@ class ItemImageAPI {
     return image;
   }
 
-  async getMany(options, inclData=true): Promise<ItemImage[]> {
-    try {
-      const parsedOptions = parseData(options);
-      let queryString = `
-        SELECT 
-          id, item_id, name, mimetype, label ${inclData ? ', data' : ''}
-        FROM itemimage
-      `;
-      if (options) queryString += ` WHERE ${parsedOptions.strings.join(' AND ')}`;
-      const images = await executeQuery(queryString, parsedOptions.values) as ItemImage[];
-      return images;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+  async getMany(options, inclData = true): Promise<ItemImage[]> {
+    const parsedOptions = parseData(options);
+    let queryString = `
+      SELECT 
+        id, item_id, name, mimetype, label ${inclData ? ', data' : ''}
+      FROM itemimage
+    `;
+    if (options) queryString += ` WHERE ${parsedOptions.strings.join(' AND ')}`;
+    const images = await executeQuery(queryString, parsedOptions.values) as ItemImage[];
+    return images;
   }
 
-  async getManyByItemShort(user: User, universeShortname: string, itemShortname: string, options?: ItemOptions, inclData=false): Promise<ItemImage[]> {
+  async getManyByItemShort(user: User, universeShortname: string, itemShortname: string, options?: ItemOptions, inclData = false): Promise<ItemImage[]> {
     const item = await this.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.READ, true);
     const images = await this.getMany({ item_id: item.id, ...(options ?? {}) }, inclData) as ItemImage[];
     return images;
@@ -141,33 +137,25 @@ class ItemImageAPI {
     const item = await this.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE, true);
 
     const queryString = `INSERT INTO itemimage (item_id, name, mimetype, data, label) VALUES (?, ?, ?, ?, ?);`;
-    return await executeQuery<ResultSetHeader>(queryString, [ item.id, originalname.substring(0, 64), mimetype, buffer, '' ]);
+    return await executeQuery<ResultSetHeader>(queryString, [item.id, originalname.substring(0, 64), mimetype, buffer, '']);
   }
 
   async putLabel(user: User, imageId: number, label: string): Promise<ResultSetHeader> {
-    try {
-      if (!user) throw new UnauthorizedError();
-      const images = await this.getMany({ id: imageId }, false) as ItemImage[];
-      const image = images && images[0];
-      if (!image) throw new NotFoundError();
-      await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
-      return await executeQuery<ResultSetHeader>(`UPDATE itemimage SET label = ? WHERE id = ?;`, [label, imageId]);
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    if (!user) throw new UnauthorizedError();
+    const images = await this.getMany({ id: imageId }, false) as ItemImage[];
+    const image = images && images[0];
+    if (!image) throw new NotFoundError();
+    await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
+    return await executeQuery<ResultSetHeader>(`UPDATE itemimage SET label = ? WHERE id = ?;`, [label, imageId]);
   }
 
   async del(user: User, imageId: number): Promise<void> {
-    try {
-      if (!user) throw new UnauthorizedError();
-      const images = await this.getMany({ id: imageId }, false) as ItemImage[];
-      const image = images && images[0];
-      if (!image) throw new NotFoundError();
-      await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
-      await executeQuery(`DELETE FROM itemimage WHERE id = ?;`, [imageId]);
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    if (!user) throw new UnauthorizedError();
+    const images = await this.getMany({ id: imageId }, false) as ItemImage[];
+    const image = images && images[0];
+    if (!image) throw new NotFoundError();
+    await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
+    await executeQuery(`DELETE FROM itemimage WHERE id = ?;`, [imageId]);
   }
 }
 
@@ -180,7 +168,7 @@ export class ItemAPI {
     this.api = api;
   }
 
-  async getOne(user: User, conditions: any={}, permissionsRequired=perms.READ, basicOnly=false, options: ItemOptions={}): Promise<Item> {
+  async getOne(user: User, conditions: any = {}, permissionsRequired = perms.READ, basicOnly = false, options: ItemOptions = {}): Promise<Item> {
 
     const parsedConditions = parseData(conditions);
 
@@ -270,7 +258,7 @@ export class ItemAPI {
     return item;
   }
 
-  async getMany(user: User, conditions, permissionsRequired=perms.READ, options: ItemOptions={}): Promise<Item[]> {
+  async getMany(user: User, conditions, permissionsRequired = perms.READ, options: ItemOptions = {}): Promise<Item[]> {
     if (options.type) {
       if (!conditions) conditions = { strings: [], values: [] };
       conditions.strings.push('item.item_type = ?');
@@ -302,40 +290,39 @@ export class ItemAPI {
       }
     }
 
-    try {
-      let permsCond = new Cond();
-      if (permissionsRequired <= perms.READ) permsCond = permsCond.or('universe.is_public = ?', 1);
-      if (user) permsCond = permsCond.or(
-        new Cond('au_filter.user_id = ?', user.id)
+    let permsCond = new Cond();
+    if (permissionsRequired <= perms.READ) permsCond = permsCond.or('universe.is_public = ?', 1);
+    if (user) permsCond = permsCond.or(
+      new Cond('au_filter.user_id = ?', user.id)
         .and('au_filter.permission_level >= ?', permissionsRequired)
-      );
+    );
 
-      let whereConds = new Cond();
-      if (conditions) {
-        for (let i = 0; i < conditions.strings.length; i++) {
-          whereConds = whereConds.and(conditions.strings[i], conditions.values[i]);
-        }
+    let whereConds = new Cond();
+    if (conditions) {
+      for (let i = 0; i < conditions.strings.length; i++) {
+        whereConds = whereConds.and(conditions.strings[i], conditions.values[i]);
       }
-      if (options.where) whereConds = whereConds.and(options.where);
+    }
+    if (options.where) whereConds = whereConds.and(options.where);
 
-      const selects: [string, string?, (string | string[])?][] = [
-        ...(options.select ?? []),
-        ...(options.includeData ? [['item.obj_data']] : []) as [string][],
-      ];
+    const selects: [string, string?, (string | string[])?][] = [
+      ...(options.select ?? []),
+      ...(options.includeData ? [['item.obj_data']] : []) as [string][],
+    ];
 
-      const joins = [
-        ...(options.join ?? []),
-      ];
+    const joins = [
+      ...(options.join ?? []),
+    ];
 
-      if (options.search) {
-        const searchCond = new Cond('item.title LIKE ?', `%${options.search}%`)
-          .or('item.shortname LIKE ?', `%${options.search}%`)
-          .or('search_tag.tag = ?', options.search)
-          .or('search_tag.tag LIKE ?', `%${options.search}%`)
-          .or(`JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body')) LIKE ?`, `%${options.search}%`);
-        whereConds = whereConds.and(searchCond);
-        selects.push([`LOCATE(?, JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body'))) AS match_pos`, undefined, options.search]);
-        selects.push([`
+    if (options.search) {
+      const searchCond = new Cond('item.title LIKE ?', `%${options.search}%`)
+        .or('item.shortname LIKE ?', `%${options.search}%`)
+        .or('search_tag.tag = ?', options.search)
+        .or('search_tag.tag LIKE ?', `%${options.search}%`)
+        .or(`JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body')) LIKE ?`, `%${options.search}%`);
+      whereConds = whereConds.and(searchCond);
+      selects.push([`LOCATE(?, JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body'))) AS match_pos`, undefined, options.search]);
+      selects.push([`
           CASE
             WHEN LOCATE(?, JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body'))) > 0
             THEN SUBSTRING(
@@ -345,27 +332,24 @@ export class ItemAPI {
             )
             ELSE NULL
           END AS snippet`,
-          undefined, [options.search, options.search],
-        ]);
-      }
-      const query = getQuery(selects, permsCond, whereConds, options);
-      for (const join of joins) {
-        query.join(...join);
-      }
-      if (options.search) {
-        query.innerJoin(['tag', 'search_tag'], new Cond('search_tag.item_id = item.id'));
-      }
-      const data = await query.execute() as Item[];
-
-      return data;
-    } catch (err) {
-      throw new ModelError(err);
+        undefined, [options.search, options.search],
+      ]);
     }
+    const query = getQuery(selects, permsCond, whereConds, options);
+    for (const join of joins) {
+      query.join(...join);
+    }
+    if (options.search) {
+      query.innerJoin(['tag', 'search_tag'], new Cond('search_tag.item_id = item.id'));
+    }
+    const data = await query.execute() as Item[];
+
+    return data;
   }
 
   async getByAuthorUsername(user, username, permissionsRequired, options): Promise<Item[]> {
 
-    const conditions = { 
+    const conditions = {
       strings: [
         'user.username = ?',
       ], values: [
@@ -379,7 +363,7 @@ export class ItemAPI {
 
   async getByUniverseId(user, universeId, permissionsRequired, options): Promise<Item[]> {
 
-    const conditions = { 
+    const conditions = {
       strings: [
         'item.universe_id = ?',
       ], values: [
@@ -391,9 +375,9 @@ export class ItemAPI {
     return items;
   }
 
-  async getByUniverseAndItemIds(user, universeId, itemId, permissionsRequired=perms.READ): Promise<Item> {
+  async getByUniverseAndItemIds(user, universeId, itemId, permissionsRequired = perms.READ): Promise<Item> {
 
-    const conditions = { 
+    const conditions = {
       strings: [
         'item.universe_id = ?',
         'item.id = ?',
@@ -412,9 +396,9 @@ export class ItemAPI {
     return item;
   }
 
-  async getByUniverseShortname(user: User, shortname: string, permissionsRequired=perms.READ, options?: ItemOptions): Promise<Item[]> {
+  async getByUniverseShortname(user: User, shortname: string, permissionsRequired = perms.READ, options?: ItemOptions): Promise<Item[]> {
 
-    const conditions = { 
+    const conditions = {
       strings: [
         'universe.shortname = ?',
       ], values: [
@@ -430,11 +414,11 @@ export class ItemAPI {
     user: User,
     universeShortname: string,
     itemShortname: string,
-    permissionsRequired=perms.READ,
-    basicOnly=false
+    permissionsRequired = perms.READ,
+    basicOnly = false
   ): Promise<Item> {
 
-    const conditions = { 
+    const conditions = {
       'universe.shortname': universeShortname,
       'item.shortname': itemShortname,
     };
@@ -449,28 +433,24 @@ export class ItemAPI {
    * @param {*} validate 
    * @returns {Promise<[number, QueryResult]>}
    */
-  async getCountsByUniverse(user, universe, validate=true): Promise<[{ [type: string]: number }, number]> {
+  async getCountsByUniverse(user, universe, validate = true): Promise<[{ [type: string]: number }, number]> {
     if (!universe.is_public && validate) {
       if (!user) throw new UnauthorizedError();
       if (!(universe.author_permissions[user.id] >= perms.READ)) throw new ForbiddenError();
     }
 
-    try {
-      const data = await executeQuery('SELECT item_type, COUNT(*) AS count FROM item WHERE universe_id = ? GROUP BY item_type', [universe.id]);
-      const counts = {};
-      let total = 0;
-      for (const row of data) {
-        counts[row.item_type] = row.count;
-        total += row.count;
-      }
-      return [counts, total];
-    } catch (err) {
-      throw new ModelError(err);
+    const data = await executeQuery('SELECT item_type, COUNT(*) AS count FROM item WHERE universe_id = ? GROUP BY item_type', [universe.id]);
+    const counts = {};
+    let total = 0;
+    for (const row of data) {
+      counts[row.item_type] = row.count;
+      total += row.count;
     }
+    return [counts, total];
   }
 
   async forEachUserToNotify(item, callback): Promise<void> {
-    const targetIDs = (await executeQuery(`SELECT user_id FROM itemnotification WHERE item_id = ? AND is_enabled`, [ item.id ])).map(row => row.user_id);
+    const targetIDs = (await executeQuery(`SELECT user_id FROM itemnotification WHERE item_id = ? AND is_enabled`, [item.id])).map(row => row.user_id);
     for (const userID of targetIDs) {
       const user = await this.api.user.getOne({ 'user.id': userID });
       await callback(user);
@@ -502,7 +482,7 @@ export class ItemAPI {
             updated_at
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
         `;
-        [ data ] = await conn.execute<ResultSetHeader>(queryString, [
+        [data] = await conn.execute<ResultSetHeader>(queryString, [
           title,
           shortname,
           item_type,
@@ -526,11 +506,11 @@ export class ItemAPI {
       return data;
     } catch (err) {
       if (err.code === 'ER_DUP_ENTRY') throw new ValidationError(`Shortname "${shortname}" already in use in this universe, please choose another.`);
-      throw new ModelError(err);
+      throw err;
     }
   }
 
-  async save(user: User, universeShortname: string, itemShortname: string, body, jsonMode=false): Promise<number> {
+  async save(user: User, universeShortname: string, itemShortname: string, body, jsonMode = false): Promise<number> {
     // Handle tags
     if (!jsonMode) body.tags = body.tags?.split(' ') ?? [];
 
@@ -554,7 +534,7 @@ export class ItemAPI {
       gallery = body.obj_data.gallery;
       body.obj_data.gallery = { title: gallery.title };
     }
-    
+
     body.obj_data = JSON.stringify(body.obj_data);
 
     // Actually save item
@@ -602,13 +582,13 @@ export class ItemAPI {
       const myImports = timeline.events?.filter(event => event.imported);
       if (myEvents) {
         const events = await this.fetchEvents(item.id);
-        const existingEvents = events.reduce((acc, event) => ({...acc, [event.event_title ?? null]: event}), {});
+        const existingEvents = events.reduce((acc, event) => ({ ...acc, [event.event_title ?? null]: event }), {});
         const newEvents = myEvents.filter(event => !existingEvents[event.title]);
         const updatedEvents = myEvents.filter(event => existingEvents[event.title] && (
           existingEvents[event.title].event_title !== event.title
           || existingEvents[event.title].abstime !== event.time
         )).map(({ title, time }) => ({ event_title: title, abstime: time, id: existingEvents[title].id }));
-        const newEventMap = myEvents.reduce((acc, event) => ({...acc, [event.title ?? null]: true}), {});
+        const newEventMap = myEvents.reduce((acc, event) => ({ ...acc, [event.title ?? null]: true }), {});
         const deletedEvents = events.filter(event => !newEventMap[event.event_title]).map(event => event.id);
         await this.insertEvents(item.id, newEvents);
         for (const event of updatedEvents) {
@@ -619,7 +599,7 @@ export class ItemAPI {
 
       if (myImports) {
         const imports = await this.fetchImports(item.id);
-        const existingImports = imports.reduce((acc, ti) => ({...acc, [ti.event_id]: ti}), {});
+        const existingImports = imports.reduce((acc, ti) => ({ ...acc, [ti.event_id]: ti }), {});
         const newImports: number[] = [];
         const importsMap = {};
         for (const { srcId: itemId, title: eventTitle } of myImports) {
@@ -658,17 +638,13 @@ export class ItemAPI {
   }
 
   private async _getLinks(item): Promise<{ to_universe_short: string, to_item_short: string, href: string }[]> {
-    const result = await executeQuery('SELECT to_universe_short, to_item_short, href FROM itemlink WHERE from_item = ?', [ item.id ]);
+    const result = await executeQuery('SELECT to_universe_short, to_item_short, href FROM itemlink WHERE from_item = ?', [item.id]);
     return result as { to_universe_short: string, to_item_short: string, href: string }[];
   }
 
   async getLinks(user: User, universeShortname: string, itemShortname: string): Promise<{ to_universe_short: string, to_item_short: string, href: string }[]> {
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE, true);
-    try {
-      return await this._getLinks(item);
-    } catch (e) {
-      throw new ModelError(e);
-    }
+    return await this._getLinks(item);
   }
 
   async handleLinks(item: Item, objData: any): Promise<void> {
@@ -698,7 +674,7 @@ export class ItemAPI {
     }
   }
 
-  async fetchEvents(itemId: number, options: EventOptions={}): Promise<ItemEvent[]> {
+  async fetchEvents(itemId: number, options: EventOptions = {}): Promise<ItemEvent[]> {
     let queryString = `SELECT * FROM itemevent WHERE item_id = ?`;
     const values: (string | number)[] = [itemId];
     if (options.title) {
@@ -710,7 +686,7 @@ export class ItemAPI {
   async insertEvents(itemId: number, events: { title: string, time: number }[]): Promise<void> {
     if (!events.length) return;
     const queryString = 'INSERT INTO itemevent (item_id, event_title, abstime) VALUES ' + events.map(() => '(?, ?, ?)').join(',');
-    const values = events.reduce((acc, event) => ([ ...acc, itemId, event.title, event.time ]), []);
+    const values = events.reduce((acc, event) => ([...acc, itemId, event.title, event.time]), []);
     await executeQuery(queryString, values);
   }
   async updateEvent(eventId: number, changes: { event_title: string, abstime: number }): Promise<void> {
@@ -729,7 +705,7 @@ export class ItemAPI {
   async importEvents(itemId: number, eventIds: number[]): Promise<void> {
     if (!eventIds.length) return;
     const queryString = 'INSERT INTO timelineitem (timeline_id, event_id) VALUES ' + eventIds.map(() => '(?, ?)').join(',');
-    const values = eventIds.reduce((acc, eventId) => ([ ...acc, itemId, eventId ]), []);
+    const values = eventIds.reduce((acc, eventId) => ([...acc, itemId, eventId]), []);
     await executeQuery(queryString, values);
   }
   async deleteImports(itemId: number | null, eventIds: number[]): Promise<void> {
@@ -785,7 +761,7 @@ export class ItemAPI {
       if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
         await conn.execute('UPDATE itemlink SET to_item_short = ? WHERE to_item_short = ?', [shortname, item.shortname]);
       }
-  
+
       const queryString = `
         UPDATE item
         SET
@@ -797,7 +773,7 @@ export class ItemAPI {
           last_updated_by = ?
         WHERE id = ?;
       `;
-      await conn.execute(queryString, [ title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), new Date(), user.id, item.id ])
+      await conn.execute(queryString, [title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), new Date(), user.id, item.id])
     });
 
     return item.id;
@@ -814,12 +790,8 @@ export class ItemAPI {
 
     await this.handleLinks(item, item.obj_data);
 
-    try {
-      const queryString = `UPDATE item SET obj_data = ?, updated_at = ?, last_updated_by = ? WHERE id = ?;`;
-      return await executeQuery<ResultSetHeader>(queryString, [JSON.stringify(item.obj_data), new Date(), user.id, item.id]);
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const queryString = `UPDATE item SET obj_data = ?, updated_at = ?, last_updated_by = ? WHERE id = ?;`;
+    return await executeQuery<ResultSetHeader>(queryString, [JSON.stringify(item.obj_data), new Date(), user.id, item.id]);
   }
 
   // TODO - how should permissions work on this?
@@ -842,7 +814,7 @@ export class ItemAPI {
    */
   async putLineage(parent_id: number, child_id: number, parent_title: string, child_title: string): Promise<ResultSetHeader> {
     const queryString = `INSERT INTO lineage (parent_id, child_id, parent_title, child_title) VALUES (?, ?, ?, ?);`;
-    const data = await executeQuery<ResultSetHeader>(queryString, [ parent_id, child_id, parent_title, child_title ]);
+    const data = await executeQuery<ResultSetHeader>(queryString, [parent_id, child_id, parent_title, child_title]);
     return data;
   }
 
@@ -854,7 +826,7 @@ export class ItemAPI {
    */
   async delLineage(parent_id: number, child_id: number): Promise<ResultSetHeader> {
     const queryString = `DELETE FROM lineage WHERE parent_id = ? AND child_id = ?;`;
-    const data = await executeQuery<ResultSetHeader>(queryString, [ parent_id, child_id ]);
+    const data = await executeQuery<ResultSetHeader>(queryString, [parent_id, child_id]);
     return data;
   }
 
@@ -880,7 +852,7 @@ export class ItemAPI {
     const whereString = tags.map(() => `tag = ?`).join(' OR ');
     if (!whereString) return;
     const queryString = `DELETE FROM tag WHERE item_id = ? AND (${whereString});`;
-    const data = await executeQuery<ResultSetHeader>(queryString, [ item.id, ...tags ]);
+    const data = await executeQuery<ResultSetHeader>(queryString, [item.id, ...tags]);
     return data;
   }
 
@@ -891,45 +863,33 @@ export class ItemAPI {
 
     const now = new Date();
 
-    try {
-      if (snooze) {
-        return await executeQuery<ResultSetHeader>(`UPDATE snooze SET snoozed_at = ? WHERE item_id = ? AND snoozed_by = ?;`, [now, item.id, user.id]);
-      } else {
-        return await executeQuery<ResultSetHeader>(`INSERT INTO snooze (item_id, snoozed_at, snoozed_by) VALUES (?, ?, ?);`, [item.id, now, user.id]);
-      }
-    } catch (err) {
-      throw new ModelError(err);
+    if (snooze) {
+      return await executeQuery<ResultSetHeader>(`UPDATE snooze SET snoozed_at = ? WHERE item_id = ? AND snoozed_by = ?;`, [now, item.id, user.id]);
+    } else {
+      return await executeQuery<ResultSetHeader>(`INSERT INTO snooze (item_id, snoozed_at, snoozed_by) VALUES (?, ?, ?);`, [item.id, now, user.id]);
     }
   }
 
   async subscribeNotifs(user: User, universeShortname: string, itemShortname: string, isSubscribed: boolean): Promise<ResultSetHeader> {
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.READ);
 
-    try {
-      return await executeQuery<ResultSetHeader>(`
+    return await executeQuery<ResultSetHeader>(`
         INSERT INTO itemnotification (item_id, user_id, is_enabled) VALUES (?, ?, ?)
         ON DUPLICATE KEY UPDATE is_enabled = ?
       `, [item.id, user.id, isSubscribed, isSubscribed]);
-    } catch (err) {
-      throw new ModelError(err);
-    }
   }
 
   async del(user: User, universeShortname: string, itemShortname: string): Promise<void> {
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.OWNER, true);
 
-    try {
-      await withTransaction(async (conn) => {
-        await conn.execute(`
+    await withTransaction(async (conn) => {
+      await conn.execute(`
           DELETE comment
           FROM comment
           INNER JOIN itemcomment AS ic ON ic.comment_id = comment.id
           WHERE ic.item_id = ?;
         `, [item.id]);
-        await conn.execute(`DELETE FROM item WHERE id = ?;`, [item.id]);
-      });
-    } catch (err) {
-      throw new ModelError(err);
-    }
+      await conn.execute(`DELETE FROM item WHERE id = ?;`, [item.id]);
+    });
   }
 }

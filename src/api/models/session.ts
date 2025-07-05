@@ -33,40 +33,28 @@ export class SessionAPI {
 
   // Unlike other models, this one will not throw on missing data, but will return undefined instead.
   async getOne(options: SessionConditions): Promise<Session | undefined> {
-    try {
-      const parsedOptions = parseData(options);
-      const queryString = `SELECT * FROM session WHERE ${parsedOptions.strings.join(' AND ')} LIMIT 1;`;
-      const data = await executeQuery<Session[]>(queryString, parsedOptions.values);
-      const session = data[0];
-      if (!session || !session.user_id) return session;
-      const user = await this.api.user.getOne({ 'user.id': session.user_id }, false, true);
-      session.user = user;
-      return session;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const parsedOptions = parseData(options);
+    const queryString = `SELECT * FROM session WHERE ${parsedOptions.strings.join(' AND ')} LIMIT 1;`;
+    const data = await executeQuery<Session[]>(queryString, parsedOptions.values);
+    const session = data[0];
+    if (!session || !session.user_id) return session;
+    const user = await this.api.user.getOne({ 'user.id': session.user_id }, false, true);
+    session.user = user;
+    return session;
   }
 
   async post(): Promise<ResultSetHeader> {
-    try {
-      const data = utils.createRandom32String();
-      const hash = utils.createHash(data);
-      const queryString = `INSERT INTO session (hash, created_at) VALUES (?, ?);`;
-      return await executeQuery<ResultSetHeader>(queryString, [ hash, new Date() ]);
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const data = utils.createRandom32String();
+    const hash = utils.createHash(data);
+    const queryString = `INSERT INTO session (hash, created_at) VALUES (?, ?);`;
+    return await executeQuery<ResultSetHeader>(queryString, [hash, new Date()]);
   }
 
   async put(options: SessionConditions, changes: SessionChanges): Promise<ResultSetHeader> {
-    try {
-      const { user_id } = changes;
-      const parsedOptions = parseData(options);
-      const queryString = `UPDATE session SET user_id = ? WHERE ${parsedOptions.strings.join(' AND ')}`;
-      return await executeQuery<ResultSetHeader>(queryString, [user_id, ...parsedOptions.values]);
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const { user_id } = changes;
+    const parsedOptions = parseData(options);
+    const queryString = `UPDATE session SET user_id = ? WHERE ${parsedOptions.strings.join(' AND ')}`;
+    return await executeQuery<ResultSetHeader>(queryString, [user_id, ...parsedOptions.values]);
   }
 
   /**
@@ -75,13 +63,9 @@ export class SessionAPI {
    * @returns {Promise<ResultSetHeader>}
    */
   async del(options: SessionConditions): Promise<ResultSetHeader> {
-    try {
-      const parsedOptions = parseData(options);
-      const queryString = `DELETE FROM session WHERE ${parsedOptions.strings.join(' AND ')}`;
-      return await executeQuery<ResultSetHeader>(queryString, parsedOptions.values);
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const parsedOptions = parseData(options);
+    const queryString = `DELETE FROM session WHERE ${parsedOptions.strings.join(' AND ')}`;
+    return await executeQuery<ResultSetHeader>(queryString, parsedOptions.values);
   }
 
   /**
