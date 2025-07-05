@@ -1,5 +1,4 @@
 import api from '../../api';
-import { UserModel } from '../../api/new-api/models';
 import { Cond, perms } from '../../api/utils';
 import fs from 'fs/promises';
 import { ADDR_PREFIX } from '../../config';
