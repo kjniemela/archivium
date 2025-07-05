@@ -177,12 +177,13 @@ export class UniverseAPI {
     return await executeQuery(queryString, [universe.id]) as ItemEvent[];
   }
 
-  async getPublicBodyByShortname(shortname: string): Promise<string> {
+  // Does not throw if universe has no body..
+  async getPublicBodyByShortname(shortname: string): Promise<string | void> {
     const queryString = `SELECT obj_data FROM universe WHERE shortname = ?`;
     const rows = (await executeQuery(queryString, [shortname]))[0];
     if (!rows) throw new NotFoundError();
     const body = JSON.parse(rows.obj_data)?.publicBody;
-    if (!body) throw new UnauthorizedError();
+    if (!body) return;
     return body;
   }
 

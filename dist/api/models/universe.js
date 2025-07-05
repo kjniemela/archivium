@@ -128,6 +128,7 @@ class UniverseAPI {
     `;
         return await (0, utils_1.executeQuery)(queryString, [universe.id]);
     }
+    // Does not throw if universe has no body..
     async getPublicBodyByShortname(shortname) {
         const queryString = `SELECT obj_data FROM universe WHERE shortname = ?`;
         const rows = (await (0, utils_1.executeQuery)(queryString, [shortname]))[0];
@@ -135,7 +136,7 @@ class UniverseAPI {
             throw new errors_1.NotFoundError();
         const body = JSON.parse(rows.obj_data)?.publicBody;
         if (!body)
-            throw new errors_1.UnauthorizedError();
+            return;
         return body;
     }
     async post(user, body) {

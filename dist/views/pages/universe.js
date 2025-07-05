@@ -35,7 +35,7 @@ exports.default = {
             const threads = await api_1.default.discussion.getThreads(user, { 'discussion.universe_id': universe.id }, false, true);
             const [counts, totalItems] = await api_1.default.item.getCountsByUniverse(user, universe, false);
             const stories = await api_1.default.story.getMany(user, { 'story.universe_id': universe.id });
-            const sponsored = await api_1.default.user.getSponsoredUniverses(user);
+            const sponsored = user ? await api_1.default.user.getSponsoredUniverses(user) : null;
             const couldUpgrade = sponsored ? (sponsored.length === 0 || sponsored
                 .filter(row => row.tier > universe.tier)
                 .some(row => row.universes.length < utils_1.tierAllowance[user.plan][row.tier])) : false;
@@ -48,7 +48,7 @@ exports.default = {
                 if (!publicBody && err instanceof errors_1.UnauthorizedError) {
                     res.status(401);
                     req.forceLogin = true;
-                    req.useExQuery = true;
+                    // req.useExQuery = true; // TODO why is this here?
                     return;
                 }
                 const request = await api_1.default.universe.getUserAccessRequest(user, req.params.universeShortname);
