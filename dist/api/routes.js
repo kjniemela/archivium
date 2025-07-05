@@ -301,30 +301,26 @@ function default_1(app, upload) {
         new APIRoute('/writable-items', {
             GET: async (req) => _1.default.item.getMany(req.session.user, null, utils_1.perms.WRITE),
         }),
-        new APIRoute('/exists', { POST: async (req) => {
-                try {
-                    const body = req.body;
-                    const tuples = [];
-                    for (const universe in body) {
-                        for (const item of body[universe]) {
-                            tuples.push([universe, item]);
-                        }
+        new APIRoute('/exists', {
+            POST: async (req) => {
+                const body = req.body;
+                const tuples = [];
+                for (const universe in body) {
+                    for (const item of body[universe]) {
+                        tuples.push([universe, item]);
                     }
-                    const results = await Promise.all(tuples.map(args => _1.default.item.exists(req.session.user, ...args)));
-                    const resultMap = {};
-                    for (let i = 0; i < results.length; i++) {
-                        const [universe, item] = tuples[i];
-                        if (!(universe in resultMap))
-                            resultMap[universe] = {};
-                        resultMap[universe][item] = results[i];
-                    }
-                    return [200, resultMap];
                 }
-                catch (err) {
-                    logger_1.default.error(err);
-                    return [500];
+                const results = await Promise.all(tuples.map(args => _1.default.item.exists(req.session.user, ...args)));
+                const resultMap = {};
+                for (let i = 0; i < results.length; i++) {
+                    const [universe, item] = tuples[i];
+                    if (!(universe in resultMap))
+                        resultMap[universe] = {};
+                    resultMap[universe][item] = results[i];
                 }
-            } }),
+                return resultMap;
+            }
+        }),
     ]);
     apiRoutes.setup(config_1.ADDR_PREFIX);
 }

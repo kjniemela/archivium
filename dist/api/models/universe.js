@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UniverseAPI = void 0;
 const utils_1 = require("../utils");
 const errors_1 = require("../../errors");
-function validateShortname(shortname, reservedShortnames = []) {
+const validateShortname = (shortname, reservedShortnames = []) => {
     if (shortname.length < 3 || shortname.length > 64) {
         return 'Shortnames must be between 3 and 64 characters long.';
     }
@@ -17,7 +17,7 @@ function validateShortname(shortname, reservedShortnames = []) {
         return 'Shortnames can only contain letters, numbers, and hyphens.';
     }
     return null;
-}
+};
 class UniverseAPI {
     api;
     validateShortname = validateShortname;
@@ -291,7 +291,7 @@ class UniverseAPI {
         }
         await query;
     }
-    async getUserAccessRequest(user, shortname) {
+    async getUserAccessRequestIfExists(user, shortname) {
         if (!user)
             throw new errors_1.UnauthorizedError();
         const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
@@ -299,7 +299,7 @@ class UniverseAPI {
             throw new errors_1.NotFoundError();
         const request = (await (0, utils_1.executeQuery)('SELECT * FROM universeaccessrequest WHERE universe_id = ? AND user_id = ?', [universe.id, user.id]))[0];
         if (!request)
-            throw new errors_1.NotFoundError();
+            return null;
         return request;
     }
     async getAccessRequests(user, shortname) {
@@ -315,7 +315,7 @@ class UniverseAPI {
         const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
         if (!universe)
             throw new errors_1.NotFoundError();
-        const request = await this.getUserAccessRequest(user, shortname).catch(utils_1.handleNotFoundAsNull);
+        const request = await this.getUserAccessRequestIfExists(user, shortname);
         if (request) {
             if (request.permission_level >= permissionLevel)
                 return;

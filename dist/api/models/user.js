@@ -10,6 +10,28 @@ const logger_1 = __importDefault(require("../../logger"));
 const config_1 = require("../../config");
 const errors_1 = require("../../errors");
 const axios_1 = require("axios");
+const validateUsername = (username) => {
+    const RESERVED_USERNAMES = ['admin', 'moderator', 'root', 'support', 'system'];
+    if (username.length < 3 || username.length > 32) {
+        return 'Username must be between 3 and 32 characters long.';
+    }
+    if (RESERVED_USERNAMES.includes(username)) {
+        return 'This username is reserved and cannot be used.';
+    }
+    if (/^\d+$/.test(username)) {
+        return 'Usernames cannot be only numbers.';
+    }
+    if (/[-_]{2,}/.test(username)) {
+        return 'Usernames cannot have consecutive dashes or underscores.';
+    }
+    if (/^[-]|[-]$/.test(username)) {
+        return 'Usernames cannot start or end with a dash.';
+    }
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+        return 'Usernames can only contain letters, numbers, underscores, and hyphens.';
+    }
+    return null;
+};
 class UserImageAPI {
     user;
     constructor(user) {
@@ -72,6 +94,7 @@ class UserImageAPI {
 exports.UserImageAPI = UserImageAPI;
 class UserAPI {
     image;
+    validateUsername = validateUsername;
     api;
     constructor(api) {
         this.image = new UserImageAPI(this);
@@ -233,28 +256,6 @@ class UserAPI {
      */
     validatePassword(attempted, password, salt) {
         return hashUtils_1.default.compareHash(attempted, password, salt);
-    }
-    validateUsername(username) {
-        const RESERVED_USERNAMES = ['admin', 'moderator', 'root', 'support', 'system'];
-        if (username.length < 3 || username.length > 32) {
-            return 'Username must be between 3 and 32 characters long.';
-        }
-        if (RESERVED_USERNAMES.includes(username)) {
-            return 'This username is reserved and cannot be used.';
-        }
-        if (/^\d+$/.test(username)) {
-            return 'Usernames cannot be only numbers.';
-        }
-        if (/[-_]{2,}/.test(username)) {
-            return 'Usernames cannot have consecutive dashes or underscores.';
-        }
-        if (/^[-]|[-]$/.test(username)) {
-            return 'Usernames cannot start or end with a dash.';
-        }
-        if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-            return 'Usernames can only contain letters, numbers, underscores, and hyphens.';
-        }
-        return null;
     }
     /**
      *

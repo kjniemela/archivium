@@ -67,6 +67,8 @@ async function withTransaction(callback) {
     }
 }
 const parseData = (conditions) => {
+    if (!conditions)
+        return { strings: [], values: [] };
     const keys = Object.keys(conditions).filter(key => conditions[key] !== undefined);
     const values = keys.map(key => conditions[key]);
     const strings = keys.map(key => `${key} = ?`);

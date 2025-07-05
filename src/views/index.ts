@@ -38,7 +38,7 @@ export default function(app: Express) {
     };
     req.getQueryParamAsNumber = (key: string): number | undefined => {
       const value = req.getQueryParam(key);
-      if (value !== undefined && value.trim() === '' || isNaN(Number(value))) {
+      if (value !== undefined && (value.trim() === '' || isNaN(Number(value)))) {
         throw new RequestError(`Parameter ${key} expected to be numeric, but wasn't`, { code: HttpStatusCode.BadRequest });
       }
       return Number(value);

@@ -65,7 +65,7 @@ function default_1(app) {
         };
         req.getQueryParamAsNumber = (key) => {
             const value = req.getQueryParam(key);
-            if (value !== undefined && value.trim() === '' || isNaN(Number(value))) {
+            if (value !== undefined && (value.trim() === '' || isNaN(Number(value)))) {
                 throw new errors_1.RequestError(`Parameter ${key} expected to be numeric, but wasn't`, { code: axios_1.HttpStatusCode.BadRequest });
             }
             return Number(value);

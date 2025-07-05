@@ -66,7 +66,8 @@ export async function withTransaction(callback: (conn: PoolConnection) => Promis
   }
 }
 
-export const parseData = (conditions: { [key: string]: any }) => {
+export const parseData = (conditions: { [key: string]: any } | undefined | null) => {
+  if (!conditions) return { strings: [], values: [] };
   const keys = Object.keys(conditions).filter(key => conditions[key] !== undefined);
   const values = keys.map(key => conditions[key]);
   const strings = keys.map(key => `${key as string} = ?`);

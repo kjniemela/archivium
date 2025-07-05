@@ -51,7 +51,7 @@ exports.default = {
                     // req.useExQuery = true; // TODO why is this here?
                     return;
                 }
-                const request = await api_1.default.universe.getUserAccessRequest(user, req.params.universeShortname);
+                const request = await api_1.default.universe.getUserAccessRequestIfExists(user, req.params.universeShortname);
                 return res.prepareRender('privateUniverse', { shortname: req.params.universeShortname, hasRequested: Boolean(request), publicBody });
             }
             throw err;

@@ -42,7 +42,7 @@ export type Universe = {
 export type ParsedUniverse = Universe & { obj_data: Object };
 export type StringifiedUniverse = Universe & { obj_data: string };
 
-function validateShortname(shortname: string, reservedShortnames: string[] = []) {
+const validateShortname = (shortname: string, reservedShortnames: string[] = []) => {
   if (shortname.length < 3 || shortname.length > 64) {
     return 'Shortnames must be between 3 and 64 characters long.';
   }
@@ -360,7 +360,7 @@ export class UniverseAPI {
     await query;
   }
 
-  async getUserAccessRequest(user: User, shortname: string): Promise<UniverseAccessRequest> {
+  async getUserAccessRequestIfExists(user: User, shortname: string): Promise<UniverseAccessRequest | null> {
     if (!user) throw new UnauthorizedError();
 
     const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
@@ -370,7 +370,7 @@ export class UniverseAPI {
       'SELECT * FROM universeaccessrequest WHERE universe_id = ? AND user_id = ?',
       [universe.id, user.id],
     ))[0] as UniverseAccessRequest;
-    if (!request) throw new NotFoundError();
+    if (!request) return null;
 
     return request;
   }
@@ -394,7 +394,7 @@ export class UniverseAPI {
     const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
     if (!universe) throw new NotFoundError();
 
-    const request = await this.getUserAccessRequest(user, shortname).catch(handleNotFoundAsNull);
+    const request = await this.getUserAccessRequestIfExists(user, shortname);
     if (request) {
       if (request.permission_level >= permissionLevel) return;
       else await this.delAccessRequest(user, shortname, user);

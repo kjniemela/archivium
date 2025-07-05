@@ -16,7 +16,7 @@ type MethodFuncs = {
   middleware?: Handler[];
 };
 
-export default function(app: Express, upload: Multer) {
+export default function (app: Express, upload: Multer) {
   class APIRoute {
     path: string;
     methodFuncs: MethodFuncs;
@@ -27,7 +27,7 @@ export default function(app: Express, upload: Multer) {
       this.methodFuncs = methodFuncs ?? {};
       this.children = children ?? [];
     }
-  
+
     setup(parentPath: string) {
       const path = parentPath + this.path;
       app.options(path, async (req, res, next) => {
@@ -167,11 +167,11 @@ export default function(app: Express, upload: Multer) {
           }, [
             new APIRoute('/:uuid', {
               GET: (req) => api.note.getByBoardShortname(
-                  req.session.user,
-                  req.params.boardShortname,
-                  { 'note.uuid': req.params.uuid },
-                  { fullBody: true, connections: true, limit: 1 },
-                ).then((notes: Note[]) => notes[0]),
+                req.session.user,
+                req.params.boardShortname,
+                { 'note.uuid': req.params.uuid },
+                { fullBody: true, connections: true, limit: 1 },
+              ).then((notes: Note[]) => notes[0]),
             }),
           ]),
         ]),
@@ -196,12 +196,12 @@ export default function(app: Express, upload: Multer) {
             }, [
               new APIRoute('/:uuid', {
                 GET: (req) => api.note.getByItemShortname(
-                    req.session.user,
-                    req.params.universeShortName,
-                    req.params.itemShortName,
-                    { 'note.uuid': req.params.uuid },
-                    { fullBody: true, connections: true, limit: 1 },
-                  ).then((data: [Note[], User[]]) => data[0][0]),
+                  req.session.user,
+                  req.params.universeShortName,
+                  req.params.itemShortName,
+                  { 'note.uuid': req.params.uuid },
+                  { fullBody: true, connections: true, limit: 1 },
+                ).then((data: [Note[], User[]]) => data[0][0]),
               }),
             ]),
             new APIRoute('/data', {
@@ -279,7 +279,7 @@ export default function(app: Express, upload: Multer) {
         new APIRoute('/request', {
           PUT: async (req) => {
             await api.universe.putAccessRequest(req.session.user, req.params.universeShortName, req.body.permissionLevel);
-            
+
             const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [req.params.universeShortName]))[0];
             const target = await api.user.getOne({ 'user.id': universe.author_id }).catch(handleNotFoundAsNull);
             const permText = {
@@ -311,8 +311,8 @@ export default function(app: Express, upload: Multer) {
     new APIRoute('/writable-items', {
       GET: async (req) => api.item.getMany(req.session.user, null, perms.WRITE),
     }),
-    new APIRoute('/exists', { POST: async (req) => {
-      try {
+    new APIRoute('/exists', {
+      POST: async (req) => {
         const body: { [universe: string]: string[] } = req.body;
         const tuples: [string, string][] = [];
         for (const universe in body) {
@@ -320,19 +320,16 @@ export default function(app: Express, upload: Multer) {
             tuples.push([universe, item]);
           }
         }
-        const results = await Promise.all(tuples.map(args => api.item.exists(req.session.user, ...args) )) as boolean[];
+        const results = await Promise.all(tuples.map(args => api.item.exists(req.session.user, ...args))) as boolean[];
         const resultMap: { [universe: string]: { [item: string]: boolean } } = {};
         for (let i = 0; i < results.length; i++) {
           const [universe, item] = tuples[i];
           if (!(universe in resultMap)) resultMap[universe] = {};
           resultMap[universe][item] = results[i];
         }
-        return [200, resultMap];
-      } catch (err) {
-        logger.error(err);
-        return [500];
+        return resultMap;
       }
-    }}),
+    }),
   ]);
 
   apiRoutes.setup(ADDR_PREFIX);

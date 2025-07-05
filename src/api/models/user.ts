@@ -35,6 +35,36 @@ export type User = {
   notifications?: number,
 };
 
+const validateUsername = (username: string) => {
+  const RESERVED_USERNAMES = ['admin', 'moderator', 'root', 'support', 'system'];
+
+  if (username.length < 3 || username.length > 32) {
+    return 'Username must be between 3 and 32 characters long.';
+  }
+
+  if (RESERVED_USERNAMES.includes(username)) {
+      return 'This username is reserved and cannot be used.';
+  }
+
+  if (/^\d+$/.test(username)) {
+      return 'Usernames cannot be only numbers.';
+  }
+
+  if (/[-_]{2,}/.test(username)) {
+    return 'Usernames cannot have consecutive dashes or underscores.';
+  }
+
+  if (/^[-]|[-]$/.test(username)) {
+    return 'Usernames cannot start or end with a dash.';
+  }
+
+  if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      return 'Usernames can only contain letters, numbers, underscores, and hyphens.';
+  }
+
+  return null;
+}
+
 export class UserImageAPI {
   readonly user: UserAPI;
 
@@ -94,6 +124,7 @@ export class UserImageAPI {
 
 export class UserAPI {
   readonly image: UserImageAPI;
+  readonly validateUsername = validateUsername;
   readonly api: API;
 
   constructor(api: API) {
@@ -252,36 +283,6 @@ export class UserAPI {
    */
   validatePassword(attempted: any, password: any, salt: any) {
     return utils.compareHash(attempted, password, salt);
-  }
-
-  validateUsername(username) {
-    const RESERVED_USERNAMES = ['admin', 'moderator', 'root', 'support', 'system'];
-
-    if (username.length < 3 || username.length > 32) {
-      return 'Username must be between 3 and 32 characters long.';
-    }
-
-    if (RESERVED_USERNAMES.includes(username)) {
-        return 'This username is reserved and cannot be used.';
-    }
-
-    if (/^\d+$/.test(username)) {
-        return 'Usernames cannot be only numbers.';
-    }
-
-    if (/[-_]{2,}/.test(username)) {
-      return 'Usernames cannot have consecutive dashes or underscores.';
-    }
-
-    if (/^[-]|[-]$/.test(username)) {
-      return 'Usernames cannot start or end with a dash.';
-    }
-
-    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-        return 'Usernames can only contain letters, numbers, underscores, and hyphens.';
-    }
-
-    return null;
   }
 
   /**

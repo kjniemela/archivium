@@ -219,8 +219,8 @@ class NoteAPI {
         await (0, utils_1.executeQuery)(queryString, [item.id, note.id]);
     }
     async putTags(user, uuid, tags) {
-        if (!tags || tags.length === 0)
-            throw new errors_1.ValidationError('No tags provided!');
+        if (tags.length === 0)
+            return false;
         const note = await this.getOne(user, uuid);
         const tagLookup = {};
         note.tags?.forEach(tag => {
@@ -236,8 +236,8 @@ class NoteAPI {
         return true;
     }
     async delTags(user, uuid, tags) {
-        if (!tags || tags.length === 0)
-            throw new errors_1.ValidationError('No tags provided!');
+        if (tags.length === 0)
+            return false;
         const note = await this.getOne(user, uuid);
         const whereString = tags.map(() => `tag = ?`).join(' OR ');
         if (!whereString)
