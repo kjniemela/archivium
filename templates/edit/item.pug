@@ -139,7 +139,7 @@ block content
   script
     | itemMap = {
     each title, shortname in itemMap
-      | '#{shortname}': '#{title}',
+      | '#{shortname}': '#{title.replaceAll('\'', '\\\'')}',
     | };
   #data(data-item=item)
   script.
