@@ -6,9 +6,9 @@
           .navbarText.material-symbols-outlined.heavy.ma-0.pa-1.pr-0.grow-0(style={ 'font-size': '1.5rem' }) add
           .big-text.navbarText.pa-1.grow-0 #{T('New')}
             if type && universe.obj_data
-              | #{capitalize(T(`${((universe.obj_data.cats || {})[type] || [, 'Missing Category'])[0]}`))}
+              |  #{capitalize(T(`${((universe.obj_data.cats || {})[type] || [, 'Missing Category'])[0]}`))}
             else
-              | #{T('Item')}
+              |  #{T('Item')}
   each item in items
     .card.sheet.gap-4.align-start(data-goto=`${universeLink(item.universe_short)}/items/${item.shortname}`)
       .d-flex.flex-col.grow-1
