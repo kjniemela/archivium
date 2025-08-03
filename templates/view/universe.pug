@@ -211,7 +211,7 @@ block content
                   | #{formatDate(authors[id].updated_at)}
     
     .hidden( data-tab='discuss' )
-      if contextUser && universe.discussion_enabled && (universe.discussion_open || universe.author_permissions[id] >= perms.COMMENT)
+      if contextUser && universe.discussion_enabled && (universe.discussion_open || universe.author_permissions[contextUser.id] >= perms.COMMENT)
         .d-flex.justify-between.align-baseline.mb-2
           a.link.link-animated( href=`${universeLink(universe.shortname)}/discuss/create` ) Create New
           input( id='threadsearch' placeholder='Search...' )
