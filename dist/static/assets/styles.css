@@ -245,7 +245,7 @@ header {
   justify-content: center;
   gap: 0.625rem;
   /* TODO we probably want to change these y-margins */
-  margin: 1rem -8vw;
+  margin: 0.5rem -8vw;
 }
 
 .glass-pane .type-card-container {
