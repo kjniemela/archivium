@@ -143,6 +143,10 @@ block content
     | };
   #data(data-item=item)
   script.
+    for (const shortname in itemMap) {
+      itemMap[shortname] = itemMap[shortname].replaceAll('&quot;', '"');
+    }
+
     var { item } = document.querySelector('#data').dataset;
     item = JSON.parse(item);
     
