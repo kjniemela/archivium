@@ -158,7 +158,9 @@ block content
             });
           })();
       .card-list
-        each username, id in universe.authors
+        - const authorIds = Object.keys(universe.authors).sort((a, b) => universe.author_permissions[a] > universe.author_permissions[b] ? -1 : 1);
+        each id in authorIds
+          - const username = universe.authors[id];
           if universe.author_permissions[id] >= perms.WRITE
             .card.sheet.gap-4(data-goto=`${ADDR_PREFIX}/users/${username}` data-username=username)
               img.userIcon(alt=username, src=authors[id].pfpUrl)
