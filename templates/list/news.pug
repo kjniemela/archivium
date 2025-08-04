@@ -19,5 +19,5 @@ block content
   h1.center #{T('Archivium News')}
   
   .d-flex.flex-col.gap-4
-    each content in newsletters
-      include ../components/mdSheet.pug
+    - const content = newsletters.join('\n\n');
+    include ../components/mdSheet.pug

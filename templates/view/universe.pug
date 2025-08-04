@@ -111,7 +111,7 @@ block content
       li.navbarBtn#bodyBtn(data-tab='stories')
         h3.navbarBtnLink.navbarText(onclick=`showTab('stories')`) #{T('Stories')}
 
-  .tabs
+  .tabs.mt-2
     .hidden( data-tab='home' )
       if universe.obj_data.homeBody
         .sheet
@@ -158,7 +158,9 @@ block content
             });
           })();
       .card-list
-        each username, id in universe.authors
+        - const authorIds = Object.keys(universe.authors).sort((a, b) => universe.author_permissions[a] > universe.author_permissions[b] ? -1 : 1);
+        each id in authorIds
+          - const username = universe.authors[id];
           if universe.author_permissions[id] >= perms.WRITE
             .card.sheet.gap-4(data-goto=`${ADDR_PREFIX}/users/${username}` data-username=username)
               img.userIcon(alt=username, src=authors[id].pfpUrl)
@@ -209,7 +211,7 @@ block content
                   | #{formatDate(authors[id].updated_at)}
     
     .hidden( data-tab='discuss' )
-      if contextUser && universe.discussion_enabled && (universe.discussion_open || universe.author_permissions[id] >= perms.COMMENT)
+      if contextUser && universe.discussion_enabled && (universe.discussion_open || universe.author_permissions[contextUser.id] >= perms.COMMENT)
         .d-flex.justify-between.align-baseline.mb-2
           a.link.link-animated( href=`${universeLink(universe.shortname)}/discuss/create` ) Create New
           input( id='threadsearch' placeholder='Search...' )

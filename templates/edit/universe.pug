@@ -232,13 +232,11 @@ block content
 
         const titlePlInput = createElement('input', { dataset: { name: 'titlePl' }, attrs: { value: catTitlePl } });
         titlePlInput.addEventListener('input', () => {
-          titlePlInput.value = titlePlInput.value.toLowerCase();
           catList[i][2] = titlePlInput.value;
         });
 
         const titleInput = createElement('input', { dataset: { name: 'title' }, attrs: { value: catTitle } });
         titleInput.addEventListener('input', () => {
-          titleInput.value = titleInput.value.toLowerCase();
           if (toPlural(catList[i][1]) === titlePlInput.value || !titlePlInput.value) {
             titlePlInput.value = toPlural(titleInput.value);
             catList[i][2] = titlePlInput.value;

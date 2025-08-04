@@ -84,10 +84,10 @@ block content
                 - const snippet = item.snippet
                 +highlight(formatSnippet(snippet, item.match_pos >= 50, snippet.length === 100), search)
     each note in notes
-      .card.sheet.gap-4.align-start(data-goto=`/notes/${note.uuid}`)
+      .card.sheet.gap-4.align-start(data-goto=`/notes?note=${note.uuid}`)
         .d-flex.flex-col.grow-1
           h3.ma-0
-            a.link.link-animated(href=`/notes/${note.uuid}`)
+            a.link.link-animated(href=`/notes?note=${note.uuid}`)
               +highlight(note.title, search, true)
 
         .d-flex.flex-col.grow-3

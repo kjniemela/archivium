@@ -1,14 +1,14 @@
 .card-list
-  if universe && contextUser
+  if universe && contextUser && universe.author_permissions[contextUser.id] >= perms.WRITE
     .card.sheet(data-goto=`${universeLink(universe.shortname || universe)}/items/create${type ? `?type=${type}` : ''}`)
       .d-flex.justify-center(style={ 'grid-column': '1 / 4' })
         a.link.d-flex.justify-center(href=`${universeLink(universe.shortname || universe)}/items/create${type ? `?type=${type}` : ''}`)
           .navbarText.material-symbols-outlined.heavy.ma-0.pa-1.pr-0.grow-0(style={ 'font-size': '1.5rem' }) add
           .big-text.navbarText.pa-1.grow-0 #{T('New')}
             if type && universe.obj_data
-              | #{capitalize(T(`${((universe.obj_data.cats || {})[type] || [, 'Missing Category'])[0]}`))}
+              |  #{capitalize(T(`${((universe.obj_data.cats || {})[type] || [, 'Missing Category'])[0]}`))}
             else
-              | #{T('Item')}
+              |  #{T('Item')}
   each item in items
     .card.sheet.gap-4.align-start(data-goto=`${universeLink(item.universe_short)}/items/${item.shortname}`)
       .d-flex.flex-col.grow-1

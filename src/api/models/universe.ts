@@ -42,7 +42,7 @@ export type Universe = {
 export type ParsedUniverse = Universe & { obj_data: Object };
 export type StringifiedUniverse = Universe & { obj_data: string };
 
-const validateShortname = (shortname: string, reservedShortnames: string[] = []) => {
+const validateShortname = (shortname: string, reservedShortnames: string[] = ['create']) => {
   if (shortname.length < 3 || shortname.length > 64) {
     return 'Shortnames must be between 3 and 64 characters long.';
   }

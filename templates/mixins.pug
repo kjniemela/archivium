@@ -1,7 +1,11 @@
 mixin authorList(authors, author_permissions)
   -
     let i = 0;
-    const authorsList = Object.keys(authors).filter(key => author_permissions[key] >= perms.WRITE).map(key => authors[key]);
+    const authorsList = Object
+      .keys(authors)
+      .filter(key => author_permissions[key] >= perms.WRITE)
+      .sort((a, b) => author_permissions[a] > author_permissions[b] ? -1 : 1)
+      .map(key => authors[key]);
   span
     each author in authorsList
       -

@@ -1,6 +1,5 @@
 let obj_data = {};
 let hasLoaded = false;
-let itemMap = {};
 let selectedTab = null;
 
 if (!window.createElement) throw 'domUtils not loaded!';
@@ -124,7 +123,7 @@ function lineageTab(name) {
         createElement('div', { children: [
           createElement('button', { attrs: {
             type: 'button',
-            innerText: itemMap[shortname] ?? shortname,
+            innerText: itemMap[shortname],
             onclick: () => {
               const newState = { ...obj_data };
               delete newState.lineage.parents[shortname];
