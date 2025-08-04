@@ -136,19 +136,11 @@ block content
     div
       input(id='obj_data' type='hidden' name='obj_data' value='{}')
 
-  script
-    | itemMap = {
-    each title, shortname in itemMap
-      | '#{shortname}': '#{title.replaceAll('\'', '\\\'')}',
-    | };
-  #data(data-item=item)
+  #data(data-item=item data-item-map=itemMap)
   script.
-    for (const shortname in itemMap) {
-      itemMap[shortname] = itemMap[shortname].replaceAll('&quot;', '"');
-    }
-
-    var { item } = document.querySelector('#data').dataset;
+    var { item, itemMap } = document.querySelector('#data').dataset;
     item = JSON.parse(item);
+    itemMap = JSON.parse(itemMap);
     
     updateObjData(item.obj_data);
     universe = '#{item.universe_short}';

@@ -1,6 +1,5 @@
 let obj_data = {};
 let hasLoaded = false;
-let itemMap = {};
 let selectedTab = null;
 
 if (!window.createElement) throw 'domUtils not loaded!';
