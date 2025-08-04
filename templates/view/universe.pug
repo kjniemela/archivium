@@ -10,7 +10,7 @@ mixin typeCard(shortname, category)
     a.cardLink( href=`${universeLink(universe.shortname)}/items${shortname ? `?type=${shortname}` : ''}` )
       div(style={ 'background-color': shortname ? category[2] : '#f3f3f3' })
         h2.mb-0.center= shortname ? capitalize(category[1]) : T('All Items')
-        h2.mt-0.center (#{counts[shortname] || 0})
+        h2.mt-0.center (#{shortname ? (counts[shortname] || 0) : totalItems})
     if contextUser && (universe.author_permissions[contextUser.id] >= perms.WRITE)
       small.d-flex.gap-2.pa-3.align-baseline
         a.link.link-animated(href=`${universeLink(universe.shortname)}/items/create${shortname ? `?type=${shortname}` : ''}`) &#x2795; New

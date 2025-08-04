@@ -51,7 +51,7 @@ block content
   .center
     .userIcon.badge-anchor
       img(alt=user.username, src=pfpUrl)
-      if user.isMe
+      if user.id === contextUser.id
         .pfpEdit(onclick='editPfp()')
           small #{user.hasPfp ? 'Change' : 'Upload'}
         if user.hasPfp
@@ -61,7 +61,7 @@ block content
     small Joined
       |  #{formatDate(new Date(user.created_at))}
       |  - Last seen #{formatDate(new Date(user.updated_at))}
-      if !user.isContact && !user.isMe
+      if !user.isContact && user.id !== contextUser.id
         |  - 
         a.link.link-animated( onclick=`addContact('${user.username}')` ) #{T('Add to contacts')}
   
