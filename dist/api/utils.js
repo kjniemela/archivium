@@ -8,6 +8,7 @@ exports.executeQuery = executeQuery;
 exports.withTransaction = withTransaction;
 exports.getPfpUrl = getPfpUrl;
 exports.handleNotFoundAsNull = handleNotFoundAsNull;
+exports.handleErrorWithData = handleErrorWithData;
 const db_1 = __importDefault(require("../db"));
 const md5_1 = __importDefault(require("md5"));
 const logger_1 = __importDefault(require("../logger"));
@@ -256,6 +257,12 @@ function getPfpUrl(user) {
 function handleNotFoundAsNull(error) {
     if (error instanceof errors_1.NotFoundError) {
         return null;
+    }
+    throw error;
+}
+function handleErrorWithData(error) {
+    if (error.data) {
+        return error.data;
     }
     throw error;
 }

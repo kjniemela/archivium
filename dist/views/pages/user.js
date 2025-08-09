@@ -79,7 +79,7 @@ exports.default = {
             res.redirect(`${config_1.ADDR_PREFIX}/`);
             return;
         }
-        const data = await api_1.default.email.trySendVerifyLink(req.session.user, req.session.user.username);
+        const data = await api_1.default.email.trySendVerifyLink(req.session.user, req.session.user.username).catch(utils_1.handleErrorWithData);
         if (data && !(data instanceof Date) && data.alreadyVerified) {
             res.redirect(`${config_1.ADDR_PREFIX}${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
             return;
