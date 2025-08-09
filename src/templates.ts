@@ -1,12 +1,12 @@
 import pug from 'pug';
 import { Request } from 'express';
-import { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN } from '../config';
-import { perms, getPfpUrl, tiers, plans, tierAllowance } from '../api/utils';
-import { locale, lang, sprintf, T } from '../locale';
-import api from '../api';
+import { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN } from './config';
+import { perms, getPfpUrl, tiers, plans, tierAllowance } from './api/utils';
+import { locale, lang, sprintf, T } from './locale';
+import api from './api';
 import path from 'path';
-import themes from '../themes';
-import logger from '../logger';
+import themes from './themes';
+import logger from './logger';
 
 export function universeLink(req: Request, uniShort) {
   const displayUniverse = req.headers['x-subdomain'];
@@ -59,7 +59,7 @@ function contextData(req) {
 }
 
 const pugOptions = {
-  basedir: path.join(__dirname, '..'),
+  basedir: __dirname,
 };
 
 function compile(file) {

@@ -1,5 +1,5 @@
 import { QueryBuilder, Cond, executeQuery, parseData, perms, withTransaction, BaseOptions } from '../utils';
-// const { extractLinks } = require('../../../static/scripts/markdown/parse');
+import { extractLinks } from '../../markdown';
 import { API } from '..';
 import { User } from './user';
 import { ResultSetHeader } from 'mysql2/promise';
@@ -653,27 +653,26 @@ export class ItemAPI {
   async handleLinks(item: Item, objData: any): Promise<void> {
     if (objData.body) {
       const bodyText = objData.body;
-      // TODO disable this for now
-      // const links = await extractLinks(item.universe_short, bodyText, { item: { ...item, obj_data: objData } });
-      // const oldLinks = await _getLinks(item);
-      // const existingLinks = {};
-      // const newLinks = {};
-      // for (const { href } of oldLinks) {
-      //   existingLinks[href] = true;
-      // }
-      // await withTransaction(async (conn) => {
-      //   for (const [universeShort, itemShort, href] of links) {
-      //     newLinks[href] = true;
-      //     if (!existingLinks[href]) {
-      //       await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [ item.id, universeShort, itemShort, href ]);
-      //     }
-      //   }
-      //   for (const { href } of oldLinks) {
-      //     if (!newLinks[href]) {
-      //       await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [ item.id, href ]);
-      //     }
-      //   }
-      // });
+      const links = await extractLinks(item.universe_short, bodyText, { item: { ...item, obj_data: objData } });
+      const oldLinks = await this._getLinks(item);
+      const existingLinks = {};
+      const newLinks = {};
+      for (const { href } of oldLinks) {
+        existingLinks[href] = true;
+      }
+      await withTransaction(async (conn) => {
+        for (const [universeShort, itemShort, href] of links) {
+          newLinks[href] = true;
+          if (!existingLinks[href]) {
+            await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [ item.id, universeShort, itemShort, href ]);
+          }
+        }
+        for (const { href } of oldLinks) {
+          if (!newLinks[href]) {
+            await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [ item.id, href ]);
+          }
+        }
+      });
     }
   }
 
