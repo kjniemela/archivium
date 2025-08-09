@@ -1,9 +1,14 @@
-const db = require(".");
-const readline = require('readline');
-const api = require("../api");
-const { askQuestion } = require("./import");
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const _1 = __importDefault(require("."));
+const readline_1 = __importDefault(require("readline"));
+const api_1 = __importDefault(require("../api"));
+const import_1 = require("./import");
 function askMultiline(query) {
-    const rl = readline.createInterface({
+    const rl = readline_1.default.createInterface({
         input: process.stdin,
         output: process.stdout,
     });
@@ -29,15 +34,15 @@ function askMultiline(query) {
 }
 async function main() {
     console.log('Please input newletter info below:');
-    const title = await askQuestion('Title: ');
-    const preview = await askQuestion('Preview: ');
+    const title = await (0, import_1.askQuestion)('Title: ');
+    const preview = await (0, import_1.askQuestion)('Preview: ');
     const body = await askMultiline('Body:');
     console.log(`Title: ${title}`);
     console.log(`Preview: ${preview}`);
     console.log(`Body: ${body}`);
-    const ans = await askQuestion('Does this look right? [y/N] ');
+    const ans = await (0, import_1.askQuestion)('Does this look right? [y/N] ');
     if (ans.toUpperCase() === 'N') {
-        const ans = await askQuestion('Try again? [y/N] ');
+        const ans = await (0, import_1.askQuestion)('Try again? [y/N] ');
         if (ans.toUpperCase() === 'Y') {
             await main();
         }
@@ -46,11 +51,9 @@ async function main() {
         }
         return;
     }
-    const [code, { insertId }] = await api.newsletter.post({ title, preview, body });
-    if (code !== 201)
-        return;
-    const [, users] = await api.user.getMany(null, true);
-    const proceed = await askQuestion(`${users.length} users to send to, proceed? [y/N] `);
+    const { insertId } = await api_1.default.newsletter.post({ title, preview, body });
+    const users = await api_1.default.user.getMany(null, true);
+    const proceed = await (0, import_1.askQuestion)(`${users.length} users to send to, proceed? [y/N] `);
     if (proceed.toUpperCase() === 'N') {
         console.log('Exiting.');
         return;
@@ -58,15 +61,15 @@ async function main() {
     for (let i = 0; i < users.length; i++) {
         const user = users[i];
         console.log(`Sending... (${i}/${users.length})`);
-        await api.notification.notify(user, api.notification.types.FEATURES, {
+        await api_1.default.notification.notify(user, api_1.default.notification.types.FEATURES, {
             title,
             body: preview,
             clickUrl: `/news/${insertId}`,
         });
-        readline.moveCursor(process.stdout, 0, -1);
+        readline_1.default.moveCursor(process.stdout, 0, -1);
     }
     console.log(`Sending... (${users.length}/${users.length})`);
 }
 if (require.main === module) {
-    main().then(() => db.end());
+    main().then(() => _1.default.end());
 }
