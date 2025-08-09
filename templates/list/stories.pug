@@ -43,15 +43,15 @@ block content
     if exploreStories.length > 0
       li.navbarBtn#bodyBtn(data-tab='explore')
         h3.navbarBtnLink.navbarText(onclick=`showTab('explore')`) #{T('Explore')}
-      if contextUser
-        -
-          sharedStories = stories.filter(story => story.shared);
-          myStories = stories.filter(story => story.author_id === contextUser.id);
-        if sharedStories.length > 0
-          li.navbarBtn#bodyBtn(data-tab='shared')
-            h3.navbarBtnLink.navbarText(onclick=`showTab('shared')`) #{T('Shared With Me')}
-        li.navbarBtn#bodyBtn(data-tab='my-stories')
-          h3.navbarBtnLink.navbarText(onclick=`showTab('my-stories')`) #{T('My Stories')}
+    if contextUser
+      -
+        sharedStories = stories.filter(story => story.shared);
+        myStories = stories.filter(story => story.author_id === contextUser.id);
+      if sharedStories.length > 0
+        li.navbarBtn#bodyBtn(data-tab='shared')
+          h3.navbarBtnLink.navbarText(onclick=`showTab('shared')`) #{T('Shared With Me')}
+      li.navbarBtn#bodyBtn(data-tab='my-stories')
+        h3.navbarBtnLink.navbarText(onclick=`showTab('my-stories')`) #{T('My Stories')}
 
   .tabs
     if exploreStories.length > 0
