@@ -516,7 +516,7 @@ class ItemAPI {
             }
         }
         if (gallery) {
-            const existingImages = await this.image.getManyByItemShort(user, universeShortname, itemShortname);
+            const existingImages = await this.image.getManyByItemShort(user, universeShortname, item.shortname);
             const oldImages = {};
             const newImages = {};
             for (const img of existingImages ?? []) {

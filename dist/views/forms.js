@@ -108,6 +108,7 @@ exports.default = {
             res.redirect(`${(0, templates_1.universeLink)(req, req.params.universeShortname)}/items/${item.shortname}`);
         }
         catch (err) {
+            console.error(err);
             if (err instanceof errors_1.ModelError) {
                 res.error = err.message;
                 await pages_1.default.item.edit(req, res);

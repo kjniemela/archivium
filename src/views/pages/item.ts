@@ -1,13 +1,12 @@
-import api from '../../api';
-import { universeLink } from '../../templates';
-import { perms, Cond, getPfpUrl } from '../../api/utils';
-import logger from '../../logger';
 import { RouteHandler } from '..';
-import { ModelError, NotFoundError } from '../../errors';
-import { Item } from '../../api/models/item';
+import api from '../../api';
 import { Comment } from '../../api/models/discussion';
-import { User } from '../../api/models/user';
+import { Item } from '../../api/models/item';
 import { Note } from '../../api/models/note';
+import { User } from '../../api/models/user';
+import { getPfpUrl, perms } from '../../api/utils';
+import { ForbiddenError, NotFoundError } from '../../errors';
+import { universeLink } from '../../templates';
 
 export default {
   async list(req, res) {
@@ -50,7 +49,7 @@ export default {
     try {
       item = await api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortname, req.params.itemShortname);
     } catch (err) {
-      if (err instanceof NotFoundError) {
+      if (err instanceof ForbiddenError) {
         if (universe.author_permissions[req.session.user?.id] >= perms.READ) {
           res.status(404);
           res.prepareRender('error', {

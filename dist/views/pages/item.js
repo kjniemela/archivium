@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const api_1 = __importDefault(require("../../api"));
-const templates_1 = require("../../templates");
 const utils_1 = require("../../api/utils");
 const errors_1 = require("../../errors");
+const templates_1 = require("../../templates");
 exports.default = {
     async list(req, res) {
         const search = req.getQueryParam('search');
@@ -46,7 +46,7 @@ exports.default = {
             item = await api_1.default.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortname, req.params.itemShortname);
         }
         catch (err) {
-            if (err instanceof errors_1.NotFoundError) {
+            if (err instanceof errors_1.ForbiddenError) {
                 if (universe.author_permissions[req.session.user?.id] >= utils_1.perms.READ) {
                     res.status(404);
                     res.prepareRender('error', {

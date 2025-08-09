@@ -65,7 +65,7 @@ exports.default = {
         });
     },
     async newsList(_, res) {
-        const newsletters = (await api_1.default.newsletter.getMany())[1].map(n => n.body);
+        const newsletters = (await api_1.default.newsletter.getMany()).map(n => n.body);
         res.prepareRender('news', { newsletters });
     },
     /* Help Pages */

@@ -54,7 +54,7 @@ div
     });
 
     async function deleteComment(commentID) {
-      const apiRoute = `${apiRoute}/${commentID}`;
+      const apiRoute = `#{apiRoute}/${commentID}`;
       await deleteJSON(apiRoute);
       window.location.reload();
     }
