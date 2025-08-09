@@ -46,8 +46,8 @@ block append save
 block content
   .d-flex.justify-between.align-baseline
     h2 Edit #{item.title}
-    a.link.link-animated.color-error(href=`${ADDR_PREFIX}/universes/${universe.shortname}/items/${item.shortname}`) #{T('Discard Changes')}
-  form#edit(method='POST')
+    a.link.link-animated.color-error(href=`${universeLink(universe.shortname)}/items/${item.shortname}`) #{T('Discard Changes')}
+  form#edit(method='POST' action=`${universeLink(universe.shortname)}/items/${item.shortname}/edit`)
 
     .inputGroup
       label(for='title') #{T('Title')}: 

@@ -217,6 +217,7 @@ function default_1(app) {
         get('/universes/:universeShortname/items/create', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.item.create);
         get('/universes/:universeShortname/items/:itemShortname', sites.NORMAL, [], pages_1.default.item.view);
         get('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.item.edit);
+        get('/universes/:universeShortname/items/:itemShortname/edit-legacy', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.item.editLegacy);
         get('/universes/:universeShortname/items/:itemShortname/delete', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.item.delete);
         /* Display Mode Pages */
         get('/', sites.DISPLAY, [], subdomain(pages_1.default.universe.view, (sub) => ({ universeShortname: sub })));

@@ -1,8 +1,6 @@
 import { Express, Handler, Request, Response } from 'express';
-import { ADDR_PREFIX, DEV_MODE } from '../config';
+import { ADDR_PREFIX } from '../config';
 import Auth from '../middleware/auth';
-import api from '../api';
-import md5 from 'md5';
 import { render, universeLink } from '../templates';
 import { tiers } from '../api/utils';
 import logger from '../logger';
@@ -200,6 +198,7 @@ export default function(app: Express) {
     get('/universes/:universeShortname/items/create', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.item.create);
     get('/universes/:universeShortname/items/:itemShortname', sites.NORMAL, [], pages.item.view);
     get('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.item.edit);
+    get('/universes/:universeShortname/items/:itemShortname/edit-legacy', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.item.editLegacy);
     get('/universes/:universeShortname/items/:itemShortname/delete', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.item.delete);
 
     /* Display Mode Pages */
