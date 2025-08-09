@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import { capitalize } from './helpers';
+import RichEditor from './components/RichEditor';
 
 type Categories = {
   [key: string]: [string, string],
@@ -15,6 +16,7 @@ type Item = {
 type ObjData = {
   notes: boolean,
   comments: boolean,
+  body: string,
 };
 
 export type AppProps = {
@@ -131,6 +133,8 @@ export default function App({ itemShort, universeShort }: AppProps) {
         <div className='mt-2'>
           <button type='submit'>{T('Save Changes')}</button>
         </div>
+
+        {objData && <RichEditor content={objData.body} />}
       </form>
     </>
   )

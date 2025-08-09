@@ -113,6 +113,7 @@ const templates = {
     notifications: compile('templates/view/notifications.pug'),
     forgotPassword: compile('templates/edit/forgotPassword.pug'),
     resetPassword: compile('templates/edit/resetPassword.pug'),
+    editor: compile('templates/editor.pug'),
 };
 function render(req, template, context = {}) {
     if (template in templates)

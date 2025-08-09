@@ -8,7 +8,7 @@ export default {
   mode: process.env.NODE_ENV || 'development',
   entry: './src/main.tsx',
   output: {
-    path: path.resolve(__dirname, '../static/editor'),
+    path: path.resolve(__dirname, '../dist/static/editor'),
     filename: 'bundle.js',
     clean: true, // Clean old builds
     publicPath: '/', // Adjust if using nested routes

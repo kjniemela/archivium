@@ -725,6 +725,13 @@ h4, h5 {
   margin-bottom: 0.25rem;
 }
 
+/* Tiptap Editor styles */
+.tiptap {
+  background-color: #fefefe;
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+}
+
 /* EasyMDE styles */
 .EasyMDEContainer {
   position: relative;
