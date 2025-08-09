@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { capitalize } from './helpers';
+import { capitalize, renderMarkdown } from './helpers';
 import RichEditor from './components/RichEditor';
 
 type Categories = {
@@ -20,8 +20,8 @@ type ObjData = {
 };
 
 export type AppProps = {
-  itemShort?: string,
-  universeShort?: string,
+  itemShort: string,
+  universeShort: string,
 };
 
 function sprintf(format: string, ...args: string[]): string {
@@ -55,13 +55,19 @@ export default function App({ itemShort, universeShort }: AppProps) {
   const [categories, setCategories] = useState<Categories | null>(null);
   const [item, setItem] = useState<Item | null>(null);
   const [objData, setObjData] = useState<ObjData | null>(null);
+  const [bodyText, setBodyText] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData(`/api/universes/${universeShort}`, (data) => {
       setCategories(data.obj_data.cats);
     });
     fetchData(`/api/universes/${universeShort}/items/${itemShort}`, (data) => {
-      setObjData(JSON.parse(data.obj_data));
+      const objData = JSON.parse(data.obj_data) as ObjData;
+      setObjData(objData);
+      renderMarkdown(universeShort, objData.body).then((text: string) => {
+        console.log(text)
+        setBodyText(text);
+      });
       delete data.obj_data;
       setItem(data);
     });
@@ -134,7 +140,7 @@ export default function App({ itemShort, universeShort }: AppProps) {
           <button type='submit'>{T('Save Changes')}</button>
         </div>
 
-        {objData && <RichEditor content={objData.body} />}
+        {bodyText && <RichEditor content={bodyText} />}
       </form>
     </>
   )
