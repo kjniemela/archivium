@@ -13,7 +13,7 @@ declare module '@tiptap/core' {
   }
 }
 
-export const Aside = Node.create<AsideOptions>({
+const Aside = Node.create<AsideOptions>({
   name: 'aside',
   group: 'block',
   content: 'block+',
@@ -52,4 +52,6 @@ export const Aside = Node.create<AsideOptions>({
       }),
     ]
   },
-})
+});
+
+export default Aside;
