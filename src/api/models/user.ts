@@ -375,6 +375,25 @@ export class UserAPI {
     }
   }
 
+  async putEmail(sessionUser: User, username: string, { email, password }): Promise<ResultSetHeader> {
+    const user = await this.getOne({ 'user.username': username }, true);
+    if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
+    const isCorrectLogin = this.validatePassword(password, user.password, user.salt);
+    if (!isCorrectLogin) throw new UnauthorizedError('Incorrect password');
+    try {
+      const data = await executeQuery<ResultSetHeader>(`
+        UPDATE user
+        SET
+          email = ?,
+          verified = ?
+        WHERE id = ?
+      `, [email, false, user.id]);
+      return data;
+    } catch (err) {
+      throw new ModelError(err);
+    }
+  }
+
   async putPassword(sessionUser: User, username: string, { oldPassword, newPassword }): Promise<ResultSetHeader> {
     const user = await this.getOne({ 'user.username': username }, true);
     if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();

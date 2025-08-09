@@ -118,6 +118,7 @@ function default_1(app, upload) {
                     }),
                 ]),
                 new APIRoute('/username', { PUT: (req) => _1.default.user.putUsername(req.session.user, req.params.username, req.body.username) }),
+                new APIRoute('/email', { PUT: (req) => _1.default.user.putEmail(req.session.user, req.params.username, req.body) }),
                 new APIRoute('/password', { PUT: (req) => _1.default.user.putPassword(req.session.user, req.params.username, req.body) }),
                 new APIRoute('/notif-settings', { PUT: (req) => _1.default.notification.putSettings((req.session?.user?.username === req.params.username) ? req.session.user : null, req.body.username) }),
                 new APIRoute('/preferences', { PUT: (req) => _1.default.user.putPreferences(req.session.user, req.params.username, req.body) }),
