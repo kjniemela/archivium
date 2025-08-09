@@ -113,7 +113,6 @@ function default_1(app) {
     };
     function use(method, path, site, middleware, handler) {
         app[method](`${config_1.ADDR_PREFIX}${path}`, ...middleware, async (req, res, next) => {
-            console.log(method, path);
             if (site(req) && !res.headersSent) {
                 try {
                     await handler(req, res);
