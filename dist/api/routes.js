@@ -48,7 +48,13 @@ function default_1(app, upload) {
                             res.json(err.data);
                         }
                         else {
-                            res.end();
+                            try {
+                                res.json(err.message);
+                            }
+                            catch (err) {
+                                logger_1.default.error(err);
+                                res.end();
+                            }
                         }
                     }
                 }

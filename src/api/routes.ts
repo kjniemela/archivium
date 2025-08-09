@@ -52,7 +52,12 @@ export default function (app: Express, upload: Multer) {
             if (err.data) {
               res.json(err.data);
             } else {
-              res.end();
+              try {
+                res.json(err.message);
+              } catch (err) {
+                logger.error(err);
+                res.end();
+              }
             }
           }
         } else {
