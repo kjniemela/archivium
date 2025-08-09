@@ -127,6 +127,7 @@ export default {
       limit: req.getQueryParamAsNumber('limit'),
       type: req.getQueryParam('type'),
       tag: req.getQueryParam('tag'),
+      author: req.getQueryParam('author'),
       search,
     });
     res.prepareRender('universeItemList', {
