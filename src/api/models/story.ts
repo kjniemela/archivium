@@ -225,17 +225,21 @@ export class StoryAPI {
       index = newIndexes[chapter.id];
     }
 
-    await executeQuery(`
-        UPDATE storychapter
-        SET
-          title = ?,
-          summary = ?,
-          body = ?,
-          is_published = ?,
-          created_at = ?,
-          updated_at = ?
-        WHERE id = ?
-      `, [title ?? chapter.title, summary ?? chapter.summary, body ?? chapter.body, is_published ?? chapter.is_published, publishDate ?? chapter.created_at, new Date(), chapter.id]);
+    await withTransaction(async (conn) => {
+      await conn.execute(`
+          UPDATE storychapter
+          SET
+            title = ?,
+            summary = ?,
+            body = ?,
+            is_published = ?,
+            created_at = ?,
+            updated_at = ?
+          WHERE id = ?
+        `, [title ?? chapter.title, summary ?? chapter.summary, body ?? chapter.body, is_published ?? chapter.is_published, publishDate ?? chapter.created_at, new Date(), chapter.id]);
+
+        await conn.execute('UPDATE story SET updated_at = ? WHERE id = ?', [new Date(), chapter.story_id]);
+    });
     return index;
   }
 
