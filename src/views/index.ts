@@ -85,7 +85,8 @@ export default function(app: Express) {
 
   function use(method: Method, path: string, site: SiteCheck, middleware: Handler[], handler: RouteHandler): void {
     app[method](`${ADDR_PREFIX}${path}`, ...middleware, async (req, res, next) => {
-      if (site(req) && res.headersSent) {
+      console.log(method, path)
+      if (site(req) && !res.headersSent) {
         try {
           await handler(req, res);
         } catch (err) {
