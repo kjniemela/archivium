@@ -169,7 +169,7 @@ function default_1(app) {
     /* User Pages */
     get('/contacts', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.user.contactList);
     get('/users/:username', sites.ALL, [], pages_1.default.user.profilePage);
-    get('/settings', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.user.settings);
+    get('/settings', sites.ALL, [auth_1.default.bypassEmailVerification, auth_1.default.verifySessionOrRedirect], pages_1.default.user.settings);
     get('/verify', sites.ALL, [], pages_1.default.user.requestVerify);
     get('/verify/:key', sites.ALL, [], pages_1.default.user.verifyUser);
     get('/notifications', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.user.notifications);

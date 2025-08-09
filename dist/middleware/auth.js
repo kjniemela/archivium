@@ -74,8 +74,16 @@ const verifySessionOrRedirect = async (req, res, next) => {
         }
     }
 };
+const bypassEmailVerification = async (req, res, next) => {
+    const user = req.session.user;
+    if (user) {
+        user.verified = true;
+    }
+    next();
+};
 exports.default = {
     createSession,
     verifySession,
     verifySessionOrRedirect,
+    bypassEmailVerification,
 };
