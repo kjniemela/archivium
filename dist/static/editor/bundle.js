@@ -2,10 +2,10 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./node_modules/@tiptap/core/dist/index.js":
-/*!*************************************************!*\
-  !*** ./node_modules/@tiptap/core/dist/index.js ***!
-  \*************************************************/
+/***/ "../node_modules/@tiptap/core/dist/index.js":
+/*!**************************************************!*\
+  !*** ../node_modules/@tiptap/core/dist/index.js ***!
+  \**************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -113,13 +113,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   updateMarkViewAttributes: () => (/* binding */ updateMarkViewAttributes),
 /* harmony export */   wrappingInputRule: () => (/* binding */ wrappingInputRule)
 /* harmony export */ });
-/* harmony import */ var _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/pm/state */ "./node_modules/@tiptap/pm/dist/state/index.js");
-/* harmony import */ var _tiptap_pm_view__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/pm/view */ "./node_modules/@tiptap/pm/dist/view/index.js");
-/* harmony import */ var _tiptap_pm_keymap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tiptap/pm/keymap */ "./node_modules/@tiptap/pm/dist/keymap/index.js");
-/* harmony import */ var _tiptap_pm_transform__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @tiptap/pm/transform */ "./node_modules/@tiptap/pm/dist/transform/index.js");
-/* harmony import */ var _tiptap_pm_model__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @tiptap/pm/model */ "./node_modules/@tiptap/pm/dist/model/index.js");
-/* harmony import */ var _tiptap_pm_commands__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @tiptap/pm/commands */ "./node_modules/@tiptap/pm/dist/commands/index.js");
-/* harmony import */ var _tiptap_pm_schema_list__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @tiptap/pm/schema-list */ "./node_modules/@tiptap/pm/dist/schema-list/index.js");
+/* harmony import */ var _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/pm/state */ "../node_modules/@tiptap/pm/dist/state/index.js");
+/* harmony import */ var _tiptap_pm_view__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/pm/view */ "../node_modules/@tiptap/pm/dist/view/index.js");
+/* harmony import */ var _tiptap_pm_keymap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tiptap/pm/keymap */ "../node_modules/@tiptap/pm/dist/keymap/index.js");
+/* harmony import */ var _tiptap_pm_transform__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @tiptap/pm/transform */ "../node_modules/@tiptap/pm/dist/transform/index.js");
+/* harmony import */ var _tiptap_pm_model__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @tiptap/pm/model */ "../node_modules/@tiptap/pm/dist/model/index.js");
+/* harmony import */ var _tiptap_pm_commands__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @tiptap/pm/commands */ "../node_modules/@tiptap/pm/dist/commands/index.js");
+/* harmony import */ var _tiptap_pm_schema_list__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @tiptap/pm/schema-list */ "../node_modules/@tiptap/pm/dist/schema-list/index.js");
 var __defProp = Object.defineProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -5513,10 +5513,10 @@ var Tracker = class {
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/core/dist/jsx-runtime/jsx-runtime.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/@tiptap/core/dist/jsx-runtime/jsx-runtime.js ***!
-  \*******************************************************************/
+/***/ "../node_modules/@tiptap/core/dist/jsx-runtime/jsx-runtime.js":
+/*!********************************************************************!*\
+  !*** ../node_modules/@tiptap/core/dist/jsx-runtime/jsx-runtime.js ***!
+  \********************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -5550,10 +5550,10 @@ var h = (tag, attributes) => {
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-blockquote/dist/index.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/@tiptap/extension-blockquote/dist/index.js ***!
-  \*****************************************************************/
+/***/ "../node_modules/@tiptap/extension-blockquote/dist/index.js":
+/*!******************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-blockquote/dist/index.js ***!
+  \******************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -5562,8 +5562,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ index_default),
 /* harmony export */   inputRegex: () => (/* binding */ inputRegex)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
-/* harmony import */ var _tiptap_core_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/core/jsx-runtime */ "./node_modules/@tiptap/core/dist/jsx-runtime/jsx-runtime.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_core_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/core/jsx-runtime */ "../node_modules/@tiptap/core/dist/jsx-runtime/jsx-runtime.js");
 // src/blockquote.tsx
 
 
@@ -5619,10 +5619,10 @@ var index_default = Blockquote;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-bold/dist/index.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/@tiptap/extension-bold/dist/index.js ***!
-  \***********************************************************/
+/***/ "../node_modules/@tiptap/extension-bold/dist/index.js":
+/*!************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-bold/dist/index.js ***!
+  \************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -5634,8 +5634,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   underscoreInputRegex: () => (/* binding */ underscoreInputRegex),
 /* harmony export */   underscorePasteRegex: () => (/* binding */ underscorePasteRegex)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
-/* harmony import */ var _tiptap_core_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/core/jsx-runtime */ "./node_modules/@tiptap/core/dist/jsx-runtime/jsx-runtime.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_core_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/core/jsx-runtime */ "../node_modules/@tiptap/core/dist/jsx-runtime/jsx-runtime.js");
 // src/bold.tsx
 
 
@@ -5724,10 +5724,10 @@ var index_default = Bold;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-code-block/dist/index.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/@tiptap/extension-code-block/dist/index.js ***!
-  \*****************************************************************/
+/***/ "../node_modules/@tiptap/extension-code-block/dist/index.js":
+/*!******************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-code-block/dist/index.js ***!
+  \******************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -5737,14 +5737,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ index_default),
 /* harmony export */   tildeInputRegex: () => (/* binding */ tildeInputRegex)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
-/* harmony import */ var _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/pm/state */ "./node_modules/@tiptap/pm/dist/state/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/pm/state */ "../node_modules/@tiptap/pm/dist/state/index.js");
 // src/code-block.ts
 
 
 var backtickInputRegex = /^```([a-z]+)?[\s\n]$/;
 var tildeInputRegex = /^~~~([a-z]+)?[\s\n]$/;
-var CodeBlock = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Node.create({
+var CodeBlock = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Node.create({
   name: "codeBlock",
   addOptions() {
     return {
@@ -5790,7 +5790,7 @@ var CodeBlock = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Node.create({
   renderHTML({ node, HTMLAttributes }) {
     return [
       "pre",
-      (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes),
+      (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes),
       [
         "code",
         {
@@ -5868,7 +5868,7 @@ var CodeBlock = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Node.create({
         const nodeAfter = doc.nodeAt(after);
         if (nodeAfter) {
           return editor.commands.command(({ tr }) => {
-            tr.setSelection(_tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.Selection.near(doc.resolve(after)));
+            tr.setSelection(_tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.Selection.near(doc.resolve(after)));
             return true;
           });
         }
@@ -5878,14 +5878,14 @@ var CodeBlock = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Node.create({
   },
   addInputRules() {
     return [
-      (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.textblockTypeInputRule)({
+      (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.textblockTypeInputRule)({
         find: backtickInputRegex,
         type: this.type,
         getAttributes: (match) => ({
           language: match[1]
         })
       }),
-      (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.textblockTypeInputRule)({
+      (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.textblockTypeInputRule)({
         find: tildeInputRegex,
         type: this.type,
         getAttributes: (match) => ({
@@ -5898,8 +5898,8 @@ var CodeBlock = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Node.create({
     return [
       // this plugin creates a code block for pasted content from VS Code
       // we can also detect the copied code language
-      new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.Plugin({
-        key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.PluginKey("codeBlockVSCodeHandler"),
+      new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.Plugin({
+        key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.PluginKey("codeBlockVSCodeHandler"),
         props: {
           handlePaste: (view, event) => {
             if (!event.clipboardData) {
@@ -5919,7 +5919,7 @@ var CodeBlock = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Node.create({
             const textNode = schema.text(text.replace(/\r\n?/g, "\n"));
             tr.replaceSelectionWith(this.type.create({ language }, textNode));
             if (tr.selection.$from.parent.type !== this.type) {
-              tr.setSelection(_tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection.near(tr.doc.resolve(Math.max(0, tr.selection.from - 2))));
+              tr.setSelection(_tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection.near(tr.doc.resolve(Math.max(0, tr.selection.from - 2))));
             }
             tr.setMeta("paste", true);
             view.dispatch(tr);
@@ -5938,10 +5938,10 @@ var index_default = CodeBlock;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-code/dist/index.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/@tiptap/extension-code/dist/index.js ***!
-  \***********************************************************/
+/***/ "../node_modules/@tiptap/extension-code/dist/index.js":
+/*!************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-code/dist/index.js ***!
+  \************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -5951,7 +5951,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   inputRegex: () => (/* binding */ inputRegex),
 /* harmony export */   pasteRegex: () => (/* binding */ pasteRegex)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
 // src/code.ts
 
 var inputRegex = /(^|[^`])`([^`]+)`(?!`)/;
@@ -6015,10 +6015,10 @@ var index_default = Code;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-document/dist/index.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/@tiptap/extension-document/dist/index.js ***!
-  \***************************************************************/
+/***/ "../node_modules/@tiptap/extension-document/dist/index.js":
+/*!****************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-document/dist/index.js ***!
+  \****************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -6026,7 +6026,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   Document: () => (/* binding */ Document),
 /* harmony export */   "default": () => (/* binding */ index_default)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
 // src/document.ts
 
 var Document = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Node.create({
@@ -6042,10 +6042,10 @@ var index_default = Document;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-hard-break/dist/index.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/@tiptap/extension-hard-break/dist/index.js ***!
-  \*****************************************************************/
+/***/ "../node_modules/@tiptap/extension-hard-break/dist/index.js":
+/*!******************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-hard-break/dist/index.js ***!
+  \******************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -6053,7 +6053,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   HardBreak: () => (/* binding */ HardBreak),
 /* harmony export */   "default": () => (/* binding */ index_default)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
 // src/hard-break.ts
 
 var HardBreak = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Node.create({
@@ -6117,10 +6117,10 @@ var index_default = HardBreak;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-heading/dist/index.js":
-/*!**************************************************************!*\
-  !*** ./node_modules/@tiptap/extension-heading/dist/index.js ***!
-  \**************************************************************/
+/***/ "../node_modules/@tiptap/extension-heading/dist/index.js":
+/*!***************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-heading/dist/index.js ***!
+  \***************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -6128,7 +6128,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   Heading: () => (/* binding */ Heading),
 /* harmony export */   "default": () => (/* binding */ index_default)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
 // src/heading.ts
 
 var Heading = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Node.create({
@@ -6208,10 +6208,10 @@ var index_default = Heading;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-horizontal-rule/dist/index.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/@tiptap/extension-horizontal-rule/dist/index.js ***!
-  \**********************************************************************/
+/***/ "../node_modules/@tiptap/extension-horizontal-rule/dist/index.js":
+/*!***********************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-horizontal-rule/dist/index.js ***!
+  \***********************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -6219,12 +6219,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   HorizontalRule: () => (/* binding */ HorizontalRule),
 /* harmony export */   "default": () => (/* binding */ index_default)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
-/* harmony import */ var _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/pm/state */ "./node_modules/@tiptap/pm/dist/state/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/pm/state */ "../node_modules/@tiptap/pm/dist/state/index.js");
 // src/horizontal-rule.ts
 
 
-var HorizontalRule = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Node.create({
+var HorizontalRule = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Node.create({
   name: "horizontalRule",
   addOptions() {
     return {
@@ -6236,18 +6236,18 @@ var HorizontalRule = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Node.create({
     return [{ tag: "hr" }];
   },
   renderHTML({ HTMLAttributes }) {
-    return ["hr", (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes)];
+    return ["hr", (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes)];
   },
   addCommands() {
     return {
       setHorizontalRule: () => ({ chain, state }) => {
-        if (!(0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.canInsertNode)(state, state.schema.nodes[this.name])) {
+        if (!(0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.canInsertNode)(state, state.schema.nodes[this.name])) {
           return false;
         }
         const { selection } = state;
         const { $to: $originTo } = selection;
         const currentChain = chain();
-        if ((0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.isNodeSelection)(selection)) {
+        if ((0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.isNodeSelection)(selection)) {
           currentChain.insertContentAt($originTo.pos, {
             type: this.name
           });
@@ -6261,17 +6261,17 @@ var HorizontalRule = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Node.create({
             const posAfter = $to.end();
             if ($to.nodeAfter) {
               if ($to.nodeAfter.isTextblock) {
-                tr.setSelection(_tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection.create(tr.doc, $to.pos + 1));
+                tr.setSelection(_tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection.create(tr.doc, $to.pos + 1));
               } else if ($to.nodeAfter.isBlock) {
-                tr.setSelection(_tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.create(tr.doc, $to.pos));
+                tr.setSelection(_tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.create(tr.doc, $to.pos));
               } else {
-                tr.setSelection(_tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection.create(tr.doc, $to.pos));
+                tr.setSelection(_tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection.create(tr.doc, $to.pos));
               }
             } else {
               const node = (_a = $to.parent.type.contentMatch.defaultType) == null ? void 0 : _a.create();
               if (node) {
                 tr.insert(posAfter, node);
-                tr.setSelection(_tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection.create(tr.doc, posAfter + 1));
+                tr.setSelection(_tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection.create(tr.doc, posAfter + 1));
               }
             }
             tr.scrollIntoView();
@@ -6283,7 +6283,7 @@ var HorizontalRule = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Node.create({
   },
   addInputRules() {
     return [
-      (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.nodeInputRule)({
+      (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.nodeInputRule)({
         find: /^(?:---|—-|___\s|\*\*\*\s)$/,
         type: this.type
       })
@@ -6298,10 +6298,10 @@ var index_default = HorizontalRule;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-italic/dist/index.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/@tiptap/extension-italic/dist/index.js ***!
-  \*************************************************************/
+/***/ "../node_modules/@tiptap/extension-italic/dist/index.js":
+/*!**************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-italic/dist/index.js ***!
+  \**************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -6313,7 +6313,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   underscoreInputRegex: () => (/* binding */ underscoreInputRegex),
 /* harmony export */   underscorePasteRegex: () => (/* binding */ underscorePasteRegex)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
 // src/italic.ts
 
 var starInputRegex = /(?:^|\s)(\*(?!\s+\*)((?:[^*]+))\*(?!\s+\*))$/;
@@ -6400,10 +6400,10 @@ var index_default = Italic;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-link/dist/index.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/@tiptap/extension-link/dist/index.js ***!
-  \***********************************************************/
+/***/ "../node_modules/@tiptap/extension-link/dist/index.js":
+/*!************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-link/dist/index.js ***!
+  \************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -6413,9 +6413,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   isAllowedUri: () => (/* binding */ isAllowedUri),
 /* harmony export */   pasteRegex: () => (/* binding */ pasteRegex)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
-/* harmony import */ var linkifyjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! linkifyjs */ "./node_modules/linkifyjs/dist/linkify.mjs");
-/* harmony import */ var _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/pm/state */ "./node_modules/@tiptap/pm/dist/state/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var linkifyjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! linkifyjs */ "../node_modules/linkifyjs/dist/linkify.mjs");
+/* harmony import */ var _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tiptap/pm/state */ "../node_modules/@tiptap/pm/dist/state/index.js");
 // src/link.ts
 
 
@@ -6442,8 +6442,8 @@ function isValidLinkStructure(tokens) {
   return false;
 }
 function autolink(options) {
-  return new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.Plugin({
-    key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.PluginKey("autolink"),
+  return new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_2__.Plugin({
+    key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_2__.PluginKey("autolink"),
     appendTransaction: (transactions, oldState, newState) => {
       const docChanges = transactions.some((transaction) => transaction.docChanged) && !oldState.doc.eq(newState.doc);
       const preventAutolink = transactions.some((transaction) => transaction.getMeta("preventAutolink"));
@@ -6451,10 +6451,10 @@ function autolink(options) {
         return;
       }
       const { tr } = newState;
-      const transform = (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_2__.combineTransactionSteps)(oldState.doc, [...transactions]);
-      const changes = (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_2__.getChangedRanges)(transform);
+      const transform = (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.combineTransactionSteps)(oldState.doc, [...transactions]);
+      const changes = (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.getChangedRanges)(transform);
       changes.forEach(({ newRange }) => {
-        const nodesInChangedRanges = (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_2__.findChildrenInRange)(newState.doc, newRange, (node) => node.isTextblock);
+        const nodesInChangedRanges = (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.findChildrenInRange)(newState.doc, newRange, (node) => node.isTextblock);
         let textBlock;
         let textBeforeWhitespace;
         if (nodesInChangedRanges.length > 1) {
@@ -6483,7 +6483,7 @@ function autolink(options) {
           if (!lastWordBeforeSpace) {
             return false;
           }
-          const linksBeforeSpace = (0,linkifyjs__WEBPACK_IMPORTED_MODULE_0__.tokenize)(lastWordBeforeSpace).map((t) => t.toObject(options.defaultProtocol));
+          const linksBeforeSpace = (0,linkifyjs__WEBPACK_IMPORTED_MODULE_1__.tokenize)(lastWordBeforeSpace).map((t) => t.toObject(options.defaultProtocol));
           if (!isValidLinkStructure(linksBeforeSpace)) {
             return false;
           }
@@ -6497,7 +6497,7 @@ function autolink(options) {
             }
             return !newState.doc.rangeHasMark(link.from, link.to, newState.schema.marks.code);
           }).filter((link) => options.validate(link.value)).filter((link) => options.shouldAutoLink(link.value)).forEach((link) => {
-            if ((0,_tiptap_core__WEBPACK_IMPORTED_MODULE_2__.getMarksBetween)(link.from, link.to, newState.doc).some((item) => item.mark.type === options.type)) {
+            if ((0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.getMarksBetween)(link.from, link.to, newState.doc).some((item) => item.mark.type === options.type)) {
               return;
             }
             tr.addMark(
@@ -6522,8 +6522,8 @@ function autolink(options) {
 
 
 function clickHandler(options) {
-  return new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.Plugin({
-    key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.PluginKey("handleClickLink"),
+  return new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_2__.Plugin({
+    key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_2__.PluginKey("handleClickLink"),
     props: {
       handleClick: (view, pos, event) => {
         var _a, _b;
@@ -6548,7 +6548,7 @@ function clickHandler(options) {
         if (!link) {
           return false;
         }
-        const attrs = (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_2__.getAttributes)(view.state, options.type.name);
+        const attrs = (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.getAttributes)(view.state, options.type.name);
         const href = (_a = link == null ? void 0 : link.href) != null ? _a : attrs.href;
         const target = (_b = link == null ? void 0 : link.target) != null ? _b : attrs.target;
         if (options.enableClickSelection) {
@@ -6568,8 +6568,8 @@ function clickHandler(options) {
 
 
 function pasteHandler(options) {
-  return new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.Plugin({
-    key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.PluginKey("handlePasteLink"),
+  return new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_2__.Plugin({
+    key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_2__.PluginKey("handlePasteLink"),
     props: {
       handlePaste: (view, event, slice) => {
         const { state } = view;
@@ -6582,7 +6582,7 @@ function pasteHandler(options) {
         slice.content.forEach((node) => {
           textContent += node.textContent;
         });
-        const link = (0,linkifyjs__WEBPACK_IMPORTED_MODULE_0__.find)(textContent, { defaultProtocol: options.defaultProtocol }).find(
+        const link = (0,linkifyjs__WEBPACK_IMPORTED_MODULE_1__.find)(textContent, { defaultProtocol: options.defaultProtocol }).find(
           (item) => item.isLink && item.value === textContent
         );
         if (!textContent || !link) {
@@ -6616,7 +6616,7 @@ function isAllowedUri(uri, protocols) {
     )
   );
 }
-var Link = _tiptap_core__WEBPACK_IMPORTED_MODULE_2__.Mark.create({
+var Link = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Mark.create({
   name: "link",
   priority: 1e3,
   keepOnSplit: false,
@@ -6628,14 +6628,14 @@ var Link = _tiptap_core__WEBPACK_IMPORTED_MODULE_2__.Mark.create({
     }
     this.options.protocols.forEach((protocol) => {
       if (typeof protocol === "string") {
-        (0,linkifyjs__WEBPACK_IMPORTED_MODULE_0__.registerCustomProtocol)(protocol);
+        (0,linkifyjs__WEBPACK_IMPORTED_MODULE_1__.registerCustomProtocol)(protocol);
         return;
       }
-      (0,linkifyjs__WEBPACK_IMPORTED_MODULE_0__.registerCustomProtocol)(protocol.scheme, protocol.optionalSlashes);
+      (0,linkifyjs__WEBPACK_IMPORTED_MODULE_1__.registerCustomProtocol)(protocol.scheme, protocol.optionalSlashes);
     });
   },
   onDestroy() {
-    (0,linkifyjs__WEBPACK_IMPORTED_MODULE_0__.reset)();
+    (0,linkifyjs__WEBPACK_IMPORTED_MODULE_1__.reset)();
   },
   inclusive() {
     return this.options.autolink;
@@ -6701,9 +6701,9 @@ var Link = _tiptap_core__WEBPACK_IMPORTED_MODULE_2__.Mark.create({
       protocols: this.options.protocols,
       defaultProtocol: this.options.defaultProtocol
     })) {
-      return ["a", (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_2__.mergeAttributes)(this.options.HTMLAttributes, { ...HTMLAttributes, href: "" }), 0];
+      return ["a", (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.mergeAttributes)(this.options.HTMLAttributes, { ...HTMLAttributes, href: "" }), 0];
     }
-    return ["a", (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_2__.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes), 0];
+    return ["a", (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes), 0];
   },
   addCommands() {
     return {
@@ -6736,12 +6736,12 @@ var Link = _tiptap_core__WEBPACK_IMPORTED_MODULE_2__.Mark.create({
   },
   addPasteRules() {
     return [
-      (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_2__.markPasteRule)({
+      (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.markPasteRule)({
         find: (text) => {
           const foundLinks = [];
           if (text) {
             const { protocols, defaultProtocol } = this.options;
-            const links = (0,linkifyjs__WEBPACK_IMPORTED_MODULE_0__.find)(text).filter(
+            const links = (0,linkifyjs__WEBPACK_IMPORTED_MODULE_1__.find)(text).filter(
               (item) => item.isLink && this.options.isAllowedUri(item.value, {
                 defaultValidate: (href) => !!isAllowedUri(href, protocols),
                 protocols,
@@ -6818,10 +6818,10 @@ var index_default = Link;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-list/dist/index.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/@tiptap/extension-list/dist/index.js ***!
-  \***********************************************************/
+/***/ "../node_modules/@tiptap/extension-list/dist/index.js":
+/*!************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-list/dist/index.js ***!
+  \************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -6838,7 +6838,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   listHelpers: () => (/* binding */ listHelpers_exports),
 /* harmony export */   orderedListInputRegex: () => (/* binding */ orderedListInputRegex)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
 var __defProp = Object.defineProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -7520,10 +7520,10 @@ var ListKit = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Extension.create({
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-paragraph/dist/index.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/@tiptap/extension-paragraph/dist/index.js ***!
-  \****************************************************************/
+/***/ "../node_modules/@tiptap/extension-paragraph/dist/index.js":
+/*!*****************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-paragraph/dist/index.js ***!
+  \*****************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -7531,7 +7531,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   Paragraph: () => (/* binding */ Paragraph),
 /* harmony export */   "default": () => (/* binding */ index_default)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
 // src/paragraph.ts
 
 var Paragraph = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Node.create({
@@ -7571,10 +7571,10 @@ var index_default = Paragraph;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-strike/dist/index.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/@tiptap/extension-strike/dist/index.js ***!
-  \*************************************************************/
+/***/ "../node_modules/@tiptap/extension-strike/dist/index.js":
+/*!**************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-strike/dist/index.js ***!
+  \**************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -7584,7 +7584,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   inputRegex: () => (/* binding */ inputRegex),
 /* harmony export */   pasteRegex: () => (/* binding */ pasteRegex)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
 // src/strike.ts
 
 var inputRegex = /(?:^|\s)(~~(?!\s+~~)((?:[^~]+))~~(?!\s+~~))$/;
@@ -7660,10 +7660,10 @@ var index_default = Strike;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-text/dist/index.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/@tiptap/extension-text/dist/index.js ***!
-  \***********************************************************/
+/***/ "../node_modules/@tiptap/extension-text/dist/index.js":
+/*!************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-text/dist/index.js ***!
+  \************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -7671,7 +7671,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   Text: () => (/* binding */ Text),
 /* harmony export */   "default": () => (/* binding */ index_default)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
 // src/text.ts
 
 var Text = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Node.create({
@@ -7686,10 +7686,10 @@ var index_default = Text;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extension-underline/dist/index.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/@tiptap/extension-underline/dist/index.js ***!
-  \****************************************************************/
+/***/ "../node_modules/@tiptap/extension-underline/dist/index.js":
+/*!*****************************************************************!*\
+  !*** ../node_modules/@tiptap/extension-underline/dist/index.js ***!
+  \*****************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -7697,7 +7697,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   Underline: () => (/* binding */ Underline),
 /* harmony export */   "default": () => (/* binding */ index_default)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
 // src/underline.ts
 
 var Underline = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Mark.create({
@@ -7750,10 +7750,10 @@ var index_default = Underline;
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/extensions/dist/index.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/@tiptap/extensions/dist/index.js ***!
-  \*******************************************************/
+/***/ "../node_modules/@tiptap/extensions/dist/index.js":
+/*!********************************************************!*\
+  !*** ../node_modules/@tiptap/extensions/dist/index.js ***!
+  \********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -7767,16 +7767,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TrailingNode: () => (/* binding */ TrailingNode),
 /* harmony export */   UndoRedo: () => (/* binding */ UndoRedo)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
-/* harmony import */ var _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/pm/state */ "./node_modules/@tiptap/pm/dist/state/index.js");
-/* harmony import */ var _tiptap_pm_dropcursor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tiptap/pm/dropcursor */ "./node_modules/@tiptap/pm/dist/dropcursor/index.js");
-/* harmony import */ var _tiptap_pm_view__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @tiptap/pm/view */ "./node_modules/@tiptap/pm/dist/view/index.js");
-/* harmony import */ var _tiptap_pm_gapcursor__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @tiptap/pm/gapcursor */ "./node_modules/@tiptap/pm/dist/gapcursor/index.js");
-/* harmony import */ var _tiptap_pm_history__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @tiptap/pm/history */ "./node_modules/@tiptap/pm/dist/history/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/pm/state */ "../node_modules/@tiptap/pm/dist/state/index.js");
+/* harmony import */ var _tiptap_pm_dropcursor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tiptap/pm/dropcursor */ "../node_modules/@tiptap/pm/dist/dropcursor/index.js");
+/* harmony import */ var _tiptap_pm_view__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @tiptap/pm/view */ "../node_modules/@tiptap/pm/dist/view/index.js");
+/* harmony import */ var _tiptap_pm_gapcursor__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @tiptap/pm/gapcursor */ "../node_modules/@tiptap/pm/dist/gapcursor/index.js");
+/* harmony import */ var _tiptap_pm_history__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @tiptap/pm/history */ "../node_modules/@tiptap/pm/dist/history/index.js");
 // src/character-count/character-count.ts
 
 
-var CharacterCount = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
+var CharacterCount = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Extension.create({
   name: "characterCount",
   addOptions() {
     return {
@@ -7811,8 +7811,8 @@ var CharacterCount = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create(
   addProseMirrorPlugins() {
     let initialEvaluationDone = false;
     return [
-      new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.Plugin({
-        key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.PluginKey("characterCount"),
+      new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.Plugin({
+        key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.PluginKey("characterCount"),
         appendTransaction: (transactions, oldState, newState) => {
           if (initialEvaluationDone) {
             return;
@@ -7875,7 +7875,7 @@ var CharacterCount = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create(
 // src/drop-cursor/drop-cursor.ts
 
 
-var Dropcursor = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
+var Dropcursor = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Extension.create({
   name: "dropCursor",
   addOptions() {
     return {
@@ -7893,7 +7893,7 @@ var Dropcursor = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
 
 
 
-var Focus = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
+var Focus = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Extension.create({
   name: "focus",
   addOptions() {
     return {
@@ -7903,8 +7903,8 @@ var Focus = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
   },
   addProseMirrorPlugins() {
     return [
-      new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.Plugin({
-        key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.PluginKey("focus"),
+      new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.Plugin({
+        key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.PluginKey("focus"),
         props: {
           decorations: ({ doc, selection }) => {
             const { isEditable, isFocused } = this.editor;
@@ -7957,7 +7957,7 @@ var Focus = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
 // src/gap-cursor/gap-cursor.ts
 
 
-var Gapcursor = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
+var Gapcursor = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Extension.create({
   name: "gapCursor",
   addProseMirrorPlugins() {
     return [(0,_tiptap_pm_gapcursor__WEBPACK_IMPORTED_MODULE_4__.gapCursor)()];
@@ -7970,7 +7970,7 @@ var Gapcursor = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
       storage: extension.storage
     };
     return {
-      allowGapCursor: (_a = (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.callOrReturn)((0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.getExtensionField)(extension, "allowGapCursor", context))) != null ? _a : null
+      allowGapCursor: (_a = (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.callOrReturn)((0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.getExtensionField)(extension, "allowGapCursor", context))) != null ? _a : null
     };
   }
 });
@@ -7979,7 +7979,7 @@ var Gapcursor = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
 
 
 
-var Placeholder = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
+var Placeholder = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Extension.create({
   name: "placeholder",
   addOptions() {
     return {
@@ -7993,8 +7993,8 @@ var Placeholder = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
   },
   addProseMirrorPlugins() {
     return [
-      new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.Plugin({
-        key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.PluginKey("placeholder"),
+      new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.Plugin({
+        key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.PluginKey("placeholder"),
         props: {
           decorations: ({ doc, selection }) => {
             const active = this.editor.isEditable || !this.options.showOnlyWhenEditable;
@@ -8006,7 +8006,7 @@ var Placeholder = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
             const isEmptyDoc = this.editor.isEmpty;
             doc.descendants((node, pos) => {
               const hasAnchor = anchor >= pos && anchor <= pos + node.nodeSize;
-              const isEmpty = !node.isLeaf && (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.isNodeEmpty)(node);
+              const isEmpty = !node.isLeaf && (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.isNodeEmpty)(node);
               if ((hasAnchor || !this.options.showOnlyCurrent) && isEmpty) {
                 const classes = [this.options.emptyNodeClass];
                 if (isEmptyDoc) {
@@ -8037,7 +8037,7 @@ var Placeholder = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
 
 
 
-var Selection = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
+var Selection = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Extension.create({
   name: "selection",
   addOptions() {
     return {
@@ -8047,11 +8047,11 @@ var Selection = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
   addProseMirrorPlugins() {
     const { editor, options } = this;
     return [
-      new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.Plugin({
-        key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.PluginKey("selection"),
+      new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.Plugin({
+        key: new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.PluginKey("selection"),
         props: {
           decorations(state) {
-            if (state.selection.empty || editor.isFocused || !editor.isEditable || (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.isNodeSelection)(state.selection) || editor.view.dragging) {
+            if (state.selection.empty || editor.isFocused || !editor.isEditable || (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.isNodeSelection)(state.selection) || editor.view.dragging) {
               return null;
             }
             return _tiptap_pm_view__WEBPACK_IMPORTED_MODULE_3__.DecorationSet.create(state.doc, [
@@ -8072,7 +8072,7 @@ var Selection = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
 function nodeEqualsType({ types, node }) {
   return node && Array.isArray(types) && types.includes(node.type) || (node == null ? void 0 : node.type) === types;
 }
-var TrailingNode = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
+var TrailingNode = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Extension.create({
   name: "trailingNode",
   addOptions() {
     return {
@@ -8081,10 +8081,10 @@ var TrailingNode = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
     };
   },
   addProseMirrorPlugins() {
-    const plugin = new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.PluginKey(this.name);
+    const plugin = new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.PluginKey(this.name);
     const disabledNodes = Object.entries(this.editor.schema.nodes).map(([, value]) => value).filter((node) => (this.options.notAfter || []).concat(this.options.node).includes(node.name));
     return [
-      new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_0__.Plugin({
+      new _tiptap_pm_state__WEBPACK_IMPORTED_MODULE_1__.Plugin({
         key: plugin,
         appendTransaction: (_, __, state) => {
           const { doc, tr, schema } = state;
@@ -8117,7 +8117,7 @@ var TrailingNode = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
 // src/undo-redo/undo-redo.ts
 
 
-var UndoRedo = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
+var UndoRedo = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Extension.create({
   name: "undoRedo",
   addOptions() {
     return {
@@ -8154,10 +8154,10 @@ var UndoRedo = _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.Extension.create({
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/pm/dist/commands/index.js":
-/*!********************************************************!*\
-  !*** ./node_modules/@tiptap/pm/dist/commands/index.js ***!
-  \********************************************************/
+/***/ "../node_modules/@tiptap/pm/dist/commands/index.js":
+/*!*********************************************************!*\
+  !*** ../node_modules/@tiptap/pm/dist/commands/index.js ***!
+  \*********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -8192,34 +8192,34 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   toggleMark: () => (/* reexport safe */ prosemirror_commands__WEBPACK_IMPORTED_MODULE_0__.toggleMark),
 /* harmony export */   wrapIn: () => (/* reexport safe */ prosemirror_commands__WEBPACK_IMPORTED_MODULE_0__.wrapIn)
 /* harmony export */ });
-/* harmony import */ var prosemirror_commands__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-commands */ "./node_modules/prosemirror-commands/dist/index.js");
+/* harmony import */ var prosemirror_commands__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-commands */ "../node_modules/prosemirror-commands/dist/index.js");
 // commands/index.ts
 
 
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/pm/dist/dropcursor/index.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/@tiptap/pm/dist/dropcursor/index.js ***!
-  \**********************************************************/
+/***/ "../node_modules/@tiptap/pm/dist/dropcursor/index.js":
+/*!***********************************************************!*\
+  !*** ../node_modules/@tiptap/pm/dist/dropcursor/index.js ***!
+  \***********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   dropCursor: () => (/* reexport safe */ prosemirror_dropcursor__WEBPACK_IMPORTED_MODULE_0__.dropCursor)
 /* harmony export */ });
-/* harmony import */ var prosemirror_dropcursor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-dropcursor */ "./node_modules/prosemirror-dropcursor/dist/index.js");
+/* harmony import */ var prosemirror_dropcursor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-dropcursor */ "../node_modules/prosemirror-dropcursor/dist/index.js");
 // dropcursor/index.ts
 
 
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/pm/dist/gapcursor/index.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/@tiptap/pm/dist/gapcursor/index.js ***!
-  \*********************************************************/
+/***/ "../node_modules/@tiptap/pm/dist/gapcursor/index.js":
+/*!**********************************************************!*\
+  !*** ../node_modules/@tiptap/pm/dist/gapcursor/index.js ***!
+  \**********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -8227,17 +8227,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   GapCursor: () => (/* reexport safe */ prosemirror_gapcursor__WEBPACK_IMPORTED_MODULE_0__.GapCursor),
 /* harmony export */   gapCursor: () => (/* reexport safe */ prosemirror_gapcursor__WEBPACK_IMPORTED_MODULE_0__.gapCursor)
 /* harmony export */ });
-/* harmony import */ var prosemirror_gapcursor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-gapcursor */ "./node_modules/prosemirror-gapcursor/dist/index.js");
+/* harmony import */ var prosemirror_gapcursor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-gapcursor */ "../node_modules/prosemirror-gapcursor/dist/index.js");
 // gapcursor/index.ts
 
 
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/pm/dist/history/index.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/@tiptap/pm/dist/history/index.js ***!
-  \*******************************************************/
+/***/ "../node_modules/@tiptap/pm/dist/history/index.js":
+/*!********************************************************!*\
+  !*** ../node_modules/@tiptap/pm/dist/history/index.js ***!
+  \********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -8251,17 +8251,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   undoDepth: () => (/* reexport safe */ prosemirror_history__WEBPACK_IMPORTED_MODULE_0__.undoDepth),
 /* harmony export */   undoNoScroll: () => (/* reexport safe */ prosemirror_history__WEBPACK_IMPORTED_MODULE_0__.undoNoScroll)
 /* harmony export */ });
-/* harmony import */ var prosemirror_history__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-history */ "./node_modules/prosemirror-history/dist/index.js");
+/* harmony import */ var prosemirror_history__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-history */ "../node_modules/prosemirror-history/dist/index.js");
 // history/index.ts
 
 
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/pm/dist/keymap/index.js":
-/*!******************************************************!*\
-  !*** ./node_modules/@tiptap/pm/dist/keymap/index.js ***!
-  \******************************************************/
+/***/ "../node_modules/@tiptap/pm/dist/keymap/index.js":
+/*!*******************************************************!*\
+  !*** ../node_modules/@tiptap/pm/dist/keymap/index.js ***!
+  \*******************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -8269,17 +8269,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   keydownHandler: () => (/* reexport safe */ prosemirror_keymap__WEBPACK_IMPORTED_MODULE_0__.keydownHandler),
 /* harmony export */   keymap: () => (/* reexport safe */ prosemirror_keymap__WEBPACK_IMPORTED_MODULE_0__.keymap)
 /* harmony export */ });
-/* harmony import */ var prosemirror_keymap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-keymap */ "./node_modules/prosemirror-keymap/dist/index.js");
+/* harmony import */ var prosemirror_keymap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-keymap */ "../node_modules/prosemirror-keymap/dist/index.js");
 // keymap/index.ts
 
 
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/pm/dist/model/index.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/@tiptap/pm/dist/model/index.js ***!
-  \*****************************************************/
+/***/ "../node_modules/@tiptap/pm/dist/model/index.js":
+/*!******************************************************!*\
+  !*** ../node_modules/@tiptap/pm/dist/model/index.js ***!
+  \******************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -8298,17 +8298,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   Schema: () => (/* reexport safe */ prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Schema),
 /* harmony export */   Slice: () => (/* reexport safe */ prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice)
 /* harmony export */ });
-/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-model */ "./node_modules/prosemirror-model/dist/index.js");
+/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-model */ "../node_modules/prosemirror-model/dist/index.js");
 // model/index.ts
 
 
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/pm/dist/schema-list/index.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/@tiptap/pm/dist/schema-list/index.js ***!
-  \***********************************************************/
+/***/ "../node_modules/@tiptap/pm/dist/schema-list/index.js":
+/*!************************************************************!*\
+  !*** ../node_modules/@tiptap/pm/dist/schema-list/index.js ***!
+  \************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -8324,17 +8324,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   wrapInList: () => (/* reexport safe */ prosemirror_schema_list__WEBPACK_IMPORTED_MODULE_0__.wrapInList),
 /* harmony export */   wrapRangeInList: () => (/* reexport safe */ prosemirror_schema_list__WEBPACK_IMPORTED_MODULE_0__.wrapRangeInList)
 /* harmony export */ });
-/* harmony import */ var prosemirror_schema_list__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-schema-list */ "./node_modules/prosemirror-schema-list/dist/index.js");
+/* harmony import */ var prosemirror_schema_list__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-schema-list */ "../node_modules/prosemirror-schema-list/dist/index.js");
 // schema-list/index.ts
 
 
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/pm/dist/state/index.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/@tiptap/pm/dist/state/index.js ***!
-  \*****************************************************/
+/***/ "../node_modules/@tiptap/pm/dist/state/index.js":
+/*!******************************************************!*\
+  !*** ../node_modules/@tiptap/pm/dist/state/index.js ***!
+  \******************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -8349,17 +8349,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TextSelection: () => (/* reexport safe */ prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection),
 /* harmony export */   Transaction: () => (/* reexport safe */ prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Transaction)
 /* harmony export */ });
-/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-state */ "./node_modules/prosemirror-state/dist/index.js");
+/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-state */ "../node_modules/prosemirror-state/dist/index.js");
 // state/index.ts
 
 
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/pm/dist/transform/index.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/@tiptap/pm/dist/transform/index.js ***!
-  \*********************************************************/
+/***/ "../node_modules/@tiptap/pm/dist/transform/index.js":
+/*!**********************************************************!*\
+  !*** ../node_modules/@tiptap/pm/dist/transform/index.js ***!
+  \**********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -8388,17 +8388,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   liftTarget: () => (/* reexport safe */ prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.liftTarget),
 /* harmony export */   replaceStep: () => (/* reexport safe */ prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.replaceStep)
 /* harmony export */ });
-/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-transform */ "./node_modules/prosemirror-transform/dist/index.js");
+/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-transform */ "../node_modules/prosemirror-transform/dist/index.js");
 // transform/index.ts
 
 
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/pm/dist/view/index.js":
-/*!****************************************************!*\
-  !*** ./node_modules/@tiptap/pm/dist/view/index.js ***!
-  \****************************************************/
+/***/ "../node_modules/@tiptap/pm/dist/view/index.js":
+/*!*****************************************************!*\
+  !*** ../node_modules/@tiptap/pm/dist/view/index.js ***!
+  \*****************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -8409,39 +8409,39 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   __endComposition: () => (/* reexport safe */ prosemirror_view__WEBPACK_IMPORTED_MODULE_0__.__endComposition),
 /* harmony export */   __parseFromClipboard: () => (/* reexport safe */ prosemirror_view__WEBPACK_IMPORTED_MODULE_0__.__parseFromClipboard)
 /* harmony export */ });
-/* harmony import */ var prosemirror_view__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-view */ "./node_modules/prosemirror-view/dist/index.js");
+/* harmony import */ var prosemirror_view__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-view */ "../node_modules/prosemirror-view/dist/index.js");
 // view/index.ts
 
 
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/react/dist/index.js":
-/*!**************************************************!*\
-  !*** ./node_modules/@tiptap/react/dist/index.js ***!
-  \**************************************************/
+/***/ "../node_modules/@tiptap/react/dist/index.js":
+/*!***************************************************!*\
+  !*** ../node_modules/@tiptap/react/dist/index.js ***!
+  \***************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   CommandManager: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.CommandManager),
-/* harmony export */   Editor: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.Editor),
+/* harmony export */   CommandManager: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.CommandManager),
+/* harmony export */   Editor: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.Editor),
 /* harmony export */   EditorConsumer: () => (/* binding */ EditorConsumer),
 /* harmony export */   EditorContent: () => (/* binding */ EditorContent),
 /* harmony export */   EditorContext: () => (/* binding */ EditorContext),
 /* harmony export */   EditorProvider: () => (/* binding */ EditorProvider),
-/* harmony export */   Extension: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.Extension),
-/* harmony export */   Fragment: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.Fragment),
-/* harmony export */   InputRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.InputRule),
-/* harmony export */   Mark: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.Mark),
-/* harmony export */   MarkView: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.MarkView),
+/* harmony export */   Extension: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.Extension),
+/* harmony export */   Fragment: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.Fragment),
+/* harmony export */   InputRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.InputRule),
+/* harmony export */   Mark: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.Mark),
+/* harmony export */   MarkView: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.MarkView),
 /* harmony export */   MarkViewContent: () => (/* binding */ MarkViewContent),
-/* harmony export */   Node: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.Node),
-/* harmony export */   NodePos: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.NodePos),
-/* harmony export */   NodeView: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.NodeView),
+/* harmony export */   Node: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.Node),
+/* harmony export */   NodePos: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.NodePos),
+/* harmony export */   NodeView: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.NodeView),
 /* harmony export */   NodeViewContent: () => (/* binding */ NodeViewContent),
 /* harmony export */   NodeViewWrapper: () => (/* binding */ NodeViewWrapper),
-/* harmony export */   PasteRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.PasteRule),
+/* harmony export */   PasteRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.PasteRule),
 /* harmony export */   PureEditorContent: () => (/* binding */ PureEditorContent),
 /* harmony export */   ReactMarkView: () => (/* binding */ ReactMarkView),
 /* harmony export */   ReactMarkViewContext: () => (/* binding */ ReactMarkViewContext),
@@ -8451,109 +8451,109 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   ReactNodeViewContext: () => (/* binding */ ReactNodeViewContext),
 /* harmony export */   ReactNodeViewRenderer: () => (/* binding */ ReactNodeViewRenderer),
 /* harmony export */   ReactRenderer: () => (/* binding */ ReactRenderer),
-/* harmony export */   Tracker: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.Tracker),
-/* harmony export */   callOrReturn: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.callOrReturn),
-/* harmony export */   canInsertNode: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.canInsertNode),
-/* harmony export */   combineTransactionSteps: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.combineTransactionSteps),
-/* harmony export */   createChainableState: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.createChainableState),
-/* harmony export */   createDocument: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.createDocument),
-/* harmony export */   createElement: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.createElement),
-/* harmony export */   createNodeFromContent: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.createNodeFromContent),
-/* harmony export */   createStyleTag: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.createStyleTag),
-/* harmony export */   defaultBlockAt: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.defaultBlockAt),
-/* harmony export */   deleteProps: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.deleteProps),
-/* harmony export */   elementFromString: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.elementFromString),
-/* harmony export */   escapeForRegEx: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.escapeForRegEx),
-/* harmony export */   extensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.extensions),
-/* harmony export */   findChildren: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.findChildren),
-/* harmony export */   findChildrenInRange: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.findChildrenInRange),
-/* harmony export */   findDuplicates: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.findDuplicates),
-/* harmony export */   findParentNode: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.findParentNode),
-/* harmony export */   findParentNodeClosestToPos: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.findParentNodeClosestToPos),
-/* harmony export */   flattenExtensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.flattenExtensions),
-/* harmony export */   fromString: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.fromString),
-/* harmony export */   generateHTML: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.generateHTML),
-/* harmony export */   generateJSON: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.generateJSON),
-/* harmony export */   generateText: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.generateText),
-/* harmony export */   getAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getAttributes),
-/* harmony export */   getAttributesFromExtensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getAttributesFromExtensions),
-/* harmony export */   getChangedRanges: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getChangedRanges),
-/* harmony export */   getDebugJSON: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getDebugJSON),
-/* harmony export */   getExtensionField: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getExtensionField),
-/* harmony export */   getHTMLFromFragment: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getHTMLFromFragment),
-/* harmony export */   getMarkAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getMarkAttributes),
-/* harmony export */   getMarkRange: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getMarkRange),
-/* harmony export */   getMarkType: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getMarkType),
-/* harmony export */   getMarksBetween: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getMarksBetween),
-/* harmony export */   getNodeAtPosition: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getNodeAtPosition),
-/* harmony export */   getNodeAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getNodeAttributes),
-/* harmony export */   getNodeType: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getNodeType),
-/* harmony export */   getRenderedAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getRenderedAttributes),
-/* harmony export */   getSchema: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getSchema),
-/* harmony export */   getSchemaByResolvedExtensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getSchemaByResolvedExtensions),
-/* harmony export */   getSchemaTypeByName: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getSchemaTypeByName),
-/* harmony export */   getSchemaTypeNameByName: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getSchemaTypeNameByName),
-/* harmony export */   getSplittedAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getSplittedAttributes),
-/* harmony export */   getText: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getText),
-/* harmony export */   getTextBetween: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getTextBetween),
-/* harmony export */   getTextContentFromNodes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getTextContentFromNodes),
-/* harmony export */   getTextSerializersFromSchema: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getTextSerializersFromSchema),
-/* harmony export */   h: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.h),
-/* harmony export */   injectExtensionAttributesToParseRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.injectExtensionAttributesToParseRule),
-/* harmony export */   inputRulesPlugin: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.inputRulesPlugin),
-/* harmony export */   isActive: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isActive),
-/* harmony export */   isAndroid: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isAndroid),
-/* harmony export */   isAtEndOfNode: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isAtEndOfNode),
-/* harmony export */   isAtStartOfNode: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isAtStartOfNode),
-/* harmony export */   isEmptyObject: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isEmptyObject),
-/* harmony export */   isExtensionRulesEnabled: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isExtensionRulesEnabled),
-/* harmony export */   isFunction: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isFunction),
-/* harmony export */   isList: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isList),
-/* harmony export */   isMacOS: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isMacOS),
-/* harmony export */   isMarkActive: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isMarkActive),
-/* harmony export */   isNodeActive: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isNodeActive),
-/* harmony export */   isNodeEmpty: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isNodeEmpty),
-/* harmony export */   isNodeSelection: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isNodeSelection),
-/* harmony export */   isNumber: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isNumber),
-/* harmony export */   isPlainObject: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isPlainObject),
-/* harmony export */   isRegExp: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isRegExp),
-/* harmony export */   isString: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isString),
-/* harmony export */   isTextSelection: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isTextSelection),
-/* harmony export */   isiOS: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.isiOS),
-/* harmony export */   markInputRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.markInputRule),
-/* harmony export */   markPasteRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.markPasteRule),
-/* harmony export */   mergeAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.mergeAttributes),
-/* harmony export */   mergeDeep: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.mergeDeep),
-/* harmony export */   minMax: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.minMax),
-/* harmony export */   nodeInputRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.nodeInputRule),
-/* harmony export */   nodePasteRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.nodePasteRule),
-/* harmony export */   objectIncludes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.objectIncludes),
-/* harmony export */   pasteRulesPlugin: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.pasteRulesPlugin),
-/* harmony export */   posToDOMRect: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.posToDOMRect),
-/* harmony export */   removeDuplicates: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.removeDuplicates),
-/* harmony export */   resolveExtensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.resolveExtensions),
-/* harmony export */   resolveFocusPosition: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.resolveFocusPosition),
-/* harmony export */   rewriteUnknownContent: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.rewriteUnknownContent),
-/* harmony export */   selectionToInsertionEnd: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.selectionToInsertionEnd),
-/* harmony export */   sortExtensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.sortExtensions),
-/* harmony export */   splitExtensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.splitExtensions),
-/* harmony export */   textInputRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.textInputRule),
-/* harmony export */   textPasteRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.textPasteRule),
-/* harmony export */   textblockTypeInputRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.textblockTypeInputRule),
-/* harmony export */   updateMarkViewAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.updateMarkViewAttributes),
+/* harmony export */   Tracker: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.Tracker),
+/* harmony export */   callOrReturn: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.callOrReturn),
+/* harmony export */   canInsertNode: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.canInsertNode),
+/* harmony export */   combineTransactionSteps: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.combineTransactionSteps),
+/* harmony export */   createChainableState: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.createChainableState),
+/* harmony export */   createDocument: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.createDocument),
+/* harmony export */   createElement: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.createElement),
+/* harmony export */   createNodeFromContent: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.createNodeFromContent),
+/* harmony export */   createStyleTag: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.createStyleTag),
+/* harmony export */   defaultBlockAt: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.defaultBlockAt),
+/* harmony export */   deleteProps: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.deleteProps),
+/* harmony export */   elementFromString: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.elementFromString),
+/* harmony export */   escapeForRegEx: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.escapeForRegEx),
+/* harmony export */   extensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.extensions),
+/* harmony export */   findChildren: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.findChildren),
+/* harmony export */   findChildrenInRange: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.findChildrenInRange),
+/* harmony export */   findDuplicates: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.findDuplicates),
+/* harmony export */   findParentNode: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.findParentNode),
+/* harmony export */   findParentNodeClosestToPos: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.findParentNodeClosestToPos),
+/* harmony export */   flattenExtensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.flattenExtensions),
+/* harmony export */   fromString: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.fromString),
+/* harmony export */   generateHTML: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.generateHTML),
+/* harmony export */   generateJSON: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.generateJSON),
+/* harmony export */   generateText: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.generateText),
+/* harmony export */   getAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getAttributes),
+/* harmony export */   getAttributesFromExtensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getAttributesFromExtensions),
+/* harmony export */   getChangedRanges: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getChangedRanges),
+/* harmony export */   getDebugJSON: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getDebugJSON),
+/* harmony export */   getExtensionField: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getExtensionField),
+/* harmony export */   getHTMLFromFragment: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getHTMLFromFragment),
+/* harmony export */   getMarkAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getMarkAttributes),
+/* harmony export */   getMarkRange: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getMarkRange),
+/* harmony export */   getMarkType: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getMarkType),
+/* harmony export */   getMarksBetween: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getMarksBetween),
+/* harmony export */   getNodeAtPosition: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getNodeAtPosition),
+/* harmony export */   getNodeAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getNodeAttributes),
+/* harmony export */   getNodeType: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getNodeType),
+/* harmony export */   getRenderedAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getRenderedAttributes),
+/* harmony export */   getSchema: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getSchema),
+/* harmony export */   getSchemaByResolvedExtensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getSchemaByResolvedExtensions),
+/* harmony export */   getSchemaTypeByName: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getSchemaTypeByName),
+/* harmony export */   getSchemaTypeNameByName: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getSchemaTypeNameByName),
+/* harmony export */   getSplittedAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getSplittedAttributes),
+/* harmony export */   getText: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getText),
+/* harmony export */   getTextBetween: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getTextBetween),
+/* harmony export */   getTextContentFromNodes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getTextContentFromNodes),
+/* harmony export */   getTextSerializersFromSchema: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getTextSerializersFromSchema),
+/* harmony export */   h: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.h),
+/* harmony export */   injectExtensionAttributesToParseRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.injectExtensionAttributesToParseRule),
+/* harmony export */   inputRulesPlugin: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.inputRulesPlugin),
+/* harmony export */   isActive: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isActive),
+/* harmony export */   isAndroid: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isAndroid),
+/* harmony export */   isAtEndOfNode: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isAtEndOfNode),
+/* harmony export */   isAtStartOfNode: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isAtStartOfNode),
+/* harmony export */   isEmptyObject: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isEmptyObject),
+/* harmony export */   isExtensionRulesEnabled: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isExtensionRulesEnabled),
+/* harmony export */   isFunction: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isFunction),
+/* harmony export */   isList: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isList),
+/* harmony export */   isMacOS: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isMacOS),
+/* harmony export */   isMarkActive: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isMarkActive),
+/* harmony export */   isNodeActive: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isNodeActive),
+/* harmony export */   isNodeEmpty: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isNodeEmpty),
+/* harmony export */   isNodeSelection: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isNodeSelection),
+/* harmony export */   isNumber: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isNumber),
+/* harmony export */   isPlainObject: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isPlainObject),
+/* harmony export */   isRegExp: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isRegExp),
+/* harmony export */   isString: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isString),
+/* harmony export */   isTextSelection: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isTextSelection),
+/* harmony export */   isiOS: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.isiOS),
+/* harmony export */   markInputRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.markInputRule),
+/* harmony export */   markPasteRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.markPasteRule),
+/* harmony export */   mergeAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.mergeAttributes),
+/* harmony export */   mergeDeep: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.mergeDeep),
+/* harmony export */   minMax: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.minMax),
+/* harmony export */   nodeInputRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.nodeInputRule),
+/* harmony export */   nodePasteRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.nodePasteRule),
+/* harmony export */   objectIncludes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.objectIncludes),
+/* harmony export */   pasteRulesPlugin: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.pasteRulesPlugin),
+/* harmony export */   posToDOMRect: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.posToDOMRect),
+/* harmony export */   removeDuplicates: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.removeDuplicates),
+/* harmony export */   resolveExtensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.resolveExtensions),
+/* harmony export */   resolveFocusPosition: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.resolveFocusPosition),
+/* harmony export */   rewriteUnknownContent: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.rewriteUnknownContent),
+/* harmony export */   selectionToInsertionEnd: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.selectionToInsertionEnd),
+/* harmony export */   sortExtensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.sortExtensions),
+/* harmony export */   splitExtensions: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.splitExtensions),
+/* harmony export */   textInputRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.textInputRule),
+/* harmony export */   textPasteRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.textPasteRule),
+/* harmony export */   textblockTypeInputRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.textblockTypeInputRule),
+/* harmony export */   updateMarkViewAttributes: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.updateMarkViewAttributes),
 /* harmony export */   useCurrentEditor: () => (/* binding */ useCurrentEditor),
 /* harmony export */   useEditor: () => (/* binding */ useEditor),
 /* harmony export */   useEditorState: () => (/* binding */ useEditorState),
 /* harmony export */   useReactNodeView: () => (/* binding */ useReactNodeView),
-/* harmony export */   wrappingInputRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.wrappingInputRule)
+/* harmony export */   wrappingInputRule: () => (/* reexport safe */ _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.wrappingInputRule)
 /* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
-/* harmony import */ var use_sync_external_store_shim_index_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! use-sync-external-store/shim/index.js */ "./node_modules/use-sync-external-store/shim/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
-/* harmony import */ var fast_deep_equal_es6_react_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! fast-deep-equal/es6/react.js */ "./node_modules/fast-deep-equal/es6/react.js");
-/* harmony import */ var use_sync_external_store_shim_with_selector_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! use-sync-external-store/shim/with-selector.js */ "./node_modules/use-sync-external-store/shim/with-selector.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "../node_modules/react/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "../node_modules/react-dom/index.js");
+/* harmony import */ var use_sync_external_store_shim_index_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! use-sync-external-store/shim/index.js */ "../node_modules/use-sync-external-store/shim/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "../node_modules/react/jsx-runtime.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var fast_deep_equal_es6_react_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! fast-deep-equal/es6/react.js */ "../node_modules/fast-deep-equal/es6/react.js");
+/* harmony import */ var use_sync_external_store_shim_with_selector_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! use-sync-external-store/shim/with-selector.js */ "../node_modules/use-sync-external-store/shim/with-selector.js");
 // src/Context.tsx
 
 
@@ -8786,12 +8786,12 @@ var EditorStateManager = class {
 function useEditorState(options) {
   var _a;
   const [editorStateManager] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(() => new EditorStateManager(options.editor));
-  const selectedState = (0,use_sync_external_store_shim_with_selector_js__WEBPACK_IMPORTED_MODULE_5__.useSyncExternalStoreWithSelector)(
+  const selectedState = (0,use_sync_external_store_shim_with_selector_js__WEBPACK_IMPORTED_MODULE_6__.useSyncExternalStoreWithSelector)(
     editorStateManager.subscribe,
     editorStateManager.getSnapshot,
     editorStateManager.getServerSnapshot,
     options.selector,
-    (_a = options.equalityFn) != null ? _a : fast_deep_equal_es6_react_js__WEBPACK_IMPORTED_MODULE_4__
+    (_a = options.equalityFn) != null ? _a : fast_deep_equal_es6_react_js__WEBPACK_IMPORTED_MODULE_5__
   );
   useIsomorphicLayoutEffect(() => {
     return editorStateManager.watch(options.editor);
@@ -8922,7 +8922,7 @@ var EditorInstanceManager = class _EditorInstanceManager {
         return (_b = (_a = this.options.current).onDelete) == null ? void 0 : _b.call(_a, ...args);
       }
     };
-    const editor = new _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.Editor(optionsToApply);
+    const editor = new _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.Editor(optionsToApply);
     return editor;
   }
   /**
@@ -9297,7 +9297,7 @@ var MarkViewContent = (props) => {
     /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(Tag, { ...rest, ref: markViewContentRef, "data-mark-view-content": "" })
   );
 };
-var ReactMarkView = class extends _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.MarkView {
+var ReactMarkView = class extends _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.MarkView {
   constructor(component, props, options) {
     super(component, props, options);
     this.didMountContentDomElement = false;
@@ -9345,7 +9345,7 @@ function ReactMarkViewRenderer(component, options = {}) {
 
 
 
-var ReactNodeView = class extends _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.NodeView {
+var ReactNodeView = class extends _tiptap_core__WEBPACK_IMPORTED_MODULE_4__.NodeView {
   constructor(component, props, options) {
     super(component, props, options);
     if (!this.node.isLeaf) {
@@ -9539,7 +9539,7 @@ var ReactNodeView = class extends _tiptap_core__WEBPACK_IMPORTED_MODULE_6__.Node
       let attrsObj = {};
       if (typeof this.options.attrs === "function") {
         const extensionAttributes = this.editor.extensionManager.attributes;
-        const HTMLAttributes = (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_6__.getRenderedAttributes)(this.node, extensionAttributes);
+        const HTMLAttributes = (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_4__.getRenderedAttributes)(this.node, extensionAttributes);
         attrsObj = this.options.attrs({ node: this.node, HTMLAttributes });
       } else {
         attrsObj = this.options.attrs;
@@ -9564,10 +9564,10 @@ function ReactNodeViewRenderer(component, options) {
 
 /***/ }),
 
-/***/ "./node_modules/@tiptap/starter-kit/dist/index.js":
-/*!********************************************************!*\
-  !*** ./node_modules/@tiptap/starter-kit/dist/index.js ***!
-  \********************************************************/
+/***/ "../node_modules/@tiptap/starter-kit/dist/index.js":
+/*!*********************************************************!*\
+  !*** ../node_modules/@tiptap/starter-kit/dist/index.js ***!
+  \*********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -9575,23 +9575,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   StarterKit: () => (/* binding */ StarterKit),
 /* harmony export */   "default": () => (/* binding */ index_default)
 /* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @tiptap/core */ "./node_modules/@tiptap/core/dist/index.js");
-/* harmony import */ var _tiptap_extension_blockquote__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/extension-blockquote */ "./node_modules/@tiptap/extension-blockquote/dist/index.js");
-/* harmony import */ var _tiptap_extension_bold__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/extension-bold */ "./node_modules/@tiptap/extension-bold/dist/index.js");
-/* harmony import */ var _tiptap_extension_code__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tiptap/extension-code */ "./node_modules/@tiptap/extension-code/dist/index.js");
-/* harmony import */ var _tiptap_extension_code_block__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @tiptap/extension-code-block */ "./node_modules/@tiptap/extension-code-block/dist/index.js");
-/* harmony import */ var _tiptap_extension_document__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @tiptap/extension-document */ "./node_modules/@tiptap/extension-document/dist/index.js");
-/* harmony import */ var _tiptap_extension_hard_break__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @tiptap/extension-hard-break */ "./node_modules/@tiptap/extension-hard-break/dist/index.js");
-/* harmony import */ var _tiptap_extension_heading__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @tiptap/extension-heading */ "./node_modules/@tiptap/extension-heading/dist/index.js");
-/* harmony import */ var _tiptap_extension_horizontal_rule__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @tiptap/extension-horizontal-rule */ "./node_modules/@tiptap/extension-horizontal-rule/dist/index.js");
-/* harmony import */ var _tiptap_extension_italic__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @tiptap/extension-italic */ "./node_modules/@tiptap/extension-italic/dist/index.js");
-/* harmony import */ var _tiptap_extension_link__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @tiptap/extension-link */ "./node_modules/@tiptap/extension-link/dist/index.js");
-/* harmony import */ var _tiptap_extension_list__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @tiptap/extension-list */ "./node_modules/@tiptap/extension-list/dist/index.js");
-/* harmony import */ var _tiptap_extension_paragraph__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @tiptap/extension-paragraph */ "./node_modules/@tiptap/extension-paragraph/dist/index.js");
-/* harmony import */ var _tiptap_extension_strike__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @tiptap/extension-strike */ "./node_modules/@tiptap/extension-strike/dist/index.js");
-/* harmony import */ var _tiptap_extension_text__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @tiptap/extension-text */ "./node_modules/@tiptap/extension-text/dist/index.js");
-/* harmony import */ var _tiptap_extension_underline__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @tiptap/extension-underline */ "./node_modules/@tiptap/extension-underline/dist/index.js");
-/* harmony import */ var _tiptap_extensions__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @tiptap/extensions */ "./node_modules/@tiptap/extensions/dist/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
+/* harmony import */ var _tiptap_extension_blockquote__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/extension-blockquote */ "../node_modules/@tiptap/extension-blockquote/dist/index.js");
+/* harmony import */ var _tiptap_extension_bold__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tiptap/extension-bold */ "../node_modules/@tiptap/extension-bold/dist/index.js");
+/* harmony import */ var _tiptap_extension_code__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @tiptap/extension-code */ "../node_modules/@tiptap/extension-code/dist/index.js");
+/* harmony import */ var _tiptap_extension_code_block__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @tiptap/extension-code-block */ "../node_modules/@tiptap/extension-code-block/dist/index.js");
+/* harmony import */ var _tiptap_extension_document__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @tiptap/extension-document */ "../node_modules/@tiptap/extension-document/dist/index.js");
+/* harmony import */ var _tiptap_extension_hard_break__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @tiptap/extension-hard-break */ "../node_modules/@tiptap/extension-hard-break/dist/index.js");
+/* harmony import */ var _tiptap_extension_heading__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @tiptap/extension-heading */ "../node_modules/@tiptap/extension-heading/dist/index.js");
+/* harmony import */ var _tiptap_extension_horizontal_rule__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @tiptap/extension-horizontal-rule */ "../node_modules/@tiptap/extension-horizontal-rule/dist/index.js");
+/* harmony import */ var _tiptap_extension_italic__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @tiptap/extension-italic */ "../node_modules/@tiptap/extension-italic/dist/index.js");
+/* harmony import */ var _tiptap_extension_link__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @tiptap/extension-link */ "../node_modules/@tiptap/extension-link/dist/index.js");
+/* harmony import */ var _tiptap_extension_list__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @tiptap/extension-list */ "../node_modules/@tiptap/extension-list/dist/index.js");
+/* harmony import */ var _tiptap_extension_paragraph__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @tiptap/extension-paragraph */ "../node_modules/@tiptap/extension-paragraph/dist/index.js");
+/* harmony import */ var _tiptap_extension_strike__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @tiptap/extension-strike */ "../node_modules/@tiptap/extension-strike/dist/index.js");
+/* harmony import */ var _tiptap_extension_text__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @tiptap/extension-text */ "../node_modules/@tiptap/extension-text/dist/index.js");
+/* harmony import */ var _tiptap_extension_underline__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @tiptap/extension-underline */ "../node_modules/@tiptap/extension-underline/dist/index.js");
+/* harmony import */ var _tiptap_extensions__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @tiptap/extensions */ "../node_modules/@tiptap/extensions/dist/index.js");
 // src/starter-kit.ts
 
 
@@ -9610,76 +9610,76 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var StarterKit = _tiptap_core__WEBPACK_IMPORTED_MODULE_16__.Extension.create({
+var StarterKit = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Extension.create({
   name: "starterKit",
   addExtensions() {
     var _a, _b, _c, _d;
     const extensions = [];
     if (this.options.bold !== false) {
-      extensions.push(_tiptap_extension_bold__WEBPACK_IMPORTED_MODULE_1__.Bold.configure(this.options.bold));
+      extensions.push(_tiptap_extension_bold__WEBPACK_IMPORTED_MODULE_2__.Bold.configure(this.options.bold));
     }
     if (this.options.blockquote !== false) {
-      extensions.push(_tiptap_extension_blockquote__WEBPACK_IMPORTED_MODULE_0__.Blockquote.configure(this.options.blockquote));
+      extensions.push(_tiptap_extension_blockquote__WEBPACK_IMPORTED_MODULE_1__.Blockquote.configure(this.options.blockquote));
     }
     if (this.options.bulletList !== false) {
-      extensions.push(_tiptap_extension_list__WEBPACK_IMPORTED_MODULE_10__.BulletList.configure(this.options.bulletList));
+      extensions.push(_tiptap_extension_list__WEBPACK_IMPORTED_MODULE_11__.BulletList.configure(this.options.bulletList));
     }
     if (this.options.code !== false) {
-      extensions.push(_tiptap_extension_code__WEBPACK_IMPORTED_MODULE_2__.Code.configure(this.options.code));
+      extensions.push(_tiptap_extension_code__WEBPACK_IMPORTED_MODULE_3__.Code.configure(this.options.code));
     }
     if (this.options.codeBlock !== false) {
-      extensions.push(_tiptap_extension_code_block__WEBPACK_IMPORTED_MODULE_3__.CodeBlock.configure(this.options.codeBlock));
+      extensions.push(_tiptap_extension_code_block__WEBPACK_IMPORTED_MODULE_4__.CodeBlock.configure(this.options.codeBlock));
     }
     if (this.options.document !== false) {
-      extensions.push(_tiptap_extension_document__WEBPACK_IMPORTED_MODULE_4__.Document.configure(this.options.document));
+      extensions.push(_tiptap_extension_document__WEBPACK_IMPORTED_MODULE_5__.Document.configure(this.options.document));
     }
     if (this.options.dropcursor !== false) {
-      extensions.push(_tiptap_extensions__WEBPACK_IMPORTED_MODULE_15__.Dropcursor.configure(this.options.dropcursor));
+      extensions.push(_tiptap_extensions__WEBPACK_IMPORTED_MODULE_16__.Dropcursor.configure(this.options.dropcursor));
     }
     if (this.options.gapcursor !== false) {
-      extensions.push(_tiptap_extensions__WEBPACK_IMPORTED_MODULE_15__.Gapcursor.configure(this.options.gapcursor));
+      extensions.push(_tiptap_extensions__WEBPACK_IMPORTED_MODULE_16__.Gapcursor.configure(this.options.gapcursor));
     }
     if (this.options.hardBreak !== false) {
-      extensions.push(_tiptap_extension_hard_break__WEBPACK_IMPORTED_MODULE_5__.HardBreak.configure(this.options.hardBreak));
+      extensions.push(_tiptap_extension_hard_break__WEBPACK_IMPORTED_MODULE_6__.HardBreak.configure(this.options.hardBreak));
     }
     if (this.options.heading !== false) {
-      extensions.push(_tiptap_extension_heading__WEBPACK_IMPORTED_MODULE_6__.Heading.configure(this.options.heading));
+      extensions.push(_tiptap_extension_heading__WEBPACK_IMPORTED_MODULE_7__.Heading.configure(this.options.heading));
     }
     if (this.options.undoRedo !== false) {
-      extensions.push(_tiptap_extensions__WEBPACK_IMPORTED_MODULE_15__.UndoRedo.configure(this.options.undoRedo));
+      extensions.push(_tiptap_extensions__WEBPACK_IMPORTED_MODULE_16__.UndoRedo.configure(this.options.undoRedo));
     }
     if (this.options.horizontalRule !== false) {
-      extensions.push(_tiptap_extension_horizontal_rule__WEBPACK_IMPORTED_MODULE_7__.HorizontalRule.configure(this.options.horizontalRule));
+      extensions.push(_tiptap_extension_horizontal_rule__WEBPACK_IMPORTED_MODULE_8__.HorizontalRule.configure(this.options.horizontalRule));
     }
     if (this.options.italic !== false) {
-      extensions.push(_tiptap_extension_italic__WEBPACK_IMPORTED_MODULE_8__.Italic.configure(this.options.italic));
+      extensions.push(_tiptap_extension_italic__WEBPACK_IMPORTED_MODULE_9__.Italic.configure(this.options.italic));
     }
     if (this.options.listItem !== false) {
-      extensions.push(_tiptap_extension_list__WEBPACK_IMPORTED_MODULE_10__.ListItem.configure(this.options.listItem));
+      extensions.push(_tiptap_extension_list__WEBPACK_IMPORTED_MODULE_11__.ListItem.configure(this.options.listItem));
     }
     if (this.options.listKeymap !== false) {
-      extensions.push(_tiptap_extension_list__WEBPACK_IMPORTED_MODULE_10__.ListKeymap.configure((_a = this.options) == null ? void 0 : _a.listKeymap));
+      extensions.push(_tiptap_extension_list__WEBPACK_IMPORTED_MODULE_11__.ListKeymap.configure((_a = this.options) == null ? void 0 : _a.listKeymap));
     }
     if (this.options.link !== false) {
-      extensions.push(_tiptap_extension_link__WEBPACK_IMPORTED_MODULE_9__.Link.configure((_b = this.options) == null ? void 0 : _b.link));
+      extensions.push(_tiptap_extension_link__WEBPACK_IMPORTED_MODULE_10__.Link.configure((_b = this.options) == null ? void 0 : _b.link));
     }
     if (this.options.orderedList !== false) {
-      extensions.push(_tiptap_extension_list__WEBPACK_IMPORTED_MODULE_10__.OrderedList.configure(this.options.orderedList));
+      extensions.push(_tiptap_extension_list__WEBPACK_IMPORTED_MODULE_11__.OrderedList.configure(this.options.orderedList));
     }
     if (this.options.paragraph !== false) {
-      extensions.push(_tiptap_extension_paragraph__WEBPACK_IMPORTED_MODULE_11__.Paragraph.configure(this.options.paragraph));
+      extensions.push(_tiptap_extension_paragraph__WEBPACK_IMPORTED_MODULE_12__.Paragraph.configure(this.options.paragraph));
     }
     if (this.options.strike !== false) {
-      extensions.push(_tiptap_extension_strike__WEBPACK_IMPORTED_MODULE_12__.Strike.configure(this.options.strike));
+      extensions.push(_tiptap_extension_strike__WEBPACK_IMPORTED_MODULE_13__.Strike.configure(this.options.strike));
     }
     if (this.options.text !== false) {
-      extensions.push(_tiptap_extension_text__WEBPACK_IMPORTED_MODULE_13__.Text.configure(this.options.text));
+      extensions.push(_tiptap_extension_text__WEBPACK_IMPORTED_MODULE_14__.Text.configure(this.options.text));
     }
     if (this.options.underline !== false) {
-      extensions.push(_tiptap_extension_underline__WEBPACK_IMPORTED_MODULE_14__.Underline.configure((_c = this.options) == null ? void 0 : _c.underline));
+      extensions.push(_tiptap_extension_underline__WEBPACK_IMPORTED_MODULE_15__.Underline.configure((_c = this.options) == null ? void 0 : _c.underline));
     }
     if (this.options.trailingNode !== false) {
-      extensions.push(_tiptap_extensions__WEBPACK_IMPORTED_MODULE_15__.TrailingNode.configure((_d = this.options) == null ? void 0 : _d.trailingNode));
+      extensions.push(_tiptap_extensions__WEBPACK_IMPORTED_MODULE_16__.TrailingNode.configure((_d = this.options) == null ? void 0 : _d.trailingNode));
     }
     return extensions;
   }
@@ -9692,10 +9692,10 @@ var index_default = StarterKit;
 
 /***/ }),
 
-/***/ "./node_modules/fast-deep-equal/es6/react.js":
-/*!***************************************************!*\
-  !*** ./node_modules/fast-deep-equal/es6/react.js ***!
-  \***************************************************/
+/***/ "../node_modules/fast-deep-equal/es6/react.js":
+/*!****************************************************!*\
+  !*** ../node_modules/fast-deep-equal/es6/react.js ***!
+  \****************************************************/
 /***/ ((module) => {
 
 
@@ -9781,10 +9781,10 @@ module.exports = function equal(a, b) {
 
 /***/ }),
 
-/***/ "./node_modules/linkifyjs/dist/linkify.mjs":
-/*!*************************************************!*\
-  !*** ./node_modules/linkifyjs/dist/linkify.mjs ***!
-  \*************************************************/
+/***/ "../node_modules/linkifyjs/dist/linkify.mjs":
+/*!**************************************************!*\
+  !*** ../node_modules/linkifyjs/dist/linkify.mjs ***!
+  \**************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -11650,10 +11650,10 @@ function test(str, type = null) {
 
 /***/ }),
 
-/***/ "./node_modules/orderedmap/dist/index.js":
-/*!***********************************************!*\
-  !*** ./node_modules/orderedmap/dist/index.js ***!
-  \***********************************************/
+/***/ "../node_modules/orderedmap/dist/index.js":
+/*!************************************************!*\
+  !*** ../node_modules/orderedmap/dist/index.js ***!
+  \************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -11801,10 +11801,10 @@ OrderedMap.from = function(value) {
 
 /***/ }),
 
-/***/ "./node_modules/prosemirror-commands/dist/index.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/prosemirror-commands/dist/index.js ***!
-  \*********************************************************/
+/***/ "../node_modules/prosemirror-commands/dist/index.js":
+/*!**********************************************************!*\
+  !*** ../node_modules/prosemirror-commands/dist/index.js ***!
+  \**********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -11839,9 +11839,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   toggleMark: () => (/* binding */ toggleMark),
 /* harmony export */   wrapIn: () => (/* binding */ wrapIn)
 /* harmony export */ });
-/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-transform */ "./node_modules/prosemirror-transform/dist/index.js");
-/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! prosemirror-model */ "./node_modules/prosemirror-model/dist/index.js");
-/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-state */ "./node_modules/prosemirror-state/dist/index.js");
+/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-transform */ "../node_modules/prosemirror-transform/dist/index.js");
+/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-model */ "../node_modules/prosemirror-model/dist/index.js");
+/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! prosemirror-state */ "../node_modules/prosemirror-state/dist/index.js");
 
 
 
@@ -11893,15 +11893,15 @@ const joinBackward = (state, dispatch, view) => {
     // If the node below has no content and the node above is
     // selectable, delete the node below and select the one above.
     if ($cursor.parent.content.size == 0 &&
-        (textblockAt(before, "end") || prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.isSelectable(before))) {
+        (textblockAt(before, "end") || prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.NodeSelection.isSelectable(before))) {
         for (let depth = $cursor.depth;; depth--) {
-            let delStep = (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.replaceStep)(state.doc, $cursor.before(depth), $cursor.after(depth), prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Slice.empty);
+            let delStep = (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.replaceStep)(state.doc, $cursor.before(depth), $cursor.after(depth), prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice.empty);
             if (delStep && delStep.slice.size < delStep.to - delStep.from) {
                 if (dispatch) {
                     let tr = state.tr.step(delStep);
                     tr.setSelection(textblockAt(before, "end")
-                        ? prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection.findFrom(tr.doc.resolve(tr.mapping.map($cut.pos, -1)), -1)
-                        : prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.create(tr.doc, $cut.pos - before.nodeSize));
+                        ? prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.Selection.findFrom(tr.doc.resolve(tr.mapping.map($cut.pos, -1)), -1)
+                        : prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.NodeSelection.create(tr.doc, $cut.pos - before.nodeSize));
                     dispatch(tr.scrollIntoView());
                 }
                 return true;
@@ -11961,13 +11961,13 @@ function joinTextblocksAround(state, $cut, dispatch) {
             return false;
         afterText = child;
     }
-    let step = (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.replaceStep)(state.doc, beforePos, afterPos, prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Slice.empty);
+    let step = (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.replaceStep)(state.doc, beforePos, afterPos, prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice.empty);
     if (!step || step.from != beforePos ||
         step instanceof prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.ReplaceStep && step.slice.size >= afterPos - beforePos)
         return false;
     if (dispatch) {
         let tr = state.tr.step(step);
-        tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection.create(tr.doc, beforePos));
+        tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.TextSelection.create(tr.doc, beforePos));
         dispatch(tr.scrollIntoView());
     }
     return true;
@@ -11999,10 +11999,10 @@ const selectNodeBackward = (state, dispatch, view) => {
         $cut = findCutBefore($head);
     }
     let node = $cut && $cut.nodeBefore;
-    if (!node || !prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.isSelectable(node))
+    if (!node || !prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.NodeSelection.isSelectable(node))
         return false;
     if (dispatch)
-        dispatch(state.tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.create(state.doc, $cut.pos - node.nodeSize)).scrollIntoView());
+        dispatch(state.tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.NodeSelection.create(state.doc, $cut.pos - node.nodeSize)).scrollIntoView());
     return true;
 };
 function findCutBefore($pos) {
@@ -12044,13 +12044,13 @@ const joinForward = (state, dispatch, view) => {
     // If the node above has no content and the node below is
     // selectable, delete the node above and select the one below.
     if ($cursor.parent.content.size == 0 &&
-        (textblockAt(after, "start") || prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.isSelectable(after))) {
-        let delStep = (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.replaceStep)(state.doc, $cursor.before(), $cursor.after(), prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Slice.empty);
+        (textblockAt(after, "start") || prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.NodeSelection.isSelectable(after))) {
+        let delStep = (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.replaceStep)(state.doc, $cursor.before(), $cursor.after(), prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice.empty);
         if (delStep && delStep.slice.size < delStep.to - delStep.from) {
             if (dispatch) {
                 let tr = state.tr.step(delStep);
-                tr.setSelection(textblockAt(after, "start") ? prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection.findFrom(tr.doc.resolve(tr.mapping.map($cut.pos)), 1)
-                    : prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.create(tr.doc, tr.mapping.map($cut.pos)));
+                tr.setSelection(textblockAt(after, "start") ? prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.Selection.findFrom(tr.doc.resolve(tr.mapping.map($cut.pos)), 1)
+                    : prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.NodeSelection.create(tr.doc, tr.mapping.map($cut.pos)));
                 dispatch(tr.scrollIntoView());
             }
             return true;
@@ -12082,10 +12082,10 @@ const selectNodeForward = (state, dispatch, view) => {
         $cut = findCutAfter($head);
     }
     let node = $cut && $cut.nodeAfter;
-    if (!node || !prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.isSelectable(node))
+    if (!node || !prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.NodeSelection.isSelectable(node))
         return false;
     if (dispatch)
-        dispatch(state.tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.create(state.doc, $cut.pos)).scrollIntoView());
+        dispatch(state.tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.NodeSelection.create(state.doc, $cut.pos)).scrollIntoView());
     return true;
 };
 function findCutAfter($pos) {
@@ -12105,7 +12105,7 @@ closest ancestor block of the selection that can be joined, with
 the sibling above it.
 */
 const joinUp = (state, dispatch) => {
-    let sel = state.selection, nodeSel = sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection, point;
+    let sel = state.selection, nodeSel = sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.NodeSelection, point;
     if (nodeSel) {
         if (sel.node.isTextblock || !(0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.canJoin)(state.doc, sel.from))
             return false;
@@ -12119,7 +12119,7 @@ const joinUp = (state, dispatch) => {
     if (dispatch) {
         let tr = state.tr.join(point);
         if (nodeSel)
-            tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.create(tr.doc, point - state.doc.resolve(point).nodeBefore.nodeSize));
+            tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.NodeSelection.create(tr.doc, point - state.doc.resolve(point).nodeBefore.nodeSize));
         dispatch(tr.scrollIntoView());
     }
     return true;
@@ -12130,7 +12130,7 @@ that can be joined, with the sibling after it.
 */
 const joinDown = (state, dispatch) => {
     let sel = state.selection, point;
-    if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection) {
+    if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.NodeSelection) {
         if (sel.node.isTextblock || !(0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.canJoin)(state.doc, sel.to))
             return false;
         point = sel.to;
@@ -12192,7 +12192,7 @@ const exitCode = (state, dispatch) => {
         return false;
     if (dispatch) {
         let pos = $head.after(), tr = state.tr.replaceWith(pos, pos, type.createAndFill());
-        tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection.near(tr.doc.resolve(pos), 1));
+        tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.Selection.near(tr.doc.resolve(pos), 1));
         dispatch(tr.scrollIntoView());
     }
     return true;
@@ -12203,7 +12203,7 @@ it is its parent's first child) or after it.
 */
 const createParagraphNear = (state, dispatch) => {
     let sel = state.selection, { $from, $to } = sel;
-    if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.AllSelection || $from.parent.inlineContent || $to.parent.inlineContent)
+    if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.AllSelection || $from.parent.inlineContent || $to.parent.inlineContent)
         return false;
     let type = defaultBlockAt($to.parent.contentMatchAt($to.indexAfter()));
     if (!type || !type.isTextblock)
@@ -12211,7 +12211,7 @@ const createParagraphNear = (state, dispatch) => {
     if (dispatch) {
         let side = (!$from.parentOffset && $to.index() < $to.parent.childCount ? $from : $to).pos;
         let tr = state.tr.insert(side, type.createAndFill());
-        tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection.create(tr.doc, side + 1));
+        tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.TextSelection.create(tr.doc, side + 1));
         dispatch(tr.scrollIntoView());
     }
     return true;
@@ -12246,7 +12246,7 @@ a custom function to determine the type of the newly split off block.
 function splitBlockAs(splitNode) {
     return (state, dispatch) => {
         let { $from, $to } = state.selection;
-        if (state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection && state.selection.node.isBlock) {
+        if (state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.NodeSelection && state.selection.node.isBlock) {
             if (!$from.parentOffset || !(0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.canSplit)(state.doc, $from.pos))
                 return false;
             if (dispatch)
@@ -12275,7 +12275,7 @@ function splitBlockAs(splitNode) {
             }
         }
         let tr = state.tr;
-        if (state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection || state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.AllSelection)
+        if (state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.TextSelection || state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.AllSelection)
             tr.deleteSelection();
         let splitPos = tr.mapping.map($from.pos);
         let can = (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.canSplit)(tr.doc, splitPos, types.length, types);
@@ -12324,7 +12324,7 @@ const selectParentNode = (state, dispatch) => {
         return false;
     pos = $from.before(same);
     if (dispatch)
-        dispatch(state.tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.create(state.doc, pos)));
+        dispatch(state.tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.NodeSelection.create(state.doc, pos)));
     return true;
 };
 /**
@@ -12332,7 +12332,7 @@ Select the whole document.
 */
 const selectAll = (state, dispatch) => {
     if (dispatch)
-        dispatch(state.tr.setSelection(new prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.AllSelection(state.doc)));
+        dispatch(state.tr.setSelection(new prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.AllSelection(state.doc)));
     return true;
 };
 function joinMaybeClear(state, $pos, dispatch) {
@@ -12360,11 +12360,11 @@ function deleteBarrier(state, $cut, dispatch, dir) {
         (conn = (match = before.contentMatchAt(before.childCount)).findWrapping(after.type)) &&
         match.matchType(conn[0] || after.type).validEnd) {
         if (dispatch) {
-            let end = $cut.pos + after.nodeSize, wrap = prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Fragment.empty;
+            let end = $cut.pos + after.nodeSize, wrap = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.empty;
             for (let i = conn.length - 1; i >= 0; i--)
-                wrap = prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Fragment.from(conn[i].create(null, wrap));
-            wrap = prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Fragment.from(before.copy(wrap));
-            let tr = state.tr.step(new prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.ReplaceAroundStep($cut.pos - 1, end, $cut.pos, end, new prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Slice(wrap, 1, 0), conn.length, true));
+                wrap = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(conn[i].create(null, wrap));
+            wrap = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(before.copy(wrap));
+            let tr = state.tr.step(new prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.ReplaceAroundStep($cut.pos - 1, end, $cut.pos, end, new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice(wrap, 1, 0), conn.length, true));
             let $joinAt = tr.doc.resolve(end + 2 * conn.length);
             if ($joinAt.nodeAfter && $joinAt.nodeAfter.type == before.type &&
                 (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.canJoin)(tr.doc, $joinAt.pos))
@@ -12373,7 +12373,7 @@ function deleteBarrier(state, $cut, dispatch, dir) {
         }
         return true;
     }
-    let selAfter = after.type.spec.isolating || (dir > 0 && isolated) ? null : prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection.findFrom($cut, 1);
+    let selAfter = after.type.spec.isolating || (dir > 0 && isolated) ? null : prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.Selection.findFrom($cut, 1);
     let range = selAfter && selAfter.$from.blockRange(selAfter.$to), target = range && (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.liftTarget)(range);
     if (target != null && target >= $cut.depth) {
         if (dispatch)
@@ -12393,10 +12393,10 @@ function deleteBarrier(state, $cut, dispatch, dir) {
             afterDepth++;
         if (at.canReplace(at.childCount, at.childCount, afterText.content)) {
             if (dispatch) {
-                let end = prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Fragment.empty;
+                let end = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.empty;
                 for (let i = wrap.length - 1; i >= 0; i--)
-                    end = prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Fragment.from(wrap[i].copy(end));
-                let tr = state.tr.step(new prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.ReplaceAroundStep($cut.pos - wrap.length, $cut.pos + after.nodeSize, $cut.pos + afterDepth, $cut.pos + after.nodeSize - afterDepth, new prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Slice(end, wrap.length, 0), 0, true));
+                    end = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(wrap[i].copy(end));
+                let tr = state.tr.step(new prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.ReplaceAroundStep($cut.pos - wrap.length, $cut.pos + after.nodeSize, $cut.pos + afterDepth, $cut.pos + after.nodeSize - afterDepth, new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice(end, wrap.length, 0), 0, true));
                 dispatch(tr.scrollIntoView());
             }
             return true;
@@ -12416,7 +12416,7 @@ function selectTextblockSide(side) {
         if (!$pos.node(depth).isTextblock)
             return false;
         if (dispatch)
-            dispatch(state.tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection.create(state.doc, side < 0 ? $pos.start(depth) : $pos.end(depth))));
+            dispatch(state.tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.TextSelection.create(state.doc, side < 0 ? $pos.start(depth) : $pos.end(depth))));
         return true;
     };
 }
@@ -12501,13 +12501,13 @@ function removeInlineAtoms(ranges) {
         $from.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
             if (node.isAtom && node.content.size && node.isInline && pos >= $from.pos && pos + node.nodeSize <= $to.pos) {
                 if (pos + 1 > $from.pos)
-                    result.push(new prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.SelectionRange($from, $from.doc.resolve(pos + 1)));
+                    result.push(new prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.SelectionRange($from, $from.doc.resolve(pos + 1)));
                 $from = $from.doc.resolve(pos + 1 + node.content.size);
                 return false;
             }
         });
         if ($from.pos < $to.pos)
-            result.push(new prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.SelectionRange($from, $to));
+            result.push(new prosemirror_state__WEBPACK_IMPORTED_MODULE_2__.SelectionRange($from, $to));
     }
     return result;
 }
@@ -12696,18 +12696,18 @@ const baseKeymap = mac ? macBaseKeymap : pcBaseKeymap;
 
 /***/ }),
 
-/***/ "./node_modules/prosemirror-dropcursor/dist/index.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/prosemirror-dropcursor/dist/index.js ***!
-  \***********************************************************/
+/***/ "../node_modules/prosemirror-dropcursor/dist/index.js":
+/*!************************************************************!*\
+  !*** ../node_modules/prosemirror-dropcursor/dist/index.js ***!
+  \************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   dropCursor: () => (/* binding */ dropCursor)
 /* harmony export */ });
-/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-state */ "./node_modules/prosemirror-state/dist/index.js");
-/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-transform */ "./node_modules/prosemirror-transform/dist/index.js");
+/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-state */ "../node_modules/prosemirror-state/dist/index.js");
+/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-transform */ "../node_modules/prosemirror-transform/dist/index.js");
 
 
 
@@ -12858,10 +12858,10 @@ class DropCursorView {
 
 /***/ }),
 
-/***/ "./node_modules/prosemirror-gapcursor/dist/index.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/prosemirror-gapcursor/dist/index.js ***!
-  \**********************************************************/
+/***/ "../node_modules/prosemirror-gapcursor/dist/index.js":
+/*!***********************************************************!*\
+  !*** ../node_modules/prosemirror-gapcursor/dist/index.js ***!
+  \***********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -12869,10 +12869,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   GapCursor: () => (/* binding */ GapCursor),
 /* harmony export */   gapCursor: () => (/* binding */ gapCursor)
 /* harmony export */ });
-/* harmony import */ var prosemirror_keymap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! prosemirror-keymap */ "./node_modules/prosemirror-keymap/dist/index.js");
-/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-state */ "./node_modules/prosemirror-state/dist/index.js");
-/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-model */ "./node_modules/prosemirror-model/dist/index.js");
-/* harmony import */ var prosemirror_view__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! prosemirror-view */ "./node_modules/prosemirror-view/dist/index.js");
+/* harmony import */ var prosemirror_keymap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-keymap */ "../node_modules/prosemirror-keymap/dist/index.js");
+/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-state */ "../node_modules/prosemirror-state/dist/index.js");
+/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! prosemirror-model */ "../node_modules/prosemirror-model/dist/index.js");
+/* harmony import */ var prosemirror_view__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! prosemirror-view */ "../node_modules/prosemirror-view/dist/index.js");
 
 
 
@@ -12882,7 +12882,7 @@ __webpack_require__.r(__webpack_exports__);
 Gap cursor selections are represented using this class. Its
 `$anchor` and `$head` properties both point at the cursor position.
 */
-class GapCursor extends prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Selection {
+class GapCursor extends prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection {
     /**
     Create a gap cursor.
     */
@@ -12891,9 +12891,9 @@ class GapCursor extends prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Selection
     }
     map(doc, mapping) {
         let $pos = doc.resolve(mapping.map(this.head));
-        return GapCursor.valid($pos) ? new GapCursor($pos) : prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Selection.near($pos);
+        return GapCursor.valid($pos) ? new GapCursor($pos) : prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection.near($pos);
     }
-    content() { return prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice.empty; }
+    content() { return prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Slice.empty; }
     eq(other) {
         return other instanceof GapCursor && other.head == this.head;
     }
@@ -12952,7 +12952,7 @@ class GapCursor extends prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Selection
             for (;;) {
                 let inside = dir > 0 ? next.firstChild : next.lastChild;
                 if (!inside) {
-                    if (next.isAtom && !next.isText && !prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.isSelectable(next)) {
+                    if (next.isAtom && !next.isText && !prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.isSelectable(next)) {
                         $pos = $pos.doc.resolve(pos + next.nodeSize * dir);
                         mustMove = false;
                         continue search;
@@ -12971,7 +12971,7 @@ class GapCursor extends prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Selection
 }
 GapCursor.prototype.visible = false;
 GapCursor.findFrom = GapCursor.findGapCursorFrom;
-prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Selection.jsonID("gapcursor", GapCursor);
+prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection.jsonID("gapcursor", GapCursor);
 class GapBookmark {
     constructor(pos) {
         this.pos = pos;
@@ -12981,7 +12981,7 @@ class GapBookmark {
     }
     resolve(doc) {
         let $pos = doc.resolve(this.pos);
-        return GapCursor.valid($pos) ? new GapCursor($pos) : prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Selection.near($pos);
+        return GapCursor.valid($pos) ? new GapCursor($pos) : prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection.near($pos);
     }
 }
 function closedBefore($pos) {
@@ -13032,7 +13032,7 @@ them. The cursor is drawn as an element with class
 styles to make it visible.
 */
 function gapCursor() {
-    return new prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Plugin({
+    return new prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Plugin({
         props: {
             decorations: drawGapCursor,
             createSelectionBetween(_view, $anchor, $head) {
@@ -13044,7 +13044,7 @@ function gapCursor() {
         }
     });
 }
-const handleKeyDown = (0,prosemirror_keymap__WEBPACK_IMPORTED_MODULE_2__.keydownHandler)({
+const handleKeyDown = (0,prosemirror_keymap__WEBPACK_IMPORTED_MODULE_0__.keydownHandler)({
     "ArrowLeft": arrow("horiz", -1),
     "ArrowRight": arrow("horiz", 1),
     "ArrowUp": arrow("vert", -1),
@@ -13055,7 +13055,7 @@ function arrow(axis, dir) {
     return function (state, dispatch, view) {
         let sel = state.selection;
         let $start = dir > 0 ? sel.$to : sel.$from, mustMove = sel.empty;
-        if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection) {
+        if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection) {
             if (!view.endOfTextblock(dirStr) || $start.depth == 0)
                 return false;
             mustMove = false;
@@ -13076,7 +13076,7 @@ function handleClick(view, pos, event) {
     if (!GapCursor.valid($pos))
         return false;
     let clickPos = view.posAtCoords({ left: event.clientX, top: event.clientY });
-    if (clickPos && clickPos.inside > -1 && prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.isSelectable(view.state.doc.nodeAt(clickPos.inside)))
+    if (clickPos && clickPos.inside > -1 && prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.isSelectable(view.state.doc.nodeAt(clickPos.inside)))
         return false;
     view.dispatch(view.state.tr.setSelection(new GapCursor($pos)));
     return true;
@@ -13092,11 +13092,11 @@ function beforeinput(view, event) {
     let insert = $from.parent.contentMatchAt($from.index()).findWrapping(view.state.schema.nodes.text);
     if (!insert)
         return false;
-    let frag = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.empty;
+    let frag = prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Fragment.empty;
     for (let i = insert.length - 1; i >= 0; i--)
-        frag = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(insert[i].createAndFill(null, frag));
-    let tr = view.state.tr.replace($from.pos, $from.pos, new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice(frag, 0, 0));
-    tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection.near(tr.doc.resolve($from.pos + 1)));
+        frag = prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Fragment.from(insert[i].createAndFill(null, frag));
+    let tr = view.state.tr.replace($from.pos, $from.pos, new prosemirror_model__WEBPACK_IMPORTED_MODULE_2__.Slice(frag, 0, 0));
+    tr.setSelection(prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection.near(tr.doc.resolve($from.pos + 1)));
     view.dispatch(tr);
     return false;
 }
@@ -13113,10 +13113,10 @@ function drawGapCursor(state) {
 
 /***/ }),
 
-/***/ "./node_modules/prosemirror-history/dist/index.js":
-/*!********************************************************!*\
-  !*** ./node_modules/prosemirror-history/dist/index.js ***!
-  \********************************************************/
+/***/ "../node_modules/prosemirror-history/dist/index.js":
+/*!*********************************************************!*\
+  !*** ../node_modules/prosemirror-history/dist/index.js ***!
+  \*********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -13130,9 +13130,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   undoDepth: () => (/* binding */ undoDepth),
 /* harmony export */   undoNoScroll: () => (/* binding */ undoNoScroll)
 /* harmony export */ });
-/* harmony import */ var rope_sequence__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rope-sequence */ "./node_modules/rope-sequence/dist/index.js");
-/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-transform */ "./node_modules/prosemirror-transform/dist/index.js");
-/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! prosemirror-state */ "./node_modules/prosemirror-state/dist/index.js");
+/* harmony import */ var rope_sequence__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rope-sequence */ "../node_modules/rope-sequence/dist/index.js");
+/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-transform */ "../node_modules/prosemirror-transform/dist/index.js");
+/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! prosemirror-state */ "../node_modules/prosemirror-state/dist/index.js");
 
 
 
@@ -13583,10 +13583,10 @@ function redoDepth(state) {
 
 /***/ }),
 
-/***/ "./node_modules/prosemirror-keymap/dist/index.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/prosemirror-keymap/dist/index.js ***!
-  \*******************************************************/
+/***/ "../node_modules/prosemirror-keymap/dist/index.js":
+/*!********************************************************!*\
+  !*** ../node_modules/prosemirror-keymap/dist/index.js ***!
+  \********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -13594,8 +13594,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   keydownHandler: () => (/* binding */ keydownHandler),
 /* harmony export */   keymap: () => (/* binding */ keymap)
 /* harmony export */ });
-/* harmony import */ var w3c_keyname__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! w3c-keyname */ "./node_modules/w3c-keyname/index.js");
-/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-state */ "./node_modules/prosemirror-state/dist/index.js");
+/* harmony import */ var w3c_keyname__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! w3c-keyname */ "../node_modules/w3c-keyname/index.js");
+/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-state */ "../node_modules/prosemirror-state/dist/index.js");
 
 
 
@@ -13728,10 +13728,10 @@ function keydownHandler(bindings) {
 
 /***/ }),
 
-/***/ "./node_modules/prosemirror-model/dist/index.js":
-/*!******************************************************!*\
-  !*** ./node_modules/prosemirror-model/dist/index.js ***!
-  \******************************************************/
+/***/ "../node_modules/prosemirror-model/dist/index.js":
+/*!*******************************************************!*\
+  !*** ../node_modules/prosemirror-model/dist/index.js ***!
+  \*******************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -13750,7 +13750,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   Schema: () => (/* binding */ Schema),
 /* harmony export */   Slice: () => (/* binding */ Slice)
 /* harmony export */ });
-/* harmony import */ var orderedmap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! orderedmap */ "./node_modules/orderedmap/dist/index.js");
+/* harmony import */ var orderedmap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! orderedmap */ "../node_modules/orderedmap/dist/index.js");
 
 
 function findDiffStart(a, b, pos) {
@@ -17208,10 +17208,10 @@ function renderSpec(doc, structure, xmlNS, blockArraysIn) {
 
 /***/ }),
 
-/***/ "./node_modules/prosemirror-schema-list/dist/index.js":
-/*!************************************************************!*\
-  !*** ./node_modules/prosemirror-schema-list/dist/index.js ***!
-  \************************************************************/
+/***/ "../node_modules/prosemirror-schema-list/dist/index.js":
+/*!*************************************************************!*\
+  !*** ../node_modules/prosemirror-schema-list/dist/index.js ***!
+  \*************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -17227,9 +17227,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   wrapInList: () => (/* binding */ wrapInList),
 /* harmony export */   wrapRangeInList: () => (/* binding */ wrapRangeInList)
 /* harmony export */ });
-/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-transform */ "./node_modules/prosemirror-transform/dist/index.js");
-/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-model */ "./node_modules/prosemirror-model/dist/index.js");
-/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! prosemirror-state */ "./node_modules/prosemirror-state/dist/index.js");
+/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-transform */ "../node_modules/prosemirror-transform/dist/index.js");
+/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-model */ "../node_modules/prosemirror-model/dist/index.js");
+/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! prosemirror-state */ "../node_modules/prosemirror-state/dist/index.js");
 
 
 
@@ -17329,12 +17329,12 @@ function wrapRangeInList(tr, range, listType, attrs = null) {
         if (range.$from.index(range.depth - 1) == 0)
             return false;
         let $insert = doc.resolve(range.start - 2);
-        outerRange = new prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.NodeRange($insert, $insert, range.depth);
+        outerRange = new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.NodeRange($insert, $insert, range.depth);
         if (range.endIndex < range.parent.childCount)
-            range = new prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.NodeRange(range.$from, doc.resolve(range.$to.end(range.depth)), range.depth);
+            range = new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.NodeRange(range.$from, doc.resolve(range.$to.end(range.depth)), range.depth);
         doJoin = true;
     }
-    let wrap = (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__.findWrapping)(outerRange, listType, attrs, range);
+    let wrap = (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.findWrapping)(outerRange, listType, attrs, range);
     if (!wrap)
         return false;
     if (tr)
@@ -17342,10 +17342,10 @@ function wrapRangeInList(tr, range, listType, attrs = null) {
     return true;
 }
 function doWrapInList(tr, range, wrappers, joinBefore, listType) {
-    let content = prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.empty;
+    let content = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.empty;
     for (let i = wrappers.length - 1; i >= 0; i--)
-        content = prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(wrappers[i].type.create(wrappers[i].attrs, content));
-    tr.step(new prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__.ReplaceAroundStep(range.start - (joinBefore ? 2 : 0), range.end, range.start, range.end, new prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice(content, 0, 0), wrappers.length, true));
+        content = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(wrappers[i].type.create(wrappers[i].attrs, content));
+    tr.step(new prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.ReplaceAroundStep(range.start - (joinBefore ? 2 : 0), range.end, range.start, range.end, new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice(content, 0, 0), wrappers.length, true));
     let found = 0;
     for (let i = 0; i < wrappers.length; i++)
         if (wrappers[i].type == listType)
@@ -17353,7 +17353,7 @@ function doWrapInList(tr, range, wrappers, joinBefore, listType) {
     let splitDepth = wrappers.length - found;
     let splitPos = range.start + wrappers.length - (joinBefore ? 2 : 0), parent = range.parent;
     for (let i = range.startIndex, e = range.endIndex, first = true; i < e; i++, first = false) {
-        if (!first && (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__.canSplit)(tr.doc, splitPos, splitDepth)) {
+        if (!first && (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.canSplit)(tr.doc, splitPos, splitDepth)) {
             tr.split(splitPos, splitDepth);
             splitPos += 2 * splitDepth;
         }
@@ -17381,18 +17381,18 @@ function splitListItem(itemType, itemAttrs) {
                 $from.index(-2) != $from.node(-2).childCount - 1)
                 return false;
             if (dispatch) {
-                let wrap = prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.empty;
+                let wrap = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.empty;
                 let depthBefore = $from.index(-1) ? 1 : $from.index(-2) ? 2 : 3;
                 // Build a fragment containing empty versions of the structure
                 // from the outer list item to the parent node of the cursor
                 for (let d = $from.depth - depthBefore; d >= $from.depth - 3; d--)
-                    wrap = prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from($from.node(d).copy(wrap));
+                    wrap = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from($from.node(d).copy(wrap));
                 let depthAfter = $from.indexAfter(-1) < $from.node(-2).childCount ? 1
                     : $from.indexAfter(-2) < $from.node(-3).childCount ? 2 : 3;
                 // Add a second list item with an empty default start node
-                wrap = wrap.append(prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(itemType.createAndFill()));
+                wrap = wrap.append(prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(itemType.createAndFill()));
                 let start = $from.before($from.depth - (depthBefore - 1));
-                let tr = state.tr.replace(start, $from.after(-depthAfter), new prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice(wrap, 4 - depthBefore, 0));
+                let tr = state.tr.replace(start, $from.after(-depthAfter), new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice(wrap, 4 - depthBefore, 0));
                 let sel = -1;
                 tr.doc.nodesBetween(start, tr.doc.content.size, (node, pos) => {
                     if (sel > -1)
@@ -17409,7 +17409,7 @@ function splitListItem(itemType, itemAttrs) {
         let nextType = $to.pos == $from.end() ? grandParent.contentMatchAt(0).defaultType : null;
         let tr = state.tr.delete($from.pos, $to.pos);
         let types = nextType ? [itemAttrs ? { type: itemType, attrs: itemAttrs } : null, { type: nextType }] : undefined;
-        if (!(0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__.canSplit)(tr.doc, $from.pos, 2, types))
+        if (!(0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.canSplit)(tr.doc, $from.pos, 2, types))
             return false;
         if (dispatch)
             dispatch(tr.split($from.pos, 2, types).scrollIntoView());
@@ -17454,15 +17454,15 @@ function liftToOuterList(state, dispatch, itemType, range) {
     if (end < endOfList) {
         // There are siblings after the lifted items, which must become
         // children of the last item
-        tr.step(new prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__.ReplaceAroundStep(end - 1, endOfList, end, endOfList, new prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice(prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(itemType.create(null, range.parent.copy())), 1, 0), 1, true));
-        range = new prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.NodeRange(tr.doc.resolve(range.$from.pos), tr.doc.resolve(endOfList), range.depth);
+        tr.step(new prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.ReplaceAroundStep(end - 1, endOfList, end, endOfList, new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice(prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(itemType.create(null, range.parent.copy())), 1, 0), 1, true));
+        range = new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.NodeRange(tr.doc.resolve(range.$from.pos), tr.doc.resolve(endOfList), range.depth);
     }
-    const target = (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__.liftTarget)(range);
+    const target = (0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.liftTarget)(range);
     if (target == null)
         return false;
     tr.lift(range, target);
     let $after = tr.doc.resolve(tr.mapping.map(end, -1) - 1);
-    if ((0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__.canJoin)(tr.doc, $after.pos) && $after.nodeBefore.type == $after.nodeAfter.type)
+    if ((0,prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.canJoin)(tr.doc, $after.pos) && $after.nodeBefore.type == $after.nodeAfter.type)
         tr.join($after.pos);
     dispatch(tr.scrollIntoView());
     return true;
@@ -17479,14 +17479,14 @@ function liftOutOfList(state, dispatch, range) {
         return false;
     let atStart = range.startIndex == 0, atEnd = range.endIndex == list.childCount;
     let parent = $start.node(-1), indexBefore = $start.index(-1);
-    if (!parent.canReplace(indexBefore + (atStart ? 0 : 1), indexBefore + 1, item.content.append(atEnd ? prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.empty : prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(list))))
+    if (!parent.canReplace(indexBefore + (atStart ? 0 : 1), indexBefore + 1, item.content.append(atEnd ? prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.empty : prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(list))))
         return false;
     let start = $start.pos, end = start + item.nodeSize;
     // Strip off the surrounding list. At the sides where we're not at
     // the end of the list, the existing list is closed. At sides where
     // this is the end, it is overwritten to its end.
-    tr.step(new prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__.ReplaceAroundStep(start - (atStart ? 1 : 0), end + (atEnd ? 1 : 0), start + 1, end - 1, new prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice((atStart ? prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.empty : prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(list.copy(prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.empty)))
-        .append(atEnd ? prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.empty : prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(list.copy(prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.empty))), atStart ? 0 : 1, atEnd ? 0 : 1), atStart ? 0 : 1));
+    tr.step(new prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.ReplaceAroundStep(start - (atStart ? 1 : 0), end + (atEnd ? 1 : 0), start + 1, end - 1, new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice((atStart ? prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.empty : prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(list.copy(prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.empty)))
+        .append(atEnd ? prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.empty : prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(list.copy(prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.empty))), atStart ? 0 : 1, atEnd ? 0 : 1), atStart ? 0 : 1));
     dispatch(tr.scrollIntoView());
     return true;
 }
@@ -17508,10 +17508,10 @@ function sinkListItem(itemType) {
             return false;
         if (dispatch) {
             let nestedBefore = nodeBefore.lastChild && nodeBefore.lastChild.type == parent.type;
-            let inner = prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(nestedBefore ? itemType.create() : null);
-            let slice = new prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice(prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(itemType.create(null, prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(parent.type.create(null, inner)))), nestedBefore ? 3 : 1, 0);
+            let inner = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(nestedBefore ? itemType.create() : null);
+            let slice = new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice(prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(itemType.create(null, prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(parent.type.create(null, inner)))), nestedBefore ? 3 : 1, 0);
             let before = range.start, after = range.end;
-            dispatch(state.tr.step(new prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__.ReplaceAroundStep(before - (nestedBefore ? 3 : 1), after, before, after, slice, 1, true))
+            dispatch(state.tr.step(new prosemirror_transform__WEBPACK_IMPORTED_MODULE_0__.ReplaceAroundStep(before - (nestedBefore ? 3 : 1), after, before, after, slice, 1, true))
                 .scrollIntoView());
         }
         return true;
@@ -17523,10 +17523,10 @@ function sinkListItem(itemType) {
 
 /***/ }),
 
-/***/ "./node_modules/prosemirror-state/dist/index.js":
-/*!******************************************************!*\
-  !*** ./node_modules/prosemirror-state/dist/index.js ***!
-  \******************************************************/
+/***/ "../node_modules/prosemirror-state/dist/index.js":
+/*!*******************************************************!*\
+  !*** ../node_modules/prosemirror-state/dist/index.js ***!
+  \*******************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -17541,8 +17541,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TextSelection: () => (/* binding */ TextSelection),
 /* harmony export */   Transaction: () => (/* binding */ Transaction)
 /* harmony export */ });
-/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-model */ "./node_modules/prosemirror-model/dist/index.js");
-/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-transform */ "./node_modules/prosemirror-transform/dist/index.js");
+/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-model */ "../node_modules/prosemirror-model/dist/index.js");
+/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-transform */ "../node_modules/prosemirror-transform/dist/index.js");
 
 
 
@@ -18550,10 +18550,10 @@ class PluginKey {
 
 /***/ }),
 
-/***/ "./node_modules/prosemirror-transform/dist/index.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/prosemirror-transform/dist/index.js ***!
-  \**********************************************************/
+/***/ "../node_modules/prosemirror-transform/dist/index.js":
+/*!***********************************************************!*\
+  !*** ../node_modules/prosemirror-transform/dist/index.js ***!
+  \***********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -18582,7 +18582,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   liftTarget: () => (/* binding */ liftTarget),
 /* harmony export */   replaceStep: () => (/* binding */ replaceStep)
 /* harmony export */ });
-/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-model */ "./node_modules/prosemirror-model/dist/index.js");
+/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-model */ "../node_modules/prosemirror-model/dist/index.js");
 
 
 // Recovery values encode a range index and an offset. They are
@@ -20743,10 +20743,10 @@ class Transform {
 
 /***/ }),
 
-/***/ "./node_modules/prosemirror-view/dist/index.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/prosemirror-view/dist/index.js ***!
-  \*****************************************************/
+/***/ "../node_modules/prosemirror-view/dist/index.js":
+/*!******************************************************!*\
+  !*** ../node_modules/prosemirror-view/dist/index.js ***!
+  \******************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -20757,9 +20757,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   __endComposition: () => (/* binding */ __endComposition),
 /* harmony export */   __parseFromClipboard: () => (/* binding */ __parseFromClipboard)
 /* harmony export */ });
-/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-state */ "./node_modules/prosemirror-state/dist/index.js");
-/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-model */ "./node_modules/prosemirror-model/dist/index.js");
-/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! prosemirror-transform */ "./node_modules/prosemirror-transform/dist/index.js");
+/* harmony import */ var prosemirror_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! prosemirror-state */ "../node_modules/prosemirror-state/dist/index.js");
+/* harmony import */ var prosemirror_model__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prosemirror-model */ "../node_modules/prosemirror-model/dist/index.js");
+/* harmony import */ var prosemirror_transform__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! prosemirror-transform */ "../node_modules/prosemirror-transform/dist/index.js");
 
 
 
@@ -21986,7 +21986,7 @@ class MarkViewDesc extends ViewDesc {
         let custom = view.nodeViews[mark.type.name];
         let spec = custom && custom(mark, view, inline);
         if (!spec || !spec.dom)
-            spec = prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.DOMSerializer.renderSpec(document, mark.type.spec.toDOM(mark, inline), null, mark.attrs);
+            spec = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.DOMSerializer.renderSpec(document, mark.type.spec.toDOM(mark, inline), null, mark.attrs);
         return new MarkViewDesc(parent, mark, spec.dom, spec.contentDOM || spec.dom, spec);
     }
     parseRule() {
@@ -22066,7 +22066,7 @@ class NodeViewDesc extends ViewDesc {
                 throw new RangeError("Text must be rendered as a DOM text node");
         }
         else if (!dom) {
-            let spec = prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.DOMSerializer.renderSpec(document, node.type.spec.toDOM(node), null, node.attrs);
+            let spec = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.DOMSerializer.renderSpec(document, node.type.spec.toDOM(node), null, node.attrs);
             ({ dom, contentDOM } = spec);
         }
         if (!contentDOM && !node.isText && dom.nodeName != "BR") { // Chrome gets confused by <br contenteditable=false>
@@ -22113,7 +22113,7 @@ class NodeViewDesc extends ViewDesc {
                 }
             }
             if (!rule.contentElement)
-                rule.getContent = () => prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.empty;
+                rule.getContent = () => prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.empty;
         }
         return rule;
     }
@@ -22137,7 +22137,7 @@ class NodeViewDesc extends ViewDesc {
             if (widget.spec.marks)
                 updater.syncToMarks(widget.spec.marks, inline, view);
             else if (widget.type.side >= 0 && !insideNode)
-                updater.syncToMarks(i == this.node.childCount ? prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Mark.none : this.node.child(i).marks, inline, view);
+                updater.syncToMarks(i == this.node.childCount ? prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Mark.none : this.node.child(i).marks, inline, view);
             // If the next node is a desc matching this widget, reuse it,
             // otherwise insert the widget as a new view desc.
             updater.placeWidget(widget, view, off);
@@ -22177,7 +22177,7 @@ class NodeViewDesc extends ViewDesc {
         // Only do something if both the selection and a focused text node
         // are inside of this node
         let { from, to } = view.state.selection;
-        if (!(view.state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection) || from < pos || to > pos + this.node.content.size)
+        if (!(view.state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection) || from < pos || to > pos + this.node.content.size)
             return null;
         let textNode = view.input.compositionNode;
         if (!textNode || !this.dom.contains(textNode.parentNode))
@@ -22962,10 +22962,10 @@ function selectionFromDOM(view, origin = null) {
         while (nearestDesc && !nearestDesc.node)
             nearestDesc = nearestDesc.parent;
         let nearestDescNode = nearestDesc.node;
-        if (nearestDesc && nearestDescNode.isAtom && prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.isSelectable(nearestDescNode) && nearestDesc.parent
+        if (nearestDesc && nearestDescNode.isAtom && prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.isSelectable(nearestDescNode) && nearestDesc.parent
             && !(nearestDescNode.isInline && isOnEdge(domSel.focusNode, domSel.focusOffset, nearestDesc.dom))) {
             let pos = nearestDesc.posBefore;
-            selection = new prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection(head == pos ? $head : doc.resolve(pos));
+            selection = new prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection(head == pos ? $head : doc.resolve(pos));
         }
     }
     else {
@@ -23021,7 +23021,7 @@ function selectionToDOM(view, force = false) {
     }
     else {
         let { anchor, head } = sel, resetEditableFrom, resetEditableTo;
-        if (brokenSelectBetweenUneditable && !(sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection)) {
+        if (brokenSelectBetweenUneditable && !(sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection)) {
             if (!sel.$from.parent.inlineContent)
                 resetEditableFrom = temporarilyEditableNear(view, sel.from);
             if (!sel.empty && !sel.$from.parent.inlineContent)
@@ -23117,7 +23117,7 @@ function selectCursorWrapper(view) {
     }
 }
 function syncNodeSelection(view, sel) {
-    if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection) {
+    if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection) {
         let desc = view.docView.descAt(sel.from);
         if (desc != view.lastSelectedViewDesc) {
             clearNodeSelection(view);
@@ -23140,7 +23140,7 @@ function clearNodeSelection(view) {
 }
 function selectionBetween(view, $anchor, $head, bias) {
     return view.someProp("createSelectionBetween", f => f(view, $anchor, $head))
-        || prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection.between($anchor, $head, bias);
+        || prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection.between($anchor, $head, bias);
 }
 function hasFocusAndSelection(view) {
     if (view.editable && !view.hasFocus())
@@ -23172,7 +23172,7 @@ function moveSelectionBlock(state, dir) {
     let { $anchor, $head } = state.selection;
     let $side = dir > 0 ? $anchor.max($head) : $anchor.min($head);
     let $start = !$side.parent.inlineContent ? $side : $side.depth ? state.doc.resolve(dir > 0 ? $side.after() : $side.before()) : null;
-    return $start && prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection.findFrom($start, dir);
+    return $start && prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Selection.findFrom($start, dir);
 }
 function apply(view, sel) {
     view.dispatch(view.state.tr.setSelection(sel).scrollIntoView());
@@ -23180,20 +23180,20 @@ function apply(view, sel) {
 }
 function selectHorizontally(view, dir, mods) {
     let sel = view.state.selection;
-    if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection) {
+    if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection) {
         if (mods.indexOf("s") > -1) {
             let { $head } = sel, node = $head.textOffset ? null : dir < 0 ? $head.nodeBefore : $head.nodeAfter;
             if (!node || node.isText || !node.isLeaf)
                 return false;
             let $newHead = view.state.doc.resolve($head.pos + node.nodeSize * (dir < 0 ? -1 : 1));
-            return apply(view, new prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection(sel.$anchor, $newHead));
+            return apply(view, new prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection(sel.$anchor, $newHead));
         }
         else if (!sel.empty) {
             return false;
         }
         else if (view.endOfTextblock(dir > 0 ? "forward" : "backward")) {
             let next = moveSelectionBlock(view.state, dir);
-            if (next && (next instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection))
+            if (next && (next instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection))
                 return apply(view, next);
             return false;
         }
@@ -23204,22 +23204,22 @@ function selectHorizontally(view, dir, mods) {
             let nodePos = dir < 0 ? $head.pos - node.nodeSize : $head.pos;
             if (!(node.isAtom || (desc = view.docView.descAt(nodePos)) && !desc.contentDOM))
                 return false;
-            if (prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.isSelectable(node)) {
-                return apply(view, new prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection(dir < 0 ? view.state.doc.resolve($head.pos - node.nodeSize) : $head));
+            if (prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.isSelectable(node)) {
+                return apply(view, new prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection(dir < 0 ? view.state.doc.resolve($head.pos - node.nodeSize) : $head));
             }
             else if (webkit) {
                 // Chrome and Safari will introduce extra pointless cursor
                 // positions around inline uneditable nodes, so we have to
                 // take over and move the cursor past them (#937)
-                return apply(view, new prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection(view.state.doc.resolve(dir < 0 ? nodePos : nodePos + node.nodeSize)));
+                return apply(view, new prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection(view.state.doc.resolve(dir < 0 ? nodePos : nodePos + node.nodeSize)));
             }
             else {
                 return false;
             }
         }
     }
-    else if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection && sel.node.isInline) {
-        return apply(view, new prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection(dir > 0 ? sel.$to : sel.$from));
+    else if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection && sel.node.isInline) {
+        return apply(view, new prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection(dir > 0 ? sel.$to : sel.$from));
     }
     else {
         let next = moveSelectionBlock(view.state, dir);
@@ -23436,25 +23436,25 @@ function findDirection(view, pos) {
 // browser)
 function selectVertically(view, dir, mods) {
     let sel = view.state.selection;
-    if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection && !sel.empty || mods.indexOf("s") > -1)
+    if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection && !sel.empty || mods.indexOf("s") > -1)
         return false;
     if (mac && mods.indexOf("m") > -1)
         return false;
     let { $from, $to } = sel;
     if (!$from.parent.inlineContent || view.endOfTextblock(dir < 0 ? "up" : "down")) {
         let next = moveSelectionBlock(view.state, dir);
-        if (next && (next instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection))
+        if (next && (next instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection))
             return apply(view, next);
     }
     if (!$from.parent.inlineContent) {
         let side = dir < 0 ? $from : $to;
-        let beyond = sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.AllSelection ? prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection.near(side, dir) : prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection.findFrom(side, dir);
+        let beyond = sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.AllSelection ? prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Selection.near(side, dir) : prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Selection.findFrom(side, dir);
         return beyond ? apply(view, beyond) : false;
     }
     return false;
 }
 function stopNativeHorizontalDelete(view, dir) {
-    if (!(view.state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection))
+    if (!(view.state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection))
         return true;
     let { $head, $anchor, empty } = view.state.selection;
     if (!$head.sameParent($anchor))
@@ -23557,7 +23557,7 @@ function serializeForClipboard(view, slice) {
         context.push(node.type.name, node.attrs != node.type.defaultAttrs ? node.attrs : null);
         content = node.content;
     }
-    let serializer = view.someProp("clipboardSerializer") || prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.DOMSerializer.fromSchema(view.state.schema);
+    let serializer = view.someProp("clipboardSerializer") || prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.DOMSerializer.fromSchema(view.state.schema);
     let doc = detachedDoc(), wrap = doc.createElement("div");
     wrap.appendChild(serializer.serializeFragment(content, { document: doc }));
     let firstChild = wrap.firstChild, needsWrap, wrappers = 0;
@@ -23587,14 +23587,14 @@ function parseFromClipboard(view, text, html, plainText, $context) {
     if (asText) {
         view.someProp("transformPastedText", f => { text = f(text, inCode || plainText, view); });
         if (inCode)
-            return text ? new prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice(prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(view.state.schema.text(text.replace(/\r\n?/g, "\n"))), 0, 0) : prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice.empty;
+            return text ? new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice(prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(view.state.schema.text(text.replace(/\r\n?/g, "\n"))), 0, 0) : prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice.empty;
         let parsed = view.someProp("clipboardTextParser", f => f(text, $context, plainText, view));
         if (parsed) {
             slice = parsed;
         }
         else {
             let marks = $context.marks();
-            let { schema } = view.state, serializer = prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.DOMSerializer.fromSchema(schema);
+            let { schema } = view.state, serializer = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.DOMSerializer.fromSchema(schema);
             dom = document.createElement("div");
             text.split(/(?:\r\n?|\n)+/).forEach(block => {
                 let p = dom.appendChild(document.createElement("p"));
@@ -23621,7 +23621,7 @@ function parseFromClipboard(view, text, html, plainText, $context) {
             dom = child;
         }
     if (!slice) {
-        let parser = view.someProp("clipboardParser") || view.someProp("domParser") || prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.DOMParser.fromSchema(view.state.schema);
+        let parser = view.someProp("clipboardParser") || view.someProp("domParser") || prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.DOMParser.fromSchema(view.state.schema);
         slice = parser.parseSlice(dom, {
             preserveWhitespace: !!(asText || sliceData),
             context: $context,
@@ -23637,7 +23637,7 @@ function parseFromClipboard(view, text, html, plainText, $context) {
         slice = addContext(closeSlice(slice, +sliceData[1], +sliceData[2]), sliceData[4]);
     }
     else { // HTML wasn't created by ProseMirror. Make sure top-level siblings are coherent
-        slice = prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice.maxOpen(normalizeSiblings(slice.content, $context), true);
+        slice = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice.maxOpen(normalizeSiblings(slice.content, $context), true);
         if (slice.openStart || slice.openEnd) {
             let openStart = 0, openEnd = 0;
             for (let node = slice.content.firstChild; openStart < slice.openStart && !node.type.spec.isolating; openStart++, node = node.firstChild) { }
@@ -23683,13 +23683,13 @@ function normalizeSiblings(fragment, $context) {
             }
         });
         if (result)
-            return prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(result);
+            return prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(result);
     }
     return fragment;
 }
 function withWrappers(node, wrap, from = 0) {
     for (let i = wrap.length - 1; i >= from; i--)
-        node = wrap[i].create(null, prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(node));
+        node = wrap[i].create(null, prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(node));
     return node;
 }
 // Used to group adjacent nodes wrapped in similar parents by
@@ -23701,14 +23701,14 @@ function addToSibling(wrap, lastWrap, node, sibling, depth) {
             return sibling.copy(sibling.content.replaceChild(sibling.childCount - 1, inner));
         let match = sibling.contentMatchAt(sibling.childCount);
         if (match.matchType(depth == wrap.length - 1 ? node.type : wrap[depth + 1]))
-            return sibling.copy(sibling.content.append(prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(withWrappers(node, wrap, depth + 1))));
+            return sibling.copy(sibling.content.append(prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(withWrappers(node, wrap, depth + 1))));
     }
 }
 function closeRight(node, depth) {
     if (depth == 0)
         return node;
     let fragment = node.content.replaceChild(node.childCount - 1, closeRight(node.lastChild, depth - 1));
-    let fill = node.contentMatchAt(node.childCount).fillBefore(prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.empty, true);
+    let fill = node.contentMatchAt(node.childCount).fillBefore(prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.empty, true);
     return node.copy(fragment.append(fill));
 }
 function closeRange(fragment, side, from, to, depth, openEnd) {
@@ -23719,14 +23719,14 @@ function closeRange(fragment, side, from, to, depth, openEnd) {
         inner = closeRange(inner, side, from, to, depth + 1, openEnd);
     if (depth >= from)
         inner = side < 0 ? node.contentMatchAt(0).fillBefore(inner, openEnd <= depth).append(inner)
-            : inner.append(node.contentMatchAt(node.childCount).fillBefore(prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.empty, true));
+            : inner.append(node.contentMatchAt(node.childCount).fillBefore(prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.empty, true));
     return fragment.replaceChild(side < 0 ? 0 : fragment.childCount - 1, node.copy(inner));
 }
 function closeSlice(slice, openStart, openEnd) {
     if (openStart < slice.openStart)
-        slice = new prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice(closeRange(slice.content, -1, openStart, slice.openStart, 0, slice.openEnd), openStart, slice.openEnd);
+        slice = new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice(closeRange(slice.content, -1, openStart, slice.openStart, 0, slice.openEnd), openStart, slice.openEnd);
     if (openEnd < slice.openEnd)
-        slice = new prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice(closeRange(slice.content, 1, openEnd, slice.openEnd, 0, 0), slice.openStart, openEnd);
+        slice = new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice(closeRange(slice.content, 1, openEnd, slice.openEnd, 0, 0), slice.openStart, openEnd);
     return slice;
 }
 // Trick from jQuery -- some elements must be wrapped in other
@@ -23801,11 +23801,11 @@ function addContext(slice, context) {
         let type = schema.nodes[array[i]];
         if (!type || type.hasRequiredAttrs())
             break;
-        content = prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(type.create(array[i + 1], content));
+        content = prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(type.create(array[i + 1], content));
         openStart++;
         openEnd++;
     }
-    return new prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice(content, openStart, openEnd);
+    return new prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice(content, openStart, openEnd);
 }
 
 // A collection of DOM events that occur within the editor, and callback functions
@@ -23945,7 +23945,7 @@ editHandlers.keypress = (view, _event) => {
         return;
     }
     let sel = view.state.selection;
-    if (!(sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection) || !sel.$from.sameParent(sel.$to)) {
+    if (!(sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection) || !sel.$from.sameParent(sel.$to)) {
         let text = String.fromCharCode(event.charCode);
         let deflt = () => view.state.tr.insertText(text).scrollIntoView();
         if (!/[\r\n]/.test(text) && !view.someProp("handleTextInput", f => f(view, sel.$from.pos, sel.$to.pos, text, deflt)))
@@ -23983,8 +23983,8 @@ function selectClickedLeaf(view, inside) {
     if (inside == -1)
         return false;
     let $pos = view.state.doc.resolve(inside), node = $pos.nodeAfter;
-    if (node && node.isAtom && prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.isSelectable(node)) {
-        updateSelection(view, new prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection($pos), "pointer");
+    if (node && node.isAtom && prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.isSelectable(node)) {
+        updateSelection(view, new prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection($pos), "pointer");
         return true;
     }
     return false;
@@ -23993,12 +23993,12 @@ function selectClickedNode(view, inside) {
     if (inside == -1)
         return false;
     let sel = view.state.selection, selectedNode, selectAt;
-    if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection)
+    if (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection)
         selectedNode = sel.node;
     let $pos = view.state.doc.resolve(inside);
     for (let i = $pos.depth + 1; i > 0; i--) {
         let node = i > $pos.depth ? $pos.nodeAfter : $pos.node(i);
-        if (prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.isSelectable(node)) {
+        if (prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.isSelectable(node)) {
             if (selectedNode && sel.$from.depth > 0 &&
                 i >= sel.$from.depth && $pos.before(sel.$from.depth + 1) == sel.$from.pos)
                 selectAt = $pos.before(sel.$from.depth);
@@ -24008,7 +24008,7 @@ function selectClickedNode(view, inside) {
         }
     }
     if (selectAt != null) {
-        updateSelection(view, prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.create(view.state.doc, selectAt), "pointer");
+        updateSelection(view, prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.create(view.state.doc, selectAt), "pointer");
         return true;
     }
     else {
@@ -24035,7 +24035,7 @@ function defaultTripleClick(view, inside, event) {
     let doc = view.state.doc;
     if (inside == -1) {
         if (doc.inlineContent) {
-            updateSelection(view, prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection.create(doc, 0, doc.content.size), "pointer");
+            updateSelection(view, prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection.create(doc, 0, doc.content.size), "pointer");
             return true;
         }
         return false;
@@ -24045,9 +24045,9 @@ function defaultTripleClick(view, inside, event) {
         let node = i > $pos.depth ? $pos.nodeAfter : $pos.node(i);
         let nodePos = $pos.before(i);
         if (node.inlineContent)
-            updateSelection(view, prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection.create(doc, nodePos + 1, nodePos + 1 + node.content.size), "pointer");
-        else if (prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.isSelectable(node))
-            updateSelection(view, prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.create(doc, nodePos), "pointer");
+            updateSelection(view, prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection.create(doc, nodePos + 1, nodePos + 1 + node.content.size), "pointer");
+        else if (prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.isSelectable(node))
+            updateSelection(view, prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.create(doc, nodePos), "pointer");
         else
             continue;
         return true;
@@ -24112,7 +24112,7 @@ class MouseDown {
         let { selection } = view.state;
         if (event.button == 0 &&
             targetNode.type.spec.draggable && targetNode.type.spec.selectable !== false ||
-            selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection && selection.from <= targetPos && selection.to > targetPos)
+            selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection && selection.from <= targetPos && selection.to > targetPos)
             this.mightDrag = {
                 node: targetNode,
                 pos: targetPos,
@@ -24176,7 +24176,7 @@ class MouseDown {
                 // works around that.
                 (chrome && !this.view.state.selection.visible &&
                     Math.min(Math.abs(pos.pos - this.view.state.selection.from), Math.abs(pos.pos - this.view.state.selection.to)) <= 2))) {
-            updateSelection(this.view, prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection.near(this.view.state.doc.resolve(pos.pos)), "pointer");
+            updateSelection(this.view, prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Selection.near(this.view.state.doc.resolve(pos.pos)), "pointer");
             event.preventDefault();
         }
         else {
@@ -24230,7 +24230,7 @@ editHandlers.compositionstart = editHandlers.compositionupdate = view => {
     if (!view.composing) {
         view.domObserver.flush();
         let { state } = view, $pos = state.selection.$to;
-        if (state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection &&
+        if (state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection &&
             (state.storedMarks ||
                 (!$pos.textOffset && $pos.parentOffset && $pos.nodeBefore.marks.some(m => m.type.spec.inclusive === false)))) {
             // Need to wrap the cursor in mark nodes different from the ones in the DOM context
@@ -24409,7 +24409,7 @@ function capturePaste(view, event) {
 }
 function doPaste(view, text, html, preferPlain, event) {
     let slice = parseFromClipboard(view, text, html, preferPlain, view.state.selection.$from);
-    if (view.someProp("handlePaste", f => f(view, event, slice || prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice.empty)))
+    if (view.someProp("handlePaste", f => f(view, event, slice || prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice.empty)))
         return true;
     if (!slice)
         return false;
@@ -24464,14 +24464,14 @@ handlers.dragstart = (view, _event) => {
     let sel = view.state.selection;
     let pos = sel.empty ? null : view.posAtCoords(eventCoords(event));
     let node;
-    if (pos && pos.pos >= sel.from && pos.pos <= (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection ? sel.to - 1 : sel.to)) ;
+    if (pos && pos.pos >= sel.from && pos.pos <= (sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection ? sel.to - 1 : sel.to)) ;
     else if (mouseDown && mouseDown.mightDrag) {
-        node = prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.create(view.state.doc, mouseDown.mightDrag.pos);
+        node = prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.create(view.state.doc, mouseDown.mightDrag.pos);
     }
     else if (event.target && event.target.nodeType == 1) {
         let desc = view.docView.nearestDesc(event.target, true);
         if (desc && desc.node.type.spec.draggable && desc != view.docView)
-            node = prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.create(view.state.doc, desc.posBefore);
+            node = prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.create(view.state.doc, desc.posBefore);
     }
     let draggedSlice = (node || view.state.selection).content();
     let { dom, text, slice } = serializeForClipboard(view, draggedSlice);
@@ -24511,7 +24511,7 @@ editHandlers.drop = (view, _event) => {
         slice = parseFromClipboard(view, getText(event.dataTransfer), brokenClipboardAPI ? null : event.dataTransfer.getData("text/html"), false, $mouse);
     }
     let move = !!(dragging && dragMoves(view, event));
-    if (view.someProp("handleDrop", f => f(view, event, slice || prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Slice.empty, move))) {
+    if (view.someProp("handleDrop", f => f(view, event, slice || prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Slice.empty, move))) {
         event.preventDefault();
         return;
     }
@@ -24539,9 +24539,9 @@ editHandlers.drop = (view, _event) => {
     if (tr.doc.eq(beforeInsert))
         return;
     let $pos = tr.doc.resolve(pos);
-    if (isNode && prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.isSelectable(slice.content.firstChild) &&
+    if (isNode && prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.isSelectable(slice.content.firstChild) &&
         $pos.nodeAfter && $pos.nodeAfter.sameMarkup(slice.content.firstChild)) {
-        tr.setSelection(new prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection($pos));
+        tr.setSelection(new prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection($pos));
     }
     else {
         let end = tr.mapping.map(insertPos);
@@ -25483,7 +25483,7 @@ class DOMObserver {
         if (from < 0 && newSel && view.input.lastFocus > Date.now() - 200 &&
             Math.max(view.input.lastTouch, view.input.lastClick.time) < Date.now() - 300 &&
             selectionCollapsed(sel) && (readSel = selectionFromDOM(view)) &&
-            readSel.eq(prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection.near(view.state.doc.resolve(0), 1))) {
+            readSel.eq(prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Selection.near(view.state.doc.resolve(0), 1))) {
             view.input.lastFocus = 0;
             selectionToDOM(view);
             this.currentSelection.set(sel);
@@ -25647,7 +25647,7 @@ function parseBetween(view, from_, to_) {
         }
     }
     let startDoc = view.state.doc;
-    let parser = view.someProp("domParser") || prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.DOMParser.fromSchema(view.state.schema);
+    let parser = view.someProp("domParser") || prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.DOMParser.fromSchema(view.state.schema);
     let $from = startDoc.resolve(from);
     let sel = null, doc = parser.parse(parent, {
         topNode: $from.parent,
@@ -25743,7 +25743,7 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
         return;
     }
     if (!change) {
-        if (typeOver && sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection && !sel.empty && sel.$head.sameParent(sel.$anchor) &&
+        if (typeOver && sel instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection && !sel.empty && sel.$head.sameParent(sel.$anchor) &&
             !view.composing && !(parse.sel && parse.sel.anchor != parse.sel.head)) {
             change = { start: sel.from, endA: sel.to, endB: sel.to };
         }
@@ -25765,7 +25765,7 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
     // that's smaller than what was actually overwritten.
     if (view.state.selection.from < view.state.selection.to &&
         change.start == change.endB &&
-        view.state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.TextSelection) {
+        view.state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.TextSelection) {
         if (change.start > view.state.selection.from && change.start <= view.state.selection.from + 2 &&
             view.state.selection.from >= parse.from) {
             change.start = view.state.selection.from;
@@ -25798,7 +25798,7 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
         (!inlineChange && $from.pos < parse.doc.content.size &&
             (!$from.sameParent($to) || !$from.parent.inlineContent) &&
             !/\S/.test(parse.doc.textBetween($from.pos, $to.pos, "", "")) &&
-            (nextSel = prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.Selection.findFrom(parse.doc.resolve($from.pos + 1), 1, true)) &&
+            (nextSel = prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.Selection.findFrom(parse.doc.resolve($from.pos + 1), 1, true)) &&
             nextSel.head > $from.pos)) &&
         view.someProp("handleKeyDown", f => f(view, keyEvent(13, "Enter")))) {
         view.input.lastIOSEnter = 0;
@@ -25921,7 +25921,7 @@ function isMarkChange(cur, prev) {
     let updated = [];
     for (let i = 0; i < prev.childCount; i++)
         updated.push(update(prev.child(i)));
-    if (prosemirror_model__WEBPACK_IMPORTED_MODULE_0__.Fragment.from(updated).eq(cur))
+    if (prosemirror_model__WEBPACK_IMPORTED_MODULE_1__.Fragment.from(updated).eq(cur))
         return { mark, type };
 }
 function looksLikeBackspace(old, start, end, $newStart, $newEnd) {
@@ -26227,7 +26227,7 @@ class EditorView {
         let startDOM = this.domSelectionRange().focusNode;
         if (!startDOM || !this.dom.contains(startDOM.nodeType == 1 ? startDOM : startDOM.parentNode)) ;
         else if (this.someProp("handleScrollToSelection", f => f(this))) ;
-        else if (this.state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection) {
+        else if (this.state.selection instanceof prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection) {
             let target = this.docView.domAfterPos(this.state.selection.from);
             if (target.nodeType == 1)
                 scrollRectIntoView(this, target.getBoundingClientRect(), startDOM);
@@ -26276,7 +26276,7 @@ class EditorView {
             if (moved == sel.node)
                 found = movedPos;
         }
-        this.dragging = new Dragging(dragging.slice, dragging.move, found < 0 ? undefined : prosemirror_state__WEBPACK_IMPORTED_MODULE_1__.NodeSelection.create(this.state.doc, found));
+        this.dragging = new Dragging(dragging.slice, dragging.move, found < 0 ? undefined : prosemirror_state__WEBPACK_IMPORTED_MODULE_0__.NodeSelection.create(this.state.doc, found));
     }
     someProp(propName, f) {
         let prop = this._props && this._props[propName], value;
@@ -26586,10 +26586,10 @@ function checkStateComponent(plugin) {
 
 /***/ }),
 
-/***/ "./node_modules/react-dom/cjs/react-dom-client.development.js":
-/*!********************************************************************!*\
-  !*** ./node_modules/react-dom/cjs/react-dom-client.development.js ***!
-  \********************************************************************/
+/***/ "../node_modules/react-dom/cjs/react-dom-client.development.js":
+/*!*********************************************************************!*\
+  !*** ../node_modules/react-dom/cjs/react-dom-client.development.js ***!
+  \*********************************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 /**
@@ -27973,7 +27973,7 @@ function checkStateComponent(plugin) {
       prevPrepareStackTrace = error.indexOf("\n");
       -1 !== prevPrepareStackTrace &&
         (error = error.slice(prevPrepareStackTrace + 1));
-      prevPrepareStackTrace = error.indexOf("react-stack-bottom-frame");
+      prevPrepareStackTrace = error.indexOf("react_stack_bottom_frame");
       -1 !== prevPrepareStackTrace &&
         (prevPrepareStackTrace = error.lastIndexOf(
           "\n",
@@ -47794,9 +47794,9 @@ function checkStateComponent(plugin) {
       "function" ===
         typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart &&
       __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var Scheduler = __webpack_require__(/*! scheduler */ "./node_modules/scheduler/index.js"),
-      React = __webpack_require__(/*! react */ "./node_modules/react/index.js"),
-      ReactDOM = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js"),
+    var Scheduler = __webpack_require__(/*! scheduler */ "../node_modules/scheduler/index.js"),
+      React = __webpack_require__(/*! react */ "../node_modules/react/index.js"),
+      ReactDOM = __webpack_require__(/*! react-dom */ "../node_modules/react-dom/index.js"),
       assign = Object.assign,
       REACT_LEGACY_ELEMENT_TYPE = Symbol.for("react.element"),
       REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"),
@@ -50449,7 +50449,7 @@ function checkStateComponent(plugin) {
       }
     };
     var callComponent = {
-        "react-stack-bottom-frame": function (Component, props, secondArg) {
+        react_stack_bottom_frame: function (Component, props, secondArg) {
           var wasRendering = isRendering;
           isRendering = !0;
           try {
@@ -50460,9 +50460,9 @@ function checkStateComponent(plugin) {
         }
       },
       callComponentInDEV =
-        callComponent["react-stack-bottom-frame"].bind(callComponent),
+        callComponent.react_stack_bottom_frame.bind(callComponent),
       callRender = {
-        "react-stack-bottom-frame": function (instance) {
+        react_stack_bottom_frame: function (instance) {
           var wasRendering = isRendering;
           isRendering = !0;
           try {
@@ -50472,9 +50472,9 @@ function checkStateComponent(plugin) {
           }
         }
       },
-      callRenderInDEV = callRender["react-stack-bottom-frame"].bind(callRender),
+      callRenderInDEV = callRender.react_stack_bottom_frame.bind(callRender),
       callComponentDidMount = {
-        "react-stack-bottom-frame": function (finishedWork, instance) {
+        react_stack_bottom_frame: function (finishedWork, instance) {
           try {
             instance.componentDidMount();
           } catch (error) {
@@ -50482,11 +50482,12 @@ function checkStateComponent(plugin) {
           }
         }
       },
-      callComponentDidMountInDEV = callComponentDidMount[
-        "react-stack-bottom-frame"
-      ].bind(callComponentDidMount),
+      callComponentDidMountInDEV =
+        callComponentDidMount.react_stack_bottom_frame.bind(
+          callComponentDidMount
+        ),
       callComponentDidUpdate = {
-        "react-stack-bottom-frame": function (
+        react_stack_bottom_frame: function (
           finishedWork,
           instance,
           prevProps,
@@ -50500,22 +50501,24 @@ function checkStateComponent(plugin) {
           }
         }
       },
-      callComponentDidUpdateInDEV = callComponentDidUpdate[
-        "react-stack-bottom-frame"
-      ].bind(callComponentDidUpdate),
+      callComponentDidUpdateInDEV =
+        callComponentDidUpdate.react_stack_bottom_frame.bind(
+          callComponentDidUpdate
+        ),
       callComponentDidCatch = {
-        "react-stack-bottom-frame": function (instance, errorInfo) {
+        react_stack_bottom_frame: function (instance, errorInfo) {
           var stack = errorInfo.stack;
           instance.componentDidCatch(errorInfo.value, {
             componentStack: null !== stack ? stack : ""
           });
         }
       },
-      callComponentDidCatchInDEV = callComponentDidCatch[
-        "react-stack-bottom-frame"
-      ].bind(callComponentDidCatch),
+      callComponentDidCatchInDEV =
+        callComponentDidCatch.react_stack_bottom_frame.bind(
+          callComponentDidCatch
+        ),
       callComponentWillUnmount = {
-        "react-stack-bottom-frame": function (
+        react_stack_bottom_frame: function (
           current,
           nearestMountedAncestor,
           instance
@@ -50527,11 +50530,12 @@ function checkStateComponent(plugin) {
           }
         }
       },
-      callComponentWillUnmountInDEV = callComponentWillUnmount[
-        "react-stack-bottom-frame"
-      ].bind(callComponentWillUnmount),
+      callComponentWillUnmountInDEV =
+        callComponentWillUnmount.react_stack_bottom_frame.bind(
+          callComponentWillUnmount
+        ),
       callCreate = {
-        "react-stack-bottom-frame": function (effect) {
+        react_stack_bottom_frame: function (effect) {
           null != effect.resourceKind &&
             console.error(
               "Expected only SimpleEffects when enableUseEffectCRUDOverload is disabled, got %s",
@@ -50543,9 +50547,9 @@ function checkStateComponent(plugin) {
           return (effect.destroy = create);
         }
       },
-      callCreateInDEV = callCreate["react-stack-bottom-frame"].bind(callCreate),
+      callCreateInDEV = callCreate.react_stack_bottom_frame.bind(callCreate),
       callDestroy = {
-        "react-stack-bottom-frame": function (
+        react_stack_bottom_frame: function (
           current,
           nearestMountedAncestor,
           destroy
@@ -50557,16 +50561,15 @@ function checkStateComponent(plugin) {
           }
         }
       },
-      callDestroyInDEV =
-        callDestroy["react-stack-bottom-frame"].bind(callDestroy),
+      callDestroyInDEV = callDestroy.react_stack_bottom_frame.bind(callDestroy),
       callLazyInit = {
-        "react-stack-bottom-frame": function (lazy) {
+        react_stack_bottom_frame: function (lazy) {
           var init = lazy._init;
           return init(lazy._payload);
         }
       },
       callLazyInitInDEV =
-        callLazyInit["react-stack-bottom-frame"].bind(callLazyInit),
+        callLazyInit.react_stack_bottom_frame.bind(callLazyInit),
       thenableState = null,
       thenableIndexCounter = 0,
       currentDebugInfo = null,
@@ -51387,11 +51390,11 @@ function checkStateComponent(plugin) {
     };
     (function () {
       var isomorphicReactPackageVersion = React.version;
-      if ("19.1.0" !== isomorphicReactPackageVersion)
+      if ("19.1.1" !== isomorphicReactPackageVersion)
         throw Error(
           'Incompatible React versions: The "react" and "react-dom" packages must have the exact same version. Instead got:\n  - react:      ' +
             (isomorphicReactPackageVersion +
-              "\n  - react-dom:  19.1.0\nLearn more: https://react.dev/warnings/version-mismatch")
+              "\n  - react-dom:  19.1.1\nLearn more: https://react.dev/warnings/version-mismatch")
         );
     })();
     ("function" === typeof Map &&
@@ -51428,10 +51431,10 @@ function checkStateComponent(plugin) {
       !(function () {
         var internals = {
           bundleType: 1,
-          version: "19.1.0",
+          version: "19.1.1",
           rendererPackageName: "react-dom",
           currentDispatcherRef: ReactSharedInternals,
-          reconcilerVersion: "19.1.0"
+          reconcilerVersion: "19.1.1"
         };
         internals.overrideHookState = overrideHookState;
         internals.overrideHookStateDeletePath = overrideHookStateDeletePath;
@@ -51575,7 +51578,7 @@ function checkStateComponent(plugin) {
       listenToAllSupportedEvents(container);
       return new ReactDOMHydrationRoot(initialChildren);
     };
-    exports.version = "19.1.0";
+    exports.version = "19.1.1";
     "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ &&
       "function" ===
         typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop &&
@@ -51585,10 +51588,10 @@ function checkStateComponent(plugin) {
 
 /***/ }),
 
-/***/ "./node_modules/react-dom/cjs/react-dom.development.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/react-dom/cjs/react-dom.development.js ***!
-  \*************************************************************/
+/***/ "../node_modules/react-dom/cjs/react-dom.development.js":
+/*!**************************************************************!*\
+  !*** ../node_modules/react-dom/cjs/react-dom.development.js ***!
+  \**************************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 /**
@@ -51674,7 +51677,7 @@ function checkStateComponent(plugin) {
       "function" ===
         typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart &&
       __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var React = __webpack_require__(/*! react */ "./node_modules/react/index.js"),
+    var React = __webpack_require__(/*! react */ "../node_modules/react/index.js"),
       Internals = {
         d: {
           f: noop,
@@ -52009,7 +52012,7 @@ function checkStateComponent(plugin) {
     exports.useFormStatus = function () {
       return resolveDispatcher().useHostTransitionStatus();
     };
-    exports.version = "19.1.0";
+    exports.version = "19.1.1";
     "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ &&
       "function" ===
         typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop &&
@@ -52019,9 +52022,47 @@ function checkStateComponent(plugin) {
 
 /***/ }),
 
-/***/ "./node_modules/react-dom/client.js":
+/***/ "../node_modules/react-dom/client.js":
+/*!*******************************************!*\
+  !*** ../node_modules/react-dom/client.js ***!
+  \*******************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+
+
+function checkDCE() {
+  /* global __REACT_DEVTOOLS_GLOBAL_HOOK__ */
+  if (
+    typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ === 'undefined' ||
+    typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE !== 'function'
+  ) {
+    return;
+  }
+  if (true) {
+    // This branch is unreachable because this function is only called
+    // in production, but the condition is true only in development.
+    // Therefore if the branch is still here, dead code elimination wasn't
+    // properly applied.
+    // Don't change the message. React DevTools relies on it. Also make sure
+    // this message doesn't occur elsewhere in this function, or it will cause
+    // a false positive.
+    throw new Error('^_^');
+  }
+  // removed by dead control flow
+{}
+}
+
+if (false) // removed by dead control flow
+{} else {
+  module.exports = __webpack_require__(/*! ./cjs/react-dom-client.development.js */ "../node_modules/react-dom/cjs/react-dom-client.development.js");
+}
+
+
+/***/ }),
+
+/***/ "../node_modules/react-dom/index.js":
 /*!******************************************!*\
-  !*** ./node_modules/react-dom/client.js ***!
+  !*** ../node_modules/react-dom/index.js ***!
   \******************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -52051,54 +52092,16 @@ function checkDCE() {
 
 if (false) // removed by dead control flow
 {} else {
-  module.exports = __webpack_require__(/*! ./cjs/react-dom-client.development.js */ "./node_modules/react-dom/cjs/react-dom-client.development.js");
+  module.exports = __webpack_require__(/*! ./cjs/react-dom.development.js */ "../node_modules/react-dom/cjs/react-dom.development.js");
 }
 
 
 /***/ }),
 
-/***/ "./node_modules/react-dom/index.js":
-/*!*****************************************!*\
-  !*** ./node_modules/react-dom/index.js ***!
-  \*****************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-
-
-function checkDCE() {
-  /* global __REACT_DEVTOOLS_GLOBAL_HOOK__ */
-  if (
-    typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ === 'undefined' ||
-    typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE !== 'function'
-  ) {
-    return;
-  }
-  if (true) {
-    // This branch is unreachable because this function is only called
-    // in production, but the condition is true only in development.
-    // Therefore if the branch is still here, dead code elimination wasn't
-    // properly applied.
-    // Don't change the message. React DevTools relies on it. Also make sure
-    // this message doesn't occur elsewhere in this function, or it will cause
-    // a false positive.
-    throw new Error('^_^');
-  }
-  // removed by dead control flow
-{}
-}
-
-if (false) // removed by dead control flow
-{} else {
-  module.exports = __webpack_require__(/*! ./cjs/react-dom.development.js */ "./node_modules/react-dom/cjs/react-dom.development.js");
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/react/cjs/react-jsx-dev-runtime.development.js":
-/*!*********************************************************************!*\
-  !*** ./node_modules/react/cjs/react-jsx-dev-runtime.development.js ***!
-  \*********************************************************************/
+/***/ "../node_modules/react/cjs/react-jsx-dev-runtime.development.js":
+/*!**********************************************************************!*\
+  !*** ../node_modules/react/cjs/react-jsx-dev-runtime.development.js ***!
+  \**********************************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 /**
@@ -52387,7 +52390,7 @@ if (false) // removed by dead control flow
         node._store &&
         (node._store.validated = 1);
     }
-    var React = __webpack_require__(/*! react */ "./node_modules/react/index.js"),
+    var React = __webpack_require__(/*! react */ "../node_modules/react/index.js"),
       REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"),
       REACT_PORTAL_TYPE = Symbol.for("react.portal"),
       REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"),
@@ -52413,13 +52416,13 @@ if (false) // removed by dead control flow
             return null;
           };
     React = {
-      "react-stack-bottom-frame": function (callStackForError) {
+      react_stack_bottom_frame: function (callStackForError) {
         return callStackForError();
       }
     };
     var specialPropKeyWarningShown;
     var didWarnAboutElementRef = {};
-    var unknownOwnerDebugStack = React["react-stack-bottom-frame"].bind(
+    var unknownOwnerDebugStack = React.react_stack_bottom_frame.bind(
       React,
       UnknownOwner
     )();
@@ -52454,10 +52457,10 @@ if (false) // removed by dead control flow
 
 /***/ }),
 
-/***/ "./node_modules/react/cjs/react-jsx-runtime.development.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/react/cjs/react-jsx-runtime.development.js ***!
-  \*****************************************************************/
+/***/ "../node_modules/react/cjs/react-jsx-runtime.development.js":
+/*!******************************************************************!*\
+  !*** ../node_modules/react/cjs/react-jsx-runtime.development.js ***!
+  \******************************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 /**
@@ -52746,7 +52749,7 @@ if (false) // removed by dead control flow
         node._store &&
         (node._store.validated = 1);
     }
-    var React = __webpack_require__(/*! react */ "./node_modules/react/index.js"),
+    var React = __webpack_require__(/*! react */ "../node_modules/react/index.js"),
       REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"),
       REACT_PORTAL_TYPE = Symbol.for("react.portal"),
       REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"),
@@ -52772,13 +52775,13 @@ if (false) // removed by dead control flow
             return null;
           };
     React = {
-      "react-stack-bottom-frame": function (callStackForError) {
+      react_stack_bottom_frame: function (callStackForError) {
         return callStackForError();
       }
     };
     var specialPropKeyWarningShown;
     var didWarnAboutElementRef = {};
-    var unknownOwnerDebugStack = React["react-stack-bottom-frame"].bind(
+    var unknownOwnerDebugStack = React.react_stack_bottom_frame.bind(
       React,
       UnknownOwner
     )();
@@ -52822,10 +52825,10 @@ if (false) // removed by dead control flow
 
 /***/ }),
 
-/***/ "./node_modules/react/cjs/react.development.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/react/cjs/react.development.js ***!
-  \*****************************************************/
+/***/ "../node_modules/react/cjs/react.development.js":
+/*!******************************************************!*\
+  !*** ../node_modules/react/cjs/react.development.js ***!
+  \******************************************************/
 /***/ ((module, exports, __webpack_require__) => {
 
 /* module decorator */ module = __webpack_require__.nmd(module);
@@ -53507,15 +53510,16 @@ if (false) // removed by dead control flow
             return null;
           };
     deprecatedAPIs = {
-      "react-stack-bottom-frame": function (callStackForError) {
+      react_stack_bottom_frame: function (callStackForError) {
         return callStackForError();
       }
     };
     var specialPropKeyWarningShown, didWarnAboutOldJSXRuntime;
     var didWarnAboutElementRef = {};
-    var unknownOwnerDebugStack = deprecatedAPIs[
-      "react-stack-bottom-frame"
-    ].bind(deprecatedAPIs, UnknownOwner)();
+    var unknownOwnerDebugStack = deprecatedAPIs.react_stack_bottom_frame.bind(
+      deprecatedAPIs,
+      UnknownOwner
+    )();
     var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
     var didWarnAboutMaps = !1,
       userProvidedKeyEscapeRegex = /\/+/g,
@@ -54065,7 +54069,7 @@ if (false) // removed by dead control flow
     exports.useTransition = function () {
       return resolveDispatcher().useTransition();
     };
-    exports.version = "19.1.0";
+    exports.version = "19.1.1";
     "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ &&
       "function" ===
         typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop &&
@@ -54075,58 +54079,58 @@ if (false) // removed by dead control flow
 
 /***/ }),
 
-/***/ "./node_modules/react/index.js":
-/*!*************************************!*\
-  !*** ./node_modules/react/index.js ***!
-  \*************************************/
+/***/ "../node_modules/react/index.js":
+/*!**************************************!*\
+  !*** ../node_modules/react/index.js ***!
+  \**************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
 
 if (false) // removed by dead control flow
 {} else {
-  module.exports = __webpack_require__(/*! ./cjs/react.development.js */ "./node_modules/react/cjs/react.development.js");
+  module.exports = __webpack_require__(/*! ./cjs/react.development.js */ "../node_modules/react/cjs/react.development.js");
 }
 
 
 /***/ }),
 
-/***/ "./node_modules/react/jsx-dev-runtime.js":
-/*!***********************************************!*\
-  !*** ./node_modules/react/jsx-dev-runtime.js ***!
-  \***********************************************/
+/***/ "../node_modules/react/jsx-dev-runtime.js":
+/*!************************************************!*\
+  !*** ../node_modules/react/jsx-dev-runtime.js ***!
+  \************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
 
 if (false) // removed by dead control flow
 {} else {
-  module.exports = __webpack_require__(/*! ./cjs/react-jsx-dev-runtime.development.js */ "./node_modules/react/cjs/react-jsx-dev-runtime.development.js");
+  module.exports = __webpack_require__(/*! ./cjs/react-jsx-dev-runtime.development.js */ "../node_modules/react/cjs/react-jsx-dev-runtime.development.js");
 }
 
 
 /***/ }),
 
-/***/ "./node_modules/react/jsx-runtime.js":
-/*!*******************************************!*\
-  !*** ./node_modules/react/jsx-runtime.js ***!
-  \*******************************************/
+/***/ "../node_modules/react/jsx-runtime.js":
+/*!********************************************!*\
+  !*** ../node_modules/react/jsx-runtime.js ***!
+  \********************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
 
 if (false) // removed by dead control flow
 {} else {
-  module.exports = __webpack_require__(/*! ./cjs/react-jsx-runtime.development.js */ "./node_modules/react/cjs/react-jsx-runtime.development.js");
+  module.exports = __webpack_require__(/*! ./cjs/react-jsx-runtime.development.js */ "../node_modules/react/cjs/react-jsx-runtime.development.js");
 }
 
 
 /***/ }),
 
-/***/ "./node_modules/rope-sequence/dist/index.js":
-/*!**************************************************!*\
-  !*** ./node_modules/rope-sequence/dist/index.js ***!
-  \**************************************************/
+/***/ "../node_modules/rope-sequence/dist/index.js":
+/*!***************************************************!*\
+  !*** ../node_modules/rope-sequence/dist/index.js ***!
+  \***************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -54344,10 +54348,10 @@ var Append = /*@__PURE__*/(function (RopeSequence) {
 
 /***/ }),
 
-/***/ "./node_modules/scheduler/cjs/scheduler.development.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/scheduler/cjs/scheduler.development.js ***!
-  \*************************************************************/
+/***/ "../node_modules/scheduler/cjs/scheduler.development.js":
+/*!**************************************************************!*\
+  !*** ../node_modules/scheduler/cjs/scheduler.development.js ***!
+  \**************************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 /**
@@ -54718,26 +54722,26 @@ var Append = /*@__PURE__*/(function (RopeSequence) {
 
 /***/ }),
 
-/***/ "./node_modules/scheduler/index.js":
-/*!*****************************************!*\
-  !*** ./node_modules/scheduler/index.js ***!
-  \*****************************************/
+/***/ "../node_modules/scheduler/index.js":
+/*!******************************************!*\
+  !*** ../node_modules/scheduler/index.js ***!
+  \******************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
 
 if (false) // removed by dead control flow
 {} else {
-  module.exports = __webpack_require__(/*! ./cjs/scheduler.development.js */ "./node_modules/scheduler/cjs/scheduler.development.js");
+  module.exports = __webpack_require__(/*! ./cjs/scheduler.development.js */ "../node_modules/scheduler/cjs/scheduler.development.js");
 }
 
 
 /***/ }),
 
-/***/ "./node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js":
-/*!**********************************************************************************************!*\
-  !*** ./node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js ***!
-  \**********************************************************************************************/
+/***/ "../node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js":
+/*!***********************************************************************************************!*\
+  !*** ../node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js ***!
+  \***********************************************************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 /**
@@ -54814,7 +54818,7 @@ if (false) // removed by dead control flow
       "function" ===
         typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart &&
       __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var React = __webpack_require__(/*! react */ "./node_modules/react/index.js"),
+    var React = __webpack_require__(/*! react */ "../node_modules/react/index.js"),
       objectIs = "function" === typeof Object.is ? Object.is : is,
       useState = React.useState,
       useEffect = React.useEffect,
@@ -54839,10 +54843,10 @@ if (false) // removed by dead control flow
 
 /***/ }),
 
-/***/ "./node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js":
-/*!************************************************************************************************************!*\
-  !*** ./node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js ***!
-  \************************************************************************************************************/
+/***/ "../node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js":
+/*!*************************************************************************************************************!*\
+  !*** ../node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js ***!
+  \*************************************************************************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 /**
@@ -54865,8 +54869,8 @@ if (false) // removed by dead control flow
       "function" ===
         typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart &&
       __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var React = __webpack_require__(/*! react */ "./node_modules/react/index.js"),
-      shim = __webpack_require__(/*! use-sync-external-store/shim */ "./node_modules/use-sync-external-store/shim/index.js"),
+    var React = __webpack_require__(/*! react */ "../node_modules/react/index.js"),
+      shim = __webpack_require__(/*! use-sync-external-store/shim */ "../node_modules/use-sync-external-store/shim/index.js"),
       objectIs = "function" === typeof Object.is ? Object.is : is,
       useSyncExternalStore = shim.useSyncExternalStore,
       useRef = React.useRef,
@@ -54946,42 +54950,42 @@ if (false) // removed by dead control flow
 
 /***/ }),
 
-/***/ "./node_modules/use-sync-external-store/shim/index.js":
-/*!************************************************************!*\
-  !*** ./node_modules/use-sync-external-store/shim/index.js ***!
-  \************************************************************/
+/***/ "../node_modules/use-sync-external-store/shim/index.js":
+/*!*************************************************************!*\
+  !*** ../node_modules/use-sync-external-store/shim/index.js ***!
+  \*************************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
 
 if (false) // removed by dead control flow
 {} else {
-  module.exports = __webpack_require__(/*! ../cjs/use-sync-external-store-shim.development.js */ "./node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js");
+  module.exports = __webpack_require__(/*! ../cjs/use-sync-external-store-shim.development.js */ "../node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js");
 }
 
 
 /***/ }),
 
-/***/ "./node_modules/use-sync-external-store/shim/with-selector.js":
-/*!********************************************************************!*\
-  !*** ./node_modules/use-sync-external-store/shim/with-selector.js ***!
-  \********************************************************************/
+/***/ "../node_modules/use-sync-external-store/shim/with-selector.js":
+/*!*********************************************************************!*\
+  !*** ../node_modules/use-sync-external-store/shim/with-selector.js ***!
+  \*********************************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
 
 if (false) // removed by dead control flow
 {} else {
-  module.exports = __webpack_require__(/*! ../cjs/use-sync-external-store-shim/with-selector.development.js */ "./node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js");
+  module.exports = __webpack_require__(/*! ../cjs/use-sync-external-store-shim/with-selector.development.js */ "../node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js");
 }
 
 
 /***/ }),
 
-/***/ "./node_modules/w3c-keyname/index.js":
-/*!*******************************************!*\
-  !*** ./node_modules/w3c-keyname/index.js ***!
-  \*******************************************/
+/***/ "../node_modules/w3c-keyname/index.js":
+/*!********************************************!*\
+  !*** ../node_modules/w3c-keyname/index.js ***!
+  \********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -55123,8 +55127,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ App)
 /* harmony export */ });
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "./node_modules/react/jsx-dev-runtime.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "../node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./helpers */ "./src/helpers.tsx");
 /* harmony import */ var _components_RichEditor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/RichEditor */ "./src/components/RichEditor.tsx");
@@ -55456,7 +55460,7 @@ function App(param) {
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h2", {
                 children: item ? T('Edit %s', item.title) : T('Edit')
             }, void 0, false, {
-                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                 lineNumber: 72,
                 columnNumber: 7
             }, this),
@@ -55471,7 +55475,7 @@ function App(param) {
                                 htmlFor: "title",
                                 children: T('Title')
                             }, void 0, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                 lineNumber: 75,
                                 columnNumber: 11
                             }, this),
@@ -55487,13 +55491,13 @@ function App(param) {
                                     }));
                                 }
                             }, void 0, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                 lineNumber: 76,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                         lineNumber: 74,
                         columnNumber: 9
                     }, this),
@@ -55507,7 +55511,7 @@ function App(param) {
                                     ":"
                                 ]
                             }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                 lineNumber: 82,
                                 columnNumber: 11
                             }, this),
@@ -55523,13 +55527,13 @@ function App(param) {
                                     }));
                                 }
                             }, void 0, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                 lineNumber: 83,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                         lineNumber: 81,
                         columnNumber: 9
                     }, this),
@@ -55543,30 +55547,30 @@ function App(param) {
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
                                     children: T('NOTE: changes to the shortname will not auto-save.')
                                 }, void 0, false, {
-                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                     lineNumber: 90,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
-                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                     lineNumber: 91,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
                                     children: T('Other users currently editing this item will be unable to save their work. Change with caution.')
                                 }, void 0, false, {
-                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                     lineNumber: 92,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                             lineNumber: 89,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                         lineNumber: 88,
                         columnNumber: 9
                     }, this),
@@ -55580,7 +55584,7 @@ function App(param) {
                                     ":"
                                 ]
                             }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                 lineNumber: 97,
                                 columnNumber: 11
                             }, this),
@@ -55603,7 +55607,7 @@ function App(param) {
                                             "..."
                                         ]
                                     }, void 0, true, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                         lineNumber: 99,
                                         columnNumber: 13
                                     }, this),
@@ -55612,20 +55616,20 @@ function App(param) {
                                             value: type,
                                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)(categories[type][0])
                                         }, type, false, {
-                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                             lineNumber: 101,
                                             columnNumber: 15
                                         }, _this);
                                     })
                                 ]
                             }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                 lineNumber: 98,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                         lineNumber: 96,
                         columnNumber: 9
                     }, this),
@@ -55639,7 +55643,7 @@ function App(param) {
                                     ":"
                                 ]
                             }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                 lineNumber: 109,
                                 columnNumber: 11
                             }, this),
@@ -55654,13 +55658,13 @@ function App(param) {
                                     }));
                                 }
                             }, void 0, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                 lineNumber: 110,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                         lineNumber: 108,
                         columnNumber: 9
                     }, this),
@@ -55674,7 +55678,7 @@ function App(param) {
                                     ":"
                                 ]
                             }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                 lineNumber: 114,
                                 columnNumber: 11
                             }, this),
@@ -55693,26 +55697,26 @@ function App(param) {
                                             }));
                                         }
                                     }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                         lineNumber: 116,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                         className: "slider"
                                     }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                         lineNumber: 119,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                 lineNumber: 115,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                         lineNumber: 113,
                         columnNumber: 9
                     }, this),
@@ -55726,7 +55730,7 @@ function App(param) {
                                     ":"
                                 ]
                             }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                 lineNumber: 124,
                                 columnNumber: 11
                             }, this),
@@ -55745,26 +55749,26 @@ function App(param) {
                                             }));
                                         }
                                     }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                         lineNumber: 126,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                         className: "slider"
                                     }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                         lineNumber: 129,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                                 lineNumber: 125,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                         lineNumber: 123,
                         columnNumber: 9
                     }, this),
@@ -55774,25 +55778,25 @@ function App(param) {
                             type: "submit",
                             children: T('Save Changes')
                         }, void 0, false, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                             lineNumber: 134,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                         lineNumber: 133,
                         columnNumber: 9
                     }, this),
                     objData && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_RichEditor__WEBPACK_IMPORTED_MODULE_3__["default"], {
                         content: objData.body
                     }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                         lineNumber: 137,
                         columnNumber: 21
                     }, this)
                 ]
             }, void 0, true, {
-                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\App.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
                 lineNumber: 73,
                 columnNumber: 7
             }, this)
@@ -55813,17 +55817,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ RichEditor)
 /* harmony export */ });
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "./node_modules/react/jsx-dev-runtime.js");
-/* harmony import */ var _tiptap_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tiptap/react */ "./node_modules/@tiptap/react/dist/index.js");
-/* harmony import */ var _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/starter-kit */ "./node_modules/@tiptap/starter-kit/dist/index.js");
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
+/* harmony import */ var _tiptap_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/react */ "../node_modules/@tiptap/react/dist/index.js");
+/* harmony import */ var _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tiptap/starter-kit */ "../node_modules/@tiptap/starter-kit/dist/index.js");
 
 
 
 function RichEditor(param) {
     var content = param.content;
-    var editor = (0,_tiptap_react__WEBPACK_IMPORTED_MODULE_2__.useEditor)({
+    var editor = (0,_tiptap_react__WEBPACK_IMPORTED_MODULE_1__.useEditor)({
         extensions: [
-            _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_1__["default"]
+            _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_2__["default"]
         ],
         content: content,
         onUpdate: function(param) {
@@ -55833,15 +55837,15 @@ function RichEditor(param) {
     });
     return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
         className: "markdown",
-        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_tiptap_react__WEBPACK_IMPORTED_MODULE_2__.EditorContent, {
+        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_tiptap_react__WEBPACK_IMPORTED_MODULE_1__.EditorContent, {
             editor: editor
         }, void 0, false, {
-            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\components\\RichEditor.tsx",
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\RichEditor.tsx",
             lineNumber: 14,
             columnNumber: 5
         }, this)
     }, void 0, false, {
-        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\components\\RichEditor.tsx",
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\RichEditor.tsx",
         lineNumber: 13,
         columnNumber: 10
     }, this);
@@ -56016,10 +56020,10 @@ var __webpack_exports__ = {};
   !*** ./src/main.tsx ***!
   \**********************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "./node_modules/react/jsx-dev-runtime.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "../node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js");
+/* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom/client */ "../node_modules/react-dom/client.js");
 /* harmony import */ var _App_tsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./App.tsx */ "./src/App.tsx");
 function _define_property(obj, key, value) {
     if (key in obj) {
@@ -56057,12 +56061,12 @@ var root = document.querySelector('#root');
 var dataset = root.dataset;
 (0,react_dom_client__WEBPACK_IMPORTED_MODULE_2__.createRoot)(root).render(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react__WEBPACK_IMPORTED_MODULE_1__.StrictMode, {
     children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_App_tsx__WEBPACK_IMPORTED_MODULE_3__["default"], _object_spread({}, dataset), void 0, false, {
-        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\main.tsx",
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\main.tsx",
         lineNumber: 10,
         columnNumber: 5
     }, undefined)
 }, void 0, false, {
-    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\archivium-editor\\src\\main.tsx",
+    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\main.tsx",
     lineNumber: 9,
     columnNumber: 3
 }, undefined));
