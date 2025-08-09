@@ -1,4 +1,4 @@
-interface NodeAttributes {
+export interface NodeAttributes {
   class?: string,
   href?: string,
   target?: string,
@@ -9,6 +9,8 @@ interface NodeAttributes {
   width?: string | number,
   alt?: string;
 }
+
+export type MarkdownData = [string, string, MarkdownData[], NodeAttributes];
 
 class MarkdownNode {
   type: any;
@@ -71,7 +73,7 @@ class MarkdownNode {
     return `${this.content ?? ''}${this.children.map(child => child.innerText()).join('')}`;
   }
 
-  async evaluate(currentUniverse: string, ctx, transform?, topLevel=true) {
+  async evaluate(currentUniverse: string, ctx, transform?, topLevel=true): Promise<MarkdownData> {
     if (this.type === 'a') {
       this.addClass('link');
       this.addClass('link-animated');
@@ -127,7 +129,7 @@ class MarkdownNode {
       }
       delete this.attrs.ctx;
     }
-    const result = [this.type, this.content ?? '', await Promise.all(this.children.map(tag => tag.evaluate(currentUniverse, ctx, transform, false))), this.attrs];
+    const result: MarkdownData = [this.type, this.content ?? '', await Promise.all(this.children.map(tag => tag.evaluate(currentUniverse, ctx, transform, false))), this.attrs];
     return result;
   }
 }

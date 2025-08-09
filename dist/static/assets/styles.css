@@ -676,8 +676,14 @@ button:disabled {
 
 .markdown p {
   /* text-indent: 2rem; */
-  padding: 0 0.75rem;
+  padding: 0;
   min-height: 2rem;
+}
+.markdown li p {
+  /* text-indent: 2rem; */
+  padding: 0 0.25rem;
+  margin: 0;
+  min-height: unset;
 }
 
 .markdown img {
@@ -729,7 +735,7 @@ h4, h5 {
 .tiptap {
   background-color: #fefefe;
   border-radius: 0.25rem;
-  padding: 0.25rem;
+  padding: 0.25rem 1.25rem;
 }
 
 /* EasyMDE styles */

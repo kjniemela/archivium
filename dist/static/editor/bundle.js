@@ -55117,6 +55117,966 @@ function keyName(event) {
 
 /***/ }),
 
+/***/ "../src/markdown.ts":
+/*!**************************!*\
+  !*** ../src/markdown.ts ***!
+  \**************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   extractLinks: () => (/* binding */ extractLinks),
+/* harmony export */   parseMarkdown: () => (/* binding */ parseMarkdown)
+/* harmony export */ });
+function _array_like_to_array(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
+    return arr2;
+}
+function _array_with_holes(arr) {
+    if (Array.isArray(arr)) return arr;
+}
+function _array_without_holes(arr) {
+    if (Array.isArray(arr)) return _array_like_to_array(arr);
+}
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+        var info = gen[key](arg);
+        var value = info.value;
+    } catch (error) {
+        reject(error);
+        return;
+    }
+    if (info.done) {
+        resolve(value);
+    } else {
+        Promise.resolve(value).then(_next, _throw);
+    }
+}
+function _async_to_generator(fn) {
+    return function() {
+        var self = this, args = arguments;
+        return new Promise(function(resolve, reject) {
+            var gen = fn.apply(self, args);
+            function _next(value) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+            }
+            function _throw(err) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+            }
+            _next(undefined);
+        });
+    };
+}
+function _class_call_check(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+        throw new TypeError("Cannot call a class as a function");
+    }
+}
+function _construct(Parent, args, Class) {
+    if (_is_native_reflect_construct()) {
+        _construct = Reflect.construct;
+    } else {
+        _construct = function construct(Parent, args, Class) {
+            var a = [
+                null
+            ];
+            a.push.apply(a, args);
+            var Constructor = Function.bind.apply(Parent, a);
+            var instance = new Constructor();
+            if (Class) _set_prototype_of(instance, Class.prototype);
+            return instance;
+        };
+    }
+    return _construct.apply(null, arguments);
+}
+function _defineProperties(target, props) {
+    for(var i = 0; i < props.length; i++){
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+    }
+}
+function _create_class(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+}
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function _instanceof(left, right) {
+    if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) {
+        return !!right[Symbol.hasInstance](left);
+    } else {
+        return left instanceof right;
+    }
+}
+function _iterable_to_array(iter) {
+    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
+}
+function _iterable_to_array_limit(arr, i) {
+    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+    if (_i == null) return;
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _s, _e;
+    try {
+        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
+            _arr.push(_s.value);
+            if (i && _arr.length === i) break;
+        }
+    } catch (err) {
+        _d = true;
+        _e = err;
+    } finally{
+        try {
+            if (!_n && _i["return"] != null) _i["return"]();
+        } finally{
+            if (_d) throw _e;
+        }
+    }
+    return _arr;
+}
+function _non_iterable_rest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _non_iterable_spread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _set_prototype_of(o, p) {
+    _set_prototype_of = Object.setPrototypeOf || function setPrototypeOf(o, p) {
+        o.__proto__ = p;
+        return o;
+    };
+    return _set_prototype_of(o, p);
+}
+function _sliced_to_array(arr, i) {
+    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
+}
+function _to_array(arr) {
+    return _array_with_holes(arr) || _iterable_to_array(arr) || _unsupported_iterable_to_array(arr) || _non_iterable_rest();
+}
+function _to_consumable_array(arr) {
+    return _array_without_holes(arr) || _iterable_to_array(arr) || _unsupported_iterable_to_array(arr) || _non_iterable_spread();
+}
+function _unsupported_iterable_to_array(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _array_like_to_array(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
+}
+function _is_native_reflect_construct() {
+    try {
+        var result = !Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function() {}));
+    } catch (_) {}
+    return (_is_native_reflect_construct = function() {
+        return !!result;
+    })();
+}
+function _ts_generator(thisArg, body) {
+    var f, y, t, _ = {
+        label: 0,
+        sent: function() {
+            if (t[0] & 1) throw t[1];
+            return t[1];
+        },
+        trys: [],
+        ops: []
+    }, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+        return this;
+    }), g;
+    function verb(n) {
+        return function(v) {
+            return step([
+                n,
+                v
+            ]);
+        };
+    }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while(g && (g = 0, op[0] && (_ = 0)), _)try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [
+                op[0] & 2,
+                t.value
+            ];
+            switch(op[0]){
+                case 0:
+                case 1:
+                    t = op;
+                    break;
+                case 4:
+                    _.label++;
+                    return {
+                        value: op[1],
+                        done: false
+                    };
+                case 5:
+                    _.label++;
+                    y = op[1];
+                    op = [
+                        0
+                    ];
+                    continue;
+                case 7:
+                    op = _.ops.pop();
+                    _.trys.pop();
+                    continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                        _ = 0;
+                        continue;
+                    }
+                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                        _.label = op[1];
+                        break;
+                    }
+                    if (op[0] === 6 && _.label < t[1]) {
+                        _.label = t[1];
+                        t = op;
+                        break;
+                    }
+                    if (t && _.label < t[2]) {
+                        _.label = t[2];
+                        _.ops.push(op);
+                        break;
+                    }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop();
+                    continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) {
+            op = [
+                6,
+                e
+            ];
+            y = 0;
+        } finally{
+            f = t = 0;
+        }
+        if (op[0] & 5) throw op[1];
+        return {
+            value: op[0] ? op[1] : void 0,
+            done: true
+        };
+    }
+}
+var MarkdownNode = /*#__PURE__*/ function() {
+    "use strict";
+    function MarkdownNode(type) {
+        var content = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : '', attrs = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {};
+        _class_call_check(this, MarkdownNode);
+        _define_property(this, "type", void 0);
+        _define_property(this, "content", void 0);
+        _define_property(this, "attrs", void 0);
+        _define_property(this, "children", void 0);
+        _define_property(this, "parent", void 0);
+        _define_property(this, "src", void 0);
+        this.type = type;
+        this.content = content;
+        this.attrs = attrs;
+        this.children = [];
+        this.parent = null;
+        this.src = '';
+    }
+    _create_class(MarkdownNode, [
+        {
+            key: "addSrc",
+            value: function addSrc(line) {
+                this.src = this.src + "".concat(this.src ? '\n' : '').concat(line);
+            }
+        },
+        {
+            key: "addClass",
+            value: function addClass(cls) {
+                var _this_attrs_class, _this_attrs;
+                var _this_attrs_class_split;
+                var classList = (_this_attrs_class_split = (_this_attrs = this.attrs) === null || _this_attrs === void 0 ? void 0 : (_this_attrs_class = _this_attrs.class) === null || _this_attrs_class === void 0 ? void 0 : _this_attrs_class.split(' ')) !== null && _this_attrs_class_split !== void 0 ? _this_attrs_class_split : [];
+                classList.push(cls);
+                var dups = {};
+                this.attrs.class = classList.filter(function(c) {
+                    var isDup = dups[c];
+                    dups[c] = true;
+                    return !isDup;
+                }).join(' ');
+            }
+        },
+        {
+            key: "addChild",
+            value: function addChild(node) {
+                this.children.push(node);
+                node.parent = this;
+                return node;
+            }
+        },
+        {
+            key: "spliceChildren",
+            value: function spliceChildren(index, deleteCount) {
+                var _this = this;
+                for(var _len = arguments.length, nodes = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++){
+                    nodes[_key - 2] = arguments[_key];
+                }
+                var _this_children;
+                nodes.forEach(function(node) {
+                    return node.parent = _this;
+                });
+                return (_this_children = this.children).splice.apply(_this_children, [
+                    index,
+                    deleteCount
+                ].concat(_to_consumable_array(nodes)));
+            }
+        },
+        {
+            key: "addChildren",
+            value: function addChildren(nodes) {
+                var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
+                try {
+                    for(var _iterator = nodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true){
+                        var node = _step.value;
+                        this.addChild(node);
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally{
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return != null) {
+                            _iterator.return();
+                        }
+                    } finally{
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
+                }
+            }
+        },
+        {
+            key: "hasChildren",
+            value: function hasChildren() {
+                return this.children.length > 0;
+            }
+        },
+        {
+            key: "lastChild",
+            value: function lastChild() {
+                return this.hasChildren() ? this.children[this.children.length - 1] : null;
+            }
+        },
+        {
+            key: "innerText",
+            value: function innerText() {
+                var _this_content;
+                return "".concat((_this_content = this.content) !== null && _this_content !== void 0 ? _this_content : '').concat(this.children.map(function(child) {
+                    return child.innerText();
+                }).join(''));
+            }
+        },
+        {
+            key: "evaluate",
+            value: function evaluate(currentUniverse, ctx, transform) {
+                var topLevel = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : true;
+                return _async_to_generator(function() {
+                    var _this_attrs_href_substring_split, universe, itemHash, item, _this_attrs_lookups, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, lookup, value, content, nodes, attr, value1, _this_content, result, _tmp;
+                    return _ts_generator(this, function(_state) {
+                        switch(_state.label){
+                            case 0:
+                                if (this.type === 'a') {
+                                    this.addClass('link');
+                                    this.addClass('link-animated');
+                                }
+                                if (this.type === 'p' && this.children.length === 1 && this.children[0].type === 'img') {
+                                    this.type = 'div';
+                                    this.addClass('img-container');
+                                // return this.children[0].evaluate();
+                                }
+                                if (this.attrs.href) {
+                                    if (this.attrs.href[0] === '@') {
+                                        _this_attrs_href_substring_split = _sliced_to_array(this.attrs.href.substring(1).split('/'), 2), universe = _this_attrs_href_substring_split[0], itemHash = _this_attrs_href_substring_split[1];
+                                        if (universe) {
+                                            if (!itemHash) {
+                                                itemHash = universe;
+                                                universe = currentUniverse;
+                                            }
+                                            item = itemHash.split('#')[0].split('?')[0];
+                                            this.attrs['data-universe'] = universe;
+                                            this.attrs['data-item'] = item;
+                                            this.attrs['data-type'] = 'item-link';
+                                        // if (renderLinks) {
+                                        //   this.attrs.href = `${universeLink(universe)}/items/${itemHash}`;
+                                        //   bulkCheckExists(universe, item, fetches, (exists) => {
+                                        //     this.attrs['data-exists'] = exists;
+                                        //     if (!exists) this.addClass('link-broken');
+                                        //   });
+                                        // }
+                                        }
+                                    } else {
+                                        if (!this.attrs.href.startsWith('/') && !this.attrs.href.startsWith('#')) {
+                                            this.attrs.target = '_blank';
+                                        }
+                                    }
+                                }
+                                if (transform) transform(this);
+                                if (this.type === 'ctx') {
+                                    ;
+                                    _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
+                                    try {
+                                        for(_iterator = ((_this_attrs_lookups = this.attrs.lookups) !== null && _this_attrs_lookups !== void 0 ? _this_attrs_lookups : [])[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true){
+                                            lookup = _step.value;
+                                            value = lookup.getValue(ctx);
+                                            content = this.content.replace('%', value);
+                                            this.content = '';
+                                            nodes = parseInline(new Line(content));
+                                            this.addChildren(nodes);
+                                        }
+                                    } catch (err) {
+                                        _didIteratorError = true;
+                                        _iteratorError = err;
+                                    } finally{
+                                        try {
+                                            if (!_iteratorNormalCompletion && _iterator.return != null) {
+                                                _iterator.return();
+                                            }
+                                        } finally{
+                                            if (_didIteratorError) {
+                                                throw _iteratorError;
+                                            }
+                                        }
+                                    }
+                                }
+                                if (this.attrs.ctx) {
+                                    for(var attr in this.attrs.ctx){
+                                        value1 = this.attrs.ctx[attr];
+                                        if (_instanceof(value1, CtxLookup) || _instanceof(value1, GalleryUrl)) {
+                                            value1 = value1.getValue(ctx);
+                                        }
+                                        this.attrs[attr] = value1;
+                                    }
+                                    delete this.attrs.ctx;
+                                }
+                                _tmp = [
+                                    this.type,
+                                    (_this_content = this.content) !== null && _this_content !== void 0 ? _this_content : ''
+                                ];
+                                return [
+                                    4,
+                                    Promise.all(this.children.map(function(tag) {
+                                        return tag.evaluate(currentUniverse, ctx, transform, false);
+                                    }))
+                                ];
+                            case 1:
+                                result = _tmp.concat([
+                                    _state.sent(),
+                                    this.attrs
+                                ]);
+                                return [
+                                    2,
+                                    result
+                                ];
+                        }
+                    });
+                }).call(this);
+            }
+        }
+    ]);
+    return MarkdownNode;
+}();
+var CtxLookup = /*#__PURE__*/ function() {
+    "use strict";
+    function CtxLookup() {
+        for(var _len = arguments.length, lookup = new Array(_len), _key = 0; _key < _len; _key++){
+            lookup[_key] = arguments[_key];
+        }
+        _class_call_check(this, CtxLookup);
+        _define_property(this, "lookup", void 0);
+        _define_property(this, "def", void 0);
+        this.lookup = lookup;
+        this.def;
+    }
+    _create_class(CtxLookup, [
+        {
+            key: "default",
+            value: function _default(def) {
+                this.def = def;
+                return this;
+            }
+        },
+        {
+            key: "getValue",
+            value: function getValue(ctx) {
+                var value = ctx;
+                var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
+                try {
+                    for(var _iterator = this.lookup[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true){
+                        var key = _step.value;
+                        if (value && (key in value || _instanceof(value, Array) && Number(key) < value.length)) value = value[key];
+                        else {
+                            var _this_def;
+                            value = (_this_def = this.def) !== null && _this_def !== void 0 ? _this_def : "".concat(this.lookup.join('.'), ": not found.");
+                            break;
+                        }
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally{
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return != null) {
+                            _iterator.return();
+                        }
+                    } finally{
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
+                }
+                return value !== null && value !== void 0 ? value : this.def;
+            }
+        }
+    ]);
+    return CtxLookup;
+}();
+var GalleryUrl = /*#__PURE__*/ function() {
+    "use strict";
+    function GalleryUrl(idLookup) {
+        _class_call_check(this, GalleryUrl);
+        _define_property(this, "idLookup", void 0);
+        this.idLookup = idLookup;
+    }
+    _create_class(GalleryUrl, [
+        {
+            key: "getValue",
+            value: function getValue(ctx) {
+                var _ctx_item, _ctx_item1;
+                var id = this.idLookup.getValue(ctx);
+                return "/api/universes/".concat(ctx === null || ctx === void 0 ? void 0 : (_ctx_item = ctx.item) === null || _ctx_item === void 0 ? void 0 : _ctx_item.universe_short, "/items/").concat(ctx === null || ctx === void 0 ? void 0 : (_ctx_item1 = ctx.item) === null || _ctx_item1 === void 0 ? void 0 : _ctx_item1.shortname, "/gallery/images/").concat(id);
+            }
+        }
+    ]);
+    return GalleryUrl;
+}();
+var Line = /*#__PURE__*/ function() {
+    "use strict";
+    function Line(text) {
+        _class_call_check(this, Line);
+        _define_property(this, "text", void 0);
+        _define_property(this, "index", void 0);
+        this.text = text;
+        this.index = 0;
+    }
+    _create_class(Line, [
+        {
+            key: "next",
+            value: function next() {
+                return this.text[this.index++];
+            }
+        },
+        {
+            key: "peek",
+            value: function peek() {
+                var n = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : 0;
+                return this.text[this.index + n];
+            }
+        },
+        {
+            key: "hasNext",
+            value: function hasNext() {
+                return this.index < this.text.length;
+            }
+        },
+        {
+            key: "hasPrevious",
+            value: function hasPrevious() {
+                return this.index - 1 > 0;
+            }
+        },
+        {
+            key: "reset",
+            value: function reset(index) {
+                this.index = index;
+            }
+        }
+    ]);
+    return Line;
+}();
+function inlineCmds(cmd, args) {
+    if (cmd === 'data') {
+        return new MarkdownNode('ctx', "%", {
+            lookups: [
+                _construct(CtxLookup, [
+                    'item',
+                    'obj_data'
+                ].concat(_to_consumable_array(args)))
+            ]
+        });
+    } else if (cmd === 'tab') {
+        return new MarkdownNode('ctx', "%", {
+            lookups: [
+                _construct(CtxLookup, [
+                    'item',
+                    'obj_data',
+                    'tabs'
+                ].concat(_to_consumable_array(args)))
+            ]
+        });
+    } else if (cmd === 'img') {
+        var _args = _sliced_to_array(args, 4), src = _args[0], alt = _args[1], height = _args[2], width = _args[3];
+        var attrs = {
+            ctx: {
+                src: isNaN(Number(src)) ? src : new GalleryUrl(new CtxLookup('item', 'gallery', src, 'id')),
+                title: alt || new CtxLookup('item', 'gallery', src, 'label').default(alt),
+                alt: alt || new CtxLookup('item', 'gallery', src, 'name').default(alt)
+            }
+        };
+        if (height) attrs.height = height;
+        if (width) attrs.width = width;
+        var node = new MarkdownNode('div', '');
+        node.addClass('img-container');
+        node.addChild(new MarkdownNode('img', '', attrs));
+        return node;
+    }
+    return null;
+}
+function parseInline(line) {
+    var nodes = [];
+    var chunk = '';
+    while(line.hasNext()){
+        var char = line.next();
+        if (char === '\\') {
+            chunk += line.next();
+        } else if (char === '*' && line.peek() === '*') {
+            nodes.push(new MarkdownNode('text', chunk));
+            chunk = '';
+            var boldChunk = '';
+            var escaped = "".concat(char).concat(line.next());
+            var stars = 2;
+            while(stars > 0 && line.hasNext()){
+                if (line.peek() === '*') {
+                    if (line.peek(1) !== '*' && stars === 2) stars += 1;
+                    else stars -= 1;
+                }
+                if (stars >= 2) boldChunk += line.next();
+                else line.next();
+            }
+            var boldNode = new MarkdownNode(stars === 0 ? 'b' : 'text', stars === 0 ? '' : escaped);
+            nodes.push(boldNode);
+            boldNode.addChildren(parseInline(new Line(boldChunk)));
+        } else if (char === '*' || char === '_') {
+            nodes.push(new MarkdownNode('text', chunk));
+            chunk = '';
+            var italicsChunk = '';
+            var stars1 = 1;
+            while(stars1 > 0 && line.hasNext()){
+                if (line.peek() === '*' || line.peek() === '_') {
+                    if (line.peek() !== '_' && line.peek(1) === '*' && stars1 === 1) {
+                        stars1 += 2;
+                        italicsChunk += line.next();
+                    } else stars1 -= 1;
+                }
+                if (stars1 >= 1) italicsChunk += line.next();
+                else line.next();
+            }
+            var italicsNode = new MarkdownNode(stars1 === 0 ? 'i' : 'text', stars1 === 0 ? '' : char);
+            nodes.push(italicsNode);
+            italicsNode.addChildren(parseInline(new Line(italicsChunk)));
+        } else if (char === '[') {
+            var isImage = line.peek(-2) === '!';
+            var resetIndex = line.index;
+            if (isImage) chunk = chunk.substring(0, chunk.length - 1);
+            if (chunk) nodes.push(new MarkdownNode('text', chunk));
+            chunk = '';
+            while(!(line.peek() === ']' && line.peek(-1) !== '\\') && line.hasNext()){
+                chunk += line.next();
+            }
+            if (line.next() === ']' && line.next() === '(') {
+                var lineNodes = parseInline(new Line(chunk));
+                chunk = '';
+                while(line.peek() !== ')' && line.hasNext()){
+                    chunk += line.next();
+                }
+                if (line.next() === ')') {
+                    var linkNode = new MarkdownNode(isImage ? 'img' : 'a', '', _define_property({}, isImage ? 'src' : 'href', chunk));
+                    nodes.push(linkNode);
+                    if (isImage) linkNode.attrs.alt = lineNodes.map(function(node) {
+                        return node.innerText();
+                    }).join('');
+                    else linkNode.addChildren(lineNodes);
+                    chunk = '';
+                } else {
+                    chunk = '[';
+                    line.reset(resetIndex);
+                }
+            } else {
+                chunk = '[';
+                line.reset(resetIndex);
+            }
+        } else if (char === '@' && (line.peek(-2) === ' ' || !line.hasPrevious())) {
+            if (chunk) nodes.push(new MarkdownNode('text', chunk));
+            chunk = '';
+            while(!(line.peek() === '@' && line.peek(-1) !== '\\') && line.hasNext()){
+                chunk += line.next();
+            }
+            line.next();
+            var _splitIgnoringQuotes = _to_array(splitIgnoringQuotes(chunk)), cmd = _splitIgnoringQuotes[0], args = _splitIgnoringQuotes.slice(1);
+            var cmdNode = inlineCmds(cmd, args);
+            if (cmdNode) nodes.push(cmdNode);
+            chunk = '';
+        } else {
+            chunk += char;
+        }
+    }
+    if (chunk) nodes.push(new MarkdownNode('text', chunk));
+    return nodes;
+}
+function splitIgnoringQuotes(str) {
+    var regex = /(?:[^\s"']+|"[^"]*"|'[^']*')+/g;
+    var matches = str.match(regex);
+    return matches ? matches.map(function(match) {
+        return match.replace(/^["']|["']$/g, '');
+    }) : [];
+}
+function parseMarkdown(text) {
+    var root = new MarkdownNode('div', '', {
+        class: 'markdown'
+    });
+    var toc = null;
+    var maxTocDepth = null;
+    var curParagraph = new MarkdownNode('p');
+    var curList = [
+        null,
+        -1
+    ];
+    var rootList = null;
+    var curTocList = [
+        null,
+        -1
+    ];
+    var asideStart = null;
+    var lines = text.split('\n');
+    var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
+    try {
+        for(var _iterator = lines[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true){
+            var line = _step.value;
+            // console.log(line)
+            var trimmedLine = line.trimStart();
+            if (line[0] === '#') {
+                var headingLvl = 0;
+                while(line[headingLvl] === '#')headingLvl++;
+                var j = headingLvl;
+                var id = void 0;
+                if (line[headingLvl] === '(') {
+                    while(line[j] !== ')' && j < line.length)j++;
+                    id = line.substring(headingLvl + 1, j);
+                    j++;
+                }
+                if (line[j] === ' ') {
+                    var _curListNode_lastChild;
+                    var heading = root.addChild(new MarkdownNode("h".concat(headingLvl)));
+                    heading.addChildren(parseInline(new Line(line.substring(j + 1))));
+                    if (!id) {
+                        id = heading.innerText().toLowerCase().replaceAll(' ', '-');
+                    }
+                    heading.attrs.id = id;
+                    heading.addSrc(line);
+                    if (!toc) continue;
+                    if (maxTocDepth && headingLvl > maxTocDepth) continue;
+                    var _curTocList = _sliced_to_array(curTocList, 2), lastListNode = _curTocList[0], lastHeadingLvl = _curTocList[1];
+                    if (headingLvl > lastHeadingLvl) {
+                        var _lastListNode_lastChild;
+                        var lastListItem = lastListNode ? (_lastListNode_lastChild = lastListNode.lastChild()) !== null && _lastListNode_lastChild !== void 0 ? _lastListNode_lastChild : lastListNode.addChild(new MarkdownNode('li')) : null;
+                        var newListNode = (lastListItem !== null && lastListItem !== void 0 ? lastListItem : toc).addChild(new MarkdownNode('ol'));
+                        curTocList = [
+                            newListNode,
+                            headingLvl
+                        ];
+                    } else if (headingLvl < lastHeadingLvl) {
+                        var newListNode1 = lastListNode;
+                        for(var i = 0; i < lastHeadingLvl - headingLvl; i++){
+                            var _newListNode_parent_parent, _newListNode_parent;
+                            if (((_newListNode_parent = newListNode1.parent) === null || _newListNode_parent === void 0 ? void 0 : (_newListNode_parent_parent = _newListNode_parent.parent) === null || _newListNode_parent_parent === void 0 ? void 0 : _newListNode_parent_parent.type) === 'ol') newListNode1 = newListNode1.parent.parent;
+                            else break;
+                        }
+                        curTocList = [
+                            newListNode1,
+                            headingLvl
+                        ];
+                    }
+                    var _curTocList1 = _sliced_to_array(curTocList, 1), curListNode = _curTocList1[0]; // We know a node has been set
+                    curListNode.addChild(new MarkdownNode('li'));
+                    var tocLink = new MarkdownNode('a', heading.innerText(), {
+                        href: "#".concat(id)
+                    });
+                    (_curListNode_lastChild = curListNode.lastChild()) === null || _curListNode_lastChild === void 0 ? void 0 : _curListNode_lastChild.addChild(tocLink);
+                }
+            } else if (trimmedLine[0] === '@') {
+                var lineEnd = trimmedLine.length - (trimmedLine[trimmedLine.length - 1] === '@' ? 1 : 0);
+                var _splitIgnoringQuotes = _to_array(splitIgnoringQuotes(trimmedLine.substring(1, lineEnd))), cmd = _splitIgnoringQuotes[0], args = _splitIgnoringQuotes.slice(1);
+                if (cmd === 'toc') {
+                    toc = root.addChild(new MarkdownNode('div', '', {
+                        id: 'toc'
+                    }));
+                    toc.addChild(new MarkdownNode('h3', 'Table of Contents'));
+                    if (args.length >= 1) maxTocDepth = args[0];
+                    toc.addSrc("@".concat(cmd));
+                } else if (cmd === 'aside') {
+                    asideStart = root.children.length;
+                } else if (cmd === 'aside-end' && asideStart !== null) {
+                    var boxNodes = root.spliceChildren(asideStart, root.children.length);
+                    var box = new MarkdownNode('aside', '');
+                    root.spliceChildren(asideStart, 0, box);
+                    box.addChildren(boxNodes);
+                    box.addSrc('@aside\n');
+                    box.addSrc(boxNodes.map(function(node) {
+                        return node.src;
+                    }).join('\n\n'));
+                    box.addSrc('\n@aside-end');
+                } else {
+                    var cmdNode = inlineCmds(cmd, args);
+                    if (cmdNode) {
+                        root.addChild(cmdNode);
+                        cmdNode.addSrc("@".concat([
+                            cmd
+                        ].concat(_to_consumable_array(args)).join(' ')));
+                    }
+                }
+            } else if (trimmedLine[0] === '-' && trimmedLine[1] === ' ') {
+                var _curListNode_lastChild1;
+                var indent = (line.length - trimmedLine.length) / 2;
+                var _curList = _sliced_to_array(curList, 2), lastListNode1 = _curList[0], lastIndent = _curList[1];
+                if (lastIndent === -1 && curParagraph.hasChildren()) {
+                    curParagraph.type = 'span';
+                    curParagraph.addClass('list-label');
+                    root.addChild(curParagraph);
+                    curParagraph = new MarkdownNode('p');
+                }
+                if (indent > lastIndent) {
+                    var _lastListNode_lastChild1;
+                    var lastListItem1 = lastListNode1 ? (_lastListNode_lastChild1 = lastListNode1.lastChild()) !== null && _lastListNode_lastChild1 !== void 0 ? _lastListNode_lastChild1 : lastListNode1.addChild(new MarkdownNode('li')) : null;
+                    var newListNode2 = (lastListItem1 !== null && lastListItem1 !== void 0 ? lastListItem1 : root).addChild(new MarkdownNode('ul'));
+                    if (!lastListItem1) rootList = newListNode2;
+                    curList = [
+                        newListNode2,
+                        indent
+                    ];
+                } else if (indent < lastIndent) {
+                    var _newListNode_parent1;
+                    var newListNode3 = lastListNode1;
+                    for(var i1 = 0; i1 < lastIndent - indent; i1++)newListNode3 = (_newListNode_parent1 = newListNode3.parent) === null || _newListNode_parent1 === void 0 ? void 0 : _newListNode_parent1.parent;
+                    curList = [
+                        newListNode3,
+                        indent
+                    ];
+                }
+                var _curList1 = _sliced_to_array(curList, 1), curListNode1 = _curList1[0]; // We know a node has been set
+                curListNode1.addChild(new MarkdownNode('li'));
+                (_curListNode_lastChild1 = curListNode1.lastChild()) === null || _curListNode_lastChild1 === void 0 ? void 0 : _curListNode_lastChild1.addChildren(parseInline(new Line(trimmedLine.substring(2))));
+                rootList === null || rootList === void 0 ? void 0 : rootList.addSrc(line);
+            } else if (trimmedLine === '') {
+                if (curParagraph.hasChildren()) root.addChild(curParagraph);
+                curParagraph = new MarkdownNode('p');
+                curList = [
+                    null,
+                    -1
+                ];
+            } else {
+                curParagraph.addChildren(parseInline(new Line(line)));
+                curParagraph.addSrc(line);
+            }
+        }
+    } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+    } finally{
+        try {
+            if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+            }
+        } finally{
+            if (_didIteratorError) {
+                throw _iteratorError;
+            }
+        }
+    }
+    if (curParagraph.hasChildren()) root.addChild(curParagraph);
+    return root;
+}
+function _extractLinks(data) {
+    var _data = _sliced_to_array(data, 4), children = _data[2], attrs = _data[3];
+    var links = [];
+    if ('data-type' in attrs && attrs['data-type']) {
+        links.push([
+            attrs['data-universe'],
+            attrs['data-item'],
+            attrs.href
+        ]);
+    }
+    return _to_consumable_array(links).concat(_to_consumable_array(children.reduce(function(acc, child) {
+        return _to_consumable_array(acc).concat(_to_consumable_array(_extractLinks(child)));
+    }, [])));
+}
+function extractLinks(universeShortname, body, ctx) {
+    return _async_to_generator(function() {
+        var tree, links, err;
+        return _ts_generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    _state.trys.push([
+                        0,
+                        2,
+                        ,
+                        3
+                    ]);
+                    tree = parseMarkdown(body);
+                    return [
+                        4,
+                        tree.evaluate(universeShortname, ctx)
+                    ];
+                case 1:
+                    links = _extractLinks.apply(void 0, [
+                        _state.sent()
+                    ]);
+                    return [
+                        2,
+                        links
+                    ];
+                case 2:
+                    err = _state.sent();
+                    console.error(err);
+                    return [
+                        2,
+                        []
+                    ];
+                case 3:
+                    return [
+                        2
+                    ];
+            }
+        });
+    })();
+}
+
+
+/***/ }),
+
 /***/ "./src/App.tsx":
 /*!*********************!*\
   !*** ./src/App.tsx ***!
@@ -55441,12 +56401,18 @@ function App(param) {
     var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), categories = _useState[0], setCategories = _useState[1];
     var _useState1 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), item = _useState1[0], setItem = _useState1[1];
     var _useState2 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), objData = _useState2[0], setObjData = _useState2[1];
+    var _useState3 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), bodyText = _useState3[0], setBodyText = _useState3[1];
     (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
         fetchData("/api/universes/".concat(universeShort), function(data) {
             setCategories(data.obj_data.cats);
         });
         fetchData("/api/universes/".concat(universeShort, "/items/").concat(itemShort), function(data) {
-            setObjData(JSON.parse(data.obj_data));
+            var objData = JSON.parse(data.obj_data);
+            setObjData(objData);
+            (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.renderMarkdown)(universeShort, objData.body).then(function(text) {
+                console.log(text);
+                setBodyText(text);
+            });
             delete data.obj_data;
             setItem(data);
         });
@@ -55461,7 +56427,7 @@ function App(param) {
                 children: item ? T('Edit %s', item.title) : T('Edit')
             }, void 0, false, {
                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 72,
+                lineNumber: 78,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("form", {
@@ -55476,7 +56442,7 @@ function App(param) {
                                 children: T('Title')
                             }, void 0, false, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 75,
+                                lineNumber: 81,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -55492,13 +56458,13 @@ function App(param) {
                                 }
                             }, void 0, false, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 76,
+                                lineNumber: 82,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 74,
+                        lineNumber: 80,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -55512,7 +56478,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 82,
+                                lineNumber: 88,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -55528,13 +56494,13 @@ function App(param) {
                                 }
                             }, void 0, false, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 83,
+                                lineNumber: 89,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 81,
+                        lineNumber: 87,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -55548,30 +56514,30 @@ function App(param) {
                                     children: T('NOTE: changes to the shortname will not auto-save.')
                                 }, void 0, false, {
                                     fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                    lineNumber: 90,
+                                    lineNumber: 96,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
                                     fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                    lineNumber: 91,
+                                    lineNumber: 97,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
                                     children: T('Other users currently editing this item will be unable to save their work. Change with caution.')
                                 }, void 0, false, {
                                     fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                    lineNumber: 92,
+                                    lineNumber: 98,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 89,
+                            lineNumber: 95,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 88,
+                        lineNumber: 94,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -55585,7 +56551,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 97,
+                                lineNumber: 103,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
@@ -55608,7 +56574,7 @@ function App(param) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 99,
+                                        lineNumber: 105,
                                         columnNumber: 13
                                     }, this),
                                     categories && item && Object.keys(categories).map(function(type) {
@@ -55617,20 +56583,20 @@ function App(param) {
                                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)(categories[type][0])
                                         }, type, false, {
                                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                            lineNumber: 101,
+                                            lineNumber: 107,
                                             columnNumber: 15
                                         }, _this);
                                     })
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 98,
+                                lineNumber: 104,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 96,
+                        lineNumber: 102,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -55644,7 +56610,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 109,
+                                lineNumber: 115,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("textarea", {
@@ -55659,13 +56625,13 @@ function App(param) {
                                 }
                             }, void 0, false, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 110,
+                                lineNumber: 116,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 108,
+                        lineNumber: 114,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -55679,7 +56645,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 114,
+                                lineNumber: 120,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
@@ -55698,26 +56664,26 @@ function App(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 116,
+                                        lineNumber: 122,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                         className: "slider"
                                     }, void 0, false, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 119,
+                                        lineNumber: 125,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 115,
+                                lineNumber: 121,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 113,
+                        lineNumber: 119,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -55731,7 +56697,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 124,
+                                lineNumber: 130,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
@@ -55750,26 +56716,26 @@ function App(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 126,
+                                        lineNumber: 132,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                         className: "slider"
                                     }, void 0, false, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 129,
+                                        lineNumber: 135,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 125,
+                                lineNumber: 131,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 123,
+                        lineNumber: 129,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -55779,25 +56745,25 @@ function App(param) {
                             children: T('Save Changes')
                         }, void 0, false, {
                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 134,
+                            lineNumber: 140,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 133,
+                        lineNumber: 139,
                         columnNumber: 9
                     }, this),
-                    objData && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_RichEditor__WEBPACK_IMPORTED_MODULE_3__["default"], {
-                        content: objData.body
+                    bodyText && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_RichEditor__WEBPACK_IMPORTED_MODULE_3__["default"], {
+                        content: bodyText
                     }, void 0, false, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 137,
-                        columnNumber: 21
+                        lineNumber: 143,
+                        columnNumber: 22
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 73,
+                lineNumber: 79,
                 columnNumber: 7
             }, this)
         ]
@@ -55933,8 +56899,250 @@ var Aside = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Node.create({
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   capitalize: () => (/* binding */ capitalize),
-/* harmony export */   formatDate: () => (/* binding */ formatDate)
+/* harmony export */   formatDate: () => (/* binding */ formatDate),
+/* harmony export */   loadMarkdown: () => (/* binding */ loadMarkdown),
+/* harmony export */   renderMarkdown: () => (/* binding */ renderMarkdown),
+/* harmony export */   renderMdPreview: () => (/* binding */ renderMdPreview)
 /* harmony export */ });
+/* harmony import */ var _src_markdown__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../src/markdown */ "../src/markdown.ts");
+function _array_like_to_array(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
+    return arr2;
+}
+function _array_with_holes(arr) {
+    if (Array.isArray(arr)) return arr;
+}
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+        var info = gen[key](arg);
+        var value = info.value;
+    } catch (error) {
+        reject(error);
+        return;
+    }
+    if (info.done) {
+        resolve(value);
+    } else {
+        Promise.resolve(value).then(_next, _throw);
+    }
+}
+function _async_to_generator(fn) {
+    return function() {
+        var self = this, args = arguments;
+        return new Promise(function(resolve, reject) {
+            var gen = fn.apply(self, args);
+            function _next(value) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+            }
+            function _throw(err) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+            }
+            _next(undefined);
+        });
+    };
+}
+function _class_call_check(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+        throw new TypeError("Cannot call a class as a function");
+    }
+}
+function _defineProperties(target, props) {
+    for(var i = 0; i < props.length; i++){
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+    }
+}
+function _create_class(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+}
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function _iterable_to_array_limit(arr, i) {
+    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+    if (_i == null) return;
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _s, _e;
+    try {
+        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
+            _arr.push(_s.value);
+            if (i && _arr.length === i) break;
+        }
+    } catch (err) {
+        _d = true;
+        _e = err;
+    } finally{
+        try {
+            if (!_n && _i["return"] != null) _i["return"]();
+        } finally{
+            if (_d) throw _e;
+        }
+    }
+    return _arr;
+}
+function _non_iterable_rest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            _define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
+function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+        var symbols = Object.getOwnPropertySymbols(object);
+        if (enumerableOnly) {
+            symbols = symbols.filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+            });
+        }
+        keys.push.apply(keys, symbols);
+    }
+    return keys;
+}
+function _object_spread_props(target, source) {
+    source = source != null ? source : {};
+    if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+        ownKeys(Object(source)).forEach(function(key) {
+            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+    }
+    return target;
+}
+function _sliced_to_array(arr, i) {
+    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
+}
+function _unsupported_iterable_to_array(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _array_like_to_array(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
+}
+function _ts_generator(thisArg, body) {
+    var f, y, t, _ = {
+        label: 0,
+        sent: function() {
+            if (t[0] & 1) throw t[1];
+            return t[1];
+        },
+        trys: [],
+        ops: []
+    }, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+        return this;
+    }), g;
+    function verb(n) {
+        return function(v) {
+            return step([
+                n,
+                v
+            ]);
+        };
+    }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while(g && (g = 0, op[0] && (_ = 0)), _)try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [
+                op[0] & 2,
+                t.value
+            ];
+            switch(op[0]){
+                case 0:
+                case 1:
+                    t = op;
+                    break;
+                case 4:
+                    _.label++;
+                    return {
+                        value: op[1],
+                        done: false
+                    };
+                case 5:
+                    _.label++;
+                    y = op[1];
+                    op = [
+                        0
+                    ];
+                    continue;
+                case 7:
+                    op = _.ops.pop();
+                    _.trys.pop();
+                    continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                        _ = 0;
+                        continue;
+                    }
+                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                        _.label = op[1];
+                        break;
+                    }
+                    if (op[0] === 6 && _.label < t[1]) {
+                        _.label = t[1];
+                        t = op;
+                        break;
+                    }
+                    if (t && _.label < t[2]) {
+                        _.label = t[2];
+                        _.ops.push(op);
+                        break;
+                    }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop();
+                    continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) {
+            op = [
+                6,
+                e
+            ];
+            y = 0;
+        } finally{
+            f = t = 0;
+        }
+        if (op[0] & 5) throw op[1];
+        return {
+            value: op[0] ? op[1] : void 0,
+            done: true
+        };
+    }
+}
+
 // TODO this is duplicated from helpers.pug
 var capitalize = function(str) {
     return str[0].toUpperCase() + str.substr(1, str.length - 1);
@@ -55999,6 +57207,230 @@ var formatDate = function(date) {
     if (short) return "".concat(date.toDateString(), " ").concat(date.toLocaleTimeString());
     else return "on ".concat(date.toDateString(), " at ").concat(date.toLocaleTimeString());
 };
+function createElement(type) {
+    var options = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {
+        attrs: {},
+        classList: [],
+        dataset: {},
+        children: [],
+        style: {}
+    };
+    var attrs = options.attrs, classList = options.classList, dataset = options.dataset, children = options.children, style = options.style;
+    var el = document.createElement(type);
+    for(var attr in attrs){
+        if (attr === 'innerText' || attr === 'textContent') {
+            el.textContent = attrs[attr];
+            continue;
+        }
+        el.setAttribute(attr, attrs[attr]);
+    }
+    if (style) {
+        for(var key in style){
+            el.style[key] = style[key];
+        }
+    }
+    if (dataset) {
+        for(var key1 in dataset !== null && dataset !== void 0 ? dataset : {}){
+            el.dataset[key1] = dataset[key1];
+        }
+    }
+    var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
+    try {
+        for(var _iterator = (classList !== null && classList !== void 0 ? classList : [])[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true){
+            var cl = _step.value;
+            el.classList.add(cl);
+        }
+    } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+    } finally{
+        try {
+            if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+            }
+        } finally{
+            if (_didIteratorError) {
+                throw _iteratorError;
+            }
+        }
+    }
+    var _iteratorNormalCompletion1 = true, _didIteratorError1 = false, _iteratorError1 = undefined;
+    try {
+        for(var _iterator1 = (children !== null && children !== void 0 ? children : [])[Symbol.iterator](), _step1; !(_iteratorNormalCompletion1 = (_step1 = _iterator1.next()).done); _iteratorNormalCompletion1 = true){
+            var child = _step1.value;
+            if (child) el.appendChild(child);
+        }
+    } catch (err) {
+        _didIteratorError1 = true;
+        _iteratorError1 = err;
+    } finally{
+        try {
+            if (!_iteratorNormalCompletion1 && _iterator1.return != null) {
+                _iterator1.return();
+            }
+        } finally{
+            if (_didIteratorError1) {
+                throw _iteratorError1;
+            }
+        }
+    }
+    return el;
+}
+var MarkdownElement = /*#__PURE__*/ function() {
+    "use strict";
+    function MarkdownElement(parent, data) {
+        var meta = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {};
+        _class_call_check(this, MarkdownElement);
+        _define_property(this, "type", void 0);
+        _define_property(this, "parent", void 0);
+        _define_property(this, "element", null);
+        _define_property(this, "attrs", void 0);
+        _define_property(this, "dataset", void 0);
+        _define_property(this, "meta", void 0);
+        _define_property(this, "content", void 0);
+        _define_property(this, "children", void 0);
+        _define_property(this, "classes", void 0);
+        this.parent = parent;
+        this.update(data, meta);
+        this.element = null;
+    }
+    _create_class(MarkdownElement, [
+        {
+            key: "update",
+            value: function update(param) {
+                var _this = this;
+                var _param = _sliced_to_array(param, 4), type = _param[0], content = _param[1], children = _param[2], attrs = _param[3], meta = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+                this.type = type;
+                this.attrs = attrs !== null && attrs !== void 0 ? attrs : {};
+                this.dataset = {};
+                for(var key in this.attrs){
+                    if (key.startsWith('data-')) {
+                        this.dataset[key.replace('data-', '')] = this.attrs[key];
+                        delete this.attrs[key];
+                    }
+                }
+                this.meta = _object_spread({}, meta);
+                if (this.type === 'text') this.type = 'span';
+                if (this.attrs.id === 'toc') meta.isToc = true;
+                if (this.type === 'a') meta.isLink = true;
+                this.content = content;
+                this.children = children.map(function(child) {
+                    return new MarkdownElement(_this, child, _object_spread({}, meta));
+                });
+                if (this.attrs.class) {
+                    this.classes = this.attrs.class.split(' ');
+                    delete this.attrs.class;
+                } else {
+                    this.classes = [];
+                }
+            }
+        },
+        {
+            key: "makeElement",
+            value: function makeElement() {
+                var children = this.children.map(function(child) {
+                    return child.makeElement();
+                });
+                this.element = createElement(this.type, {
+                    attrs: _object_spread_props(_object_spread({}, this.attrs), {
+                        innerText: this.content
+                    }),
+                    dataset: this.dataset,
+                    children: children,
+                    classList: this.classes
+                });
+                return this.element;
+            }
+        },
+        {
+            key: "getElement",
+            value: function getElement() {
+                return this.element;
+            }
+        },
+        {
+            key: "render",
+            value: function render() {
+                var prevEl = this.element;
+                if (prevEl) this.parent.getElement().replaceChild(this.makeElement(), prevEl);
+                else this.parent.getElement().appendChild(this.makeElement());
+            }
+        }
+    ]);
+    return MarkdownElement;
+}();
+function loadMarkdown(container, universeShortname, body, ctx, frmt) {
+    var render = arguments.length > 5 && arguments[5] !== void 0 ? arguments[5] : true;
+    return _async_to_generator(function() {
+        var data, nodes;
+        return _ts_generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    return [
+                        4,
+                        (0,_src_markdown__WEBPACK_IMPORTED_MODULE_0__.parseMarkdown)(body).evaluate(universeShortname, ctx, frmt)
+                    ];
+                case 1:
+                    data = _state.sent();
+                    container.classList.add('markdown');
+                    nodes = new MarkdownElement({
+                        getElement: function() {
+                            return container;
+                        }
+                    }, data);
+                    if (render) nodes.render();
+                    return [
+                        2,
+                        nodes
+                    ];
+            }
+        });
+    })();
+}
+function renderMarkdown(universeShortname, body, ctx, frmt) {
+    return _async_to_generator(function() {
+        var container;
+        return _ts_generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    container = createElement('div');
+                    return [
+                        4,
+                        loadMarkdown(container, universeShortname, body, ctx, frmt)
+                    ];
+                case 1:
+                    _state.sent();
+                    return [
+                        2,
+                        container.innerHTML
+                    ];
+            }
+        });
+    })();
+}
+function renderMdPreview(universeShortname, body, ctx, frmt) {
+    return _async_to_generator(function() {
+        var container, nodes;
+        return _ts_generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    container = createElement('div');
+                    return [
+                        4,
+                        loadMarkdown(container, universeShortname, body, ctx, frmt)
+                    ];
+                case 1:
+                    nodes = _state.sent();
+                    return [
+                        2,
+                        nodes.children.map(function(child) {
+                            return child.getElement().textContent;
+                        }).join(' ')
+                    ];
+            }
+        });
+    })();
+}
 
 
 /***/ })
