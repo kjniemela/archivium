@@ -497,6 +497,8 @@ export class ItemAPI {
         await conn.execute(`
           INSERT INTO itemnotification (item_id, user_id, is_enabled) VALUES (?, ?, ?)
         `, [data.insertId, user.id, true]);
+
+        this.api.universe.putUpdatedAtWithTransaction(conn, universe.id, new Date());
       });
 
       if (!data) {
@@ -773,7 +775,9 @@ export class ItemAPI {
           last_updated_by = ?
         WHERE id = ?;
       `;
-      await conn.execute(queryString, [title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), new Date(), user.id, item.id])
+      await conn.execute(queryString, [title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), new Date(), user.id, item.id]);
+
+      this.api.universe.putUpdatedAtWithTransaction(conn, item.universe_id, new Date());
     });
 
     return item.id;
@@ -790,8 +794,15 @@ export class ItemAPI {
 
     await this.handleLinks(item, item.obj_data);
 
-    const queryString = `UPDATE item SET obj_data = ?, updated_at = ?, last_updated_by = ? WHERE id = ?;`;
-    return await executeQuery<ResultSetHeader>(queryString, [JSON.stringify(item.obj_data), new Date(), user.id, item.id]);
+    let data!: ResultSetHeader;
+    await withTransaction(async (conn) => {
+      const queryString = `UPDATE item SET obj_data = ?, updated_at = ?, last_updated_by = ? WHERE id = ?;`;
+      [data] = await conn.execute<ResultSetHeader>(queryString, [JSON.stringify(item.obj_data), new Date(), user.id, item.id]);
+      
+      this.api.universe.putUpdatedAtWithTransaction(conn, item.universe_id, new Date());
+    });
+
+    return data;
   }
 
   // TODO - how should permissions work on this?
