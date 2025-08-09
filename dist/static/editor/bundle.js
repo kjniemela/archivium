@@ -55820,6 +55820,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
 /* harmony import */ var _tiptap_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/react */ "../node_modules/@tiptap/react/dist/index.js");
 /* harmony import */ var _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tiptap/starter-kit */ "../node_modules/@tiptap/starter-kit/dist/index.js");
+/* harmony import */ var _extensions_Aside__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../extensions/Aside */ "./src/extensions/Aside.ts");
+
 
 
 
@@ -55827,7 +55829,8 @@ function RichEditor(param) {
     var content = param.content;
     var editor = (0,_tiptap_react__WEBPACK_IMPORTED_MODULE_1__.useEditor)({
         extensions: [
-            _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_2__["default"]
+            _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_2__["default"],
+            _extensions_Aside__WEBPACK_IMPORTED_MODULE_3__.Aside
         ],
         content: content,
         onUpdate: function(param) {
@@ -55841,15 +55844,82 @@ function RichEditor(param) {
             editor: editor
         }, void 0, false, {
             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\RichEditor.tsx",
-            lineNumber: 14,
+            lineNumber: 18,
             columnNumber: 5
         }, this)
     }, void 0, false, {
         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\RichEditor.tsx",
-        lineNumber: 13,
+        lineNumber: 17,
         columnNumber: 10
     }, this);
 }
+
+
+/***/ }),
+
+/***/ "./src/extensions/Aside.ts":
+/*!*********************************!*\
+  !*** ./src/extensions/Aside.ts ***!
+  \*********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Aside: () => (/* binding */ Aside)
+/* harmony export */ });
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
+
+var Aside = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Node.create({
+    name: 'aside',
+    group: 'block',
+    content: 'block+',
+    defining: true,
+    addOptions: function addOptions() {
+        return {
+            HTMLAttributes: {}
+        };
+    },
+    parseHTML: function parseHTML() {
+        return [
+            {
+                tag: 'aside'
+            }
+        ];
+    },
+    renderHTML: function renderHTML(param) {
+        var HTMLAttributes = param.HTMLAttributes;
+        return [
+            'aside',
+            (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes),
+            0
+        ];
+    },
+    addCommands: function addCommands() {
+        var _this = this;
+        return {
+            wrapAside: function() {
+                return function(param) {
+                    var commands = param.commands;
+                    return commands.wrapIn(_this.name);
+                };
+            },
+            toggleAside: function() {
+                return function(param) {
+                    var commands = param.commands;
+                    return commands.toggleWrap(_this.name);
+                };
+            }
+        };
+    },
+    addInputRules: function addInputRules() {
+        return [
+            (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.wrappingInputRule)({
+                find: /^@aside\s$/,
+                type: this.type
+            })
+        ];
+    }
+});
 
 
 /***/ }),
