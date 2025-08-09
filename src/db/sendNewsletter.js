@@ -1,7 +1,7 @@
-const db = require(".");
-const readline = require('readline');
-const api = require("../api");
-const { askQuestion } = require("./import");
+import db from ".";
+import readline from 'readline';
+import api from "../api";
+import { askQuestion } from "./import";
 
 function askMultiline(query) {
   const rl = readline.createInterface({
@@ -49,10 +49,9 @@ async function main() {
     return;
   }
 
-  const [code, { insertId }] = await api.newsletter.post({ title, preview, body });
-  if (code !== 201) return;
+  const { insertId } = await api.newsletter.post({ title, preview, body });
 
-  const [, users] = await api.user.getMany(null, true);
+  const users = await api.user.getMany(null, true);
   const proceed = await askQuestion(`${users.length} users to send to, proceed? [y/N] `);
   if (proceed.toUpperCase() === 'N') {
     console.log('Exiting.');
