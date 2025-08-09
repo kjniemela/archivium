@@ -108,10 +108,11 @@ export default {
       const item = await api.item.getOne(req.session.user, { 'item.id': id }, perms.READ, true);
       res.redirect(`${universeLink(req, req.params.universeShortname)}/items/${item.shortname}`);
     } catch (err) {
+      console.error(err);
       if (err instanceof ModelError) {
         res.error = err.message;
-      await pages.item.edit(req, res);
-      return;
+        await pages.item.edit(req, res);
+        return;
       }
       throw err;
     }
