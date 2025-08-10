@@ -120,7 +120,8 @@ block content
             label(for='theme') #{T('Preferred Theme')}: 
             select#theme(name='theme' type='text')
               each _, key in themes
-                option(value=key selected=(user.preferred_theme === key)) #{T(`theme_${key}`)}
+                if key !== 'custom' || user.plan >= plans.PREMIUM_BETA
+                  option(value=key selected=(user.preferred_theme === key)) #{T(`theme_${key}`)}
 
           #customTheme.hidden.form-row-group
             .inputGroup
