@@ -182,6 +182,9 @@ class UniverseAPI {
             throw err;
         }
     }
+    async putUpdatedAtWithTransaction(conn, universeId, updatedAt) {
+        await conn.execute('UPDATE universe SET updated_at = ? WHERE id = ?', [updatedAt, universeId]);
+    }
     async put(user, universeShortname, changes) {
         const { title, shortname, is_public, discussion_enabled, discussion_open, obj_data } = changes;
         if (!title)

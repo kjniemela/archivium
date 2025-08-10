@@ -1,7 +1,7 @@
 import { executeQuery, parseData, perms, withTransaction, tiers, tierAllowance, BaseOptions, handleNotFoundAsNull, Tier } from '../utils';
 import logger from '../../logger';
 import { API } from '..';
-import { ResultSetHeader } from 'mysql2/promise';
+import { PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { User } from './user';
 import { ForbiddenError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
 
@@ -226,6 +226,10 @@ export class UniverseAPI {
       if (err.code === 'ER_BAD_NULL_ERROR') throw new ValidationError('Missing parameters.');
       throw err;
     }
+  }
+
+  async putUpdatedAtWithTransaction(conn: PoolConnection, universeId: number, updatedAt: Date): Promise<void> {
+    await conn.execute('UPDATE universe SET updated_at = ? WHERE id = ?', [updatedAt, universeId]);
   }
 
   async put(user: User, universeShortname: string, changes): Promise<number> {
