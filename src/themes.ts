@@ -4,10 +4,9 @@ export type Theme = {
   backgroundImage?: string,
 };
 
-const themes = {
-  custom: {
-    glass: false,
-  },
+export type ThemeName = keyof typeof themes;
+
+const themes: Record<string, Theme> = {
   default: {
     glass: false,
   },
@@ -19,6 +18,9 @@ const themes = {
     glass: true,
     backgroundImage: '/static/assets/themes/space.jpg',
   },
-} satisfies Record<string, Theme>;
+  custom: {
+    glass: false,
+  },
+};
 
 export default themes;

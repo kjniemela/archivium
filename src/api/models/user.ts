@@ -6,6 +6,7 @@ import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { API } from '..';
 import { RequestError, ModelError, ValidationError, UnauthorizedError, ForbiddenError, NotFoundError } from '../../errors';
 import { HttpStatusCode } from 'axios';
+import { Theme, ThemeName } from '../../themes';
 
 export type UserSponsoredUniverses = { tier: number, universes: string[], universe_shorts: string[] }[];
 
@@ -28,7 +29,8 @@ export type User = {
   verified: boolean,
   suspect: boolean,
   email_notifications: boolean,
-  preferred_theme: string | null,
+  preferred_theme: ThemeName | null,
+  custom_theme: Theme | null,
   isContact?: boolean,
   hasPfp?: boolean,
   plan?: plans, 
@@ -312,11 +314,12 @@ export class UserAPI {
     }
   }
 
-  async putPreferences(sessionUser: User | undefined, username: string, { preferred_theme, glass, background_image }): Promise<ResultSetHeader> {
+  async putPreferences(sessionUser: User | undefined, username: string, body: { preferred_theme: string, custom_theme: Theme }): Promise<ResultSetHeader> {
     if (!sessionUser) throw new UnauthorizedError();
+    const { preferred_theme, custom_theme } = body;
     const user = await this.getOne({ 'user.username': username }, true);
     if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
-    const changes = { preferred_theme };
+    const changes = { preferred_theme, custom_theme };
     try {
       const keys = Object.keys(changes).filter(key => changes[key] !== undefined);
       if (keys.length === 0) throw new ValidationError('No changes provided');

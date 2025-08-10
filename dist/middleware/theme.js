@@ -9,7 +9,7 @@ const setTheme = (req, _, next) => {
     if (user) {
         const customTheme = user.custom_theme;
         const baseTheme = user.preferred_theme ? themes_1.default[user.preferred_theme] : null;
-        req.theme = baseTheme ?? themes_1.default.default;
+        req.theme = (user.preferred_theme === 'custom' ? customTheme : baseTheme) ?? themes_1.default.default;
     }
     next();
 };

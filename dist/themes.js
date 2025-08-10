@@ -1,9 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const themes = {
-    custom: {
-        glass: false,
-    },
     default: {
         glass: false,
     },
@@ -14,6 +11,9 @@ const themes = {
     space: {
         glass: true,
         backgroundImage: '/static/assets/themes/space.jpg',
+    },
+    custom: {
+        glass: false,
     },
 };
 exports.default = themes;

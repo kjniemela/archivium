@@ -120,19 +120,18 @@ block content
             label(for='theme') #{T('Preferred Theme')}: 
             select#theme(name='theme' type='text')
               each _, key in themes
-                if key !== 'custom'
-                  option(value=key selected=(user.preferred_theme === key)) #{T(`theme_${key}`)}
+                option(value=key selected=(user.preferred_theme === key)) #{T(`theme_${key}`)}
 
           #customTheme.hidden.form-row-group
             .inputGroup
               label #{T('Use "Glass Pane" theme')}: 
               label.switch
-                input#glass(type='checkbox' checked=Boolean((universe.obj_data.customTheme || {}).glass))
+                input#glass(type='checkbox' checked=Boolean((user.custom_theme || {}).glass))
                 span.slider
 
             .inputGroup
               label #{T('Background Image URL')}: 
-              input#backgroundImage(type='text' value=(universe.obj_data.customTheme || {}).backgroundImage)
+              input#backgroundImage(type='text' value=(user.custom_theme || {}).backgroundImage)
 
           .inputGroup
             .d-flex.col-2
@@ -159,8 +158,10 @@ block content
 
                 const [response, data] = await putJSON(`/api/users/#{user.username}/preferences`, {
                   preferred_theme: theme.value,
-                  glass: glass.value,
-                  background_image: backgroundImage.value,
+                  custom_theme: {
+                    glass: glass.value,
+                    backgroundImage: backgroundImage.value,
+                  },
                 });
                 if (response.status === 200) {
                   window.location.reload();

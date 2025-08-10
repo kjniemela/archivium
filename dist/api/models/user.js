@@ -283,13 +283,14 @@ class UserAPI {
             throw new errors_1.ModelError(err);
         }
     }
-    async putPreferences(sessionUser, username, { preferred_theme, glass, background_image }) {
+    async putPreferences(sessionUser, username, body) {
         if (!sessionUser)
             throw new errors_1.UnauthorizedError();
+        const { preferred_theme, custom_theme } = body;
         const user = await this.getOne({ 'user.username': username }, true);
         if (Number(sessionUser.id) !== Number(user.id))
             throw new errors_1.ForbiddenError();
-        const changes = { preferred_theme };
+        const changes = { preferred_theme, custom_theme };
         try {
             const keys = Object.keys(changes).filter(key => changes[key] !== undefined);
             if (keys.length === 0)
