@@ -5,6 +5,9 @@ export type Theme = {
 };
 
 const themes = {
+  custom: {
+    glass: false,
+  },
   default: {
     glass: false,
   },

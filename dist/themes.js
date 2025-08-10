@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const themes = {
+    custom: {
+        glass: false,
+    },
     default: {
         glass: false,
     },
