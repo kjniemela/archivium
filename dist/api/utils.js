@@ -27,7 +27,8 @@ var plans;
     plans[plans["FREE"] = 0] = "FREE";
     plans[plans["PREMIUM"] = 1] = "PREMIUM";
     plans[plans["BETA"] = 2] = "BETA";
-    plans[plans["SUPER"] = 3] = "SUPER";
+    plans[plans["PREMIUM_BETA"] = 3] = "PREMIUM_BETA";
+    plans[plans["SUPER"] = 4] = "SUPER";
 })(plans || (exports.plans = plans = {}));
 exports.paidTiers = {
     PREMIUM: 1,
@@ -40,6 +41,7 @@ exports.tierAllowance = {
     [plans.FREE]: { total: 5, [exports.tiers.PREMIUM]: 0 },
     [plans.PREMIUM]: { total: 20, [exports.tiers.PREMIUM]: 5 },
     [plans.BETA]: { total: 5, [exports.tiers.PREMIUM]: 1 },
+    [plans.PREMIUM_BETA]: { total: 20, [exports.tiers.PREMIUM]: 5 },
     [plans.SUPER]: { total: 999, [exports.tiers.PREMIUM]: 99 },
 };
 async function executeQuery(query, values = []) {
