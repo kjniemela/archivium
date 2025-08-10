@@ -30,7 +30,7 @@ export class DiscussionAPI {
     this.api = api;
   }
 
-  async getThreads(user: User, options?, canPost = false, includeExtra = false): Promise<Thread[]> {
+  async getThreads(user: User | undefined, options?, canPost = false, includeExtra = false): Promise<Thread[]> {
     const parsedOptions = parseData(options);
     const filter = user
       ? (canPost
@@ -89,7 +89,7 @@ export class DiscussionAPI {
    * @param {*} inclCommenters 
    * @returns {Promise<[number, QueryResult, QueryResult?]>}
    */
-  async getCommentsByThread(user: User, threadId: number, validate = true, inclCommenters = false): Promise<[Comment[], User[]?]> {
+  async getCommentsByThread(user: User | undefined, threadId: number, validate = true, inclCommenters = false): Promise<[Comment[], User[]?]> {
     if (validate) {
       const threads = await this.getThreads(user, { 'discussion.id': threadId });
       const thread = threads[0];
@@ -170,7 +170,8 @@ export class DiscussionAPI {
     return [comments];
   }
 
-  async postUniverseThread(user: User, universeShortname: string, { title }): Promise<ResultSetHeader> {
+  async postUniverseThread(user: User | undefined, universeShortname: string, { title }): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
     const universe = await this.api.universe.getOne(user, { shortname: universeShortname }, perms.READ);
     if (!universe.discussion_enabled) throw new ForbiddenError();
     if (!universe.discussion_open && universe.author_permissions[user.id] < perms.COMMENT) throw new ForbiddenError();
@@ -196,7 +197,8 @@ export class DiscussionAPI {
    * @param {{ body: string, reply_to?: number }} payload 
    * @returns {Promise<[number, QueryResult?]>}
    */
-  async postCommentToThread(user: User, threadId: number, { body, reply_to }: { body: string, reply_to?: number }): Promise<ResultSetHeader> {
+  async postCommentToThread(user: User | undefined, threadId: number, { body, reply_to }: { body: string, reply_to?: number }): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
     const threads = await this.getThreads(user, { 'discussion.id': threadId }, true);
     const thread = threads[0];
     if (!thread) throw new NotFoundError();
@@ -223,7 +225,8 @@ export class DiscussionAPI {
     return data;
   }
 
-  async postCommentToItem(user: User, universeShortname: string, itemShortname: string, { body, reply_to }: { body: string, reply_to?: number }): Promise<ResultSetHeader> {
+  async postCommentToItem(user: User | undefined, universeShortname: string, itemShortname: string, { body, reply_to }: { body: string, reply_to?: number }): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
     const universe = await this.api.universe.getOne(user, { shortname: universeShortname }, perms.READ);
     if (!universe.discussion_enabled) throw new ForbiddenError();
     const item = await this.api.item.getByUniverseAndItemShortnames(
@@ -255,7 +258,8 @@ export class DiscussionAPI {
 
     return data;
   }
-  async postCommentToChapter(user: User, shortname: string, index: number, { body, reply_to }: { body: string, reply_to?: number }): Promise<ResultSetHeader> {
+  async postCommentToChapter(user: User | undefined, shortname: string, index: number, { body, reply_to }: { body: string, reply_to?: number }): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
     const story = await this.api.story.getOne(user, { 'story.shortname': shortname });
     const chapter = await this.api.story.getChapter(user, shortname, index);
     if (!chapter.is_published) throw new ForbiddenError();
@@ -284,7 +288,7 @@ export class DiscussionAPI {
     return data;
   }
 
-  async subscribeToThread(user: User, threadId: number, isSubscribed: boolean): Promise<ResultSetHeader> {
+  async subscribeToThread(user: User | undefined, threadId: number, isSubscribed: boolean): Promise<ResultSetHeader> {
     if (!user) throw new UnauthorizedError();
     const threads = await this.getThreads(user, { 'discussion.id': threadId }, true);
     const thread = threads[0];
@@ -296,7 +300,7 @@ export class DiscussionAPI {
       `, [thread.id, user.id, isSubscribed, isSubscribed]);
   }
 
-  async deleteThreadComment(user: User, threadId: number, commentId: number): Promise<void> {
+  async deleteThreadComment(user: User | undefined, threadId: number, commentId: number): Promise<void> {
     if (!user) throw new UnauthorizedError();
     const threads = await this.getThreads(user, { 'discussion.id': threadId });
     const thread = threads[0];
@@ -315,7 +319,9 @@ export class DiscussionAPI {
     await executeQuery('UPDATE comment SET body = NULL, author_id = NULL WHERE id = ?', [commentId]);
   }
 
-  async deleteItemComment(user: User, universeShortname: string, itemShortname: string, commentId: number): Promise<void> {
+  async deleteItemComment(user: User | undefined, universeShortname: string, itemShortname: string, commentId: number): Promise<void> {
+    if (!user) throw new UnauthorizedError();
+
     const item = await this.api.item.getByUniverseAndItemShortnames(
       user,
       universeShortname,

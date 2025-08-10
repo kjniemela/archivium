@@ -53,7 +53,7 @@ exports.default = {
         });
     },
     async settings(req, res) {
-        const user = await api_1.default.user.getOne({ 'user.id': req.session.user.id });
+        const user = await api_1.default.user.getOne({ 'user.id': req.session.user?.id });
         const typeSettingData = await api_1.default.notification.getTypeSettings(user);
         if (!typeSettingData)
             return;
@@ -71,10 +71,8 @@ exports.default = {
         });
     },
     async requestVerify(req, res) {
-        if (!req.session.user) {
-            res.status(401);
-            return;
-        }
+        if (!req.session.user)
+            throw new errors_1.UnauthorizedError();
         if (req.session.user.verified) {
             res.redirect(`${config_1.ADDR_PREFIX}/`);
             return;
@@ -86,7 +84,7 @@ exports.default = {
         }
         res.prepareRender('verify', {
             user: req.session.user,
-            gravatarLink: `https://www.gravatar.com/avatar/${(0, md5_1.default)(req.session.user.email)}.jpg`,
+            gravatarLink: req.session.user.email && `https://www.gravatar.com/avatar/${(0, md5_1.default)(req.session.user.email)}.jpg`,
             nextPage: `${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`,
             reason: req.query.reason,
         });

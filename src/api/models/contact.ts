@@ -18,7 +18,7 @@ export class ContactAPI {
     this.api = api;
   }
 
-  async getOne(sessionUser: User, targetID: number): Promise<ContactUser> {
+  async getOne(sessionUser: User | undefined, targetID: number): Promise<ContactUser> {
     if (!sessionUser) throw new UnauthorizedError();
 
     const queryString = `
@@ -52,7 +52,7 @@ export class ContactAPI {
     return user;
   }
 
-  async getAll(user: User, includePending = true, includeAccepted = true): Promise<ContactUser[]> {
+  async getAll(user: User | undefined, includePending = true, includeAccepted = true): Promise<ContactUser[]> {
     if (!(includePending || includeAccepted)) throw new ValidationError('Either includePending or includeAccepted must be true');
     if (!user) throw new UnauthorizedError();
 
@@ -78,7 +78,8 @@ export class ContactAPI {
     return users;
   }
 
-  async post(user: User, username: string): Promise<ResultSetHeader> {
+  async post(user: User | undefined, username: string): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
 
     const target = await this.api.user.getOne({ 'user.username': username });
     if (!target) throw new NotFoundError();
@@ -107,7 +108,8 @@ export class ContactAPI {
     return result;
   }
 
-  async put(user: User, username: string, accepted: boolean): Promise<ResultSetHeader> {
+  async put(user: User | undefined, username: string, accepted: boolean): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
     const target = await this.api.user.getOne({ 'user.username': username });
     const contact = await this.getOne(user, target.id);
 
@@ -133,7 +135,7 @@ export class ContactAPI {
     return result;
   }
 
-  async del(user: User, targetID: number): Promise<ResultSetHeader> {
+  async del(user: User | undefined, targetID: number): Promise<ResultSetHeader> {
 
     const contact = await this.getOne(user, targetID);
 
@@ -145,7 +147,7 @@ export class ContactAPI {
     `);
   }
 
-  async delByUsername(user: User, username: string): Promise<ResultSetHeader> {
+  async delByUsername(user: User | undefined, username: string): Promise<ResultSetHeader> {
     const target = await this.api.user.getOne({ 'user.username': username });
     return await this.del(user, target.id);
   }

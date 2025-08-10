@@ -283,7 +283,7 @@ class UserAPI {
             throw new errors_1.ModelError(err);
         }
     }
-    async putPreferences(sessionUser, username, { preferred_theme }) {
+    async putPreferences(sessionUser, username, { preferred_theme, glass, background_image }) {
         if (!sessionUser)
             throw new errors_1.UnauthorizedError();
         const user = await this.getOne({ 'user.username': username }, true);
@@ -311,7 +311,7 @@ class UserAPI {
         const user = await this.getOne({ 'user.username': oldUsername });
         if (!user)
             throw new errors_1.NotFoundError();
-        if (Number(sessionUser.id) !== Number(user.id))
+        if (!sessionUser || Number(sessionUser.id) !== Number(user.id))
             throw new errors_1.ForbiddenError();
         const validationError = this.validateUsername(newUsername);
         if (validationError)
@@ -355,7 +355,7 @@ class UserAPI {
     }
     async putEmail(sessionUser, username, { email, password }) {
         const user = await this.getOne({ 'user.username': username }, true);
-        if (Number(sessionUser.id) !== Number(user.id))
+        if (!sessionUser || Number(sessionUser.id) !== Number(user.id))
             throw new errors_1.ForbiddenError();
         const isCorrectLogin = this.validatePassword(password, user.password, user.salt);
         if (!isCorrectLogin)
@@ -376,7 +376,7 @@ class UserAPI {
     }
     async putPassword(sessionUser, username, { oldPassword, newPassword }) {
         const user = await this.getOne({ 'user.username': username }, true);
-        if (Number(sessionUser.id) !== Number(user.id))
+        if (!sessionUser || Number(sessionUser.id) !== Number(user.id))
             throw new errors_1.ForbiddenError();
         const isCorrectLogin = this.validatePassword(oldPassword, user.password, user.salt);
         if (!isCorrectLogin)

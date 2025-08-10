@@ -50,7 +50,7 @@ export default {
       item = await api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortname, req.params.itemShortname);
     } catch (err) {
       if (err instanceof ForbiddenError) {
-        if (universe.author_permissions[req.session.user?.id] >= perms.READ) {
+        if (req.session.user && universe.author_permissions[req.session.user.id] >= perms.READ) {
           res.status(404);
           res.prepareRender('error', {
             code: 404,

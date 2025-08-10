@@ -89,7 +89,7 @@ export class UserImageAPI {
     }
   }
 
-  async post(sessionUser: User, file: Express.Multer.File | undefined, username: string): Promise<ResultSetHeader> {
+  async post(sessionUser: User | undefined, file: Express.Multer.File | undefined, username: string): Promise<ResultSetHeader> {
     if (!file) throw new ValidationError('No file provided');
     if (!sessionUser) throw new UnauthorizedError();
     if (sessionUser.username !== username) throw new ForbiddenError();
@@ -110,7 +110,7 @@ export class UserImageAPI {
     }
   }
 
-  async del(sessionUser: User, username: string): Promise<ResultSetHeader> {
+  async del(sessionUser: User | undefined, username: string): Promise<ResultSetHeader> {
     try {
       if (!sessionUser) throw new UnauthorizedError();
       if (sessionUser.username !== username) throw new ForbiddenError();
@@ -193,7 +193,7 @@ export class UserAPI {
     }
   }
 
-  async getByUniverseShortname(user: User, shortname: string): Promise<(User & { items_authored: number })[]> {
+  async getByUniverseShortname(user: User | undefined, shortname: string): Promise<(User & { items_authored: number })[]> {
     const universe = await this.api.universe.getOne(user, { shortname });
     if (!universe) throw new NotFoundError();
     try {
@@ -220,7 +220,7 @@ export class UserAPI {
     }
   }
 
-  async getSponsoredUniverses(user: User): Promise<UserSponsoredUniverses> {
+  async getSponsoredUniverses(user: User | undefined): Promise<UserSponsoredUniverses> {
     if (!user) throw new ValidationError('User required');
     try {
       const queryString = `
@@ -312,7 +312,7 @@ export class UserAPI {
     }
   }
 
-  async putPreferences(sessionUser: User, username: string, { preferred_theme }): Promise<ResultSetHeader> {
+  async putPreferences(sessionUser: User | undefined, username: string, { preferred_theme, glass, background_image }): Promise<ResultSetHeader> {
     if (!sessionUser) throw new UnauthorizedError();
     const user = await this.getOne({ 'user.username': username }, true);
     if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
@@ -333,10 +333,10 @@ export class UserAPI {
     }
   }
 
-  async putUsername(sessionUser: User, oldUsername: string, newUsername: string): Promise<Date | ResultSetHeader | string> {
+  async putUsername(sessionUser: User | undefined, oldUsername: string, newUsername: string): Promise<Date | ResultSetHeader | string> {
     const user = await this.getOne({ 'user.username': oldUsername });
     if (!user) throw new NotFoundError();
-    if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
+    if (!sessionUser || Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
     const validationError = this.validateUsername(newUsername);
     if (validationError) throw new ValidationError(validationError);
     const now = new Date();
@@ -375,9 +375,9 @@ export class UserAPI {
     }
   }
 
-  async putEmail(sessionUser: User, username: string, { email, password }): Promise<ResultSetHeader> {
+  async putEmail(sessionUser: User | undefined, username: string, { email, password }): Promise<ResultSetHeader> {
     const user = await this.getOne({ 'user.username': username }, true);
-    if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
+    if (!sessionUser || Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
     const isCorrectLogin = this.validatePassword(password, user.password, user.salt);
     if (!isCorrectLogin) throw new UnauthorizedError('Incorrect password');
     try {
@@ -394,9 +394,9 @@ export class UserAPI {
     }
   }
 
-  async putPassword(sessionUser: User, username: string, { oldPassword, newPassword }): Promise<ResultSetHeader> {
+  async putPassword(sessionUser: User | undefined, username: string, { oldPassword, newPassword }): Promise<ResultSetHeader> {
     const user = await this.getOne({ 'user.username': username }, true);
-    if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
+    if (!sessionUser || Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
     const isCorrectLogin = this.validatePassword(oldPassword, user.password, user.salt);
     if (!isCorrectLogin) throw new UnauthorizedError('Incorrect password');
     const salt = utils.createRandom32String();

@@ -106,7 +106,7 @@ export class StoryAPI {
     return stories;
   }
 
-  async getChapter(user: User, shortname: string, index: number, permissionsRequired = perms.READ): Promise<Chapter> {
+  async getChapter(user: User | undefined, shortname: string, index: number, permissionsRequired = perms.READ): Promise<Chapter> {
     const story = await this.getOne(user, { 'story.shortname': shortname }, permissionsRequired);
 
     const chapters = await executeQuery('SELECT * FROM storychapter WHERE story_id = ? AND chapter_number = ?', [story.id, index]) as Chapter[];
@@ -115,7 +115,7 @@ export class StoryAPI {
     return chapter;
   }
 
-  async post(user: User, payload): Promise<ResultSetHeader> {
+  async post(user: User | undefined, payload): Promise<ResultSetHeader> {
     if (!user) throw new UnauthorizedError();
     const { title, shortname, summary, is_public, universe: universeShort } = payload;
     if (!title) throw new ValidationError('Title is required.');
@@ -137,7 +137,7 @@ export class StoryAPI {
     }
   }
 
-  async postChapter(user: User, shortname: string, payload): Promise<[ResultSetHeader, number]> {
+  async postChapter(user: User | undefined, shortname: string, payload): Promise<[ResultSetHeader, number]> {
     if (!user) throw new UnauthorizedError();
     const { title, summary } = payload;
     if (!title) throw new ValidationError('Title is required.');
@@ -179,7 +179,7 @@ export class StoryAPI {
     return newIndexes;
   }
 
-  async put(user: User, storyShortname: string, payload): Promise<string> {
+  async put(user: User | undefined, storyShortname: string, payload): Promise<string> {
     if (!user) throw new UnauthorizedError();
     const { title, shortname, summary, drafts_public, order } = payload;
 
@@ -203,7 +203,7 @@ export class StoryAPI {
     return shortname ?? story.shortname;
   }
 
-  async putChapter(user: User, shortname: string, index: number, payload): Promise<number> {
+  async putChapter(user: User | undefined, shortname: string, index: number, payload): Promise<number> {
     if (!user) throw new UnauthorizedError();
     const { title, summary, body, is_published } = payload;
 
@@ -243,7 +243,7 @@ export class StoryAPI {
     return index;
   }
 
-  async del(user: User, shortname: string): Promise<void> {
+  async del(user: User | undefined, shortname: string): Promise<void> {
     const story = await this.getOne(user, { 'story.shortname': shortname }, perms.OWNER);
 
     await withTransaction(async (conn) => {
@@ -258,7 +258,7 @@ export class StoryAPI {
     });
   }
 
-  async delChapter(user: User, shortname: string, index: number): Promise<void> {
+  async delChapter(user: User | undefined, shortname: string, index: number): Promise<void> {
     const chapter = await this.getChapter(user, shortname, index, perms.OWNER);
 
     await withTransaction(async (conn) => {

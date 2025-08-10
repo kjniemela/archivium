@@ -126,7 +126,7 @@ function default_1(app, upload) {
                 new APIRoute('/username', { PUT: (req) => _1.default.user.putUsername(req.session.user, req.params.username, req.body.username) }),
                 new APIRoute('/email', { PUT: (req) => _1.default.user.putEmail(req.session.user, req.params.username, req.body) }),
                 new APIRoute('/password', { PUT: (req) => _1.default.user.putPassword(req.session.user, req.params.username, req.body) }),
-                new APIRoute('/notif-settings', { PUT: (req) => _1.default.notification.putSettings((req.session?.user?.username === req.params.username) ? req.session.user : null, req.body.username) }),
+                new APIRoute('/notif-settings', { PUT: (req) => _1.default.notification.putSettings((req.session?.user?.username === req.params.username) ? req.session.user : undefined, req.body.username) }),
                 new APIRoute('/preferences', { PUT: (req) => _1.default.user.putPreferences(req.session.user, req.params.username, req.body) }),
             ]),
         ]),
@@ -277,6 +277,7 @@ function default_1(app, upload) {
                 new APIRoute('/request', {
                     PUT: async (req) => {
                         await _1.default.universe.putAccessRequest(req.session.user, req.params.universeShortName, req.body.permissionLevel);
+                        const user = req.session.user;
                         const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [req.params.universeShortName]))[0];
                         const target = await _1.default.user.getOne({ 'user.id': universe.author_id }).catch(utils_1.handleNotFoundAsNull);
                         const permText = {
@@ -289,7 +290,7 @@ function default_1(app, upload) {
                         if (target) {
                             await _1.default.notification.notify(target, _1.default.notification.types.UNIVERSE, {
                                 title: 'Universe Access Request',
-                                body: `${req.session.user.username} is requesting ${permText[req.body.permissionLevel]} permissions on your universe ${universe.title}.`,
+                                body: `${user.username} is requesting ${permText[req.body.permissionLevel]} permissions on your universe ${universe.title}.`,
                                 icon: (0, utils_1.getPfpUrl)(req.session.user),
                                 clickUrl: `/universes/${req.params.universeShortName}/permissions`,
                             });

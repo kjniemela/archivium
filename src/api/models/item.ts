@@ -103,7 +103,7 @@ class ItemImageAPI {
     this.item = item;
   }
 
-  async getOneByItemShort(user: User, universeShortname: string, itemShortname: string, options?): Promise<ItemImage> {
+  async getOneByItemShort(user: User | undefined, universeShortname: string, itemShortname: string, options?): Promise<ItemImage> {
     const item = await this.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.READ, true);
     const data = await this.getMany({ item_id: item.id, ...(options ?? {}) }) as ItemImage[];
     const image = data[0];
@@ -123,13 +123,13 @@ class ItemImageAPI {
     return images;
   }
 
-  async getManyByItemShort(user: User, universeShortname: string, itemShortname: string, options?: ItemOptions, inclData = false): Promise<ItemImage[]> {
+  async getManyByItemShort(user: User | undefined, universeShortname: string, itemShortname: string, options?: ItemOptions, inclData = false): Promise<ItemImage[]> {
     const item = await this.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.READ, true);
     const images = await this.getMany({ item_id: item.id, ...(options ?? {}) }, inclData) as ItemImage[];
     return images;
   }
 
-  async post(user: User, file: Express.Multer.File | undefined, universeShortname: string, itemShortname: string): Promise<ResultSetHeader> {
+  async post(user: User | undefined, file: Express.Multer.File | undefined, universeShortname: string, itemShortname: string): Promise<ResultSetHeader> {
     if (!file) throw new ValidationError('Missing required fields');
     if (!user) throw new UnauthorizedError();
 
@@ -140,7 +140,7 @@ class ItemImageAPI {
     return await executeQuery<ResultSetHeader>(queryString, [item.id, originalname.substring(0, 64), mimetype, buffer, '']);
   }
 
-  async putLabel(user: User, imageId: number, label: string): Promise<ResultSetHeader> {
+  async putLabel(user: User | undefined, imageId: number, label: string): Promise<ResultSetHeader> {
     if (!user) throw new UnauthorizedError();
     const images = await this.getMany({ id: imageId }, false) as ItemImage[];
     const image = images && images[0];
@@ -149,7 +149,7 @@ class ItemImageAPI {
     return await executeQuery<ResultSetHeader>(`UPDATE itemimage SET label = ? WHERE id = ?;`, [label, imageId]);
   }
 
-  async del(user: User, imageId: number): Promise<void> {
+  async del(user: User | undefined, imageId: number): Promise<void> {
     if (!user) throw new UnauthorizedError();
     const images = await this.getMany({ id: imageId }, false) as ItemImage[];
     const image = images && images[0];
@@ -168,7 +168,7 @@ export class ItemAPI {
     this.api = api;
   }
 
-  async getOne(user: User, conditions: any = {}, permissionsRequired = perms.READ, basicOnly = false, options: ItemOptions = {}): Promise<Item> {
+  async getOne(user: User | undefined, conditions: any = {}, permissionsRequired = perms.READ, basicOnly = false, options: ItemOptions = {}): Promise<Item> {
 
     const parsedConditions = parseData(conditions);
 
@@ -258,7 +258,7 @@ export class ItemAPI {
     return item;
   }
 
-  async getMany(user: User, conditions, permissionsRequired = perms.READ, options: ItemOptions = {}): Promise<Item[]> {
+  async getMany(user: User | undefined, conditions, permissionsRequired = perms.READ, options: ItemOptions = {}): Promise<Item[]> {
     if (options.type) {
       if (!conditions) conditions = { strings: [], values: [] };
       conditions.strings.push('item.item_type = ?');
@@ -396,7 +396,7 @@ export class ItemAPI {
     return item;
   }
 
-  async getByUniverseShortname(user: User, shortname: string, permissionsRequired = perms.READ, options?: ItemOptions): Promise<Item[]> {
+  async getByUniverseShortname(user: User | undefined, shortname: string, permissionsRequired = perms.READ, options?: ItemOptions): Promise<Item[]> {
 
     const conditions = {
       strings: [
@@ -411,7 +411,7 @@ export class ItemAPI {
   }
 
   async getByUniverseAndItemShortnames(
-    user: User,
+    user: User | undefined,
     universeShortname: string,
     itemShortname: string,
     permissionsRequired = perms.READ,
@@ -457,7 +457,8 @@ export class ItemAPI {
     }
   }
 
-  async post(user: User, body, universeShortName: string): Promise<ResultSetHeader> {
+  async post(user: User | undefined, body, universeShortName: string): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
     const { title, shortname, item_type, parent_id, obj_data } = body;
 
     try {
@@ -512,7 +513,7 @@ export class ItemAPI {
     }
   }
 
-  async save(user: User, universeShortname: string, itemShortname: string, body, jsonMode = false): Promise<number> {
+  async save(user: User | undefined, universeShortname: string, itemShortname: string, body, jsonMode = false): Promise<number> {
     // Handle tags
     if (!jsonMode) body.tags = body.tags?.split(' ') ?? [];
 
@@ -725,11 +726,12 @@ export class ItemAPI {
   }
 
   async put(
-    user: User,
+    user: User | undefined,
     universeShortname: string,
     itemShortname: string,
     changes: { title: string, shortname: string, item_type: string, obj_data: string, tags: string[] }
   ): Promise<number> {
+    if (!user) throw new UnauthorizedError();
     const { title, shortname, item_type, obj_data, tags } = changes;
 
     if (!title || !obj_data) throw new ValidationError('Missing required fields');
@@ -783,7 +785,8 @@ export class ItemAPI {
     return item.id;
   }
 
-  async putData(user: User, universeShortname: string, itemShortname: string, changes): Promise<ResultSetHeader> {
+  async putData(user: User | undefined, universeShortname: string, itemShortname: string, changes): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
 
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE);
 
@@ -806,7 +809,7 @@ export class ItemAPI {
   }
 
   // TODO - how should permissions work on this?
-  async exists(user: User, universeShortname: string, itemShortname: string): Promise<boolean> {
+  async exists(user: User | undefined, universeShortname: string, itemShortname: string): Promise<boolean> {
     const queryString = `
       SELECT 1
       FROM item
@@ -841,7 +844,7 @@ export class ItemAPI {
     return data;
   }
 
-  async putTags(user: User, universeShortname: string, itemShortname: string, tags: string[]): Promise<ResultSetHeader | void> {
+  async putTags(user: User | undefined, universeShortname: string, itemShortname: string, tags: string[]): Promise<ResultSetHeader | void> {
     if (tags.length === 0) return; // Nothing to do
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE, true);
     const tagLookup = {};
@@ -857,7 +860,7 @@ export class ItemAPI {
     return data;
   }
 
-  async delTags(user: User, universeShortname: string, itemShortname: string, tags: string[]): Promise<ResultSetHeader | void> {
+  async delTags(user: User | undefined, universeShortname: string, itemShortname: string, tags: string[]): Promise<ResultSetHeader | void> {
     if (tags.length === 0) return; // Nothing to do
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE, true);
     const whereString = tags.map(() => `tag = ?`).join(' OR ');
@@ -867,7 +870,8 @@ export class ItemAPI {
     return data;
   }
 
-  async snoozeUntil(user: User, universeShortname: string, itemShortname: string): Promise<ResultSetHeader> {
+  async snoozeUntil(user: User | undefined, universeShortname: string, itemShortname: string): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE);
 
     const snooze = (await executeQuery(`SELECT * FROM snooze WHERE item_id = ${item.id} AND snoozed_by = ${user.id};`))[0];
@@ -881,7 +885,8 @@ export class ItemAPI {
     }
   }
 
-  async subscribeNotifs(user: User, universeShortname: string, itemShortname: string, isSubscribed: boolean): Promise<ResultSetHeader> {
+  async subscribeNotifs(user: User | undefined, universeShortname: string, itemShortname: string, isSubscribed: boolean): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.READ);
 
     return await executeQuery<ResultSetHeader>(`
@@ -890,7 +895,7 @@ export class ItemAPI {
       `, [item.id, user.id, isSubscribed, isSubscribed]);
   }
 
-  async del(user: User, universeShortname: string, itemShortname: string): Promise<void> {
+  async del(user: User | undefined, universeShortname: string, itemShortname: string): Promise<void> {
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.OWNER, true);
 
     await withTransaction(async (conn) => {

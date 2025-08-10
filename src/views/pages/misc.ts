@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import { ADDR_PREFIX } from '../../config';
 import { RouteHandler } from '..';
 import path from 'path';
+import { UnauthorizedError } from '../../errors';
 
 const staticDir = path.join(__dirname, '../../static');
 
@@ -78,6 +79,7 @@ export default {
   /* Note pages */
   async notes(req, res) {
     const user = req.session.user;
+    if (!user) throw new UnauthorizedError();
     const notes = await api.note.getByUsername(user, user.username);
     const noteAuthors = { [user.id]: user };
     res.prepareRender('notes', {

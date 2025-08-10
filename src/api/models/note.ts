@@ -43,7 +43,7 @@ export class NoteAPI {
     this.api = api;
   }
 
-  async getOne(user: User, uuid: string): Promise<Note> {
+  async getOne(user: User | undefined, uuid: string): Promise<Note> {
     // Direct note access is only allowed for our own notes.
     if (!user) throw new UnauthorizedError();
 
@@ -65,7 +65,7 @@ export class NoteAPI {
    * @param {*} options 
    * @returns 
    */
-  async getMany(user: User, conditions, options): Promise<Note[]> {
+  async getMany(user: User | undefined, conditions, options): Promise<Note[]> {
     const parsedConds = parseData(conditions ?? {});
     if (user) {
       parsedConds.strings.push('(note.is_public OR note.author_id = ?)');
@@ -127,7 +127,7 @@ export class NoteAPI {
     return notes;
   }
 
-  async getByUsername(sessionUser: User, username: string, conditions?, options?): Promise<Note[]> {
+  async getByUsername(sessionUser: User | undefined, username: string, conditions?, options?): Promise<Note[]> {
     const user = await this.api.user.getOne({ 'user.username': username });
     if (!user) throw new NotFoundError();
     const notes = await this.getMany(
@@ -139,7 +139,7 @@ export class NoteAPI {
   }
 
   async getByItemShortname(
-    user: User,
+    user: User | undefined,
     universeShortname: string,
     itemShortname: string,
     conditions?: any,
@@ -166,13 +166,13 @@ export class NoteAPI {
     return [notes];
   }
 
-  async getBoardsByUniverseShortname(user: User, shortname: string): Promise<NoteBoard[]> {
+  async getBoardsByUniverseShortname(user: User | undefined, shortname: string): Promise<NoteBoard[]> {
     const universe = await this.api.universe.getOne(user, { 'universe.shortname': shortname }, perms.READ);
     const boards = await executeQuery('SELECT * FROM noteboard WHERE universe_id = ?', [universe.id]) as NoteBoard[];
     return boards;
   }
 
-  async getByBoardShortname(user: User, shortname: string, conditions: any = null, options: any = null, validate = true, inclAuthors = false): Promise<Note[] | [Note[], { id: number, username: string, email: string }[]]> {
+  async getByBoardShortname(user: User | undefined, shortname: string, conditions: any = null, options: any = null, validate = true, inclAuthors = false): Promise<Note[] | [Note[], { id: number, username: string, email: string }[]]> {
     const boards = await executeQuery('SELECT * FROM noteboard WHERE shortname = ?', [shortname]) as NoteBoard[];
     const board = boards[0];
     if (!board) throw new NotFoundError();
@@ -198,7 +198,7 @@ export class NoteAPI {
     return notes;
   }
 
-  async postBoard(user: User, { title, shortname }, universeShortname: string): Promise<ResultSetHeader> {
+  async postBoard(user: User | undefined, { title, shortname }, universeShortname: string): Promise<ResultSetHeader> {
     if (!user) throw new UnauthorizedError();
     const universe = await this.api.universe.getOne(user, { 'universe.shortname': universeShortname }, perms.WRITE);
 
@@ -207,7 +207,7 @@ export class NoteAPI {
     return data;
   }
 
-  async post(user: User, { title, body, is_public, tags }): Promise<string> {
+  async post(user: User | undefined, { title, body, is_public, tags }): Promise<string> {
     if (!user) throw new UnauthorizedError();
     const uuid = crypto.randomUUID();
 
@@ -220,7 +220,8 @@ export class NoteAPI {
     return uuid;
   }
 
-  async put(user: User, uuid: string, changes): Promise<ResultSetHeader> {
+  async put(user: User | undefined, uuid: string, changes): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
     const { title, body, is_public, items, boards, tags } = changes;
     const note = await this.getOne(user, uuid);
 
@@ -257,7 +258,7 @@ export class NoteAPI {
     return data;
   }
 
-  async linkToBoard(user: User, boardShortname: string, noteUuid: string): Promise<void> {
+  async linkToBoard(user: User | undefined, boardShortname: string, noteUuid: string): Promise<void> {
     if (!noteUuid) throw new ValidationError('Note UUID is required');
     if (!user) throw new UnauthorizedError();
     const board = (await executeQuery('SELECT * FROM noteboard WHERE shortname = ?', [boardShortname]))[0] as NoteBoard | undefined;
@@ -268,7 +269,7 @@ export class NoteAPI {
     await executeQuery(queryString, [board.id, note.id])
   }
 
-  async linkToItem(user: User, universeShortname: string, itemShortname: string, noteUuid: string): Promise<void> {
+  async linkToItem(user: User | undefined, universeShortname: string, itemShortname: string, noteUuid: string): Promise<void> {
     if (!noteUuid) throw new ValidationError('Note UUID is required');
     if (!user) throw new UnauthorizedError();
     const item = await this.api.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE, true)
@@ -304,7 +305,7 @@ export class NoteAPI {
     return true;
   }
 
-  async del(user: User, uuid: string): Promise<ResultSetHeader> {
+  async del(user: User | undefined, uuid: string): Promise<ResultSetHeader> {
     if (!user) throw new UnauthorizedError();
     const note = await this.getOne(user, uuid);
 

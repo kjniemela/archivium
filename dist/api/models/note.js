@@ -166,6 +166,8 @@ class NoteAPI {
         return uuid;
     }
     async put(user, uuid, changes) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const { title, body, is_public, items, boards, tags } = changes;
         const note = await this.getOne(user, uuid);
         const queryString = `

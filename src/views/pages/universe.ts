@@ -85,10 +85,10 @@ export default {
   },
  
   async createDiscussionThread(req, res) {
+    if (!req.session.user) throw new UnauthorizedError();
     const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.READ);
     if (!universe.discussion_enabled || !universe.discussion_open && universe.author_permissions[req.session.user.id] < perms.COMMENT) {
-      res.status(403);
-      return;
+      throw new ForbiddenError();
     }
     res.prepareRender('createUniverseThread', { universe });
   },
@@ -99,10 +99,7 @@ export default {
       'discussion.id': req.params.threadId,
       'universe.id': universe.id,
     });
-    if (threads.length === 0) {
-      res.status(404);
-      return;
-    }
+    if (threads.length === 0) throw new NotFoundError();
     const thread = threads[0];
     const [comments, users] = await api.discussion.getCommentsByThread(req.session.user, thread.id, false, true) as [Comment[], User[]];
     const commenters = {};

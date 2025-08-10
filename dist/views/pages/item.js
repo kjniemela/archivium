@@ -47,7 +47,7 @@ exports.default = {
         }
         catch (err) {
             if (err instanceof errors_1.ForbiddenError) {
-                if (universe.author_permissions[req.session.user?.id] >= utils_1.perms.READ) {
+                if (req.session.user && universe.author_permissions[req.session.user.id] >= utils_1.perms.READ) {
                     res.status(404);
                     res.prepareRender('error', {
                         code: 404,

@@ -97,7 +97,7 @@ const utils_1 = require("./api/utils");
 */
 async function logout(req, res) {
     await api_1.default.session.delete({ id: req.session.id });
-    res.clearCookie('archiviumuid', req.session.id);
+    res.clearCookie('archiviumuid');
 }
 app.get(`${config_1.ADDR_PREFIX}/login`, async (req, res, next) => {
     if (req.session.user) {

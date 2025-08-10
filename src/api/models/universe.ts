@@ -70,7 +70,7 @@ export class UniverseAPI {
     this.api = api;
   }
 
-  async getOne(user: User, conditions, permissionLevel = perms.READ): Promise<ParsedUniverse> {
+  async getOne(user: User | undefined, conditions, permissionLevel = perms.READ): Promise<ParsedUniverse> {
     if (!conditions) throw new ValidationError('Conditions are required.');
     const parsedConditions = parseData(conditions);
     const data = await this.getMany(user, parsedConditions, permissionLevel);
@@ -88,7 +88,7 @@ export class UniverseAPI {
     return universe;
   }
 
-  async getMany(user: User, conditions: any = null, permissionLevel = perms.READ, options: BaseOptions = {}): Promise<StringifiedUniverse[]> {
+  async getMany(user: User | undefined, conditions: any = null, permissionLevel = perms.READ, options: BaseOptions = {}): Promise<StringifiedUniverse[]> {
 
     if (options.sort && !options.forceSort) {
       const validSorts = { 'title': true, 'created_at': true, 'updated_at': true };
@@ -163,7 +163,7 @@ export class UniverseAPI {
     });
   }
 
-  async getEventsByUniverseShortname(user: User, shortname: string, permissionsRequired = perms.READ): Promise<ItemEvent[]> {
+  async getEventsByUniverseShortname(user: User | undefined, shortname: string, permissionsRequired = perms.READ): Promise<ItemEvent[]> {
     const universe = await this.getOne(user, { 'universe.shortname': shortname }, permissionsRequired);
 
     const queryString = `
@@ -187,7 +187,9 @@ export class UniverseAPI {
     return body;
   }
 
-  async post(user: User, body): Promise<[ResultSetHeader, ResultSetHeader]> {
+  async post(user: User | undefined, body): Promise<[ResultSetHeader, ResultSetHeader]> {
+    if (!user) throw new UnauthorizedError();
+
     try {
       const { title, shortname, is_public, discussion_enabled, discussion_open, obj_data } = body;
 
@@ -232,7 +234,7 @@ export class UniverseAPI {
     await conn.execute('UPDATE universe SET updated_at = ? WHERE id = ?', [updatedAt, universeId]);
   }
 
-  async put(user: User, universeShortname: string, changes): Promise<number> {
+  async put(user: User | undefined, universeShortname: string, changes): Promise<number> {
     const { title, shortname, is_public, discussion_enabled, discussion_open, obj_data } = changes;
 
     if (!title) throw new ValidationError('Title is required.');
@@ -263,8 +265,8 @@ export class UniverseAPI {
     return universe.id;
   }
 
-  async putPermissions(user: User, shortname: string, targetUser: User, permission_level: perms): Promise<ResultSetHeader> {
-    permission_level = Number(permission_level); // just yet another proof that we need typescript...
+  async putPermissions(user: User | undefined, shortname: string, targetUser: User, permission_level: perms): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
     const universe = await this.getOne(
       user,
       { shortname },
@@ -307,7 +309,7 @@ export class UniverseAPI {
     return await query;
   }
 
-  async putUserFollowing(user: User, shortname: string, isFollowing: boolean): Promise<ResultSetHeader> {
+  async putUserFollowing(user: User | undefined, shortname: string, isFollowing: boolean): Promise<ResultSetHeader> {
     if (!user) throw new UnauthorizedError();
     const universe = await this.getOne(user, { shortname }, perms.READ);
 
@@ -329,7 +331,7 @@ export class UniverseAPI {
     return await query;
   }
 
-  async putUserSponsoring(user: User, shortname: string, tier: Tier): Promise<void> {
+  async putUserSponsoring(user: User | undefined, shortname: string, tier: Tier): Promise<void> {
     if (!user) throw new UnauthorizedError();
     const universe = await this.getOne(user, { shortname }, perms.ADMIN);
     if (universe.sponsoring_user !== null && universe.sponsoring_user !== user.id) {
@@ -364,7 +366,7 @@ export class UniverseAPI {
     await query;
   }
 
-  async getUserAccessRequestIfExists(user: User, shortname: string): Promise<UniverseAccessRequest | null> {
+  async getUserAccessRequestIfExists(user: User | undefined, shortname: string): Promise<UniverseAccessRequest | null> {
     if (!user) throw new UnauthorizedError();
 
     const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
@@ -379,7 +381,7 @@ export class UniverseAPI {
     return request;
   }
 
-  async getAccessRequests(user: User, shortname: string): Promise<UniverseAccessRequest[]> {
+  async getAccessRequests(user: User | undefined, shortname: string): Promise<UniverseAccessRequest[]> {
     if (!user) throw new UnauthorizedError();
 
     const universe = await this.getOne(user, { shortname }, perms.ADMIN);
@@ -392,7 +394,7 @@ export class UniverseAPI {
     return requests;
   }
 
-  async putAccessRequest(user: User, shortname: string, permissionLevel: perms): Promise<void> {
+  async putAccessRequest(user: User | undefined, shortname: string, permissionLevel: perms): Promise<void> {
     if (!user) throw new UnauthorizedError();
 
     const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
@@ -410,7 +412,7 @@ export class UniverseAPI {
     );
   }
 
-  async delAccessRequest(user: User, shortname: string, requestingUser: User): Promise<void> {
+  async delAccessRequest(user: User | undefined, shortname: string, requestingUser: User): Promise<void> {
     if (!user) throw new UnauthorizedError();
     if (!requestingUser) throw new ValidationError('Requesting user is required.');
     const permsUniverse = await this.getOne(user, { shortname }, perms.ADMIN);
@@ -423,7 +425,7 @@ export class UniverseAPI {
     );
   }
 
-  async del(user: User, shortname: string): Promise<void> {
+  async del(user: User | undefined, shortname: string): Promise<void> {
     const universe = await this.getOne(user, { shortname }, perms.OWNER);
 
     await withTransaction(async (conn) => {
