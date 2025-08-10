@@ -6,7 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const themes_1 = __importDefault(require("../themes"));
 const setTheme = (req, _, next) => {
     const user = req.session.user;
-    req.theme = themes_1.default[user?.preferred_theme] ?? themes_1.default.default;
+    if (user) {
+        const customTheme = user.custom_theme;
+        const baseTheme = user.preferred_theme ? themes_1.default[user.preferred_theme] : null;
+        req.theme = baseTheme ?? themes_1.default.default;
+    }
     next();
 };
 exports.default = setTheme;

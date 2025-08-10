@@ -31,6 +31,7 @@ CREATE TABLE user (
   suspect BOOLEAN DEFAULT FALSE,
   email_notifications BOOLEAN DEFAULT FALSE,
   preferred_theme VARCHAR(16),
+  custom_theme JSON DEFAULT NULL,
   PRIMARY KEY (id)
 );
 
