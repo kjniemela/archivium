@@ -85,7 +85,6 @@ export default function(app: Express) {
 
   function use(method: Method, path: string, site: SiteCheck, middleware: Handler[], handler: RouteHandler): void {
     app[method](`${ADDR_PREFIX}${path}`, ...middleware, async (req, res, next) => {
-      console.log(method, path)
       if (site(req) && !res.headersSent) {
         try {
           await handler(req, res);
@@ -148,7 +147,7 @@ export default function(app: Express) {
   /* User Pages */
   get('/contacts', sites.ALL, [Auth.verifySessionOrRedirect], pages.user.contactList);
   get('/users/:username', sites.ALL, [], pages.user.profilePage);
-  get('/settings', sites.ALL, [Auth.verifySessionOrRedirect], pages.user.settings);
+  get('/settings', sites.ALL, [Auth.bypassEmailVerification, Auth.verifySessionOrRedirect], pages.user.settings);
   get('/verify', sites.ALL, [], pages.user.requestVerify);
   get('/verify/:key', sites.ALL, [], pages.user.verifyUser);
   get('/notifications', sites.ALL, [Auth.verifySessionOrRedirect], pages.user.notifications);

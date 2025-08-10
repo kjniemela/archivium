@@ -1,11 +1,7 @@
-import { ADDR_PREFIX, DEV_MODE } from '../../config';
-import Auth from '../../middleware/auth';
+import { ADDR_PREFIX } from '../../config';
 import api from '../../api';
 import md5 from 'md5';
-import { render } from '../../templates';
-import { perms, Cond, getPfpUrl, handleNotFoundAsNull } from '../../api/utils';
-import fs from 'fs/promises';
-import logger from '../../logger';
+import { perms, Cond, getPfpUrl, handleNotFoundAsNull, handleErrorWithData } from '../../api/utils';
 import { RouteHandler } from '..';
 import { NotFoundError } from '../../errors';
 
@@ -81,7 +77,7 @@ export default {
       res.redirect(`${ADDR_PREFIX}/`);
       return;
     }
-    const data = await api.email.trySendVerifyLink(req.session.user, req.session.user.username);
+    const data = await api.email.trySendVerifyLink(req.session.user, req.session.user.username).catch(handleErrorWithData);
     if (data && !(data instanceof Date) && data.alreadyVerified) {
       res.redirect(`${ADDR_PREFIX}${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
       return;

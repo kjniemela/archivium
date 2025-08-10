@@ -52,7 +52,12 @@ export default function (app: Express, upload: Multer) {
             if (err.data) {
               res.json(err.data);
             } else {
-              res.end();
+              try {
+                res.json(err.message);
+              } catch (err) {
+                logger.error(err);
+                res.end();
+              }
             }
           }
         } else {
@@ -119,6 +124,7 @@ export default function (app: Express, upload: Multer) {
           }),
         ]),
         new APIRoute('/username', { PUT: (req) => api.user.putUsername(req.session.user, req.params.username, req.body.username) }),
+        new APIRoute('/email', { PUT: (req) => api.user.putEmail(req.session.user, req.params.username, req.body) }),
         new APIRoute('/password', { PUT: (req) => api.user.putPassword(req.session.user, req.params.username, req.body) }),
         new APIRoute('/notif-settings', { PUT: (req) => api.notification.putSettings((req.session?.user?.username === req.params.username) ? req.session.user : null, req.body.username) }),
         new APIRoute('/preferences', { PUT: (req) => api.user.putPreferences(req.session.user, req.params.username, req.body) }),

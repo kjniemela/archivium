@@ -277,3 +277,10 @@ export function handleNotFoundAsNull(error: any): null {
   }
   throw error;
 }
+
+export function handleErrorWithData(error: any): null {
+  if (error.data) {
+    return error.data;
+  }
+  throw error;
+}

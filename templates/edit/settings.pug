@@ -75,6 +75,44 @@ block content
 
       hr.mt-4
 
+      h3 #{T('Change Email')}
+      form#changeEmail
+        .inputGroup
+          label(for='emailChangePassword') #{T('Confirm password')}:
+          input(id='emailChangePassword' name='emailChangePassword' type='password')
+        .inputGroup
+          label(for='email') #{T('Email')}:
+          input(id='email' name='email' type='email' value=user.email)
+          small.row-2.col-2 #{T('If you change your email address, your account will have to be re-verified!')}
+          .d-flex
+            button(type='submit') #{T('Change Email')}
+
+        small.color-error.hidden#email-error
+
+        script.
+          (() => {
+            const form = document.forms.changeEmail;
+            const formError = document.querySelector('#email-error');
+            form.addEventListener('submit', async (e) => {
+              formError.classList.add('hidden');
+              e.preventDefault();
+
+              const value = form.email.value;
+              const password = form.emailChangePassword.value;
+              if (value === '#{user.email}') return;
+
+              const [response, data] = await putJSON(`/api/users/#{user.username}/email`, { email: value, password });
+              if (response.status === 200) {
+                window.location.reload();
+              } else {
+                formError.innerText = data;
+                formError.classList.remove('hidden');
+              }
+            });
+          })();
+
+      hr.mt-4
+
       if user.plan >= plans.BETA
         h3 #{T('Change Preferences')}
         form#changePreferences
@@ -152,6 +190,8 @@ block content
               }
             });
           })();
+
+      hr.mt-4
 
       h3 #{T('Request Account Deletion')}
       form#deleteAccount
