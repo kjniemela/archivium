@@ -46,7 +46,7 @@ export default {
       const couldUpgrade = sponsored ? (
         sponsored.length === 0 || sponsored
           .filter(row => row.tier > universe.tier)
-          .some(row => row.universes.length < tierAllowance[user.plan][row.tier])
+          // .some(row => row.universes.length < tierAllowance[user.plan][row.tier])
       ) : false;
       res.prepareRender('universe', { universe, authors: authorMap, threads, counts, totalItems, stories, couldUpgrade });
     } catch (err) {
