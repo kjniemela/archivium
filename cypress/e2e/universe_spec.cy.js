@@ -60,6 +60,7 @@ describe('Universe spec', () => {
     cy.get('#action-bar').contains('Set Permissions').click();
 
     cy.get('form').contains('testwriter').parent().find('select').select('0');
+    cy.wait(1000);
     cy.get('#breadcrumbs').contains('Public Test Universe').click();
 
     cy.get('#tabBtns').contains('Authors').click();
@@ -68,6 +69,7 @@ describe('Universe spec', () => {
     cy.get('#action-bar').contains('Set Permissions').click();
 
     cy.get('form').contains('testwriter').parent().find('select').select('3');
+    cy.wait(1000);
     cy.get('#breadcrumbs').contains('Public Test Universe').click();
 
     cy.get('#tabBtns').contains('Authors').click();
@@ -79,6 +81,7 @@ describe('Universe spec', () => {
     cy.get('#action-bar').contains('Set Permissions').click();
 
     cy.get('form').contains('testwriter').parent().find('select').select('0');
+    cy.wait(1000);
     cy.get('#breadcrumbs').contains('Private Test Universe').click();
 
     cy.get('#tabBtns').contains('Authors').click();
@@ -88,6 +91,7 @@ describe('Universe spec', () => {
     cy.get('#action-bar').contains('Set Permissions').click();
 
     cy.get('form').contains('testwriter').parent().find('select').select('3');
+    cy.wait(1000);
     cy.get('#breadcrumbs').contains('Private Test Universe').click();
 
     cy.get('#tabBtns').contains('Authors').click();
