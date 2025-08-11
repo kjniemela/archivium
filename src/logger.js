@@ -15,7 +15,6 @@ const logger = winston.createLogger({
   level: DEV_MODE ? 'debug' : 'info',
   format: winston.format.combine(
     winston.format.timestamp(),
-    winston.format.errors({ stack: true }),
     winston.format.printf(({ timestamp, level, message, stack }) => {
         return `${timestamp} [${level.toUpperCase()}]: ${stack || message}`;
     })
@@ -25,5 +24,16 @@ const logger = winston.createLogger({
     new winston.transports.Console(),
   ],
 });
+
+// Allows us to log errors sanely in winston
+Error.prototype.toString = function() {
+  let str = this.stack ?? this.message;
+
+  if (this.cause) {
+    str += `\nCaused by: ${this.cause.toString()}`;
+  }
+
+  return str;
+};
 
 module.exports = logger;

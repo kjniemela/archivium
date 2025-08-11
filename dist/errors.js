@@ -7,17 +7,17 @@ class RequestError extends Error {
     data;
     constructor(msgOrError, { cause, code, data } = {}) {
         if (msgOrError instanceof Error) {
-            super(msgOrError.message, { cause: msgOrError });
+            cause = msgOrError;
+            msgOrError = msgOrError.message;
         }
-        else {
-            super(msgOrError);
-        }
+        super(msgOrError, { cause });
         if (code) {
             this.code = code;
         }
         if (data) {
             this.data = data;
         }
+        this.name = this.constructor.name;
     }
 }
 exports.RequestError = RequestError;

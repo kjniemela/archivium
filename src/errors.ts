@@ -6,16 +6,20 @@ export class RequestError extends Error {
 
   constructor(msgOrError?: string | Error, { cause, code, data }: { cause?: Error, code?: number, data?: any } = {}) {
     if (msgOrError instanceof Error) {
-      super(msgOrError.message, { cause: msgOrError });
-    } else {
-      super(msgOrError);
+      cause = msgOrError;
+      msgOrError = msgOrError.message;
     }
+
+    super(msgOrError, { cause });
+
     if (code) {
       this.code = code;
     }
     if (data) {
       this.data = data;
     }
+
+    this.name = this.constructor.name;
   }
 }
 
