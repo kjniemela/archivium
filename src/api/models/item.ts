@@ -222,7 +222,7 @@ export class ItemAPI {
 
       if (item.obj_data) {
         const objData = JSON.parse(item.obj_data as string);
-        if (objData.body) {
+        if (typeof objData.body === 'string') {
           const links = await executeQuery(`
             SELECT to_universe_short, to_item_short, href
             FROM itemlink
@@ -628,7 +628,7 @@ export class ItemAPI {
       }
       for (const img of gallery?.imgs ?? []) {
         newImages[img.id] = img;
-        if (oldImages[img.id] && img.label !== oldImages[img.id].label) {
+        if (img.label && oldImages[img.id] && img.label !== oldImages[img.id].label) {
           await this.image.putLabel(user, img.id, img.label);
         }
       }
@@ -652,27 +652,31 @@ export class ItemAPI {
 
   async handleLinks(item: Item, objData: any): Promise<void> {
     if (objData.body) {
-      const bodyText = objData.body;
-      const links = await extractLinks(item.universe_short, bodyText, { item: { ...item, obj_data: objData } });
-      const oldLinks = await this._getLinks(item);
-      const existingLinks = {};
-      const newLinks = {};
-      for (const { href } of oldLinks) {
-        existingLinks[href] = true;
-      }
-      await withTransaction(async (conn) => {
-        for (const [universeShort, itemShort, href] of links) {
-          newLinks[href] = true;
-          if (!existingLinks[href]) {
-            await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [ item.id, universeShort, itemShort, href ]);
-          }
-        }
+      if (typeof objData.body === 'string') {
+        const bodyText = objData.body;
+        const links = await extractLinks(item.universe_short, bodyText, { item: { ...item, obj_data: objData } });
+        const oldLinks = await this._getLinks(item);
+        const existingLinks = {};
+        const newLinks = {};
         for (const { href } of oldLinks) {
-          if (!newLinks[href]) {
-            await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [ item.id, href ]);
-          }
+          existingLinks[href] = true;
         }
-      });
+        await withTransaction(async (conn) => {
+          for (const [universeShort, itemShort, href] of links) {
+            newLinks[href] = true;
+            if (!existingLinks[href]) {
+              await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [ item.id, universeShort, itemShort, href ]);
+            }
+          }
+          for (const { href } of oldLinks) {
+            if (!newLinks[href]) {
+              await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [ item.id, href ]);
+            }
+          }
+        });
+      } else {
+        console.log(objData.body);
+      }
     }
   }
 

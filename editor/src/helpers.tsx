@@ -63,6 +63,21 @@ export const formatDate = (date: Date, intervalOnly=false, short=false) => {
   else return `on ${date.toDateString()} at ${date.toLocaleTimeString()}`;
 };
 
+export function deepCompare(a: any, b: any): boolean {
+  if (!(a instanceof Object && b instanceof Object)) {
+    return a === b;
+  }
+  for (const key in a) {
+    if (!(key in b)) return false;
+    if (!deepCompare(a[key], b[key])) return false;
+  }
+  for (const key in b) {
+    if (!(key in a)) return false;
+  }
+  return true;
+}
+
+
 function createElement(
   type: string, 
   options: { attrs?: Record<string, any>, classList?: string[], dataset?: Record<string, any>, children?: HTMLElement[], style?: Record<string, string> } = {

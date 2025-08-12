@@ -1,0 +1,86 @@
+interface OffsetTextNode {
+  type: string;
+  start?: number;
+  end?: number;
+  marks?: any[];
+  content?: OffsetTextNode[];
+  attrs?: { [key: string]: any };
+}
+
+interface CombinedNode {
+  type: string;
+  text?: string;
+  marks?: any[];
+  content?: OffsetTextNode[];
+  attrs?: { [key: string]: any };
+}
+
+export interface IndexedDocument {
+  text: string;
+  structure: OffsetTextNode[];
+}
+
+export function jsonToIndexed(doc: any): IndexedDocument {
+  let textBuffer = '';
+  let pos = 0;
+
+  function walk(node: any): OffsetTextNode {
+    if (node.type === 'text') {
+      const start = pos;
+      textBuffer += node.text || '';
+      pos += (node.text || '').length;
+      return {
+        type: 'text',
+        start,
+        end: pos,
+        marks: node.marks ?? [],
+        attrs: node.attrs ?? {},
+      };
+    }
+
+    const content = (node.content || []).map(walk);
+
+    // preserve block breaks between top-level nodes
+    if ((node.type === 'paragraph' || node.type === 'heading') && content.length > 0) {
+      textBuffer += '\n';
+      pos += 1;
+    }
+
+    return {
+      type: node.type,
+      marks: node.marks || [],
+      attrs: node.attrs ?? {},
+      content,
+    };
+  }
+
+  const structure = (doc.content || []).map(walk);
+  return { text: textBuffer, structure };
+}
+
+export function indexedToJson(indexed: IndexedDocument): any {
+  const { text, structure } = indexed;
+
+  function walk(node: OffsetTextNode): any {
+    if (node.type === 'text') {
+      const combinedNode: CombinedNode = {
+        type: 'text',
+        text: text.slice(node.start, node.end),
+      };
+      if (node.marks && node.marks.length > 0) combinedNode.marks = node.marks;
+      if (node.attrs && Object.keys(node.attrs).length > 0) combinedNode.attrs = node.attrs;
+      return combinedNode;
+    }
+
+    const combinedNode: CombinedNode = { type: node.type };
+    if (node.marks && node.marks.length > 0) combinedNode.marks = node.marks;
+    if (node.attrs && Object.keys(node.attrs).length > 0) combinedNode.attrs = node.attrs;
+    if (node.content && node.content.length > 0) {
+      combinedNode.content = node.content.map(walk);
+    }
+
+    return combinedNode;
+  }
+
+  return { type: 'doc', content: structure.map(walk) };
+}
