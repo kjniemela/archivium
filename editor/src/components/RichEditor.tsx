@@ -2,9 +2,27 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '../extensions/Image';
 import Aside from '../extensions/Aside';
-import { jsonToIndexed } from '../../../src/lib/tiptapHelpers';
+import { jsonToIndexed, indexedToJson, type IndexedDocument } from '../../../src/lib/tiptapHelpers';
 
-export default function RichEditor({ content }: { content?: string }) {
+type RichEditorProps = {
+  content?: string | Object;
+  onChange: (content: IndexedDocument) => void;
+};
+
+let timeoutId: NodeJS.Timeout | null = null;
+function debouncedOnUpdate(editor: any, onChange: (content: IndexedDocument) => void) {
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
+
+  timeoutId = setTimeout(() => {
+    const json = editor.getJSON();
+    const indexed = jsonToIndexed(json);
+    onChange(indexed);
+  }, 500);
+}
+
+export default function RichEditor({ content, onChange }: RichEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -13,7 +31,7 @@ export default function RichEditor({ content }: { content?: string }) {
     ],
     content,
     onUpdate: ({ editor }) => {
-      console.log(editor.getJSON());
+      debouncedOnUpdate(editor, onChange);
     },
   });
 

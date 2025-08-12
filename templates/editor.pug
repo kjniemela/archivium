@@ -1,5 +1,9 @@
 extends layout.pug
 
+block append save
+  li#save-btn.navbarBtn
+    a.navbarBtnLink.navbarText(onclick='save(0)') #{T('Save')}
+
 block content
   #root(data-item-short=itemShort data-universe-short=universeShort)
   script(src='/static/editor/bundle.js')

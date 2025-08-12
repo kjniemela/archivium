@@ -676,12 +676,12 @@ button:disabled {
 
 .markdown p {
   /* text-indent: 2rem; */
-  padding: 0;
+  padding: 0 0.75rem;
   min-height: 2rem;
 }
 .markdown li p {
   /* text-indent: 2rem; */
-  padding: 0 0.25rem;
+  padding: 0;
   margin: 0;
   min-height: unset;
 }

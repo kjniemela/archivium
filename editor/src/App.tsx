@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { capitalize, renderMarkdown } from './helpers';
+import { capitalize, deepCompare, renderMarkdown } from './helpers';
 import RichEditor from './components/RichEditor';
+import { indexedToJson, type IndexedDocument } from '../../src/lib/tiptapHelpers';
 
 type Categories = {
   [key: string]: [string, string],
@@ -14,9 +15,9 @@ type Item = {
 };
 
 type ObjData = {
-  notes: boolean,
-  comments: boolean,
-  body: string,
+  notes?: boolean,
+  comments?: boolean,
+  body: IndexedDocument,
 };
 
 export type AppProps = {
@@ -51,11 +52,71 @@ async function fetchData(url: string, setter: (value: any) => void): Promise<any
   }
 }
 
+function setSaveText(text: string) {
+  const saveBtn = document.getElementById('save-btn');
+  if (saveBtn && saveBtn.firstChild) {
+    saveBtn.firstChild.textContent = text;
+  }
+}
+
+let needsSaving = false;
+let saveTimeout: NodeJS.Timeout | null = null;
+let previousData: (Item & { obj_data: ObjData }) | null = null;
+
 export default function App({ itemShort, universeShort }: AppProps) {
   const [categories, setCategories] = useState<Categories | null>(null);
   const [item, setItem] = useState<Item | null>(null);
   const [objData, setObjData] = useState<ObjData | null>(null);
-  const [bodyText, setBodyText] = useState<string | null>(null);
+  const [initBodyData, setInitBodyData] = useState<string | Object | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  
+  async function save(delay=5000) {
+    if (saveTimeout) {
+      clearTimeout(saveTimeout);
+    }
+    saveTimeout = setTimeout(async () => {
+      if (!item || !objData) return;
+      setSaveText('Saving...');
+      console.log('SAVING...');
+      const data = {
+        ...item,
+        obj_data: { ...objData },
+      };
+
+      if (deepCompare(data, previousData)) {
+        console.log('NO CHANGE');
+        setSaveText('Saved');
+        needsSaving = false;
+        return;
+      }
+
+      try {
+        setErrorMessage(null);
+        const response = await fetch(`/api/universes/${universeShort}/items/${itemShort}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        })
+        const err = await response.json();
+        if (!response.ok) {
+          setErrorMessage(err);
+          throw err;
+        }
+        console.log('SAVED.');
+        setSaveText('Saved');
+        previousData = data;
+        needsSaving = false;
+      } catch (err) {
+        console.error('Failed to save!');
+        console.error(err);
+        setSaveText('Error');
+        previousData = null;
+      }
+    }, delay);
+  }
 
   useEffect(() => {
     fetchData(`/api/universes/${universeShort}`, (data) => {
@@ -64,10 +125,14 @@ export default function App({ itemShort, universeShort }: AppProps) {
     fetchData(`/api/universes/${universeShort}/items/${itemShort}`, (data) => {
       const objData = JSON.parse(data.obj_data) as ObjData;
       setObjData(objData);
-      renderMarkdown(universeShort, objData.body).then((text: string) => {
-        console.log(text)
-        setBodyText(text);
-      });
+      if (typeof objData.body === 'string') {
+        renderMarkdown(universeShort, objData.body, { item: { ...data, obj_data: objData } }).then((text: string) => {
+          setInitBodyData(text);
+        });
+      } else {
+        const json = indexedToJson(objData.body);
+        setInitBodyData(json);
+      }
       delete data.obj_data;
       setItem(data);
     });
@@ -76,7 +141,7 @@ export default function App({ itemShort, universeShort }: AppProps) {
   return (
     <>
       <h2>{item ? T('Edit %s', item.title) : T('Edit')}</h2>
-      <form id='edit' method='POST'>
+      <div id='edit' className='form-row-group'>
         <div className='inputGroup'>
           <label htmlFor='title'>{T('Title')}</label>
           <input id='title' type='text' name='title' value={item?.title ?? ''} onChange={({ target }) =>
@@ -137,11 +202,17 @@ export default function App({ itemShort, universeShort }: AppProps) {
         </div>
 
         <div className='mt-2'>
-          <button type='submit'>{T('Save Changes')}</button>
+          <button onClick={() => save(0)}>{T('Save Changes')}</button>
         </div>
 
-        {bodyText && <RichEditor content={bodyText} />}
-      </form>
+        {errorMessage && <div>
+          <span id='item-error' className='color-error' style={{ fontSize: 'small' }}>{errorMessage}</span>
+        </div>}
+
+        {initBodyData && <RichEditor content={initBodyData} onChange={(content) => {
+          setObjData({ ...objData, body: content });
+        }} />}
+      </div>
     </>
   )
 }
