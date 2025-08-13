@@ -52,6 +52,16 @@ async function fetchData(url: string, setter: (value: any) => void): Promise<any
   }
 }
 
+let needsSaving = false;
+export function setNeedsSaving(value: boolean) {
+  needsSaving = value;
+}
+window.onbeforeunload = (event) => {
+  if (needsSaving) {
+    event.preventDefault();
+    event.returnValue = true;
+  }
+};
 let saveTimeout: NodeJS.Timeout | null = null;
 let previousData: (Item & { obj_data: ObjData }) | null = null;
 
@@ -70,12 +80,8 @@ export default function App({ itemShort, universeShort }: AppProps) {
   const [initBodyData, setInitBodyData] = useState<string | Object | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [saveText, setSaveText] = useState<string>('Save Changes');
-  const [needsSaving, setNeedsSaving] = useState<boolean>(false);
-
   
-  async function save(delay=5000) {
-    console.log(objData);
-    console.log(item);
+  async function save(delay: number) {
     if (saveTimeout) {
       clearTimeout(saveTimeout);
     }
@@ -156,6 +162,7 @@ export default function App({ itemShort, universeShort }: AppProps) {
     if (item && objData) {
       setNeedsSaving(true);
       setSaveText('Save Changes');
+      save(5000);
     }
   }, [item, objData]);
 
