@@ -1,3 +1,4 @@
+"use strict";
 const parseCookies = (req, res, next) => {
     req.cookies = {};
     if ('cookie' in req.headers) {

@@ -1,3 +1,4 @@
+"use strict";
 const winston = require('winston');
 require('winston-daily-rotate-file');
 const { DEV_MODE } = require('./config');

@@ -1,3 +1,4 @@
+"use strict";
 const db = require(".");
 const { handleLinks } = require("../api/new-api/models/item");
 const { executeQuery } = require("../api/utils");

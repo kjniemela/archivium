@@ -5517,7 +5517,7 @@ var Tracker = class {
 /*!********************************************************************!*\
   !*** ../node_modules/@tiptap/core/dist/jsx-runtime/jsx-runtime.js ***!
   \********************************************************************/
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -55209,6 +55209,155 @@ function keyName(event) {
 
 /***/ }),
 
+/***/ "../src/lib/editor/extensions/Aside.ts":
+/*!*********************************************!*\
+  !*** ../src/lib/editor/extensions/Aside.ts ***!
+  \*********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
+
+var Aside = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Node.create({
+    name: 'aside',
+    group: 'block',
+    content: 'block+',
+    defining: true,
+    addOptions: function addOptions() {
+        return {
+            HTMLAttributes: {}
+        };
+    },
+    parseHTML: function parseHTML() {
+        return [
+            {
+                tag: 'aside'
+            }
+        ];
+    },
+    renderHTML: function renderHTML(param) {
+        var HTMLAttributes = param.HTMLAttributes;
+        return [
+            'aside',
+            (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes),
+            0
+        ];
+    },
+    addCommands: function addCommands() {
+        var _this = this;
+        return {
+            wrapAside: function() {
+                return function(param) {
+                    var commands = param.commands;
+                    return commands.wrapIn(_this.name);
+                };
+            },
+            toggleAside: function() {
+                return function(param) {
+                    var commands = param.commands;
+                    return commands.toggleWrap(_this.name);
+                };
+            }
+        };
+    },
+    addInputRules: function addInputRules() {
+        return [
+            (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.wrappingInputRule)({
+                find: /^@aside\s$/,
+                type: this.type
+            })
+        ];
+    }
+});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Aside);
+
+
+/***/ }),
+
+/***/ "../src/lib/editor/extensions/Image.ts":
+/*!*********************************************!*\
+  !*** ../src/lib/editor/extensions/Image.ts ***!
+  \*********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _tiptap_extension_image__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/extension-image */ "../node_modules/@tiptap/extension-image/dist/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
+function _instanceof(left, right) {
+    if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) {
+        return !!right[Symbol.hasInstance](left);
+    } else {
+        return left instanceof right;
+    }
+}
+
+
+var Image = _tiptap_extension_image__WEBPACK_IMPORTED_MODULE_0__["default"].extend({
+    renderHTML: function renderHTML(param) {
+        var HTMLAttributes = param.HTMLAttributes;
+        return [
+            'div',
+            {
+                class: 'img-container'
+            },
+            [
+                'img',
+                (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes)
+            ]
+        ];
+    },
+    parseHTML: function parseHTML() {
+        return [
+            {
+                tag: 'div.img-container img',
+                getAttrs: function(element) {
+                    if (!_instanceof(element, HTMLImageElement)) return {};
+                    return {
+                        src: element.getAttribute('src'),
+                        alt: element.getAttribute('alt'),
+                        title: element.getAttribute('title')
+                    };
+                }
+            }
+        ];
+    }
+});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Image);
+
+
+/***/ }),
+
+/***/ "../src/lib/editor/index.ts":
+/*!**********************************!*\
+  !*** ../src/lib/editor/index.ts ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   editorExtensions: () => (/* binding */ editorExtensions)
+/* harmony export */ });
+/* harmony import */ var _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/starter-kit */ "../node_modules/@tiptap/starter-kit/dist/index.js");
+/* harmony import */ var _extensions_Aside__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./extensions/Aside */ "../src/lib/editor/extensions/Aside.ts");
+/* harmony import */ var _extensions_Image__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./extensions/Image */ "../src/lib/editor/extensions/Image.ts");
+
+
+
+var editorExtensions = [
+    _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_0__["default"],
+    _extensions_Aside__WEBPACK_IMPORTED_MODULE_1__["default"],
+    _extensions_Image__WEBPACK_IMPORTED_MODULE_2__["default"]
+];
+
+
+/***/ }),
+
 /***/ "../src/lib/tiptapHelpers.ts":
 /*!***********************************!*\
   !*** ../src/lib/tiptapHelpers.ts ***!
@@ -57103,12 +57252,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
 /* harmony import */ var _tiptap_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/react */ "../node_modules/@tiptap/react/dist/index.js");
-/* harmony import */ var _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tiptap/starter-kit */ "../node_modules/@tiptap/starter-kit/dist/index.js");
-/* harmony import */ var _extensions_Image__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../extensions/Image */ "./src/extensions/Image.ts");
-/* harmony import */ var _extensions_Aside__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../extensions/Aside */ "./src/extensions/Aside.ts");
-/* harmony import */ var _src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../src/lib/tiptapHelpers */ "../src/lib/tiptapHelpers.ts");
-
-
+/* harmony import */ var _src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../src/lib/tiptapHelpers */ "../src/lib/tiptapHelpers.ts");
+/* harmony import */ var _src_lib_editor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../src/lib/editor */ "../src/lib/editor/index.ts");
 
 
 
@@ -57120,18 +57265,14 @@ function debouncedOnUpdate(editor, onChange) {
     }
     timeoutId = setTimeout(function() {
         var json = editor.getJSON();
-        var indexed = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_5__.jsonToIndexed)(json);
+        var indexed = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_2__.jsonToIndexed)(json);
         onChange(indexed);
     }, 500);
 }
 function RichEditor(param) {
     var content = param.content, onChange = param.onChange;
     var editor = (0,_tiptap_react__WEBPACK_IMPORTED_MODULE_1__.useEditor)({
-        extensions: [
-            _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_2__["default"],
-            _extensions_Image__WEBPACK_IMPORTED_MODULE_3__["default"],
-            _extensions_Aside__WEBPACK_IMPORTED_MODULE_4__["default"]
-        ],
+        extensions: _src_lib_editor__WEBPACK_IMPORTED_MODULE_3__.editorExtensions,
         content: content,
         onUpdate: function(param) {
             var editor = param.editor;
@@ -57144,139 +57285,15 @@ function RichEditor(param) {
             editor: editor
         }, void 0, false, {
             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\RichEditor.tsx",
-            lineNumber: 39,
+            lineNumber: 33,
             columnNumber: 5
         }, this)
     }, void 0, false, {
         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\RichEditor.tsx",
-        lineNumber: 38,
+        lineNumber: 32,
         columnNumber: 10
     }, this);
 }
-
-
-/***/ }),
-
-/***/ "./src/extensions/Aside.ts":
-/*!*********************************!*\
-  !*** ./src/extensions/Aside.ts ***!
-  \*********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
-
-var Aside = _tiptap_core__WEBPACK_IMPORTED_MODULE_0__.Node.create({
-    name: 'aside',
-    group: 'block',
-    content: 'block+',
-    defining: true,
-    addOptions: function addOptions() {
-        return {
-            HTMLAttributes: {}
-        };
-    },
-    parseHTML: function parseHTML() {
-        return [
-            {
-                tag: 'aside'
-            }
-        ];
-    },
-    renderHTML: function renderHTML(param) {
-        var HTMLAttributes = param.HTMLAttributes;
-        return [
-            'aside',
-            (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes),
-            0
-        ];
-    },
-    addCommands: function addCommands() {
-        var _this = this;
-        return {
-            wrapAside: function() {
-                return function(param) {
-                    var commands = param.commands;
-                    return commands.wrapIn(_this.name);
-                };
-            },
-            toggleAside: function() {
-                return function(param) {
-                    var commands = param.commands;
-                    return commands.toggleWrap(_this.name);
-                };
-            }
-        };
-    },
-    addInputRules: function addInputRules() {
-        return [
-            (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_0__.wrappingInputRule)({
-                find: /^@aside\s$/,
-                type: this.type
-            })
-        ];
-    }
-});
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Aside);
-
-
-/***/ }),
-
-/***/ "./src/extensions/Image.ts":
-/*!*********************************!*\
-  !*** ./src/extensions/Image.ts ***!
-  \*********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _tiptap_extension_image__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/extension-image */ "../node_modules/@tiptap/extension-image/dist/index.js");
-/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
-function _instanceof(left, right) {
-    if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) {
-        return !!right[Symbol.hasInstance](left);
-    } else {
-        return left instanceof right;
-    }
-}
-
-
-var Image = _tiptap_extension_image__WEBPACK_IMPORTED_MODULE_0__["default"].extend({
-    renderHTML: function renderHTML(param) {
-        var HTMLAttributes = param.HTMLAttributes;
-        return [
-            'div',
-            {
-                class: 'img-container'
-            },
-            [
-                'img',
-                (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes)
-            ]
-        ];
-    },
-    parseHTML: function parseHTML() {
-        return [
-            {
-                tag: 'div.img-container img',
-                getAttrs: function(element) {
-                    if (!_instanceof(element, HTMLImageElement)) return {};
-                    return {
-                        src: element.getAttribute('src'),
-                        alt: element.getAttribute('alt'),
-                        title: element.getAttribute('title')
-                    };
-                }
-            }
-        ];
-    }
-});
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Image);
 
 
 /***/ }),

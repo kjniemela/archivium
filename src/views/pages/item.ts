@@ -1,3 +1,5 @@
+import { renderToHTMLString } from '@tiptap/static-renderer/pm/html-string';
+import sanitizeHtml from 'sanitize-html';
 import { RouteHandler } from '..';
 import api from '../../api';
 import { Comment } from '../../api/models/discussion';
@@ -6,7 +8,10 @@ import { Note } from '../../api/models/note';
 import { User } from '../../api/models/user';
 import { getPfpUrl, perms } from '../../api/utils';
 import { ForbiddenError, NotFoundError } from '../../errors';
+import { IndexedDocument, indexedToJson } from '../../lib/tiptapHelpers';
+import logger from '../../logger';
 import { universeLink } from '../../templates';
+import { editorExtensions } from '../../lib/editor';
 
 export default {
   async list(req, res) {
@@ -63,11 +68,36 @@ export default {
       throw err;
     }
 
-    item.obj_data = JSON.parse(item.obj_data as string);
+    item.obj_data = JSON.parse(item.obj_data as string) as Record<string, any>;
     item.itemTypeName = ((universe.obj_data['cats'] ?? {})[item.item_type] ?? ['Missing Category'])[0];
     item.itemTypeColor = ((universe.obj_data['cats'] ?? {})[item.item_type] ?? [,,'#f3f3f3'])[2];
     if (item.gallery.length > 0) {
       item.gallery = item.gallery.sort((a, b) => a.id > b.id ? 1 : -1);
+    }
+
+    if ('body' in item.obj_data && typeof item.obj_data.body !== 'string') {
+      try {
+        const jsonBody = indexedToJson(item.obj_data.body as IndexedDocument);
+        const htmlBody = renderToHTMLString({ extensions: editorExtensions, content: jsonBody });
+        const sanitizedHtml = sanitizeHtml(htmlBody, {
+          allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+          allowedAttributes: {
+            ...sanitizeHtml.defaults.allowedAttributes,
+            img: ['src', 'alt', 'title'],
+          },
+          disallowedTagsMode: 'escape',
+          allowedClasses: {
+            '*': false,
+          },
+      });
+        item.obj_data.body = {
+          type: 'html',
+          content: sanitizedHtml,
+        };
+      } catch (err) {
+        logger.error('Failed to parse item body:', err);
+        item.obj_data.body = '';
+      }
     }
 
     const [comments, commentUsers] = await api.discussion.getCommentsByItem(item.id, true) as [Comment[], User[]];

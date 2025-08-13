@@ -1,3 +1,4 @@
+"use strict";
 const db = require(".");
 const api = require("../api");
 const { doDeleteUser } = require("../api/new-api/models/user");

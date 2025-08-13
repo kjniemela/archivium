@@ -1,3 +1,4 @@
+"use strict";
 const { DB_CONFIG, DOMAIN } = require('../config');
 const logger = require('../logger');
 const { spawn } = require('child_process');

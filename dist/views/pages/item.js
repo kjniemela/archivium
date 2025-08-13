@@ -3,10 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const html_string_1 = require("@tiptap/static-renderer/pm/html-string");
+const sanitize_html_1 = __importDefault(require("sanitize-html"));
 const api_1 = __importDefault(require("../../api"));
 const utils_1 = require("../../api/utils");
 const errors_1 = require("../../errors");
+const tiptapHelpers_1 = require("../../lib/tiptapHelpers");
+const logger_1 = __importDefault(require("../../logger"));
 const templates_1 = require("../../templates");
+const editor_1 = require("../../lib/editor");
 exports.default = {
     async list(req, res) {
         const search = req.getQueryParam('search');
@@ -64,6 +69,31 @@ exports.default = {
         item.itemTypeColor = ((universe.obj_data['cats'] ?? {})[item.item_type] ?? [, , '#f3f3f3'])[2];
         if (item.gallery.length > 0) {
             item.gallery = item.gallery.sort((a, b) => a.id > b.id ? 1 : -1);
+        }
+        if ('body' in item.obj_data && typeof item.obj_data.body !== 'string') {
+            try {
+                const jsonBody = (0, tiptapHelpers_1.indexedToJson)(item.obj_data.body);
+                const htmlBody = (0, html_string_1.renderToHTMLString)({ extensions: editor_1.editorExtensions, content: jsonBody });
+                const sanitizedHtml = (0, sanitize_html_1.default)(htmlBody, {
+                    allowedTags: sanitize_html_1.default.defaults.allowedTags.concat(['img']),
+                    allowedAttributes: {
+                        ...sanitize_html_1.default.defaults.allowedAttributes,
+                        img: ['src', 'alt', 'title'],
+                    },
+                    disallowedTagsMode: 'escape',
+                    allowedClasses: {
+                        '*': false,
+                    },
+                });
+                item.obj_data.body = {
+                    type: 'html',
+                    content: sanitizedHtml,
+                };
+            }
+            catch (err) {
+                logger_1.default.error('Failed to parse item body:', err);
+                item.obj_data.body = '';
+            }
         }
         const [comments, commentUsers] = await api_1.default.discussion.getCommentsByItem(item.id, true);
         const commenters = {};
