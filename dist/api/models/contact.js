@@ -75,7 +75,7 @@ class ContactAPI {
             throw new errors_1.NotFoundError();
         if (target.id === user.id)
             throw new errors_1.ValidationError('Cannot contact yourself');
-        const contact = await this.getOne(user, target.id).catch(utils_1.handleNotFoundAsNull);
+        const contact = await this.getOne(user, target.id).catch((0, utils_1.handleAsNull)(errors_1.NotFoundError));
         if (contact)
             throw new errors_1.ValidationError('Already a contact');
         let result;

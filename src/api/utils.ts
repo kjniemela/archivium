@@ -3,7 +3,7 @@ import _ from 'lodash';
 import md5 from 'md5';
 import logger from '../logger';
 import { PoolConnection, QueryResult, RowDataPacket } from 'mysql2/promise';
-import { NotFoundError } from '../errors';
+import { ForbiddenError, NotFoundError, RequestError } from '../errors';
 
 export enum perms {
   NONE,
@@ -273,11 +273,22 @@ export function getPfpUrl(user) {
   return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email)}.jpg`;
 }
 
-export function handleNotFoundAsNull(error: any): null {
-  if (error instanceof NotFoundError) {
-    return null;
+export function handleAsNull(type: typeof RequestError | (typeof RequestError)[]) {
+  if (type instanceof Array) {
+    return (error: any): null => {
+      if (type.some(t => error instanceof t)) {
+        return null;
+      }
+      throw error;
+    };
+  } else {
+    return (error: any): null => {
+      if (error instanceof type) {
+        return null;
+      }
+      throw error;
+    };
   }
-  throw error;
 }
 
 export function handleErrorWithData(error: any): null {

@@ -10,6 +10,7 @@ const utils_1 = require("../api/utils");
 const logger_1 = __importDefault(require("../logger"));
 const pages_1 = __importDefault(require("./pages"));
 const errors_1 = require("../errors");
+const axios_1 = require("axios");
 exports.default = {
     async notificationSettings(req, res) {
         const { body, session } = req;
@@ -102,20 +103,20 @@ exports.default = {
         }
     },
     async editItem(req, res) {
-        try {
-            const id = await api_1.default.item.save(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);
-            const item = await api_1.default.item.getOne(req.session.user, { 'item.id': id }, utils_1.perms.READ, true);
-            res.redirect(`${(0, templates_1.universeLink)(req, req.params.universeShortname)}/items/${item.shortname}`);
-        }
-        catch (err) {
-            console.error(err);
-            if (err instanceof errors_1.ModelError) {
-                res.error = err.message;
-                await pages_1.default.item.edit(req, res);
-                return;
-            }
-            throw err;
-        }
+        throw new errors_1.RequestError('This endpoint is deprecared.', { code: axios_1.HttpStatusCode.Gone });
+        // try {
+        //   const id = await api.item.save(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);
+        //   const item = await api.item.getOne(req.session.user, { 'item.id': id }, perms.READ, true);
+        //   res.redirect(`${universeLink(req, req.params.universeShortname)}/items/${item.shortname}`);
+        // } catch (err) {
+        //   console.error(err);
+        //   if (err instanceof ModelError) {
+        //     res.error = err.message;
+        //     await pages.item.edit(req, res);
+        //     return;
+        //   }
+        //   throw err;
+        // }
     },
     async commentOnItem(req, res) {
         await api_1.default.discussion.postCommentToItem(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);

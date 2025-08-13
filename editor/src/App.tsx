@@ -63,6 +63,15 @@ let needsSaving = false;
 let saveTimeout: NodeJS.Timeout | null = null;
 let previousData: (Item & { obj_data: ObjData }) | null = null;
 
+
+const saveBtn = document.getElementById('save-btn');
+if (saveBtn) {
+  saveBtn.addEventListener('click', () => {
+    const saveChangesBtn = document.getElementById('save-changes');
+    saveChangesBtn?.click();
+  });
+}
+
 export default function App({ itemShort, universeShort }: AppProps) {
   const [categories, setCategories] = useState<Categories | null>(null);
   const [item, setItem] = useState<Item | null>(null);
@@ -72,6 +81,8 @@ export default function App({ itemShort, universeShort }: AppProps) {
 
   
   async function save(delay=5000) {
+    console.log(objData);
+    console.log(item);
     if (saveTimeout) {
       clearTimeout(saveTimeout);
     }
@@ -202,7 +213,7 @@ export default function App({ itemShort, universeShort }: AppProps) {
         </div>
 
         <div className='mt-2'>
-          <button onClick={() => save(0)}>{T('Save Changes')}</button>
+          <button id='save-changes' onClick={() => save(0)}>{T('Save Changes')}</button>
         </div>
 
         {errorMessage && <div>

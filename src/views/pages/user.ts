@@ -1,7 +1,10 @@
 import { ADDR_PREFIX } from '../../config';
 import api from '../../api';
 import md5 from 'md5';
-import { perms, Cond, getPfpUrl, handleNotFoundAsNull, handleErrorWithData } from '../../api/utils';
+import { render } from '../../templates';
+import { perms, Cond, getPfpUrl, handleAsNull, handleErrorWithData } from '../../api/utils';
+import fs from 'fs/promises';
+import logger from '../../logger';
 import { RouteHandler } from '..';
 import { NotFoundError, UnauthorizedError } from '../../errors';
 
@@ -38,7 +41,7 @@ export default {
     });
     if (!items) return;
     if (req.session.user?.id !== user.id) {
-      const contact = await api.contact.getOne(req.session.user, user.id).catch(handleNotFoundAsNull);
+      const contact = await api.contact.getOne(req.session.user, user.id).catch(handleAsNull(NotFoundError));
       user.isContact = contact !== null;
     }
     res.prepareRender('user', {

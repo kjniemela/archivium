@@ -3,10 +3,11 @@ import { ADDR_PREFIX } from '../config';
 import Auth from '../middleware/auth';
 import api from '.';
 import logger from '../logger';
-import { perms, executeQuery, getPfpUrl, handleNotFoundAsNull } from './utils';
+import { perms, executeQuery, getPfpUrl, handleAsNull } from './utils';
 import { Multer } from 'multer';
 import { Note } from './models/note';
 import { User } from './models/user';
+import { NotFoundError } from '../errors';
 
 type RouteMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 export type APIRouteHandler = (req: Request, res: Response) => Promise<any>;
@@ -104,7 +105,7 @@ export default function (app: Express, upload: Multer) {
         ]),
         new APIRoute('/universes', {
           GET: async (req) => {
-            const user = await api.user.getOne({ 'user.username': req.params.username }).catch(handleNotFoundAsNull);
+            const user = await api.user.getOne({ 'user.username': req.params.username }).catch(handleAsNull(NotFoundError));
             if (user) return api.universe.getManyByAuthorId(req.session.user, user.id);
             else return [];
           }
@@ -187,7 +188,7 @@ export default function (app: Express, upload: Multer) {
         }, [
           new APIRoute('/:itemShortName', {
             GET: (req) => api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortName, req.params.itemShortName),
-            PUT: (req) => api.item.save(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body, true),
+            PUT: (req) => api.item.save(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body),
             DELETE: (req) => api.item.del(req.session.user, req.params.universeShortName, req.params.itemShortName),
           }, [
             new APIRoute('/notes', {
@@ -288,7 +289,7 @@ export default function (app: Express, upload: Multer) {
             const user = req.session.user as User;
 
             const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [req.params.universeShortName]))[0];
-            const target = await api.user.getOne({ 'user.id': universe.author_id }).catch(handleNotFoundAsNull);
+            const target = await api.user.getOne({ 'user.id': universe.author_id }).catch(handleAsNull(NotFoundError));
             const permText = {
               [perms.READ]: 'read',
               [perms.COMMENT]: 'comment',

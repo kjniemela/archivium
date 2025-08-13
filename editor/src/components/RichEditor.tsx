@@ -2,7 +2,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '../extensions/Image';
 import Aside from '../extensions/Aside';
-import { jsonToIndexed, indexedToJson, type IndexedDocument } from '../../../src/lib/tiptapHelpers';
+import { jsonToIndexed, type IndexedDocument } from '../../../src/lib/tiptapHelpers';
 
 type RichEditorProps = {
   content?: string | Object;

@@ -8,6 +8,7 @@ const config_1 = require("../config");
 const _1 = __importDefault(require("."));
 const logger_1 = __importDefault(require("../logger"));
 const utils_1 = require("./utils");
+const errors_1 = require("../errors");
 function default_1(app, upload) {
     class APIRoute {
         path;
@@ -100,7 +101,7 @@ function default_1(app, upload) {
                 ]),
                 new APIRoute('/universes', {
                     GET: async (req) => {
-                        const user = await _1.default.user.getOne({ 'user.username': req.params.username }).catch(utils_1.handleNotFoundAsNull);
+                        const user = await _1.default.user.getOne({ 'user.username': req.params.username }).catch((0, utils_1.handleAsNull)(errors_1.NotFoundError));
                         if (user)
                             return _1.default.universe.getManyByAuthorId(req.session.user, user.id);
                         else
@@ -182,7 +183,7 @@ function default_1(app, upload) {
                 }, [
                     new APIRoute('/:itemShortName', {
                         GET: (req) => _1.default.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortName, req.params.itemShortName),
-                        PUT: (req) => _1.default.item.save(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body, true),
+                        PUT: (req) => _1.default.item.save(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body),
                         DELETE: (req) => _1.default.item.del(req.session.user, req.params.universeShortName, req.params.itemShortName),
                     }, [
                         new APIRoute('/notes', {
@@ -279,7 +280,7 @@ function default_1(app, upload) {
                         await _1.default.universe.putAccessRequest(req.session.user, req.params.universeShortName, req.body.permissionLevel);
                         const user = req.session.user;
                         const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [req.params.universeShortName]))[0];
-                        const target = await _1.default.user.getOne({ 'user.id': universe.author_id }).catch(utils_1.handleNotFoundAsNull);
+                        const target = await _1.default.user.getOne({ 'user.id': universe.author_id }).catch((0, utils_1.handleAsNull)(errors_1.NotFoundError));
                         const permText = {
                             [utils_1.perms.READ]: 'read',
                             [utils_1.perms.COMMENT]: 'comment',

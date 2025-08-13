@@ -1,4 +1,4 @@
-import { QueryBuilder, Cond, executeQuery, parseData, perms, withTransaction, BaseOptions } from '../utils';
+import { QueryBuilder, Cond, executeQuery, parseData, perms, withTransaction, BaseOptions, handleAsNull } from '../utils';
 import { extractLinks } from '../../markdown';
 import { API } from '..';
 import { User } from './user';
@@ -513,129 +513,115 @@ export class ItemAPI {
     }
   }
 
-  async save(user: User | undefined, universeShortname: string, itemShortname: string, body, jsonMode = false): Promise<number> {
-    // Handle tags
-    if (!jsonMode) body.tags = body.tags?.split(' ') ?? [];
+  async save(user: User | undefined, universeShortname: string, itemShortname: string, body: Partial<Item>): Promise<number> {
+    let item!: Item;
+    await withTransaction(async (conn) => {
+      // Actually save item
+      const changes = {
+        title: body.title,
+        shortname: body.shortname,
+        item_type: body.item_type,
+        obj_data: JSON.stringify(body.obj_data),
+        tags: body.tags ?? [],
+      };
+      const itemId = await this.put(user, universeShortname, itemShortname, changes);
 
-    // Handle obj_data
-    if (!('obj_data' in body)) {
-      throw new ValidationError('Missing required fields');
-    }
-    if (!jsonMode) body.obj_data = JSON.parse(decodeURIComponent(body.obj_data));
-    let lineage;
-    if ('lineage' in body.obj_data) {
-      lineage = body.obj_data.lineage;
-      body.obj_data.lineage = { title: lineage.title };
-    }
-    let timeline;
-    if ('timeline' in body.obj_data) {
-      timeline = body.obj_data.timeline;
-      body.obj_data.timeline = { title: timeline.title };
-    }
-    let gallery;
-    if ('gallery' in body.obj_data) {
-      gallery = body.obj_data.gallery;
-      body.obj_data.gallery = { title: gallery.title };
-    }
+      item = await this.getOne(user, { 'item.id': itemId }, perms.WRITE);
 
-    body.obj_data = JSON.stringify(body.obj_data);
-
-    // Actually save item
-    const itemId = await this.put(user, universeShortname, itemShortname, body);
-
-    const item = await this.getOne(user, { 'item.id': itemId }, perms.WRITE);
-
-    // Handle lineage data
-    if (lineage) {
-      const [existingParents, existingChildren] = [{}, {}];
-      for (const { parent_shortname } of item.parents) existingParents[parent_shortname] = true;
-      for (const { child_shortname } of item.children) existingChildren[child_shortname] = true;
-      const [newParents, newChildren] = [{}, {}];
-      for (const shortname in lineage.parents ?? {}) {
-        const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, shortname, perms.WRITE);
-        newParents[shortname] = true;
-        if (!(shortname in existingParents)) {
-          await this.putLineage(parent.id, item.id, ...lineage.parents[shortname] as [string, string]);
-        }
-      }
-      for (const shortname in lineage.children ?? {}) {
-        const child = await this.getByUniverseAndItemShortnames(user, universeShortname, shortname, perms.WRITE);
-        newChildren[shortname] = true;
-        if (!(shortname in existingChildren)) {
-          await this.putLineage(item.id, child.id, ...lineage.children[shortname].reverse() as [string, string]);
-        }
-      }
-      for (const { parent_shortname } of item.parents) {
-        if (!newParents[parent_shortname]) {
-          const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, parent_shortname, perms.WRITE);
-          await this.delLineage(parent.id, item.id);
-        }
-      }
-      for (const { child_shortname } of item.children) {
-        if (!newChildren[child_shortname]) {
-          const child = await this.getByUniverseAndItemShortnames(user, universeShortname, child_shortname, perms.WRITE);
-          await this.delLineage(item.id, child.id);
-        }
-      }
-    }
-
-    // Handle timeline data
-    if (timeline) {
-      const myEvents = timeline.events?.filter(event => !event.imported);
-      const myImports = timeline.events?.filter(event => event.imported);
-      if (myEvents) {
-        const events = await this.fetchEvents(item.id);
-        const existingEvents = events.reduce((acc, event) => ({ ...acc, [event.event_title ?? null]: event }), {});
-        const newEvents = myEvents.filter(event => !existingEvents[event.title]);
-        const updatedEvents = myEvents.filter(event => existingEvents[event.title] && (
-          existingEvents[event.title].event_title !== event.title
-          || existingEvents[event.title].abstime !== event.time
-        )).map(({ title, time }) => ({ event_title: title, abstime: time, id: existingEvents[title].id }));
-        const newEventMap = myEvents.reduce((acc, event) => ({ ...acc, [event.title ?? null]: true }), {});
-        const deletedEvents = events.filter(event => !newEventMap[event.event_title]).map(event => event.id);
-        await this.insertEvents(item.id, newEvents);
-        for (const event of updatedEvents) {
-          await this.updateEvent(event.id, event);
-        }
-        await this.deleteEvents(deletedEvents);
-      }
-
-      if (myImports) {
-        const imports = await this.fetchImports(item.id);
-        const existingImports = imports.reduce((acc, ti) => ({ ...acc, [ti.event_id]: ti }), {});
-        const newImports: number[] = [];
-        const importsMap = {};
-        for (const { srcId: itemId, title: eventTitle } of myImports) {
-          const event = (await this.fetchEvents(itemId, { title: eventTitle }))[0];
-          if (!event) continue;
-          if (!(event.id in existingImports)) {
-            newImports.push(event.id);
+      // Handle lineage data
+      if (body.parents && body.children) {
+        const [existingParents, existingChildren] = [{}, {}];
+        for (const { parent_shortname } of item.parents) existingParents[parent_shortname] = true;
+        for (const { child_shortname } of item.children) existingChildren[child_shortname] = true;
+        const [newParents, newChildren] = [{}, {}];
+        for (const shortname in body.parents ?? {}) {
+          const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, shortname, perms.WRITE).catch(handleAsNull([NotFoundError, ForbiddenError]));
+          if (!parent) continue;
+          newParents[shortname] = true;
+          if (!(shortname in existingParents)) {
+            await this.putLineage(parent.id, item.id, ...body.parents[shortname] as [string, string]);
           }
-          importsMap[event.id] = true;
         }
-        const deletedImports = imports.filter(ti => !importsMap[ti.event_id]).map(ti => ti.event_id);
-        await this.importEvents(item.id, newImports);
-        await this.deleteImports(item.id, deletedImports);
+        for (const shortname in body.children ?? {}) {
+          const child = await this.getByUniverseAndItemShortnames(user, universeShortname, shortname, perms.WRITE).catch(handleAsNull([NotFoundError, ForbiddenError]));
+          if (!child) continue;
+          newChildren[shortname] = true;
+          if (!(shortname in existingChildren)) {
+            await this.putLineage(item.id, child.id, ...body.children[shortname].reverse() as [string, string]);
+          }
+        }
+        for (const { parent_shortname } of item.parents) {
+          if (!newParents[parent_shortname]) {
+            const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, parent_shortname, perms.WRITE);
+            await this.delLineage(parent.id, item.id);
+          }
+        }
+        for (const { child_shortname } of item.children) {
+          if (!newChildren[child_shortname]) {
+            const child = await this.getByUniverseAndItemShortnames(user, universeShortname, child_shortname, perms.WRITE);
+            await this.delLineage(item.id, child.id);
+          }
+        }
       }
-    }
 
-    if (gallery) {
-      const existingImages = await this.image.getManyByItemShort(user, universeShortname, item.shortname);
-      const oldImages = {};
-      const newImages = {};
-      for (const img of existingImages ?? []) {
-        oldImages[img.id] = img;
-      }
-      for (const img of gallery?.imgs ?? []) {
-        newImages[img.id] = img;
-        if (img.label && oldImages[img.id] && img.label !== oldImages[img.id].label) {
-          await this.image.putLabel(user, img.id, img.label);
+      // Handle timeline data
+      if (body.events) {
+        const myEvents = body.events?.filter(event => !event.imported);
+        const myImports = body.events?.filter(event => event.imported);
+        if (myEvents) {
+          const events = await this.fetchEvents(item.id);
+          const existingEvents = events.reduce((acc, event) => ({ ...acc, [event.event_title ?? null]: event }), {});
+          const newEvents = myEvents.filter(event => !existingEvents[event.event_title]);
+          const updatedEvents = myEvents.filter(event => existingEvents[event.event_title] && (
+            existingEvents[event.event_title].event_title !== event.event_title
+            || existingEvents[event.event_title].abstime !== event.abstime
+          )).map(({ event_title, abstime }) => ({ event_title, abstime, id: existingEvents[event_title].id }));
+          const newEventMap = myEvents.reduce((acc, event) => ({ ...acc, [event.event_title ?? null]: true }), {});
+          const deletedEvents = events.filter(event => !newEventMap[event.event_title]).map(event => event.id);
+          await this.insertEvents(item.id, newEvents);
+          for (const event of updatedEvents) {
+            await this.updateEvent(event.id, event);
+          }
+          await this.deleteEvents(deletedEvents);
+        }
+
+        if (myImports) {
+          const imports = await this.fetchImports(item.id);
+          const existingImports = imports.reduce((acc, ti) => ({ ...acc, [ti.event_id]: ti }), {});
+          const newImports: number[] = [];
+          const importsMap = {};
+          for (const { srcId: itemId, title: eventTitle } of myImports) {
+            const event = (await this.fetchEvents(itemId, { title: eventTitle }))[0];
+            if (!event) continue;
+            if (!(event.id in existingImports)) {
+              newImports.push(event.id);
+            }
+            importsMap[event.id] = true;
+          }
+          const deletedImports = imports.filter(ti => !importsMap[ti.event_id]).map(ti => ti.event_id);
+          await this.importEvents(item.id, newImports);
+          await this.deleteImports(item.id, deletedImports);
         }
       }
-      for (const img of existingImages ?? []) {
-        if (!newImages[img.id]) await this.image.del(user, img.id);
+
+      if (body.gallery) {
+        const existingImages = await this.image.getManyByItemShort(user, universeShortname, item.shortname);
+        const oldImages = {};
+        const newImages = {};
+        for (const img of existingImages ?? []) {
+          oldImages[img.id] = img;
+        }
+        for (const img of body.gallery ?? []) {
+          newImages[img.id] = img;
+          if (img.label && oldImages[img.id] && img.label !== oldImages[img.id].label) {
+            await this.image.putLabel(user, img.id, img.label);
+          }
+        }
+        for (const img of existingImages ?? []) {
+          if (!newImages[img.id]) await this.image.del(user, img.id);
+        }
       }
-    }
+    });
 
     return item.id;
   }
@@ -675,7 +661,7 @@ export class ItemAPI {
           }
         });
       } else {
-        console.log(objData.body);
+        // console.log(objData.body.structure);
       }
     }
   }
@@ -689,10 +675,10 @@ export class ItemAPI {
     }
     return await executeQuery(queryString, values) as ItemEvent[];
   }
-  async insertEvents(itemId: number, events: { title: string, time: number }[]): Promise<void> {
+  async insertEvents(itemId: number, events: { event_title: string, abstime: number }[]): Promise<void> {
     if (!events.length) return;
     const queryString = 'INSERT INTO itemevent (item_id, event_title, abstime) VALUES ' + events.map(() => '(?, ?, ?)').join(',');
-    const values = events.reduce((acc, event) => ([...acc, itemId, event.title, event.time]), []);
+    const values = events.reduce((acc, event) => ([...acc, itemId, event.event_title, event.abstime]), []);
     await executeQuery(queryString, values);
   }
   async updateEvent(eventId: number, changes: { event_title: string, abstime: number }): Promise<void> {
@@ -732,7 +718,7 @@ export class ItemAPI {
     user: User | undefined,
     universeShortname: string,
     itemShortname: string,
-    changes: { title: string, shortname: string, item_type: string, obj_data: string, tags: string[] }
+    changes: { title?: string, shortname?: string, item_type?: string, obj_data?: string, tags?: string[] }
   ): Promise<number> {
     if (!user) throw new UnauthorizedError();
     const { title, shortname, item_type, obj_data, tags } = changes;

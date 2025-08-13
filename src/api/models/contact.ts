@@ -1,4 +1,4 @@
-import { executeQuery, parseData, getPfpUrl, handleNotFoundAsNull } from '../utils';
+import { executeQuery, parseData, getPfpUrl, handleAsNull } from '../utils';
 import { API } from '..';
 import { User } from './user';
 import { ResultSetHeader } from 'mysql2/promise';
@@ -84,7 +84,7 @@ export class ContactAPI {
     const target = await this.api.user.getOne({ 'user.username': username });
     if (!target) throw new NotFoundError();
     if (target.id === user.id) throw new ValidationError('Cannot contact yourself');
-    const contact = await this.getOne(user, target.id).catch(handleNotFoundAsNull);
+    const contact = await this.getOne(user, target.id).catch(handleAsNull(NotFoundError));
     if (contact) throw new ValidationError('Already a contact');
 
     let result: ResultSetHeader;
