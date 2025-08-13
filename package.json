@@ -34,7 +34,6 @@
   "homepage": "https://archivium.net",
   "dependencies": {
     "@tiptap/extension-image": "^3.0.9",
-    "@tiptap/html": "^3.1.0",
     "@tiptap/react": "^3.0.9",
     "@tiptap/starter-kit": "^3.0.9",
     "@tiptap/static-renderer": "^3.1.0",

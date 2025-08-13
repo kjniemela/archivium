@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactElement } from 'react';
 import { capitalize, deepCompare, renderMarkdown } from './helpers';
-import RichEditor from './components/RichEditor';
-import { indexedToJson, type IndexedDocument } from '../../src/lib/tiptapHelpers';
+import EditorFrame from './components/EditorFrame';
+import { indexedToJson, jsonToIndexed, type IndexedDocument } from '../../src/lib/tiptapHelpers';
+import { editorExtensions } from '../../src/lib/editor';
+import { createPortal } from 'react-dom';
+import TabsBar from './components/TabsBar';
+import { useEditor } from '@tiptap/react';
 
 type Categories = {
   [key: string]: [string, string],
@@ -14,11 +18,16 @@ type Item = {
   tags: string[],
 };
 
+const BUILTIN_TABS = ['lineage', 'location', 'timeline', 'gallery'] as const;
+
 type ObjData = {
   notes?: boolean,
   comments?: boolean,
-  body: IndexedDocument,
-};
+  body?: IndexedDocument,
+  tabs?: { [key: string]: any },
+} & { [K in typeof BUILTIN_TABS[number]]?: any };
+
+type ModalType = 'newTab';
 
 export type AppProps = {
   itemShort: string,
@@ -52,6 +61,19 @@ async function fetchData(url: string, setter: (value: any) => void): Promise<any
   }
 }
 
+let timeoutId: NodeJS.Timeout | null = null;
+function debouncedOnUpdate(editor: any, onChange: (content: IndexedDocument) => void) {
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
+
+  timeoutId = setTimeout(() => {
+    const json = editor.getJSON();
+    const indexed = jsonToIndexed(json);
+    onChange(indexed);
+  }, 500);
+}
+
 let needsSaving = false;
 export function setNeedsSaving(value: boolean) {
   needsSaving = value;
@@ -73,13 +95,31 @@ if (saveBtn) {
   });
 }
 
+function computeTabs(objData: ObjData): Record<string, string> {
+  return {
+    ...(objData.body ? { body: T('Main Text') } : {}),
+    ...(objData.tabs ? Object.keys(objData.tabs) : []).reduce((acc, tab) => ({ ...acc, [tab]: tab }), {}),
+    ...BUILTIN_TABS.filter(tab => objData[tab] !== undefined).reduce((acc, tab) => ({ ...acc, [tab]: objData[tab].title }), {}),
+  };
+}
+
 export default function App({ itemShort, universeShort }: AppProps) {
   const [categories, setCategories] = useState<Categories | null>(null);
   const [item, setItem] = useState<Item | null>(null);
   const [objData, setObjData] = useState<ObjData | null>(null);
-  const [initBodyData, setInitBodyData] = useState<string | Object | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [saveText, setSaveText] = useState<string>('Save Changes');
+  const [currentModal, setCurrentModal] = useState<ModalType | null>(null);
+  const [currentTab, setCurrentTab] = useState<string | null>(null);
+  const [tabNames, setTabNames] = useState<Record<string, string>>({});
+  
+  const editor = useEditor({
+    extensions: editorExtensions,
+    onUpdate: ({ editor }) => {
+      if (!objData) return;
+      debouncedOnUpdate(editor, (content) => setObjData({ ...objData, body: content }));
+    },
+  });
   
   async function save(delay: number) {
     if (saveTimeout) {
@@ -138,25 +178,19 @@ export default function App({ itemShort, universeShort }: AppProps) {
     fetchData(`/api/universes/${universeShort}/items/${itemShort}`, (data) => {
       const objData = JSON.parse(data.obj_data) as ObjData;
       setObjData(objData);
+      setTabNames(computeTabs(objData));
       if (typeof objData.body === 'string') {
         renderMarkdown(universeShort, objData.body, { item: { ...data, obj_data: objData } }).then((text: string) => {
-          setInitBodyData(text);
+          editor.commands.setContent(text);
         });
-      } else {
+      } else if (objData.body) {
         const json = indexedToJson(objData.body);
-        setInitBodyData(json);
+        editor.commands.setContent(json);
       }
       delete data.obj_data;
       setItem(data);
     });
   }, [itemShort, universeShort]);
-
-  useEffect(() => {
-    const saveBtn = document.getElementById('save-btn');
-    if (saveBtn && saveBtn.firstChild) {
-      saveBtn.firstChild.textContent = saveText;
-    }
-  }, [saveText]);
 
   useEffect(() => {
     if (item && objData) {
@@ -166,8 +200,83 @@ export default function App({ itemShort, universeShort }: AppProps) {
     }
   }, [item, objData]);
 
+  useEffect(() => {
+    if (!currentTab && Object.keys(tabNames).length > 0) {
+      setCurrentTab(Object.keys(tabNames)[0]);
+    }
+  }, [tabNames]);
+
+  const modalAnchor = document.querySelector('#modal-anchor');
+  const saveBtnAnchor = document.querySelector('#save-btn');
+
+  const [newTabType, setNewTabType] = useState<string | undefined>(undefined);
+  const [newTabName, setNewTabName] = useState<string>('');
+  function addTabByType() {
+    console.log('Adding tab:', newTabType, newTabName);
+    if (!objData || newTabType === undefined) return;
+    let newObjData = { ...objData };
+    if (BUILTIN_TABS.includes(newTabType as typeof BUILTIN_TABS[number])) {
+      newObjData[newTabType as typeof BUILTIN_TABS[number]] = { title: capitalize(T(newTabType)) };
+    }
+    setObjData(newObjData);
+    setTabNames(computeTabs(newObjData));
+    setCurrentModal(null);
+  }
+  function removeTab(tab: string) {
+    if (!objData) return;
+    let newObjData = { ...objData };
+    if (BUILTIN_TABS.includes(tab as typeof BUILTIN_TABS[number])) {
+      delete newObjData[tab as typeof BUILTIN_TABS[number]];
+    } else if (newObjData.tabs) {
+      if (!newObjData.tabs[tab]) return;
+      delete newObjData.tabs[tab];
+    }
+    setObjData(newObjData);
+    setTabNames(computeTabs(newObjData));
+  }
+
+  const modals: Record<ModalType, ReactElement> = {
+    newTab: (
+      <div className='sheet d-flex flex-col gap-1' style={{ minWidth: '20rem' }}>
+        <select onChange={({ target }) => setNewTabType(target.value)}>
+          <option hidden disabled selected value={undefined}>{T('Tab Type')}...</option>
+          <option value='body' disabled={'body' in ['currentTabs']}>{T('Main Text')}</option>
+          {BUILTIN_TABS.map(type => (
+            <option key={type} value={type} disabled={type in ['currentTabs']}>{capitalize(T(type))}</option>
+          ))}
+          <option value='custom'>{T('Custom Data')}</option>
+        </select>
+        {newTabType === 'custom' && <input type='text' placeholder={T('Tab Name')} value={newTabName} onChange={({ target }) => setNewTabName(target.value)} />}
+        <button type='button' onClick={() => addTabByType()}>{T('New Tab')}</button>
+      </div>
+    ),
+  };
+
+  const tabs: Record<string, ReactElement | null> = {
+    body: (
+      <EditorFrame editor={editor} />
+    ),
+  };
+
   return (
     <>
+      {/* Save Button */}
+      {saveBtnAnchor && createPortal(
+        <a className='navbarBtnLink navbarText'>{T(saveText)}</a>,
+        saveBtnAnchor,
+      )}
+      {/* Modals */}
+      {modalAnchor && (
+        currentModal && createPortal(
+          <div className='modal' onClick={() => setCurrentModal(null)}>
+            <div className='modal-content' onClick={(e) => e.stopPropagation()}>
+              {modals[currentModal]}
+            </div>
+          </div>,
+          modalAnchor
+        )
+      )}
+      {/* Editor Page */}
       <h2>{item ? T('Edit %s', item.title) : T('Edit')}</h2>
       <div id='edit' className='form-row-group'>
         <div className='inputGroup'>
@@ -237,9 +346,20 @@ export default function App({ itemShort, universeShort }: AppProps) {
           <span id='item-error' className='color-error' style={{ fontSize: 'small' }}>{errorMessage}</span>
         </div>}
 
-        {initBodyData && <RichEditor content={initBodyData} onChange={(content) => {
-          setObjData({ ...objData, body: content });
-        }} />}
+        <hr className='w-100 mb-0' />
+
+        {objData && <div>
+          <div className='d-flex align-start mb-2'>
+            <TabsBar tabs={tabNames} selectedTab={currentTab} onSelectTab={(tab) => setCurrentTab(tab)} onRemoveTab={(tab) => removeTab(tab)} />
+            <ul className='navbarBtns'>
+              <li className='navbarBtn'>
+                <h3 className='navbarBtnLink navbarText ma-0 material-symbols-outlined heavy' onClick={() => setCurrentModal('newTab')}>add</h3>
+              </li>
+            </ul>
+          </div>
+
+          {currentTab && tabs[currentTab]}
+        </div>}
       </div>
     </>
   )
