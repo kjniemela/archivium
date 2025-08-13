@@ -41,7 +41,7 @@ exports.default = {
         if (!items)
             return;
         if (req.session.user?.id !== user.id) {
-            const contact = await api_1.default.contact.getOne(req.session.user, user.id).catch(utils_1.handleNotFoundAsNull);
+            const contact = await api_1.default.contact.getOne(req.session.user, user.id).catch((0, utils_1.handleAsNull)(errors_1.NotFoundError));
             user.isContact = contact !== null;
         }
         res.prepareRender('user', {

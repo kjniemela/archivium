@@ -91,6 +91,7 @@ const views_1 = __importDefault(require("./views"));
 // Load api routes
 const routes_1 = __importDefault(require("./api/routes"));
 const utils_1 = require("./api/utils");
+const errors_1 = require("./errors");
 (0, routes_1.default)(app, upload);
 /*
   ACCOUNT ROUTES
@@ -129,7 +130,7 @@ app.get(`${config_1.ADDR_PREFIX}/logout`, async (req, res, next) => {
 });
 app.post(`${config_1.ADDR_PREFIX}/login`, async (req, res, next) => {
     try {
-        const user = await api_1.default.user.getOne({ 'user.username': req.body.username }, true).catch(utils_1.handleNotFoundAsNull);
+        const user = await api_1.default.user.getOne({ 'user.username': req.body.username }, true).catch((0, utils_1.handleAsNull)(errors_1.NotFoundError));
         if (user) {
             req.loginId = user.id;
             const isCorrectLogin = api_1.default.user.validatePassword(req.body.password, user.password, user.salt);

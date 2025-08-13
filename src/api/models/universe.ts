@@ -1,4 +1,4 @@
-import { executeQuery, parseData, perms, withTransaction, tiers, tierAllowance, BaseOptions, handleNotFoundAsNull, Tier } from '../utils';
+import { executeQuery, parseData, perms, withTransaction, tiers, tierAllowance, BaseOptions, Tier } from '../utils';
 import logger from '../../logger';
 import { API } from '..';
 import { PoolConnection, ResultSetHeader } from 'mysql2/promise';

@@ -46,7 +46,7 @@ async function setUniversePerms(owner, universe, user, permsLvl) {
 }
 async function createItem(owner, universe, title, shortname, item_type, obj_data, tags = ['testing'], parent_id = null) {
     const data = await api_1.default.item.post(owner, { title, shortname, item_type, parent_id, obj_data: {} }, universe.shortname);
-    await api_1.default.item.save(owner, universe.shortname, shortname, { title, tags, obj_data }, true);
+    await api_1.default.item.save(owner, universe.shortname, shortname, { title, tags, obj_data });
     const item = await api_1.default.item.getOne(owner, { 'item.id': data.insertId });
     return item;
 }
