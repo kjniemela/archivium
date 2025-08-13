@@ -1,8 +1,6 @@
 import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Image from '../extensions/Image';
-import Aside from '../extensions/Aside';
 import { jsonToIndexed, type IndexedDocument } from '../../../src/lib/tiptapHelpers';
+import { editorExtensions } from '../../../src/lib/editor';
 
 type RichEditorProps = {
   content?: string | Object;
@@ -24,11 +22,7 @@ function debouncedOnUpdate(editor: any, onChange: (content: IndexedDocument) => 
 
 export default function RichEditor({ content, onChange }: RichEditorProps) {
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Image,
-      Aside,
-    ],
+    extensions: editorExtensions,
     content,
     onUpdate: ({ editor }) => {
       debouncedOnUpdate(editor, onChange);

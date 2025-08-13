@@ -103,7 +103,7 @@ export default {
     }
   },
 
-  async editItem(req, res) {
+  async editItem() {
     throw new RequestError('This endpoint is deprecared.', { code: HttpStatusCode.Gone });
     // try {
     //   const id = await api.item.save(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);

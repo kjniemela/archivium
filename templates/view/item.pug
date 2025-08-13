@@ -202,12 +202,18 @@ block content
 
     if 'body' in item.obj_data
       .sheet.hidden(data-tab='body')
-        #markdown-body
+        if item.obj_data.body instanceof Object
+          if item.obj_data.body.type === 'html'
+            .markdown !{item.obj_data.body.content}
+          else
+            .markdown #{item.obj_data.body.content}
+        else
+          #markdown-body
 
   script.
     (function() {
       const body = document.getElementById('markdown-body');
-      if (body) {
+      if (body && typeof item.obj_data.body === 'string') {
         loadMarkdown(body, '#{universe.shortname}', item.obj_data.body, { item }).then(async () => {
           await tabLoadPromise;
           const hash = location.hash.substr(1);

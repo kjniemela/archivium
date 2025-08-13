@@ -1,3 +1,4 @@
+"use strict";
 const mysql = require('mysql2/promise');
 const { DB_CONFIG } = require('../config');
 const logger = require('../logger');

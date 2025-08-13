@@ -82,7 +82,7 @@ class ItemImageAPI {
         const queryString = `INSERT INTO itemimage (item_id, name, mimetype, data, label) VALUES (?, ?, ?, ?, ?);`;
         return await (0, utils_1.executeQuery)(queryString, [item.id, originalname.substring(0, 64), mimetype, buffer, '']);
     }
-    async putLabel(user, imageId, label) {
+    async putLabel(user, imageId, label, conn) {
         if (!user)
             throw new errors_1.UnauthorizedError();
         const images = await this.getMany({ id: imageId }, false);
@@ -90,9 +90,9 @@ class ItemImageAPI {
         if (!image)
             throw new errors_1.NotFoundError();
         await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
-        return await (0, utils_1.executeQuery)(`UPDATE itemimage SET label = ? WHERE id = ?;`, [label, imageId]);
+        return await (0, utils_1.executeQuery)(`UPDATE itemimage SET label = ? WHERE id = ?;`, [label, imageId], conn);
     }
-    async del(user, imageId) {
+    async del(user, imageId, conn) {
         if (!user)
             throw new errors_1.UnauthorizedError();
         const images = await this.getMany({ id: imageId }, false);
@@ -100,7 +100,7 @@ class ItemImageAPI {
         if (!image)
             throw new errors_1.NotFoundError();
         await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
-        await (0, utils_1.executeQuery)(`DELETE FROM itemimage WHERE id = ?;`, [imageId]);
+        await (0, utils_1.executeQuery)(`DELETE FROM itemimage WHERE id = ?;`, [imageId], conn);
     }
 }
 class ItemAPI {
@@ -429,7 +429,7 @@ class ItemAPI {
                 obj_data: JSON.stringify(body.obj_data),
                 tags: body.tags ?? [],
             };
-            const itemId = await this.put(user, universeShortname, itemShortname, changes);
+            const itemId = await this.put(user, universeShortname, itemShortname, changes, conn);
             item = await this.getOne(user, { 'item.id': itemId }, utils_1.perms.WRITE);
             // Handle lineage data
             if (body.parents && body.children) {
@@ -445,7 +445,7 @@ class ItemAPI {
                         continue;
                     newParents[shortname] = true;
                     if (!(shortname in existingParents)) {
-                        await this.putLineage(parent.id, item.id, ...body.parents[shortname]);
+                        await this.putLineage(parent.id, item.id, ...body.parents[shortname], conn);
                     }
                 }
                 for (const shortname in body.children ?? {}) {
@@ -454,19 +454,19 @@ class ItemAPI {
                         continue;
                     newChildren[shortname] = true;
                     if (!(shortname in existingChildren)) {
-                        await this.putLineage(item.id, child.id, ...body.children[shortname].reverse());
+                        await this.putLineage(item.id, child.id, ...body.children[shortname].reverse(), conn);
                     }
                 }
                 for (const { parent_shortname } of item.parents) {
                     if (!newParents[parent_shortname]) {
                         const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, parent_shortname, utils_1.perms.WRITE);
-                        await this.delLineage(parent.id, item.id);
+                        await this.delLineage(parent.id, item.id, conn);
                     }
                 }
                 for (const { child_shortname } of item.children) {
                     if (!newChildren[child_shortname]) {
                         const child = await this.getByUniverseAndItemShortnames(user, universeShortname, child_shortname, utils_1.perms.WRITE);
-                        await this.delLineage(item.id, child.id);
+                        await this.delLineage(item.id, child.id, conn);
                     }
                 }
             }
@@ -482,11 +482,11 @@ class ItemAPI {
                         || existingEvents[event.event_title].abstime !== event.abstime)).map(({ event_title, abstime }) => ({ event_title, abstime, id: existingEvents[event_title].id }));
                     const newEventMap = myEvents.reduce((acc, event) => ({ ...acc, [event.event_title ?? null]: true }), {});
                     const deletedEvents = events.filter(event => !newEventMap[event.event_title]).map(event => event.id);
-                    await this.insertEvents(item.id, newEvents);
+                    await this.insertEvents(item.id, newEvents, conn);
                     for (const event of updatedEvents) {
-                        await this.updateEvent(event.id, event);
+                        await this.updateEvent(event.id, event, conn);
                     }
-                    await this.deleteEvents(deletedEvents);
+                    await this.deleteEvents(deletedEvents, conn);
                 }
                 if (myImports) {
                     const imports = await this.fetchImports(item.id);
@@ -503,8 +503,8 @@ class ItemAPI {
                         importsMap[event.id] = true;
                     }
                     const deletedImports = imports.filter(ti => !importsMap[ti.event_id]).map(ti => ti.event_id);
-                    await this.importEvents(item.id, newImports);
-                    await this.deleteImports(item.id, deletedImports);
+                    await this.importEvents(item.id, newImports, conn);
+                    await this.deleteImports(item.id, deletedImports, conn);
                 }
             }
             if (body.gallery) {
@@ -517,12 +517,12 @@ class ItemAPI {
                 for (const img of body.gallery ?? []) {
                     newImages[img.id] = img;
                     if (img.label && oldImages[img.id] && img.label !== oldImages[img.id].label) {
-                        await this.image.putLabel(user, img.id, img.label);
+                        await this.image.putLabel(user, img.id, img.label, conn);
                     }
                 }
                 for (const img of existingImages ?? []) {
                     if (!newImages[img.id])
-                        await this.image.del(user, img.id);
+                        await this.image.del(user, img.id, conn);
                 }
             }
         });
@@ -536,7 +536,7 @@ class ItemAPI {
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE, true);
         return await this._getLinks(item);
     }
-    async handleLinks(item, objData) {
+    async handleLinks(item, objData, conn) {
         if (objData.body) {
             if (typeof objData.body === 'string') {
                 const bodyText = objData.body;
@@ -547,7 +547,7 @@ class ItemAPI {
                 for (const { href } of oldLinks) {
                     existingLinks[href] = true;
                 }
-                await (0, utils_1.withTransaction)(async (conn) => {
+                const doUpdates = async (conn) => {
                     for (const [universeShort, itemShort, href] of links) {
                         newLinks[href] = true;
                         if (!existingLinks[href]) {
@@ -559,7 +559,13 @@ class ItemAPI {
                             await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [item.id, href]);
                         }
                     }
-                });
+                };
+                if (conn) {
+                    await doUpdates(conn);
+                }
+                else {
+                    await (0, utils_1.withTransaction)(doUpdates);
+                }
             }
             else {
                 // console.log(objData.body.structure);
@@ -575,35 +581,35 @@ class ItemAPI {
         }
         return await (0, utils_1.executeQuery)(queryString, values);
     }
-    async insertEvents(itemId, events) {
+    async insertEvents(itemId, events, conn) {
         if (!events.length)
             return;
         const queryString = 'INSERT INTO itemevent (item_id, event_title, abstime) VALUES ' + events.map(() => '(?, ?, ?)').join(',');
         const values = events.reduce((acc, event) => ([...acc, itemId, event.event_title, event.abstime]), []);
-        await (0, utils_1.executeQuery)(queryString, values);
+        await (0, utils_1.executeQuery)(queryString, values, conn);
     }
-    async updateEvent(eventId, changes) {
+    async updateEvent(eventId, changes, conn) {
         const { event_title, abstime } = changes;
         const queryString = 'UPDATE itemevent SET event_title = ?, abstime = ? WHERE id = ?';
-        await (0, utils_1.executeQuery)(queryString, [event_title, abstime, eventId]);
+        await (0, utils_1.executeQuery)(queryString, [event_title, abstime, eventId], conn);
     }
-    async deleteEvents(eventIds) {
+    async deleteEvents(eventIds, conn) {
         if (!eventIds.length)
             return;
         // Un-import deleted events
         await this.deleteImports(null, eventIds);
         const [whereClause, values] = eventIds.reduce((cond, id) => cond.or('id = ?', id), new utils_1.Cond()).export();
         const queryString = `DELETE FROM itemevent WHERE ${whereClause};`;
-        await (0, utils_1.executeQuery)(queryString, values.filter(val => val !== undefined));
+        await (0, utils_1.executeQuery)(queryString, values.filter(val => val !== undefined), conn);
     }
-    async importEvents(itemId, eventIds) {
+    async importEvents(itemId, eventIds, conn) {
         if (!eventIds.length)
             return;
         const queryString = 'INSERT INTO timelineitem (timeline_id, event_id) VALUES ' + eventIds.map(() => '(?, ?)').join(',');
         const values = eventIds.reduce((acc, eventId) => ([...acc, itemId, eventId]), []);
-        await (0, utils_1.executeQuery)(queryString, values);
+        await (0, utils_1.executeQuery)(queryString, values, conn);
     }
-    async deleteImports(itemId, eventIds) {
+    async deleteImports(itemId, eventIds, conn) {
         if (!eventIds.length)
             return;
         let cond = eventIds.reduce((cond, id) => cond.or('event_id = ?', id), new utils_1.Cond());
@@ -611,14 +617,14 @@ class ItemAPI {
             cond = cond.and('timeline_id = ?', itemId);
         const [whereClause, values] = cond.export();
         const queryString = `DELETE FROM timelineitem WHERE ${whereClause};`;
-        await (0, utils_1.executeQuery)(queryString, values.filter(val => val !== undefined));
+        await (0, utils_1.executeQuery)(queryString, values.filter(val => val !== undefined), conn);
     }
     async fetchImports(itemId) {
         const queryString = `SELECT * FROM timelineitem WHERE timeline_id = ?`;
         const values = [itemId];
         return await (0, utils_1.executeQuery)(queryString, values);
     }
-    async put(user, universeShortname, itemShortname, changes) {
+    async put(user, universeShortname, itemShortname, changes, conn) {
         if (!user)
             throw new errors_1.UnauthorizedError();
         const { title, shortname, item_type, obj_data, tags } = changes;
@@ -626,11 +632,11 @@ class ItemAPI {
             throw new errors_1.ValidationError('Missing required fields');
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE);
         const objData = JSON.parse(obj_data);
-        await this.handleLinks(item, objData);
+        await this.handleLinks(item, objData, conn);
         if (tags) {
             const trimmedTags = tags.map(tag => tag[0] === '#' ? tag.substring(1) : tag);
             // If tags list is provided, we can just as well handle it here
-            await this.putTags(user, universeShortname, itemShortname, trimmedTags);
+            await this.putTags(user, universeShortname, itemShortname, trimmedTags, conn);
             const tagLookup = {};
             item.tags?.forEach(tag => {
                 tagLookup[tag] = true;
@@ -638,7 +644,7 @@ class ItemAPI {
             trimmedTags.forEach(tag => {
                 delete tagLookup[tag];
             });
-            await this.delTags(user, universeShortname, itemShortname, Object.keys(tagLookup));
+            await this.delTags(user, universeShortname, itemShortname, Object.keys(tagLookup), conn);
         }
         if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
             // The item shortname has changed, we need to update all links to it to reflect this
@@ -646,7 +652,7 @@ class ItemAPI {
             if (shortnameError)
                 throw new errors_1.ValidationError(shortnameError);
         }
-        await (0, utils_1.withTransaction)(async (conn) => {
+        const doUpdate = async (conn) => {
             if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
                 await conn.execute('UPDATE itemlink SET to_item_short = ? WHERE to_item_short = ?', [shortname, item.shortname]);
             }
@@ -663,7 +669,13 @@ class ItemAPI {
       `;
             await conn.execute(queryString, [title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), new Date(), user.id, item.id]);
             this.api.universe.putUpdatedAtWithTransaction(conn, item.universe_id, new Date());
-        });
+        };
+        if (conn) {
+            await doUpdate(conn);
+        }
+        else {
+            await (0, utils_1.withTransaction)(doUpdate);
+        }
         return item.id;
     }
     async putData(user, universeShortname, itemShortname, changes) {
@@ -699,9 +711,9 @@ class ItemAPI {
      * @param {*} itemShortname
      * @returns
      */
-    async putLineage(parent_id, child_id, parent_title, child_title) {
+    async putLineage(parent_id, child_id, parent_title, child_title, conn) {
         const queryString = `INSERT INTO lineage (parent_id, child_id, parent_title, child_title) VALUES (?, ?, ?, ?);`;
-        const data = await (0, utils_1.executeQuery)(queryString, [parent_id, child_id, parent_title, child_title]);
+        const data = await (0, utils_1.executeQuery)(queryString, [parent_id, child_id, parent_title, child_title], conn);
         return data;
     }
     /**
@@ -709,12 +721,12 @@ class ItemAPI {
      * @param {*} itemShortname
      * @returns
      */
-    async delLineage(parent_id, child_id) {
+    async delLineage(parent_id, child_id, conn) {
         const queryString = `DELETE FROM lineage WHERE parent_id = ? AND child_id = ?;`;
-        const data = await (0, utils_1.executeQuery)(queryString, [parent_id, child_id]);
+        const data = await (0, utils_1.executeQuery)(queryString, [parent_id, child_id], conn);
         return data;
     }
-    async putTags(user, universeShortname, itemShortname, tags) {
+    async putTags(user, universeShortname, itemShortname, tags, conn) {
         if (tags.length === 0)
             return; // Nothing to do
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE, true);
@@ -728,10 +740,10 @@ class ItemAPI {
         if (!valueString)
             return;
         const queryString = `INSERT INTO tag (item_id, tag) VALUES ${valueString};`;
-        const data = await (0, utils_1.executeQuery)(queryString, valueArray);
+        const data = await (0, utils_1.executeQuery)(queryString, valueArray, conn);
         return data;
     }
-    async delTags(user, universeShortname, itemShortname, tags) {
+    async delTags(user, universeShortname, itemShortname, tags, conn) {
         if (tags.length === 0)
             return; // Nothing to do
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE, true);
@@ -739,7 +751,7 @@ class ItemAPI {
         if (!whereString)
             return;
         const queryString = `DELETE FROM tag WHERE item_id = ? AND (${whereString});`;
-        const data = await (0, utils_1.executeQuery)(queryString, [item.id, ...tags]);
+        const data = await (0, utils_1.executeQuery)(queryString, [item.id, ...tags], conn);
         return data;
     }
     async snoozeUntil(user, universeShortname, itemShortname) {

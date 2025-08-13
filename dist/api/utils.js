@@ -43,8 +43,8 @@ exports.tierAllowance = {
     [plans.PREMIUM_BETA]: { total: 20, [exports.tiers.PREMIUM]: 5 },
     [plans.SUPER]: { total: 999, [exports.tiers.PREMIUM]: 99 },
 };
-async function executeQuery(query, values = []) {
-    const [results] = await db_1.default.execute(query, values);
+async function executeQuery(query, values = [], conn) {
+    const [results] = await (conn ?? db_1.default).execute(query, values);
     return results;
 }
 class RollbackError extends Error {
