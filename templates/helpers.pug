@@ -8,7 +8,7 @@
     return prefixedItems;
   };
   const formatSnippet = (snippet, cutStart=true, cutEnd=true) => {
-    let clean = snippet.trim();
+    let clean = snippet.replaceAll('\\n', ' ').trim();
 
     const firstSpace = clean.indexOf(' ');
     if (cutStart && firstSpace > 0 && firstSpace < Math.min(15, clean.length - 15)) {
