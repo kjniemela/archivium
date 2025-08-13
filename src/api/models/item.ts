@@ -797,10 +797,10 @@ export class ItemAPI {
       ...changes,
     };
 
-    await this.handleLinks(item, item.obj_data);
-
     let data!: ResultSetHeader;
     await withTransaction(async (conn) => {
+      await this.handleLinks(item, item.obj_data, conn);
+
       const queryString = `UPDATE item SET obj_data = ?, updated_at = ?, last_updated_by = ? WHERE id = ?;`;
       [data] = await conn.execute<ResultSetHeader>(queryString, [JSON.stringify(item.obj_data), new Date(), user.id, item.id]);
       

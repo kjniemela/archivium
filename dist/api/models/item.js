@@ -686,9 +686,9 @@ class ItemAPI {
             ...JSON.parse(item.obj_data),
             ...changes,
         };
-        await this.handleLinks(item, item.obj_data);
         let data;
         await (0, utils_1.withTransaction)(async (conn) => {
+            await this.handleLinks(item, item.obj_data, conn);
             const queryString = `UPDATE item SET obj_data = ?, updated_at = ?, last_updated_by = ? WHERE id = ?;`;
             [data] = await conn.execute(queryString, [JSON.stringify(item.obj_data), new Date(), user.id, item.id]);
             this.api.universe.putUpdatedAtWithTransaction(conn, item.universe_id, new Date());
