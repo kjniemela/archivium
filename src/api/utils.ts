@@ -42,8 +42,8 @@ export const tierAllowance: Record<plans, Record<PaidTier | 'total', number>> = 
   [plans.SUPER]: { total: 999, [tiers.PREMIUM]: 99  },
 };
 
-export async function executeQuery<T extends QueryResult = RowDataPacket[]>(query: string, values: any[] = []) {
-  const [ results ] = await db.execute<T>(query, values);
+export async function executeQuery<T extends QueryResult = RowDataPacket[]>(query: string, values: any[] = [], conn?: PoolConnection): Promise<T> {
+  const [ results ] = await (conn ?? db).execute<T>(query, values);
   return results;
 }
 

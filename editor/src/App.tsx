@@ -52,17 +52,8 @@ async function fetchData(url: string, setter: (value: any) => void): Promise<any
   }
 }
 
-function setSaveText(text: string) {
-  const saveBtn = document.getElementById('save-btn');
-  if (saveBtn && saveBtn.firstChild) {
-    saveBtn.firstChild.textContent = text;
-  }
-}
-
-let needsSaving = false;
 let saveTimeout: NodeJS.Timeout | null = null;
 let previousData: (Item & { obj_data: ObjData }) | null = null;
-
 
 const saveBtn = document.getElementById('save-btn');
 if (saveBtn) {
@@ -78,6 +69,8 @@ export default function App({ itemShort, universeShort }: AppProps) {
   const [objData, setObjData] = useState<ObjData | null>(null);
   const [initBodyData, setInitBodyData] = useState<string | Object | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [saveText, setSaveText] = useState<string>('Save Changes');
+  const [needsSaving, setNeedsSaving] = useState<boolean>(false);
 
   
   async function save(delay=5000) {
@@ -98,7 +91,7 @@ export default function App({ itemShort, universeShort }: AppProps) {
       if (deepCompare(data, previousData)) {
         console.log('NO CHANGE');
         setSaveText('Saved');
-        needsSaving = false;
+        setNeedsSaving(false);
         return;
       }
 
@@ -119,12 +112,15 @@ export default function App({ itemShort, universeShort }: AppProps) {
         console.log('SAVED.');
         setSaveText('Saved');
         previousData = data;
-        needsSaving = false;
+        setNeedsSaving(false);
       } catch (err) {
         console.error('Failed to save!');
         console.error(err);
         setSaveText('Error');
         previousData = null;
+        if (err instanceof TypeError) {
+          setErrorMessage('Network error. Make sure you are connected to the internet and try again.');
+        }
       }
     }, delay);
   }
@@ -148,6 +144,20 @@ export default function App({ itemShort, universeShort }: AppProps) {
       setItem(data);
     });
   }, [itemShort, universeShort]);
+
+  useEffect(() => {
+    const saveBtn = document.getElementById('save-btn');
+    if (saveBtn && saveBtn.firstChild) {
+      saveBtn.firstChild.textContent = saveText;
+    }
+  }, [saveText]);
+
+  useEffect(() => {
+    if (item && objData) {
+      setNeedsSaving(true);
+      setSaveText('Save Changes');
+    }
+  }, [item, objData]);
 
   return (
     <>
@@ -213,7 +223,7 @@ export default function App({ itemShort, universeShort }: AppProps) {
         </div>
 
         <div className='mt-2'>
-          <button id='save-changes' onClick={() => save(0)}>{T('Save Changes')}</button>
+          <button id='save-changes' onClick={() => save(0)}>{T(saveText)}</button>
         </div>
 
         {errorMessage && <div>

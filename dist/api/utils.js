@@ -7,8 +7,8 @@ exports.Cond = exports.QueryBuilder = exports.parseData = exports.RollbackError 
 exports.executeQuery = executeQuery;
 exports.withTransaction = withTransaction;
 exports.getPfpUrl = getPfpUrl;
-exports.handleErrorWithData = handleErrorWithData;
 exports.handleAsNull = handleAsNull;
+exports.handleErrorWithData = handleErrorWithData;
 const db_1 = __importDefault(require("../db"));
 const md5_1 = __importDefault(require("md5"));
 const logger_1 = __importDefault(require("../logger"));
