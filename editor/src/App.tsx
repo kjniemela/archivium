@@ -201,8 +201,9 @@ export default function App({ itemShort, universeShort }: AppProps) {
   }, [item, objData]);
 
   useEffect(() => {
-    if (!currentTab && Object.keys(tabNames).length > 0) {
-      setCurrentTab(Object.keys(tabNames)[0]);
+    if (!(currentTab && tabNames[currentTab])) {
+      if (Object.keys(tabNames).length > 0) setCurrentTab(Object.keys(tabNames)[0]);
+      else setCurrentTab(null);
     }
   }, [tabNames]);
 
@@ -212,11 +213,16 @@ export default function App({ itemShort, universeShort }: AppProps) {
   const [newTabType, setNewTabType] = useState<string | undefined>(undefined);
   const [newTabName, setNewTabName] = useState<string>('');
   function addTabByType() {
-    console.log('Adding tab:', newTabType, newTabName);
     if (!objData || newTabType === undefined) return;
     let newObjData = { ...objData };
     if (BUILTIN_TABS.includes(newTabType as typeof BUILTIN_TABS[number])) {
       newObjData[newTabType as typeof BUILTIN_TABS[number]] = { title: capitalize(T(newTabType)) };
+    } else if (newTabType === 'body') {
+      newObjData.body = { text: '', structure: [] };
+    } else if (newTabType === 'custom') {
+      if (!newTabName) return;
+      if (!newObjData.tabs) newObjData.tabs = {};
+      newObjData.tabs[newTabName] = {};
     }
     setObjData(newObjData);
     setTabNames(computeTabs(newObjData));
@@ -227,6 +233,8 @@ export default function App({ itemShort, universeShort }: AppProps) {
     let newObjData = { ...objData };
     if (BUILTIN_TABS.includes(tab as typeof BUILTIN_TABS[number])) {
       delete newObjData[tab as typeof BUILTIN_TABS[number]];
+    } else if (tab === 'body') {
+      delete newObjData.body;
     } else if (newObjData.tabs) {
       if (!newObjData.tabs[tab]) return;
       delete newObjData.tabs[tab];

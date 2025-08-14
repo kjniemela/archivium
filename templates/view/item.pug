@@ -211,10 +211,14 @@ block content
           #markdown-body
 
   script.
-    (function() {
+    (() => {
       const body = document.getElementById('markdown-body');
-      if (body && typeof item.obj_data.body === 'string') {
-        loadMarkdown(body, '#{universe.shortname}', item.obj_data.body, { item }).then(async () => {
+      if (body) {
+        (async () => {
+          if (typeof item.obj_data.body === 'string') {
+            await loadMarkdown(body, '#{universe.shortname}', item.obj_data.body, { item })
+          }
+        })().then(async () => {
           await tabLoadPromise;
           const hash = location.hash.substr(1);
           if (hash) {
@@ -222,7 +226,7 @@ block content
             el.scrollIntoView();
           }
         });
-      };
+      }
 
       document.querySelectorAll('.mdVal').forEach((el) => {
         loadMarkdown(el, '#{universe.shortname}', el.dataset.val, null, (tag) => {
