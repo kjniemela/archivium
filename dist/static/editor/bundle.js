@@ -4488,7 +4488,6 @@ var Editor = class extends EventEmitter {
    * Remove the editor from the DOM, but still allow remounting at a different point in time
    */
   unmount() {
-    var _a;
     if (this.editorView) {
       const dom = this.editorView.dom;
       if (dom == null ? void 0 : dom.editor) {
@@ -4498,7 +4497,17 @@ var Editor = class extends EventEmitter {
     }
     this.editorView = null;
     this.isInitialized = false;
-    (_a = this.css) == null ? void 0 : _a.remove();
+    if (this.css) {
+      try {
+        if (typeof this.css.remove === "function") {
+          this.css.remove();
+        } else if (this.css.parentNode) {
+          this.css.parentNode.removeChild(this.css);
+        }
+      } catch (error) {
+        console.warn("Failed to remove CSS element:", error);
+      }
+    }
     this.css = null;
   }
   /**
