@@ -63,6 +63,27 @@ export const formatDate = (date: Date, intervalOnly=false, short=false) => {
   else return `on ${date.toDateString()} at ${date.toLocaleTimeString()}`;
 };
 
+export function sprintf(format: string, ...args: string[]): string {
+  let i = 0;
+  return format.replace(/%s/g, () => args[i++]);
+}
+
+export function T(str: string, ...args: string[]): string {
+// return sprintf(locale[lang][str] ?? str, ...args);
+  return sprintf(str, ...args);
+}
+
+export async function postFormData(url: string, data: { [key: string]: any }) {
+  const formData = new FormData();
+  for (const key in data) {
+    formData.append(key, data[key]);
+  }
+  return await fetch(url, {
+    method: 'POST',
+    body: formData,
+  });
+}
+
 export function deepCompare(a: any, b: any): boolean {
   if (!(a instanceof Object && b instanceof Object)) {
     return a === b;
