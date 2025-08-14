@@ -56418,6 +56418,1702 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-dom */ "../node_modules/react-dom/index.js");
 /* harmony import */ var _components_TabsBar__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/TabsBar */ "./src/components/TabsBar.tsx");
 /* harmony import */ var _tiptap_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @tiptap/react */ "../node_modules/@tiptap/react/dist/index.js");
+/* harmony import */ var _components_Gallery__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/Gallery */ "./src/components/Gallery.tsx");
+function _array_like_to_array(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
+    return arr2;
+}
+function _array_with_holes(arr) {
+    if (Array.isArray(arr)) return arr;
+}
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+        var info = gen[key](arg);
+        var value = info.value;
+    } catch (error) {
+        reject(error);
+        return;
+    }
+    if (info.done) {
+        resolve(value);
+    } else {
+        Promise.resolve(value).then(_next, _throw);
+    }
+}
+function _async_to_generator(fn) {
+    return function() {
+        var self = this, args = arguments;
+        return new Promise(function(resolve, reject) {
+            var gen = fn.apply(self, args);
+            function _next(value) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+            }
+            function _throw(err) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+            }
+            _next(undefined);
+        });
+    };
+}
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function _instanceof(left, right) {
+    if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) {
+        return !!right[Symbol.hasInstance](left);
+    } else {
+        return left instanceof right;
+    }
+}
+function _iterable_to_array_limit(arr, i) {
+    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+    if (_i == null) return;
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _s, _e;
+    try {
+        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
+            _arr.push(_s.value);
+            if (i && _arr.length === i) break;
+        }
+    } catch (err) {
+        _d = true;
+        _e = err;
+    } finally{
+        try {
+            if (!_n && _i["return"] != null) _i["return"]();
+        } finally{
+            if (_d) throw _e;
+        }
+    }
+    return _arr;
+}
+function _non_iterable_rest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            _define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
+function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+        var symbols = Object.getOwnPropertySymbols(object);
+        if (enumerableOnly) {
+            symbols = symbols.filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+            });
+        }
+        keys.push.apply(keys, symbols);
+    }
+    return keys;
+}
+function _object_spread_props(target, source) {
+    source = source != null ? source : {};
+    if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+        ownKeys(Object(source)).forEach(function(key) {
+            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+    }
+    return target;
+}
+function _sliced_to_array(arr, i) {
+    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
+}
+function _unsupported_iterable_to_array(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _array_like_to_array(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
+}
+function _ts_generator(thisArg, body) {
+    var f, y, t, _ = {
+        label: 0,
+        sent: function() {
+            if (t[0] & 1) throw t[1];
+            return t[1];
+        },
+        trys: [],
+        ops: []
+    }, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+        return this;
+    }), g;
+    function verb(n) {
+        return function(v) {
+            return step([
+                n,
+                v
+            ]);
+        };
+    }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while(g && (g = 0, op[0] && (_ = 0)), _)try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [
+                op[0] & 2,
+                t.value
+            ];
+            switch(op[0]){
+                case 0:
+                case 1:
+                    t = op;
+                    break;
+                case 4:
+                    _.label++;
+                    return {
+                        value: op[1],
+                        done: false
+                    };
+                case 5:
+                    _.label++;
+                    y = op[1];
+                    op = [
+                        0
+                    ];
+                    continue;
+                case 7:
+                    op = _.ops.pop();
+                    _.trys.pop();
+                    continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                        _ = 0;
+                        continue;
+                    }
+                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                        _.label = op[1];
+                        break;
+                    }
+                    if (op[0] === 6 && _.label < t[1]) {
+                        _.label = t[1];
+                        t = op;
+                        break;
+                    }
+                    if (t && _.label < t[2]) {
+                        _.label = t[2];
+                        _.ops.push(op);
+                        break;
+                    }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop();
+                    continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) {
+            op = [
+                6,
+                e
+            ];
+            y = 0;
+        } finally{
+            f = t = 0;
+        }
+        if (op[0] & 5) throw op[1];
+        return {
+            value: op[0] ? op[1] : void 0,
+            done: true
+        };
+    }
+}
+
+
+
+
+
+
+
+
+
+
+var BUILTIN_TABS = [
+    'lineage',
+    'location',
+    'timeline',
+    'gallery'
+];
+function fetchData(url, setter) {
+    return _async_to_generator(function() {
+        var res, data, err;
+        return _ts_generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    _state.trys.push([
+                        0,
+                        3,
+                        ,
+                        4
+                    ]);
+                    return [
+                        4,
+                        fetch(url, {
+                            method: 'GET',
+                            credentials: 'include',
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        })
+                    ];
+                case 1:
+                    res = _state.sent();
+                    if (!res.ok) throw new Error('Failed to fetch');
+                    return [
+                        4,
+                        res.json()
+                    ];
+                case 2:
+                    data = _state.sent();
+                    setter(data);
+                    return [
+                        3,
+                        4
+                    ];
+                case 3:
+                    err = _state.sent();
+                    console.error(err);
+                    return [
+                        3,
+                        4
+                    ];
+                case 4:
+                    return [
+                        2
+                    ];
+            }
+        });
+    })();
+}
+var timeoutId = null;
+function debouncedOnUpdate(editor, onChange) {
+    if (timeoutId) {
+        clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(function() {
+        var json = editor.getJSON();
+        var indexed = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__.jsonToIndexed)(json);
+        onChange(indexed);
+    }, 500);
+}
+var needsSaving = false;
+function setNeedsSaving(value) {
+    needsSaving = value;
+}
+window.onbeforeunload = function(event) {
+    if (needsSaving) {
+        event.preventDefault();
+        event.returnValue = true;
+    }
+};
+var saveTimeout = null;
+var previousData = null;
+var saveBtn = document.getElementById('save-btn');
+if (saveBtn) {
+    saveBtn.addEventListener('click', function() {
+        var saveChangesBtn = document.getElementById('save-changes');
+        saveChangesBtn === null || saveChangesBtn === void 0 ? void 0 : saveChangesBtn.click();
+    });
+}
+function computeTabs(objData) {
+    return _object_spread({}, objData.body ? {
+        body: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Main Text')
+    } : {}, (objData.tabs ? Object.keys(objData.tabs) : []).reduce(function(acc, tab) {
+        return _object_spread_props(_object_spread({}, acc), _define_property({}, tab, tab));
+    }, {}), BUILTIN_TABS.filter(function(tab) {
+        return objData[tab] !== undefined;
+    }).reduce(function(acc, tab) {
+        return _object_spread_props(_object_spread({}, acc), _define_property({}, tab, objData[tab].title));
+    }, {}));
+}
+function App(param) {
+    var _this = this;
+    var itemShort = param.itemShort, universeShort = param.universeShort;
+    var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), categories = _useState[0], setCategories = _useState[1];
+    var _useState1 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), item = _useState1[0], setItem = _useState1[1];
+    var _useState2 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), objData = _useState2[0], setObjData = _useState2[1];
+    var _useState3 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), errorMessage = _useState3[0], setErrorMessage = _useState3[1];
+    var _useState4 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)('Save Changes'), 2), saveText = _useState4[0], setSaveText = _useState4[1];
+    var _useState5 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), currentModal = _useState5[0], setCurrentModal = _useState5[1];
+    var _useState6 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), currentTab = _useState6[0], setCurrentTab = _useState6[1];
+    var _useState7 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({}), 2), tabNames = _useState7[0], setTabNames = _useState7[1];
+    var editor = (0,_tiptap_react__WEBPACK_IMPORTED_MODULE_8__.useEditor)({
+        extensions: _src_lib_editor__WEBPACK_IMPORTED_MODULE_5__.editorExtensions,
+        onUpdate: function(param) {
+            var editor = param.editor;
+            if (!objData) return;
+            debouncedOnUpdate(editor, function(content) {
+                return setObjData(_object_spread_props(_object_spread({}, objData), {
+                    body: content
+                }));
+            });
+        }
+    });
+    function save(delay) {
+        return _async_to_generator(function() {
+            return _ts_generator(this, function(_state) {
+                if (saveTimeout) {
+                    clearTimeout(saveTimeout);
+                }
+                saveTimeout = setTimeout(function() {
+                    return _async_to_generator(function() {
+                        var data, response, _$err, err;
+                        return _ts_generator(this, function(_state) {
+                            switch(_state.label){
+                                case 0:
+                                    if (!item || !objData) return [
+                                        2
+                                    ];
+                                    setSaveText('Saving...');
+                                    console.log('SAVING...');
+                                    data = _object_spread_props(_object_spread({}, item), {
+                                        obj_data: _object_spread({}, objData)
+                                    });
+                                    if ((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.deepCompare)(data, previousData)) {
+                                        console.log('NO CHANGE');
+                                        setSaveText('Saved');
+                                        setNeedsSaving(false);
+                                        return [
+                                            2
+                                        ];
+                                    }
+                                    _state.label = 1;
+                                case 1:
+                                    _state.trys.push([
+                                        1,
+                                        4,
+                                        ,
+                                        5
+                                    ]);
+                                    setErrorMessage(null);
+                                    return [
+                                        4,
+                                        fetch("/api/universes/".concat(universeShort, "/items/").concat(itemShort), {
+                                            method: 'PUT',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify(data)
+                                        })
+                                    ];
+                                case 2:
+                                    response = _state.sent();
+                                    return [
+                                        4,
+                                        response.json()
+                                    ];
+                                case 3:
+                                    _$err = _state.sent();
+                                    if (!response.ok) {
+                                        setErrorMessage(_$err);
+                                        throw _$err;
+                                    }
+                                    console.log('SAVED.');
+                                    setSaveText('Saved');
+                                    previousData = data;
+                                    setNeedsSaving(false);
+                                    return [
+                                        3,
+                                        5
+                                    ];
+                                case 4:
+                                    err = _state.sent();
+                                    console.error('Failed to save!');
+                                    console.error(err);
+                                    setSaveText('Error');
+                                    previousData = null;
+                                    if (_instanceof(err, TypeError)) {
+                                        setErrorMessage('Network error. Make sure you are connected to the internet and try again.');
+                                    }
+                                    return [
+                                        3,
+                                        5
+                                    ];
+                                case 5:
+                                    return [
+                                        2
+                                    ];
+                            }
+                        });
+                    })();
+                }, delay);
+                return [
+                    2
+                ];
+            });
+        })();
+    }
+    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
+        fetchData("/api/universes/".concat(universeShort), function(data) {
+            setCategories(data.obj_data.cats);
+        });
+        fetchData("/api/universes/".concat(universeShort, "/items/").concat(itemShort), function(data) {
+            var objData = JSON.parse(data.obj_data);
+            setObjData(objData);
+            setTabNames(computeTabs(objData));
+            if (typeof objData.body === 'string') {
+                (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.renderMarkdown)(universeShort, objData.body, {
+                    item: _object_spread_props(_object_spread({}, data), {
+                        obj_data: objData
+                    })
+                }).then(function(text) {
+                    editor.commands.setContent(text);
+                });
+            } else if (objData.body) {
+                var json = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__.indexedToJson)(objData.body);
+                editor.commands.setContent(json);
+            }
+            delete data.obj_data;
+            setItem(data);
+        });
+    }, [
+        itemShort,
+        universeShort
+    ]);
+    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
+        if (item && objData) {
+            setNeedsSaving(true);
+            setSaveText('Save Changes');
+            save(5000);
+        }
+    }, [
+        item,
+        objData
+    ]);
+    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
+        if (!(currentTab && tabNames[currentTab])) {
+            if (Object.keys(tabNames).length > 0) setCurrentTab(Object.keys(tabNames)[0]);
+            else setCurrentTab(null);
+        }
+    }, [
+        tabNames
+    ]);
+    var modalAnchor = document.querySelector('#modal-anchor');
+    var saveBtnAnchor = document.querySelector('#save-btn');
+    var _useState8 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(undefined), 2), newTabType = _useState8[0], setNewTabType = _useState8[1];
+    var _useState9 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(''), 2), newTabName = _useState9[0], setNewTabName = _useState9[1];
+    function addTabByType() {
+        if (!objData || newTabType === undefined) return;
+        var newObjData = _object_spread({}, objData);
+        if (BUILTIN_TABS.includes(newTabType)) {
+            newObjData[newTabType] = {
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(newTabType))
+            };
+        } else if (newTabType === 'body') {
+            newObjData.body = {
+                text: '',
+                structure: []
+            };
+        } else if (newTabType === 'custom') {
+            if (!newTabName) return;
+            if (!newObjData.tabs) newObjData.tabs = {};
+            newObjData.tabs[newTabName] = {};
+        }
+        setObjData(newObjData);
+        setTabNames(computeTabs(newObjData));
+        setCurrentModal(null);
+    }
+    function removeTab(tab) {
+        if (!objData) return;
+        var newObjData = _object_spread({}, objData);
+        if (BUILTIN_TABS.includes(tab)) {
+            delete newObjData[tab];
+        } else if (tab === 'body') {
+            delete newObjData.body;
+        } else if (newObjData.tabs) {
+            if (!newObjData.tabs[tab]) return;
+            delete newObjData.tabs[tab];
+        }
+        setObjData(newObjData);
+        setTabNames(computeTabs(newObjData));
+    }
+    /* Loading Screen */ if (!item || !objData) {
+        return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+            className: "d-flex justify-center align-center",
+            children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                className: "loader",
+                style: {
+                    marginTop: 'max(0px, calc(50vh - 50px - var(--page-margin-top)))'
+                }
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                lineNumber: 241,
+                columnNumber: 7
+            }, this)
+        }, void 0, false, {
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+            lineNumber: 240,
+            columnNumber: 12
+        }, this);
+    }
+    var modals = {
+        newTab: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+            className: "sheet d-flex flex-col gap-1",
+            style: {
+                minWidth: '20rem'
+            },
+            children: [
+                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
+                    onChange: function(param) {
+                        var target = param.target;
+                        return setNewTabType(target.value);
+                    },
+                    children: [
+                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                            hidden: true,
+                            disabled: true,
+                            selected: true,
+                            value: undefined,
+                            children: [
+                                (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Tab Type'),
+                                "..."
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                            lineNumber: 249,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                            value: "body",
+                            disabled: 'body' in [
+                                'currentTabs'
+                            ],
+                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Main Text')
+                        }, void 0, false, {
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                            lineNumber: 250,
+                            columnNumber: 11
+                        }, this),
+                        BUILTIN_TABS.map(function(type) {
+                            return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                                value: type,
+                                disabled: type in [
+                                    'currentTabs'
+                                ],
+                                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(type))
+                            }, type, false, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 252,
+                                columnNumber: 13
+                            }, _this);
+                        }),
+                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                            value: "custom",
+                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Custom Data')
+                        }, void 0, false, {
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                            lineNumber: 254,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                    lineNumber: 248,
+                    columnNumber: 9
+                }, this),
+                newTabType === 'custom' && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                    type: "text",
+                    placeholder: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Tab Name'),
+                    value: newTabName,
+                    onChange: function(param) {
+                        var target = param.target;
+                        return setNewTabName(target.value);
+                    }
+                }, void 0, false, {
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                    lineNumber: 256,
+                    columnNumber: 37
+                }, this),
+                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                    type: "button",
+                    onClick: function() {
+                        return addTabByType();
+                    },
+                    children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('New Tab')
+                }, void 0, false, {
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                    lineNumber: 257,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+            lineNumber: 247,
+            columnNumber: 7
+        }, this)
+    };
+    var tabs = {
+        body: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_EditorFrame__WEBPACK_IMPORTED_MODULE_3__["default"], {
+            editor: editor
+        }, void 0, false, {
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+            lineNumber: 264,
+            columnNumber: 7
+        }, this),
+        gallery: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_Gallery__WEBPACK_IMPORTED_MODULE_9__["default"], {
+            universe: universeShort,
+            item: itemShort,
+            images: item.gallery,
+            onRemoveImage: function(id) {
+                var newState = _object_spread({}, item);
+                for(var i = 0; i < newState.gallery.length; i++){
+                    var img = newState.gallery[i];
+                    if (img.id === id) {
+                        newState.gallery.splice(i, 1);
+                        break;
+                    }
+                }
+                setItem(newState);
+            },
+            onUploadImage: function(img) {
+                var newState = _object_spread({}, item);
+                newState.gallery.push(img);
+                setItem(newState);
+            },
+            onChangeLabel: function(id, label) {
+                var newState = _object_spread({}, item);
+                for(var i = 0; i < newState.gallery.length; i++){
+                    var img = newState.gallery[i];
+                    if (img.id === id) {
+                        img.label = label;
+                        break;
+                    }
+                }
+                setItem(newState);
+            }
+        }, void 0, false, {
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+            lineNumber: 267,
+            columnNumber: 7
+        }, this)
+    };
+    var _item_title, _item_shortname, _item_tags, _objData_comments, _objData_notes;
+    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+        children: [
+            saveBtnAnchor && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("a", {
+                className: "navbarBtnLink navbarText",
+                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                lineNumber: 299,
+                columnNumber: 9
+            }, this), saveBtnAnchor),
+            modalAnchor && currentModal && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                className: "modal",
+                onClick: function() {
+                    return setCurrentModal(null);
+                },
+                children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                    className: "modal-content",
+                    onClick: function(e) {
+                        return e.stopPropagation();
+                    },
+                    children: modals[currentModal]
+                }, void 0, false, {
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                    lineNumber: 306,
+                    columnNumber: 13
+                }, this)
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                lineNumber: 305,
+                columnNumber: 11
+            }, this), modalAnchor),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h2", {
+                children: item ? (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Edit %s', item.title) : (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Edit')
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                lineNumber: 314,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                id: "edit",
+                className: "form-row-group",
+                children: [
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "title",
+                                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Title')
+                            }, void 0, false, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 317,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                id: "title",
+                                type: "text",
+                                name: "title",
+                                value: (_item_title = item === null || item === void 0 ? void 0 : item.title) !== null && _item_title !== void 0 ? _item_title : '',
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
+                                        title: target.value
+                                    }));
+                                }
+                            }, void 0, false, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 318,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 316,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "shortname",
+                                children: [
+                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Shortname'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 324,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                id: "shortname",
+                                type: "text",
+                                name: "shortname",
+                                value: (_item_shortname = item === null || item === void 0 ? void 0 : item.shortname) !== null && _item_shortname !== void 0 ? _item_shortname : '',
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
+                                        shortname: target.value
+                                    }));
+                                }
+                            }, void 0, false, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 325,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 323,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("small", {
+                            style: {
+                                gridColumn: '2 / 4'
+                            },
+                            children: [
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
+                                    children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('NOTE: changes to the shortname will not auto-save.')
+                                }, void 0, false, {
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                    lineNumber: 332,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                    lineNumber: 333,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
+                                    children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Other users currently editing this item will be unable to save their work. Change with caution.')
+                                }, void 0, false, {
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                    lineNumber: 334,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                            lineNumber: 331,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 330,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "item_type",
+                                children: [
+                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Type'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 339,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
+                                id: "item_type",
+                                name: "item_type",
+                                defaultValue: item === null || item === void 0 ? void 0 : item.itemType,
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
+                                        itemType: target.value
+                                    }));
+                                },
+                                children: [
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                                        hidden: true,
+                                        disabled: true,
+                                        children: [
+                                            (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Select one'),
+                                            "..."
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 341,
+                                        columnNumber: 13
+                                    }, this),
+                                    categories && item && Object.keys(categories).map(function(type) {
+                                        return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                                            value: type,
+                                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)(categories[type][0])
+                                        }, type, false, {
+                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                            lineNumber: 343,
+                                            columnNumber: 15
+                                        }, _this);
+                                    })
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 340,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 338,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "tags",
+                                children: [
+                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Tags'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 351,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("textarea", {
+                                id: "tags",
+                                name: "tags",
+                                value: ((_item_tags = item === null || item === void 0 ? void 0 : item.tags) !== null && _item_tags !== void 0 ? _item_tags : []).join(' '),
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
+                                        tags: target.value.split(' ')
+                                    }));
+                                }
+                            }, void 0, false, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 352,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 350,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "comments",
+                                children: [
+                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Enable comments'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 356,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                className: "switch",
+                                children: [
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                        id: "comments",
+                                        name: "comments",
+                                        type: "checkbox",
+                                        checked: (_objData_comments = objData === null || objData === void 0 ? void 0 : objData.comments) !== null && _objData_comments !== void 0 ? _objData_comments : false,
+                                        onChange: function(param) {
+                                            var target = param.target;
+                                            return objData && setObjData(_object_spread_props(_object_spread({}, objData), {
+                                                comments: target.checked
+                                            }));
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 358,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
+                                        className: "slider"
+                                    }, void 0, false, {
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 361,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 357,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 355,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "notes",
+                                children: [
+                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Enable notes'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 366,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                className: "switch",
+                                children: [
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                        id: "notes",
+                                        name: "notes",
+                                        type: "checkbox",
+                                        checked: (_objData_notes = objData === null || objData === void 0 ? void 0 : objData.notes) !== null && _objData_notes !== void 0 ? _objData_notes : false,
+                                        onChange: function(param) {
+                                            var target = param.target;
+                                            return objData && setObjData(_object_spread_props(_object_spread({}, objData), {
+                                                notes: target.checked
+                                            }));
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 368,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
+                                        className: "slider"
+                                    }, void 0, false, {
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 371,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 367,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 365,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "mt-2",
+                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                            id: "save-changes",
+                            onClick: function() {
+                                return save(0);
+                            },
+                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
+                        }, void 0, false, {
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                            lineNumber: 376,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 375,
+                        columnNumber: 9
+                    }, this),
+                    errorMessage && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
+                            id: "item-error",
+                            className: "color-error",
+                            style: {
+                                fontSize: 'small'
+                            },
+                            children: errorMessage
+                        }, void 0, false, {
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                            lineNumber: 380,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 379,
+                        columnNumber: 26
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("hr", {
+                        className: "w-100 mb-0"
+                    }, void 0, false, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 383,
+                        columnNumber: 9
+                    }, this),
+                    objData && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                                className: "d-flex align-start mb-2",
+                                children: [
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_TabsBar__WEBPACK_IMPORTED_MODULE_7__["default"], {
+                                        tabs: tabNames,
+                                        selectedTab: currentTab,
+                                        onSelectTab: function(tab) {
+                                            return setCurrentTab(tab);
+                                        },
+                                        onRemoveTab: function(tab) {
+                                            return removeTab(tab);
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 387,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("ul", {
+                                        className: "navbarBtns",
+                                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("li", {
+                                            className: "navbarBtn",
+                                            children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h3", {
+                                                className: "navbarBtnLink navbarText ma-0 material-symbols-outlined heavy",
+                                                onClick: function() {
+                                                    return setCurrentModal('newTab');
+                                                },
+                                                children: "add"
+                                            }, void 0, false, {
+                                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                                lineNumber: 390,
+                                                columnNumber: 17
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                            lineNumber: 389,
+                                            columnNumber: 15
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 388,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 386,
+                                columnNumber: 11
+                            }, this),
+                            currentTab && tabs[currentTab]
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 385,
+                        columnNumber: 21
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                lineNumber: 315,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true);
+}
+
+
+/***/ }),
+
+/***/ "./src/components/EditorFrame.tsx":
+/*!****************************************!*\
+  !*** ./src/components/EditorFrame.tsx ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ EditorFrame)
+/* harmony export */ });
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
+/* harmony import */ var _tiptap_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/react */ "../node_modules/@tiptap/react/dist/index.js");
+
+
+function EditorFrame(param) {
+    var editor = param.editor;
+    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+        className: "markdown",
+        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_tiptap_react__WEBPACK_IMPORTED_MODULE_1__.EditorContent, {
+            editor: editor
+        }, void 0, false, {
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+            lineNumber: 9,
+            columnNumber: 5
+        }, this)
+    }, void 0, false, {
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+        lineNumber: 8,
+        columnNumber: 10
+    }, this);
+}
+
+
+/***/ }),
+
+/***/ "./src/components/Gallery.tsx":
+/*!************************************!*\
+  !*** ./src/components/Gallery.tsx ***!
+  \************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Gallery)
+/* harmony export */ });
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "../node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../helpers */ "./src/helpers.tsx");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-dom */ "../node_modules/react-dom/index.js");
+function _array_like_to_array(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
+    return arr2;
+}
+function _array_with_holes(arr) {
+    if (Array.isArray(arr)) return arr;
+}
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+        var info = gen[key](arg);
+        var value = info.value;
+    } catch (error) {
+        reject(error);
+        return;
+    }
+    if (info.done) {
+        resolve(value);
+    } else {
+        Promise.resolve(value).then(_next, _throw);
+    }
+}
+function _async_to_generator(fn) {
+    return function() {
+        var self = this, args = arguments;
+        return new Promise(function(resolve, reject) {
+            var gen = fn.apply(self, args);
+            function _next(value) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+            }
+            function _throw(err) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+            }
+            _next(undefined);
+        });
+    };
+}
+function _iterable_to_array_limit(arr, i) {
+    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+    if (_i == null) return;
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _s, _e;
+    try {
+        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
+            _arr.push(_s.value);
+            if (i && _arr.length === i) break;
+        }
+    } catch (err) {
+        _d = true;
+        _e = err;
+    } finally{
+        try {
+            if (!_n && _i["return"] != null) _i["return"]();
+        } finally{
+            if (_d) throw _e;
+        }
+    }
+    return _arr;
+}
+function _non_iterable_rest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _sliced_to_array(arr, i) {
+    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
+}
+function _unsupported_iterable_to_array(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _array_like_to_array(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
+}
+function _ts_generator(thisArg, body) {
+    var f, y, t, _ = {
+        label: 0,
+        sent: function() {
+            if (t[0] & 1) throw t[1];
+            return t[1];
+        },
+        trys: [],
+        ops: []
+    }, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+        return this;
+    }), g;
+    function verb(n) {
+        return function(v) {
+            return step([
+                n,
+                v
+            ]);
+        };
+    }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while(g && (g = 0, op[0] && (_ = 0)), _)try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [
+                op[0] & 2,
+                t.value
+            ];
+            switch(op[0]){
+                case 0:
+                case 1:
+                    t = op;
+                    break;
+                case 4:
+                    _.label++;
+                    return {
+                        value: op[1],
+                        done: false
+                    };
+                case 5:
+                    _.label++;
+                    y = op[1];
+                    op = [
+                        0
+                    ];
+                    continue;
+                case 7:
+                    op = _.ops.pop();
+                    _.trys.pop();
+                    continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                        _ = 0;
+                        continue;
+                    }
+                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                        _.label = op[1];
+                        break;
+                    }
+                    if (op[0] === 6 && _.label < t[1]) {
+                        _.label = t[1];
+                        t = op;
+                        break;
+                    }
+                    if (t && _.label < t[2]) {
+                        _.label = t[2];
+                        _.ops.push(op);
+                        break;
+                    }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop();
+                    continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) {
+            op = [
+                6,
+                e
+            ];
+            y = 0;
+        } finally{
+            f = t = 0;
+        }
+        if (op[0] & 5) throw op[1];
+        return {
+            value: op[0] ? op[1] : void 0,
+            done: true
+        };
+    }
+}
+
+
+
+
+function Gallery(param) {
+    var _this = this;
+    var universe = param.universe, item = param.item, images = param.images, onRemoveImage = param.onRemoveImage, onUploadImage = param.onUploadImage, onChangeLabel = param.onChangeLabel;
+    var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false), 2), uploadModal = _useState[0], setUploadModal = _useState[1];
+    var modalAnchor = document.querySelector('#modal-anchor');
+    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+        children: [
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                className: "item-gallery d-flex gap-4 flex-wrap",
+                children: images.map(function(img, i) {
+                    var _img_label;
+                    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                            className: "d-flex gap-1",
+                            style: {
+                                height: '8rem'
+                            },
+                            children: [
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("img", {
+                                    src: "/api/universes/".concat(universe, "/items/").concat(item, "/gallery/images/").concat(img.id),
+                                    alt: img.label
+                                }, void 0, false, {
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                                    lineNumber: 29,
+                                    columnNumber: 13
+                                }, _this),
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                                    className: "d-flex flex-col",
+                                    children: [
+                                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                                            type: "button",
+                                            onClick: function() {
+                                                return onRemoveImage(img.id);
+                                            },
+                                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Remove Image')
+                                        }, void 0, false, {
+                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                                            lineNumber: 31,
+                                            columnNumber: 15
+                                        }, _this),
+                                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                            value: (_img_label = img.label) !== null && _img_label !== void 0 ? _img_label : '',
+                                            placeholder: "Label",
+                                            onChange: function(param) {
+                                                var target = param.target;
+                                                return onChangeLabel(img.id, target.value);
+                                            }
+                                        }, void 0, false, {
+                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                                            lineNumber: 32,
+                                            columnNumber: 15
+                                        }, _this),
+                                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("a", {
+                                            className: "link link-animated align-self-start",
+                                            href: "/api/universes/".concat(universe, "/items/").concat(item, "/gallery/images/").concat(img.id, "?download=1"),
+                                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Download')
+                                        }, void 0, false, {
+                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                                            lineNumber: 33,
+                                            columnNumber: 15
+                                        }, _this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                                    lineNumber: 30,
+                                    columnNumber: 13
+                                }, _this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                            lineNumber: 28,
+                            columnNumber: 11
+                        }, _this)
+                    }, void 0, false, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                        lineNumber: 27,
+                        columnNumber: 9
+                    }, _this);
+                })
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                lineNumber: 25,
+                columnNumber: 5
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                type: "button",
+                onClick: function() {
+                    return setUploadModal(true);
+                },
+                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Upload Image')
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                lineNumber: 39,
+                columnNumber: 5
+            }, this),
+            uploadModal && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_3__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                className: "modal",
+                onClick: function() {
+                    return setUploadModal(false);
+                },
+                children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                    className: "modal-content",
+                    onClick: function(e) {
+                        return e.stopPropagation();
+                    },
+                    children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "sheet d-flex flex-col gap-1 align-center",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h2", {
+                                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Upload Image')
+                            }, void 0, false, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                                lineNumber: 45,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                type: "file",
+                                accept: "image/*",
+                                required: true
+                            }, void 0, false, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                                lineNumber: 46,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                                type: "button",
+                                onClick: function(param) {
+                                    var target = param.target;
+                                    return _async_to_generator(function() {
+                                        var _target_parentElement, imageInput, image, response, data;
+                                        return _ts_generator(this, function(_state) {
+                                            switch(_state.label){
+                                                case 0:
+                                                    imageInput = (_target_parentElement = target.parentElement) === null || _target_parentElement === void 0 ? void 0 : _target_parentElement.querySelector('input[type=file]');
+                                                    if (!imageInput.files) return [
+                                                        2
+                                                    ];
+                                                    image = imageInput.files[0];
+                                                    return [
+                                                        4,
+                                                        (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.postFormData)("/api/universes/".concat(universe, "/items/").concat(item, "/gallery/upload"), {
+                                                            image: image
+                                                        })
+                                                    ];
+                                                case 1:
+                                                    response = _state.sent();
+                                                    return [
+                                                        4,
+                                                        response.json()
+                                                    ];
+                                                case 2:
+                                                    data = _state.sent();
+                                                    onUploadImage({
+                                                        id: data.insertId,
+                                                        name: image.name,
+                                                        label: ''
+                                                    });
+                                                    setUploadModal(false);
+                                                    return [
+                                                        2
+                                                    ];
+                                            }
+                                        });
+                                    })();
+                                },
+                                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Upload')
+                            }, void 0, false, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                                lineNumber: 47,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                        lineNumber: 44,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                    lineNumber: 43,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+                lineNumber: 42,
+                columnNumber: 9
+            }, this), modalAnchor)
+        ]
+    }, void 0, true);
+}
+
+
+/***/ }),
+
+/***/ "./src/components/TabsBar.tsx":
+/*!************************************!*\
+  !*** ./src/components/TabsBar.tsx ***!
+  \************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ TabsBar)
+/* harmony export */ });
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
+function _array_like_to_array(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
+    return arr2;
+}
+function _array_with_holes(arr) {
+    if (Array.isArray(arr)) return arr;
+}
+function _iterable_to_array_limit(arr, i) {
+    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+    if (_i == null) return;
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _s, _e;
+    try {
+        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
+            _arr.push(_s.value);
+            if (i && _arr.length === i) break;
+        }
+    } catch (err) {
+        _d = true;
+        _e = err;
+    } finally{
+        try {
+            if (!_n && _i["return"] != null) _i["return"]();
+        } finally{
+            if (_d) throw _e;
+        }
+    }
+    return _arr;
+}
+function _non_iterable_rest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _sliced_to_array(arr, i) {
+    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
+}
+function _unsupported_iterable_to_array(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _array_like_to_array(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
+}
+
+function TabsBar(param) {
+    var _this = this;
+    var tabs = param.tabs, selectedTab = param.selectedTab, onSelectTab = param.onSelectTab, onRemoveTab = param.onRemoveTab;
+    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("ul", {
+        className: "tabs-buttons navbarBtns gap-1 grow-1",
+        children: Object.entries(tabs).map(function(param) {
+            var _param = _sliced_to_array(param, 2), tab = _param[0], name = _param[1];
+            return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("li", {
+                className: "navbarBtn badge-anchor".concat(tab === selectedTab ? ' selected' : ''),
+                onClick: function() {
+                    return onSelectTab(tab);
+                },
+                children: [
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h3", {
+                        className: "navbarBtnLink navbarText ma-0",
+                        children: name
+                    }, void 0, false, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TabsBar.tsx",
+                        lineNumber: 13,
+                        columnNumber: 11
+                    }, _this),
+                    tab === selectedTab && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "material-symbols-outlined badge badge-large",
+                        onClick: function(e) {
+                            e.stopPropagation();
+                            onRemoveTab(tab);
+                        },
+                        children: "delete"
+                    }, void 0, false, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TabsBar.tsx",
+                        lineNumber: 14,
+                        columnNumber: 35
+                    }, _this)
+                ]
+            }, tab, true, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TabsBar.tsx",
+                lineNumber: 12,
+                columnNumber: 9
+            }, _this);
+        })
+    }, void 0, false, {
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TabsBar.tsx",
+        lineNumber: 10,
+        columnNumber: 5
+    }, this);
+}
+
+
+/***/ }),
+
+/***/ "./src/helpers.tsx":
+/*!*************************!*\
+  !*** ./src/helpers.tsx ***!
+  \*************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   T: () => (/* binding */ T),
+/* harmony export */   capitalize: () => (/* binding */ capitalize),
+/* harmony export */   deepCompare: () => (/* binding */ deepCompare),
+/* harmony export */   formatDate: () => (/* binding */ formatDate),
+/* harmony export */   loadMarkdown: () => (/* binding */ loadMarkdown),
+/* harmony export */   postFormData: () => (/* binding */ postFormData),
+/* harmony export */   renderMarkdown: () => (/* binding */ renderMarkdown),
+/* harmony export */   renderMdPreview: () => (/* binding */ renderMdPreview),
+/* harmony export */   sprintf: () => (/* binding */ sprintf)
+/* harmony export */ });
+/* harmony import */ var _src_markdown__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../src/markdown */ "../src/markdown.ts");
 function _array_like_to_array(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
     for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
@@ -56457,6 +58153,25 @@ function _async_to_generator(fn) {
             _next(undefined);
         });
     };
+}
+function _class_call_check(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+        throw new TypeError("Cannot call a class as a function");
+    }
+}
+function _defineProperties(target, props) {
+    for(var i = 0; i < props.length; i++){
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+    }
+}
+function _create_class(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
 }
 function _define_property(obj, key, value) {
     if (key in obj) {
@@ -56656,1300 +58371,6 @@ function _ts_generator(thisArg, body) {
     }
 }
 
-
-
-
-
-
-
-
-
-var BUILTIN_TABS = [
-    'lineage',
-    'location',
-    'timeline',
-    'gallery'
-];
-function sprintf(format) {
-    for(var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++){
-        args[_key - 1] = arguments[_key];
-    }
-    var i = 0;
-    return format.replace(/%s/g, function() {
-        return args[i++];
-    });
-}
-function T(str) {
-    for(var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++){
-        args[_key - 1] = arguments[_key];
-    }
-    // return sprintf(locale[lang][str] ?? str, ...args);
-    return sprintf.apply(void 0, [
-        str
-    ].concat(_to_consumable_array(args)));
-}
-function fetchData(url, setter) {
-    return _async_to_generator(function() {
-        var res, data, err;
-        return _ts_generator(this, function(_state) {
-            switch(_state.label){
-                case 0:
-                    _state.trys.push([
-                        0,
-                        3,
-                        ,
-                        4
-                    ]);
-                    return [
-                        4,
-                        fetch(url, {
-                            method: 'GET',
-                            credentials: 'include',
-                            headers: {
-                                'Accept': 'application/json'
-                            }
-                        })
-                    ];
-                case 1:
-                    res = _state.sent();
-                    if (!res.ok) throw new Error('Failed to fetch');
-                    return [
-                        4,
-                        res.json()
-                    ];
-                case 2:
-                    data = _state.sent();
-                    setter(data);
-                    return [
-                        3,
-                        4
-                    ];
-                case 3:
-                    err = _state.sent();
-                    console.error(err);
-                    return [
-                        3,
-                        4
-                    ];
-                case 4:
-                    return [
-                        2
-                    ];
-            }
-        });
-    })();
-}
-var timeoutId = null;
-function debouncedOnUpdate(editor, onChange) {
-    if (timeoutId) {
-        clearTimeout(timeoutId);
-    }
-    timeoutId = setTimeout(function() {
-        var json = editor.getJSON();
-        var indexed = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__.jsonToIndexed)(json);
-        onChange(indexed);
-    }, 500);
-}
-var needsSaving = false;
-function setNeedsSaving(value) {
-    needsSaving = value;
-}
-window.onbeforeunload = function(event) {
-    if (needsSaving) {
-        event.preventDefault();
-        event.returnValue = true;
-    }
-};
-var saveTimeout = null;
-var previousData = null;
-var saveBtn = document.getElementById('save-btn');
-if (saveBtn) {
-    saveBtn.addEventListener('click', function() {
-        var saveChangesBtn = document.getElementById('save-changes');
-        saveChangesBtn === null || saveChangesBtn === void 0 ? void 0 : saveChangesBtn.click();
-    });
-}
-function computeTabs(objData) {
-    return _object_spread({}, objData.body ? {
-        body: T('Main Text')
-    } : {}, (objData.tabs ? Object.keys(objData.tabs) : []).reduce(function(acc, tab) {
-        return _object_spread_props(_object_spread({}, acc), _define_property({}, tab, tab));
-    }, {}), BUILTIN_TABS.filter(function(tab) {
-        return objData[tab] !== undefined;
-    }).reduce(function(acc, tab) {
-        return _object_spread_props(_object_spread({}, acc), _define_property({}, tab, objData[tab].title));
-    }, {}));
-}
-function App(param) {
-    var _this = this;
-    var itemShort = param.itemShort, universeShort = param.universeShort;
-    var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), categories = _useState[0], setCategories = _useState[1];
-    var _useState1 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), item = _useState1[0], setItem = _useState1[1];
-    var _useState2 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), objData = _useState2[0], setObjData = _useState2[1];
-    var _useState3 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), errorMessage = _useState3[0], setErrorMessage = _useState3[1];
-    var _useState4 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)('Save Changes'), 2), saveText = _useState4[0], setSaveText = _useState4[1];
-    var _useState5 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), currentModal = _useState5[0], setCurrentModal = _useState5[1];
-    var _useState6 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), currentTab = _useState6[0], setCurrentTab = _useState6[1];
-    var _useState7 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({}), 2), tabNames = _useState7[0], setTabNames = _useState7[1];
-    var editor = (0,_tiptap_react__WEBPACK_IMPORTED_MODULE_8__.useEditor)({
-        extensions: _src_lib_editor__WEBPACK_IMPORTED_MODULE_5__.editorExtensions,
-        onUpdate: function(param) {
-            var editor = param.editor;
-            if (!objData) return;
-            debouncedOnUpdate(editor, function(content) {
-                return setObjData(_object_spread_props(_object_spread({}, objData), {
-                    body: content
-                }));
-            });
-        }
-    });
-    function save(delay) {
-        return _async_to_generator(function() {
-            return _ts_generator(this, function(_state) {
-                if (saveTimeout) {
-                    clearTimeout(saveTimeout);
-                }
-                saveTimeout = setTimeout(function() {
-                    return _async_to_generator(function() {
-                        var data, response, _$err, err;
-                        return _ts_generator(this, function(_state) {
-                            switch(_state.label){
-                                case 0:
-                                    if (!item || !objData) return [
-                                        2
-                                    ];
-                                    setSaveText('Saving...');
-                                    console.log('SAVING...');
-                                    data = _object_spread_props(_object_spread({}, item), {
-                                        obj_data: _object_spread({}, objData)
-                                    });
-                                    if ((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.deepCompare)(data, previousData)) {
-                                        console.log('NO CHANGE');
-                                        setSaveText('Saved');
-                                        setNeedsSaving(false);
-                                        return [
-                                            2
-                                        ];
-                                    }
-                                    _state.label = 1;
-                                case 1:
-                                    _state.trys.push([
-                                        1,
-                                        4,
-                                        ,
-                                        5
-                                    ]);
-                                    setErrorMessage(null);
-                                    return [
-                                        4,
-                                        fetch("/api/universes/".concat(universeShort, "/items/").concat(itemShort), {
-                                            method: 'PUT',
-                                            headers: {
-                                                'Content-Type': 'application/json'
-                                            },
-                                            body: JSON.stringify(data)
-                                        })
-                                    ];
-                                case 2:
-                                    response = _state.sent();
-                                    return [
-                                        4,
-                                        response.json()
-                                    ];
-                                case 3:
-                                    _$err = _state.sent();
-                                    if (!response.ok) {
-                                        setErrorMessage(_$err);
-                                        throw _$err;
-                                    }
-                                    console.log('SAVED.');
-                                    setSaveText('Saved');
-                                    previousData = data;
-                                    setNeedsSaving(false);
-                                    return [
-                                        3,
-                                        5
-                                    ];
-                                case 4:
-                                    err = _state.sent();
-                                    console.error('Failed to save!');
-                                    console.error(err);
-                                    setSaveText('Error');
-                                    previousData = null;
-                                    if (_instanceof(err, TypeError)) {
-                                        setErrorMessage('Network error. Make sure you are connected to the internet and try again.');
-                                    }
-                                    return [
-                                        3,
-                                        5
-                                    ];
-                                case 5:
-                                    return [
-                                        2
-                                    ];
-                            }
-                        });
-                    })();
-                }, delay);
-                return [
-                    2
-                ];
-            });
-        })();
-    }
-    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
-        fetchData("/api/universes/".concat(universeShort), function(data) {
-            setCategories(data.obj_data.cats);
-        });
-        fetchData("/api/universes/".concat(universeShort, "/items/").concat(itemShort), function(data) {
-            var objData = JSON.parse(data.obj_data);
-            setObjData(objData);
-            setTabNames(computeTabs(objData));
-            if (typeof objData.body === 'string') {
-                (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.renderMarkdown)(universeShort, objData.body, {
-                    item: _object_spread_props(_object_spread({}, data), {
-                        obj_data: objData
-                    })
-                }).then(function(text) {
-                    editor.commands.setContent(text);
-                });
-            } else if (objData.body) {
-                var json = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__.indexedToJson)(objData.body);
-                editor.commands.setContent(json);
-            }
-            delete data.obj_data;
-            setItem(data);
-        });
-    }, [
-        itemShort,
-        universeShort
-    ]);
-    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
-        if (item && objData) {
-            setNeedsSaving(true);
-            setSaveText('Save Changes');
-            save(5000);
-        }
-    }, [
-        item,
-        objData
-    ]);
-    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
-        if (!(currentTab && tabNames[currentTab])) {
-            if (Object.keys(tabNames).length > 0) setCurrentTab(Object.keys(tabNames)[0]);
-            else setCurrentTab(null);
-        }
-    }, [
-        tabNames
-    ]);
-    var modalAnchor = document.querySelector('#modal-anchor');
-    var saveBtnAnchor = document.querySelector('#save-btn');
-    var _useState8 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(undefined), 2), newTabType = _useState8[0], setNewTabType = _useState8[1];
-    var _useState9 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(''), 2), newTabName = _useState9[0], setNewTabName = _useState9[1];
-    function addTabByType() {
-        if (!objData || newTabType === undefined) return;
-        var newObjData = _object_spread({}, objData);
-        if (BUILTIN_TABS.includes(newTabType)) {
-            newObjData[newTabType] = {
-                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)(T(newTabType))
-            };
-        } else if (newTabType === 'body') {
-            newObjData.body = {
-                text: '',
-                structure: []
-            };
-        } else if (newTabType === 'custom') {
-            if (!newTabName) return;
-            if (!newObjData.tabs) newObjData.tabs = {};
-            newObjData.tabs[newTabName] = {};
-        }
-        setObjData(newObjData);
-        setTabNames(computeTabs(newObjData));
-        setCurrentModal(null);
-    }
-    function removeTab(tab) {
-        if (!objData) return;
-        var newObjData = _object_spread({}, objData);
-        if (BUILTIN_TABS.includes(tab)) {
-            delete newObjData[tab];
-        } else if (tab === 'body') {
-            delete newObjData.body;
-        } else if (newObjData.tabs) {
-            if (!newObjData.tabs[tab]) return;
-            delete newObjData.tabs[tab];
-        }
-        setObjData(newObjData);
-        setTabNames(computeTabs(newObjData));
-    }
-    var modals = {
-        newTab: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-            className: "sheet d-flex flex-col gap-1",
-            style: {
-                minWidth: '20rem'
-            },
-            children: [
-                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
-                    onChange: function(param) {
-                        var target = param.target;
-                        return setNewTabType(target.value);
-                    },
-                    children: [
-                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
-                            hidden: true,
-                            disabled: true,
-                            selected: true,
-                            value: undefined,
-                            children: [
-                                T('Tab Type'),
-                                "..."
-                            ]
-                        }, void 0, true, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 250,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
-                            value: "body",
-                            disabled: 'body' in [
-                                'currentTabs'
-                            ],
-                            children: T('Main Text')
-                        }, void 0, false, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 251,
-                            columnNumber: 11
-                        }, this),
-                        BUILTIN_TABS.map(function(type) {
-                            return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
-                                value: type,
-                                disabled: type in [
-                                    'currentTabs'
-                                ],
-                                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)(T(type))
-                            }, type, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 253,
-                                columnNumber: 13
-                            }, _this);
-                        }),
-                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
-                            value: "custom",
-                            children: T('Custom Data')
-                        }, void 0, false, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 255,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                    lineNumber: 249,
-                    columnNumber: 9
-                }, this),
-                newTabType === 'custom' && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
-                    type: "text",
-                    placeholder: T('Tab Name'),
-                    value: newTabName,
-                    onChange: function(param) {
-                        var target = param.target;
-                        return setNewTabName(target.value);
-                    }
-                }, void 0, false, {
-                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                    lineNumber: 257,
-                    columnNumber: 37
-                }, this),
-                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
-                    type: "button",
-                    onClick: function() {
-                        return addTabByType();
-                    },
-                    children: T('New Tab')
-                }, void 0, false, {
-                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                    lineNumber: 258,
-                    columnNumber: 9
-                }, this)
-            ]
-        }, void 0, true, {
-            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-            lineNumber: 248,
-            columnNumber: 7
-        }, this)
-    };
-    var tabs = {
-        body: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_EditorFrame__WEBPACK_IMPORTED_MODULE_3__["default"], {
-            editor: editor
-        }, void 0, false, {
-            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-            lineNumber: 265,
-            columnNumber: 7
-        }, this)
-    };
-    var _item_title, _item_shortname, _item_tags, _objData_comments, _objData_notes;
-    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        children: [
-            saveBtnAnchor && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("a", {
-                className: "navbarBtnLink navbarText",
-                children: T(saveText)
-            }, void 0, false, {
-                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 273,
-                columnNumber: 9
-            }, this), saveBtnAnchor),
-            modalAnchor && currentModal && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                className: "modal",
-                onClick: function() {
-                    return setCurrentModal(null);
-                },
-                children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                    className: "modal-content",
-                    onClick: function(e) {
-                        return e.stopPropagation();
-                    },
-                    children: modals[currentModal]
-                }, void 0, false, {
-                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                    lineNumber: 280,
-                    columnNumber: 13
-                }, this)
-            }, void 0, false, {
-                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 279,
-                columnNumber: 11
-            }, this), modalAnchor),
-            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h2", {
-                children: item ? T('Edit %s', item.title) : T('Edit')
-            }, void 0, false, {
-                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 288,
-                columnNumber: 7
-            }, this),
-            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                id: "edit",
-                className: "form-row-group",
-                children: [
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                htmlFor: "title",
-                                children: T('Title')
-                            }, void 0, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 291,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
-                                id: "title",
-                                type: "text",
-                                name: "title",
-                                value: (_item_title = item === null || item === void 0 ? void 0 : item.title) !== null && _item_title !== void 0 ? _item_title : '',
-                                onChange: function(param) {
-                                    var target = param.target;
-                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
-                                        title: target.value
-                                    }));
-                                }
-                            }, void 0, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 292,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 290,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                htmlFor: "shortname",
-                                children: [
-                                    T('Shortname'),
-                                    ":"
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 298,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
-                                id: "shortname",
-                                type: "text",
-                                name: "shortname",
-                                value: (_item_shortname = item === null || item === void 0 ? void 0 : item.shortname) !== null && _item_shortname !== void 0 ? _item_shortname : '',
-                                onChange: function(param) {
-                                    var target = param.target;
-                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
-                                        shortname: target.value
-                                    }));
-                                }
-                            }, void 0, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 299,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 297,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("small", {
-                            style: {
-                                gridColumn: '2 / 4'
-                            },
-                            children: [
-                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
-                                    children: T('NOTE: changes to the shortname will not auto-save.')
-                                }, void 0, false, {
-                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                    lineNumber: 306,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
-                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                    lineNumber: 307,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
-                                    children: T('Other users currently editing this item will be unable to save their work. Change with caution.')
-                                }, void 0, false, {
-                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                    lineNumber: 308,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 305,
-                            columnNumber: 11
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 304,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                htmlFor: "item_type",
-                                children: [
-                                    T('Type'),
-                                    ":"
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 313,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
-                                id: "item_type",
-                                name: "item_type",
-                                defaultValue: item === null || item === void 0 ? void 0 : item.itemType,
-                                onChange: function(param) {
-                                    var target = param.target;
-                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
-                                        itemType: target.value
-                                    }));
-                                },
-                                children: [
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
-                                        hidden: true,
-                                        disabled: true,
-                                        children: [
-                                            T('Select one'),
-                                            "..."
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 315,
-                                        columnNumber: 13
-                                    }, this),
-                                    categories && item && Object.keys(categories).map(function(type) {
-                                        return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
-                                            value: type,
-                                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)(categories[type][0])
-                                        }, type, false, {
-                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                            lineNumber: 317,
-                                            columnNumber: 15
-                                        }, _this);
-                                    })
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 314,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 312,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                htmlFor: "tags",
-                                children: [
-                                    T('Tags'),
-                                    ":"
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 325,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("textarea", {
-                                id: "tags",
-                                name: "tags",
-                                value: ((_item_tags = item === null || item === void 0 ? void 0 : item.tags) !== null && _item_tags !== void 0 ? _item_tags : []).join(' '),
-                                onChange: function(param) {
-                                    var target = param.target;
-                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
-                                        tags: target.value.split(' ')
-                                    }));
-                                }
-                            }, void 0, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 326,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 324,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                htmlFor: "comments",
-                                children: [
-                                    T('Enable comments'),
-                                    ":"
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 330,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                className: "switch",
-                                children: [
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
-                                        id: "comments",
-                                        name: "comments",
-                                        type: "checkbox",
-                                        checked: (_objData_comments = objData === null || objData === void 0 ? void 0 : objData.comments) !== null && _objData_comments !== void 0 ? _objData_comments : false,
-                                        onChange: function(param) {
-                                            var target = param.target;
-                                            return objData && setObjData(_object_spread_props(_object_spread({}, objData), {
-                                                comments: target.checked
-                                            }));
-                                        }
-                                    }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 332,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
-                                        className: "slider"
-                                    }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 335,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 331,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 329,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                htmlFor: "notes",
-                                children: [
-                                    T('Enable notes'),
-                                    ":"
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 340,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                className: "switch",
-                                children: [
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
-                                        id: "notes",
-                                        name: "notes",
-                                        type: "checkbox",
-                                        checked: (_objData_notes = objData === null || objData === void 0 ? void 0 : objData.notes) !== null && _objData_notes !== void 0 ? _objData_notes : false,
-                                        onChange: function(param) {
-                                            var target = param.target;
-                                            return objData && setObjData(_object_spread_props(_object_spread({}, objData), {
-                                                notes: target.checked
-                                            }));
-                                        }
-                                    }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 342,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
-                                        className: "slider"
-                                    }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 345,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 341,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 339,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "mt-2",
-                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
-                            id: "save-changes",
-                            onClick: function() {
-                                return save(0);
-                            },
-                            children: T(saveText)
-                        }, void 0, false, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 350,
-                            columnNumber: 11
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 349,
-                        columnNumber: 9
-                    }, this),
-                    errorMessage && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
-                            id: "item-error",
-                            className: "color-error",
-                            style: {
-                                fontSize: 'small'
-                            },
-                            children: errorMessage
-                        }, void 0, false, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 354,
-                            columnNumber: 11
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 353,
-                        columnNumber: 26
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("hr", {
-                        className: "w-100 mb-0"
-                    }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 357,
-                        columnNumber: 9
-                    }, this),
-                    objData && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                                className: "d-flex align-start mb-2",
-                                children: [
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_TabsBar__WEBPACK_IMPORTED_MODULE_7__["default"], {
-                                        tabs: tabNames,
-                                        selectedTab: currentTab,
-                                        onSelectTab: function(tab) {
-                                            return setCurrentTab(tab);
-                                        },
-                                        onRemoveTab: function(tab) {
-                                            return removeTab(tab);
-                                        }
-                                    }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 361,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("ul", {
-                                        className: "navbarBtns",
-                                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("li", {
-                                            className: "navbarBtn",
-                                            children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h3", {
-                                                className: "navbarBtnLink navbarText ma-0 material-symbols-outlined heavy",
-                                                onClick: function() {
-                                                    return setCurrentModal('newTab');
-                                                },
-                                                children: "add"
-                                            }, void 0, false, {
-                                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                                lineNumber: 364,
-                                                columnNumber: 17
-                                            }, this)
-                                        }, void 0, false, {
-                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                            lineNumber: 363,
-                                            columnNumber: 15
-                                        }, this)
-                                    }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 362,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 360,
-                                columnNumber: 11
-                            }, this),
-                            currentTab && tabs[currentTab]
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 359,
-                        columnNumber: 21
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 289,
-                columnNumber: 7
-            }, this)
-        ]
-    }, void 0, true);
-}
-
-
-/***/ }),
-
-/***/ "./src/components/EditorFrame.tsx":
-/*!****************************************!*\
-  !*** ./src/components/EditorFrame.tsx ***!
-  \****************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ EditorFrame)
-/* harmony export */ });
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
-/* harmony import */ var _tiptap_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/react */ "../node_modules/@tiptap/react/dist/index.js");
-
-
-function EditorFrame(param) {
-    var editor = param.editor;
-    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-        className: "markdown",
-        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_tiptap_react__WEBPACK_IMPORTED_MODULE_1__.EditorContent, {
-            editor: editor
-        }, void 0, false, {
-            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
-            lineNumber: 9,
-            columnNumber: 5
-        }, this)
-    }, void 0, false, {
-        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
-        lineNumber: 8,
-        columnNumber: 10
-    }, this);
-}
-
-
-/***/ }),
-
-/***/ "./src/components/TabsBar.tsx":
-/*!************************************!*\
-  !*** ./src/components/TabsBar.tsx ***!
-  \************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ TabsBar)
-/* harmony export */ });
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
-function _array_like_to_array(arr, len) {
-    if (len == null || len > arr.length) len = arr.length;
-    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
-    return arr2;
-}
-function _array_with_holes(arr) {
-    if (Array.isArray(arr)) return arr;
-}
-function _iterable_to_array_limit(arr, i) {
-    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
-    if (_i == null) return;
-    var _arr = [];
-    var _n = true;
-    var _d = false;
-    var _s, _e;
-    try {
-        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
-            _arr.push(_s.value);
-            if (i && _arr.length === i) break;
-        }
-    } catch (err) {
-        _d = true;
-        _e = err;
-    } finally{
-        try {
-            if (!_n && _i["return"] != null) _i["return"]();
-        } finally{
-            if (_d) throw _e;
-        }
-    }
-    return _arr;
-}
-function _non_iterable_rest() {
-    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-function _sliced_to_array(arr, i) {
-    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
-}
-function _unsupported_iterable_to_array(o, minLen) {
-    if (!o) return;
-    if (typeof o === "string") return _array_like_to_array(o, minLen);
-    var n = Object.prototype.toString.call(o).slice(8, -1);
-    if (n === "Object" && o.constructor) n = o.constructor.name;
-    if (n === "Map" || n === "Set") return Array.from(n);
-    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
-}
-
-function TabsBar(param) {
-    var _this = this;
-    var tabs = param.tabs, selectedTab = param.selectedTab, onSelectTab = param.onSelectTab, onRemoveTab = param.onRemoveTab;
-    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("ul", {
-        className: "tabs-buttons navbarBtns gap-1 grow-1",
-        children: Object.entries(tabs).map(function(param) {
-            var _param = _sliced_to_array(param, 2), tab = _param[0], name = _param[1];
-            return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("li", {
-                className: "navbarBtn badge-anchor".concat(tab === selectedTab ? ' selected' : ''),
-                onClick: function() {
-                    return onSelectTab(tab);
-                },
-                children: [
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h3", {
-                        className: "navbarBtnLink navbarText ma-0",
-                        children: name
-                    }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TabsBar.tsx",
-                        lineNumber: 13,
-                        columnNumber: 11
-                    }, _this),
-                    tab === selectedTab && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "material-symbols-outlined badge badge-large",
-                        onClick: function(e) {
-                            e.stopPropagation();
-                            onRemoveTab(tab);
-                        },
-                        children: "delete"
-                    }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TabsBar.tsx",
-                        lineNumber: 14,
-                        columnNumber: 35
-                    }, _this)
-                ]
-            }, tab, true, {
-                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TabsBar.tsx",
-                lineNumber: 12,
-                columnNumber: 9
-            }, _this);
-        })
-    }, void 0, false, {
-        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TabsBar.tsx",
-        lineNumber: 10,
-        columnNumber: 5
-    }, this);
-}
-
-
-/***/ }),
-
-/***/ "./src/helpers.tsx":
-/*!*************************!*\
-  !*** ./src/helpers.tsx ***!
-  \*************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   capitalize: () => (/* binding */ capitalize),
-/* harmony export */   deepCompare: () => (/* binding */ deepCompare),
-/* harmony export */   formatDate: () => (/* binding */ formatDate),
-/* harmony export */   loadMarkdown: () => (/* binding */ loadMarkdown),
-/* harmony export */   renderMarkdown: () => (/* binding */ renderMarkdown),
-/* harmony export */   renderMdPreview: () => (/* binding */ renderMdPreview)
-/* harmony export */ });
-/* harmony import */ var _src_markdown__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../src/markdown */ "../src/markdown.ts");
-function _array_like_to_array(arr, len) {
-    if (len == null || len > arr.length) len = arr.length;
-    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
-    return arr2;
-}
-function _array_with_holes(arr) {
-    if (Array.isArray(arr)) return arr;
-}
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
-    try {
-        var info = gen[key](arg);
-        var value = info.value;
-    } catch (error) {
-        reject(error);
-        return;
-    }
-    if (info.done) {
-        resolve(value);
-    } else {
-        Promise.resolve(value).then(_next, _throw);
-    }
-}
-function _async_to_generator(fn) {
-    return function() {
-        var self = this, args = arguments;
-        return new Promise(function(resolve, reject) {
-            var gen = fn.apply(self, args);
-            function _next(value) {
-                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
-            }
-            function _throw(err) {
-                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
-            }
-            _next(undefined);
-        });
-    };
-}
-function _class_call_check(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
-    }
-}
-function _defineProperties(target, props) {
-    for(var i = 0; i < props.length; i++){
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-    }
-}
-function _create_class(Constructor, protoProps, staticProps) {
-    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) _defineProperties(Constructor, staticProps);
-    return Constructor;
-}
-function _define_property(obj, key, value) {
-    if (key in obj) {
-        Object.defineProperty(obj, key, {
-            value: value,
-            enumerable: true,
-            configurable: true,
-            writable: true
-        });
-    } else {
-        obj[key] = value;
-    }
-    return obj;
-}
-function _instanceof(left, right) {
-    if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) {
-        return !!right[Symbol.hasInstance](left);
-    } else {
-        return left instanceof right;
-    }
-}
-function _iterable_to_array_limit(arr, i) {
-    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
-    if (_i == null) return;
-    var _arr = [];
-    var _n = true;
-    var _d = false;
-    var _s, _e;
-    try {
-        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
-            _arr.push(_s.value);
-            if (i && _arr.length === i) break;
-        }
-    } catch (err) {
-        _d = true;
-        _e = err;
-    } finally{
-        try {
-            if (!_n && _i["return"] != null) _i["return"]();
-        } finally{
-            if (_d) throw _e;
-        }
-    }
-    return _arr;
-}
-function _non_iterable_rest() {
-    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-function _object_spread(target) {
-    for(var i = 1; i < arguments.length; i++){
-        var source = arguments[i] != null ? arguments[i] : {};
-        var ownKeys = Object.keys(source);
-        if (typeof Object.getOwnPropertySymbols === "function") {
-            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
-                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-            }));
-        }
-        ownKeys.forEach(function(key) {
-            _define_property(target, key, source[key]);
-        });
-    }
-    return target;
-}
-function ownKeys(object, enumerableOnly) {
-    var keys = Object.keys(object);
-    if (Object.getOwnPropertySymbols) {
-        var symbols = Object.getOwnPropertySymbols(object);
-        if (enumerableOnly) {
-            symbols = symbols.filter(function(sym) {
-                return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-            });
-        }
-        keys.push.apply(keys, symbols);
-    }
-    return keys;
-}
-function _object_spread_props(target, source) {
-    source = source != null ? source : {};
-    if (Object.getOwnPropertyDescriptors) {
-        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-    } else {
-        ownKeys(Object(source)).forEach(function(key) {
-            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-        });
-    }
-    return target;
-}
-function _sliced_to_array(arr, i) {
-    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
-}
-function _unsupported_iterable_to_array(o, minLen) {
-    if (!o) return;
-    if (typeof o === "string") return _array_like_to_array(o, minLen);
-    var n = Object.prototype.toString.call(o).slice(8, -1);
-    if (n === "Object" && o.constructor) n = o.constructor.name;
-    if (n === "Map" || n === "Set") return Array.from(n);
-    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
-}
-function _ts_generator(thisArg, body) {
-    var f, y, t, _ = {
-        label: 0,
-        sent: function() {
-            if (t[0] & 1) throw t[1];
-            return t[1];
-        },
-        trys: [],
-        ops: []
-    }, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
-    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() {
-        return this;
-    }), g;
-    function verb(n) {
-        return function(v) {
-            return step([
-                n,
-                v
-            ]);
-        };
-    }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while(g && (g = 0, op[0] && (_ = 0)), _)try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [
-                op[0] & 2,
-                t.value
-            ];
-            switch(op[0]){
-                case 0:
-                case 1:
-                    t = op;
-                    break;
-                case 4:
-                    _.label++;
-                    return {
-                        value: op[1],
-                        done: false
-                    };
-                case 5:
-                    _.label++;
-                    y = op[1];
-                    op = [
-                        0
-                    ];
-                    continue;
-                case 7:
-                    op = _.ops.pop();
-                    _.trys.pop();
-                    continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
-                        _ = 0;
-                        continue;
-                    }
-                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
-                        _.label = op[1];
-                        break;
-                    }
-                    if (op[0] === 6 && _.label < t[1]) {
-                        _.label = t[1];
-                        t = op;
-                        break;
-                    }
-                    if (t && _.label < t[2]) {
-                        _.label = t[2];
-                        _.ops.push(op);
-                        break;
-                    }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop();
-                    continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) {
-            op = [
-                6,
-                e
-            ];
-            y = 0;
-        } finally{
-            f = t = 0;
-        }
-        if (op[0] & 5) throw op[1];
-        return {
-            value: op[0] ? op[1] : void 0,
-            done: true
-        };
-    }
-}
-
 // TODO this is duplicated from helpers.pug
 var capitalize = function(str) {
     return str[0].toUpperCase() + str.substr(1, str.length - 1);
@@ -58014,6 +58435,50 @@ var formatDate = function(date) {
     if (short) return "".concat(date.toDateString(), " ").concat(date.toLocaleTimeString());
     else return "on ".concat(date.toDateString(), " at ").concat(date.toLocaleTimeString());
 };
+function sprintf(format) {
+    for(var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++){
+        args[_key - 1] = arguments[_key];
+    }
+    var i = 0;
+    return format.replace(/%s/g, function() {
+        return args[i++];
+    });
+}
+function T(str) {
+    for(var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++){
+        args[_key - 1] = arguments[_key];
+    }
+    // return sprintf(locale[lang][str] ?? str, ...args);
+    return sprintf.apply(void 0, [
+        str
+    ].concat(_to_consumable_array(args)));
+}
+function postFormData(url, data) {
+    return _async_to_generator(function() {
+        var formData, key;
+        return _ts_generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    formData = new FormData();
+                    for(var key in data){
+                        formData.append(key, data[key]);
+                    }
+                    return [
+                        4,
+                        fetch(url, {
+                            method: 'POST',
+                            body: formData
+                        })
+                    ];
+                case 1:
+                    return [
+                        2,
+                        _state.sent()
+                    ];
+            }
+        });
+    })();
+}
 function deepCompare(a, b) {
     if (!(_instanceof(a, Object) && _instanceof(b, Object))) {
         return a === b;

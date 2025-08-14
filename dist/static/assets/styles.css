@@ -1044,6 +1044,34 @@ input:checked + .slider:before {
   }
 }
 
+/* Loading Spinner */
+.loader {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 8px solid #0000;
+  border-right-color: #00669997;
+  position: relative;
+  animation: s4 1s infinite linear;
+}
+.loader:before,
+.loader:after {
+  content: "";
+  position: absolute;
+  inset:-8px;
+  border-radius: 50%;
+  border:inherit;
+  animation:inherit;
+  animation-duration: 2s;
+}
+.loader:after {
+  animation-duration: 4s;
+}
+
+@keyframes s4 {
+  100% {transform: rotate(1turn)}
+}
+
 /* Generic classes */
 .d-flex {
   display: flex;

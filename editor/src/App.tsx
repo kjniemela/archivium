@@ -1,11 +1,12 @@
 import { useState, useEffect, type ReactElement } from 'react';
-import { capitalize, deepCompare, renderMarkdown } from './helpers';
+import { capitalize, deepCompare, renderMarkdown, T } from './helpers';
 import EditorFrame from './components/EditorFrame';
 import { indexedToJson, jsonToIndexed, type IndexedDocument } from '../../src/lib/tiptapHelpers';
 import { editorExtensions } from '../../src/lib/editor';
 import { createPortal } from 'react-dom';
 import TabsBar from './components/TabsBar';
 import { useEditor } from '@tiptap/react';
+import Gallery, { type GalleryImage } from './components/Gallery';
 
 type Categories = {
   [key: string]: [string, string],
@@ -16,6 +17,7 @@ type Item = {
   shortname: string,
   itemType: string,
   tags: string[],
+  gallery: GalleryImage[],
 };
 
 const BUILTIN_TABS = ['lineage', 'location', 'timeline', 'gallery'] as const;
@@ -33,16 +35,6 @@ export type AppProps = {
   itemShort: string,
   universeShort: string,
 };
-
-function sprintf(format: string, ...args: string[]): string {
-  let i = 0;
-  return format.replace(/%s/g, () => args[i++]);
-}
-
-function T(str: string, ...args: string[]): string {
-// return sprintf(locale[lang][str] ?? str, ...args);
-  return sprintf(str, ...args);
-}
 
 async function fetchData(url: string, setter: (value: any) => void): Promise<any> {
   try {
@@ -243,6 +235,13 @@ export default function App({ itemShort, universeShort }: AppProps) {
     setTabNames(computeTabs(newObjData));
   }
 
+  /* Loading Screen */
+  if (!item || !objData) {
+    return <div className='d-flex justify-center align-center'>
+      <div className='loader' style={{ marginTop: 'max(0px, calc(50vh - 50px - var(--page-margin-top)))' }}></div>
+    </div>;
+  }
+
   const modals: Record<ModalType, ReactElement> = {
     newTab: (
       <div className='sheet d-flex flex-col gap-1' style={{ minWidth: '20rem' }}>
@@ -263,6 +262,33 @@ export default function App({ itemShort, universeShort }: AppProps) {
   const tabs: Record<string, ReactElement | null> = {
     body: (
       <EditorFrame editor={editor} />
+    ),
+    gallery: (
+      <Gallery universe={universeShort} item={itemShort} images={item.gallery} onRemoveImage={(id) => {
+        let newState = { ...item };
+        for (let i = 0; i < newState.gallery.length; i++) {
+          const img = newState.gallery[i];
+          if (img.id === id) {
+            newState.gallery.splice(i, 1);
+            break;
+          }
+        }
+        setItem(newState);
+      }} onUploadImage={(img) => {
+        let newState = { ...item };
+        newState.gallery.push(img);
+        setItem(newState);
+      }} onChangeLabel={(id, label) => {
+        let newState = { ...item };
+        for (let i = 0; i < newState.gallery.length; i++) {
+          const img = newState.gallery[i];
+          if (img.id === id) {
+            img.label = label;
+            break;
+          }
+        }
+        setItem(newState);
+      }} />
     ),
   };
 
