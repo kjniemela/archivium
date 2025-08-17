@@ -472,8 +472,8 @@ class ItemAPI {
             }
             // Handle timeline data
             if (body.events) {
-                const myEvents = body.events?.filter(event => !event.imported);
-                const myImports = body.events?.filter(event => event.imported);
+                const myEvents = body.events?.filter(event => event.src_id === item.id);
+                const myImports = body.events?.filter(event => event.src_id !== item.id);
                 if (myEvents) {
                     const events = await this.fetchEvents(item.id);
                     const existingEvents = events.reduce((acc, event) => ({ ...acc, [event.event_title ?? null]: event }), {});
@@ -493,7 +493,7 @@ class ItemAPI {
                     const existingImports = imports.reduce((acc, ti) => ({ ...acc, [ti.event_id]: ti }), {});
                     const newImports = [];
                     const importsMap = {};
-                    for (const { srcId: itemId, title: eventTitle } of myImports) {
+                    for (const { src_id: itemId, event_title: eventTitle } of myImports) {
                         const event = (await this.fetchEvents(itemId, { title: eventTitle }))[0];
                         if (!event)
                             continue;

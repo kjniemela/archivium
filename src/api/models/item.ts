@@ -3,7 +3,6 @@ import { extractLinks } from '../../markdown';
 import { API } from '..';
 import { User } from './user';
 import { PoolConnection, ResultSetHeader } from 'mysql2/promise';
-import { ItemEvent } from './universe';
 import { ForbiddenError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
 
 export type ItemOptions = BaseOptions & {
@@ -26,8 +25,17 @@ export type ItemImage = {
   label: string,
   data?: Buffer,
 };
+
+export type ItemEvent = {
+  event_title: string,
+  abstime: number,
+  src_shortname: string,
+  src_title: string,
+  src_id: number,
+}
+
 export type Item = {
-  events?: any;
+  events?: ItemEvent[];
   gallery?: any;
   parents?: any;
   children?: any,
@@ -190,7 +198,7 @@ export class ItemAPI {
         WHERE itemevent.item_id = ? OR timelineitem.timeline_id = ?
         ORDER BY itemevent.abstime DESC
       `, [item.id, item.id]);
-      item.events = events;
+      item.events = events as ItemEvent[];
 
       const gallery = await executeQuery(`
         SELECT
@@ -566,8 +574,8 @@ export class ItemAPI {
 
       // Handle timeline data
       if (body.events) {
-        const myEvents = body.events?.filter(event => !event.imported);
-        const myImports = body.events?.filter(event => event.imported);
+        const myEvents = body.events?.filter(event => event.src_id === item.id);
+        const myImports = body.events?.filter(event => event.src_id !== item.id);
         if (myEvents) {
           const events = await this.fetchEvents(item.id);
           const existingEvents = events.reduce((acc, event) => ({ ...acc, [event.event_title ?? null]: event }), {});
@@ -590,7 +598,7 @@ export class ItemAPI {
           const existingImports = imports.reduce((acc, ti) => ({ ...acc, [ti.event_id]: ti }), {});
           const newImports: number[] = [];
           const importsMap = {};
-          for (const { srcId: itemId, title: eventTitle } of myImports) {
+          for (const { src_id: itemId, event_title: eventTitle } of myImports) {
             const event = (await this.fetchEvents(itemId, { title: eventTitle }))[0];
             if (!event) continue;
             if (!(event.id in existingImports)) {
@@ -671,14 +679,14 @@ export class ItemAPI {
     }
   }
 
-  async fetchEvents(itemId: number, options: EventOptions = {}): Promise<ItemEvent[]> {
+  async fetchEvents(itemId: number, options: EventOptions = {}): Promise<(ItemEvent & { id: number })[]> {
     let queryString = `SELECT * FROM itemevent WHERE item_id = ?`;
     const values: (string | number)[] = [itemId];
     if (options.title) {
       queryString += ` AND event_title = ?`;
       values.push(options.title);
     }
-    return await executeQuery(queryString, values) as ItemEvent[];
+    return await executeQuery(queryString, values) as (ItemEvent & { id: number })[];
   }
   async insertEvents(itemId: number, events: { event_title: string, abstime: number }[], conn?: PoolConnection): Promise<void> {
     if (!events.length) return;

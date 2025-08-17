@@ -56419,6 +56419,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_TabsBar__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/TabsBar */ "./src/components/TabsBar.tsx");
 /* harmony import */ var _tiptap_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @tiptap/react */ "../node_modules/@tiptap/react/dist/index.js");
 /* harmony import */ var _components_Gallery__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/Gallery */ "./src/components/Gallery.tsx");
+/* harmony import */ var _components_TimelineEditor__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./components/TimelineEditor */ "./src/components/TimelineEditor.tsx");
 function _array_like_to_array(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
     for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
@@ -56654,6 +56655,7 @@ function _ts_generator(thisArg, body) {
 
 
 
+
 var BUILTIN_TABS = [
     'lineage',
     'location',
@@ -56668,9 +56670,9 @@ function fetchData(url, setter) {
                 case 0:
                     _state.trys.push([
                         0,
-                        3,
+                        4,
                         ,
-                        4
+                        5
                     ]);
                     return [
                         4,
@@ -56691,19 +56693,24 @@ function fetchData(url, setter) {
                     ];
                 case 2:
                     data = _state.sent();
-                    setter(data);
                     return [
-                        3,
-                        4
+                        4,
+                        setter(data)
                     ];
                 case 3:
+                    _state.sent();
+                    return [
+                        3,
+                        5
+                    ];
+                case 4:
                     err = _state.sent();
                     console.error(err);
                     return [
                         3,
-                        4
+                        5
                     ];
-                case 4:
+                case 5:
                     return [
                         2
                     ];
@@ -56763,6 +56770,7 @@ function App(param) {
     var _useState5 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), currentModal = _useState5[0], setCurrentModal = _useState5[1];
     var _useState6 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), currentTab = _useState6[0], setCurrentTab = _useState6[1];
     var _useState7 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({}), 2), tabNames = _useState7[0], setTabNames = _useState7[1];
+    var _useState8 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(), 2), eventItemMap = _useState8[0], setEventItemMap = _useState8[1];
     var editor = (0,_tiptap_react__WEBPACK_IMPORTED_MODULE_8__.useEditor)({
         extensions: _src_lib_editor__WEBPACK_IMPORTED_MODULE_5__.editorExtensions,
         onUpdate: function(param) {
@@ -56870,27 +56878,80 @@ function App(param) {
         })();
     }
     (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
-        fetchData("/api/universes/".concat(universeShort), function(data) {
+        var categoryPromise = fetchData("/api/universes/".concat(universeShort), function(data) {
             setCategories(data.obj_data.cats);
         });
-        fetchData("/api/universes/".concat(universeShort, "/items/").concat(itemShort), function(data) {
-            var objData = JSON.parse(data.obj_data);
-            setObjData(objData);
-            setTabNames(computeTabs(objData));
-            if (typeof objData.body === 'string') {
-                (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.renderMarkdown)(universeShort, objData.body, {
-                    item: _object_spread_props(_object_spread({}, data), {
-                        obj_data: objData
-                    })
-                }).then(function(text) {
-                    editor.commands.setContent(text);
-                });
-            } else if (objData.body) {
-                var json = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__.indexedToJson)(objData.body);
-                editor.commands.setContent(json);
+        var eventItemPromise = fetchData("/api/universes/".concat(universeShort, "/events"), function(events) {
+            var newEventItemMap = {};
+            var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
+            try {
+                for(var _iterator = events[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true){
+                    var _step_value = _step.value, src_id = _step_value.src_id, src_title = _step_value.src_title, src_shortname = _step_value.src_shortname, event_title = _step_value.event_title, abstime = _step_value.abstime;
+                    if (!(src_id in newEventItemMap)) {
+                        newEventItemMap[src_id] = [];
+                    }
+                    newEventItemMap[src_id].push([
+                        src_shortname,
+                        src_title,
+                        Number(src_id),
+                        event_title,
+                        Number(abstime)
+                    ]);
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally{
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return != null) {
+                        _iterator.return();
+                    }
+                } finally{
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
             }
-            delete data.obj_data;
-            setItem(data);
+            setEventItemMap(newEventItemMap);
+        });
+        fetchData("/api/universes/".concat(universeShort, "/items/").concat(itemShort), function(data) {
+            return _async_to_generator(function() {
+                var objData, json;
+                return _ts_generator(this, function(_state) {
+                    switch(_state.label){
+                        case 0:
+                            objData = JSON.parse(data.obj_data);
+                            setObjData(objData);
+                            setTabNames(computeTabs(objData));
+                            if (typeof objData.body === 'string') {
+                                (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.renderMarkdown)(universeShort, objData.body, {
+                                    item: _object_spread_props(_object_spread({}, data), {
+                                        obj_data: objData
+                                    })
+                                }).then(function(text) {
+                                    editor.commands.setContent(text);
+                                });
+                            } else if (objData.body) {
+                                json = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__.indexedToJson)(objData.body);
+                                editor.commands.setContent(json);
+                            }
+                            delete data.obj_data;
+                            return [
+                                4,
+                                Promise.all([
+                                    categoryPromise,
+                                    eventItemPromise
+                                ])
+                            ];
+                        case 1:
+                            _state.sent();
+                            setItem(data);
+                            return [
+                                2
+                            ];
+                    }
+                });
+            })();
         });
     }, [
         itemShort,
@@ -56916,8 +56977,8 @@ function App(param) {
     ]);
     var modalAnchor = document.querySelector('#modal-anchor');
     var saveBtnAnchor = document.querySelector('#save-btn');
-    var _useState8 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(undefined), 2), newTabType = _useState8[0], setNewTabType = _useState8[1];
-    var _useState9 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(''), 2), newTabName = _useState9[0], setNewTabName = _useState9[1];
+    var _useState9 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(undefined), 2), newTabType = _useState9[0], setNewTabType = _useState9[1];
+    var _useState10 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(''), 2), newTabName = _useState10[0], setNewTabName = _useState10[1];
     function addTabByType() {
         if (!objData || newTabType === undefined) return;
         var newObjData = _object_spread({}, objData);
@@ -56963,12 +57024,12 @@ function App(param) {
                 }
             }, void 0, false, {
                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 241,
+                lineNumber: 259,
                 columnNumber: 7
             }, this)
         }, void 0, false, {
             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-            lineNumber: 240,
+            lineNumber: 258,
             columnNumber: 12
         }, this);
     }
@@ -56996,30 +57057,26 @@ function App(param) {
                             ]
                         }, void 0, true, {
                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 249,
+                            lineNumber: 267,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
                             value: "body",
-                            disabled: 'body' in [
-                                'currentTabs'
-                            ],
+                            disabled: 'body' in objData,
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Main Text')
                         }, void 0, false, {
                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 250,
+                            lineNumber: 268,
                             columnNumber: 11
                         }, this),
                         BUILTIN_TABS.map(function(type) {
                             return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
                                 value: type,
-                                disabled: type in [
-                                    'currentTabs'
-                                ],
+                                disabled: type in tabNames,
                                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(type))
                             }, type, false, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 252,
+                                lineNumber: 270,
                                 columnNumber: 13
                             }, _this);
                         }),
@@ -57028,13 +57085,13 @@ function App(param) {
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Custom Data')
                         }, void 0, false, {
                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 254,
+                            lineNumber: 272,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                    lineNumber: 248,
+                    lineNumber: 266,
                     columnNumber: 9
                 }, this),
                 newTabType === 'custom' && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -57047,7 +57104,7 @@ function App(param) {
                     }
                 }, void 0, false, {
                     fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                    lineNumber: 256,
+                    lineNumber: 274,
                     columnNumber: 37
                 }, this),
                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -57058,13 +57115,13 @@ function App(param) {
                     children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('New Tab')
                 }, void 0, false, {
                     fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                    lineNumber: 257,
+                    lineNumber: 275,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-            lineNumber: 247,
+            lineNumber: 265,
             columnNumber: 7
         }, this)
     };
@@ -57073,7 +57130,7 @@ function App(param) {
             editor: editor
         }, void 0, false, {
             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-            lineNumber: 264,
+            lineNumber: 282,
             columnNumber: 7
         }, this),
         gallery: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_Gallery__WEBPACK_IMPORTED_MODULE_9__["default"], {
@@ -57109,7 +57166,21 @@ function App(param) {
             }
         }, void 0, false, {
             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-            lineNumber: 267,
+            lineNumber: 285,
+            columnNumber: 7
+        }, this),
+        timeline: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_TimelineEditor__WEBPACK_IMPORTED_MODULE_10__["default"], {
+            item: item,
+            onEventsUpdate: function(newEvents) {
+                var newState = _object_spread({}, item);
+                console.log(newEvents);
+                newState.events = newEvents;
+                setItem(newState);
+            },
+            eventItemMap: eventItemMap !== null && eventItemMap !== void 0 ? eventItemMap : {}
+        }, void 0, false, {
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+            lineNumber: 312,
             columnNumber: 7
         }, this)
     };
@@ -57121,7 +57192,7 @@ function App(param) {
                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
             }, void 0, false, {
                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 299,
+                lineNumber: 325,
                 columnNumber: 9
             }, this), saveBtnAnchor),
             modalAnchor && currentModal && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57137,19 +57208,19 @@ function App(param) {
                     children: modals[currentModal]
                 }, void 0, false, {
                     fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                    lineNumber: 306,
+                    lineNumber: 332,
                     columnNumber: 13
                 }, this)
             }, void 0, false, {
                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 305,
+                lineNumber: 331,
                 columnNumber: 11
             }, this), modalAnchor),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h2", {
                 children: item ? (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Edit %s', item.title) : (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Edit')
             }, void 0, false, {
                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 314,
+                lineNumber: 340,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57164,7 +57235,7 @@ function App(param) {
                                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Title')
                             }, void 0, false, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 317,
+                                lineNumber: 343,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -57180,13 +57251,13 @@ function App(param) {
                                 }
                             }, void 0, false, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 318,
+                                lineNumber: 344,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 316,
+                        lineNumber: 342,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57200,7 +57271,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 324,
+                                lineNumber: 350,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -57216,13 +57287,13 @@ function App(param) {
                                 }
                             }, void 0, false, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 325,
+                                lineNumber: 351,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 323,
+                        lineNumber: 349,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57236,30 +57307,30 @@ function App(param) {
                                     children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('NOTE: changes to the shortname will not auto-save.')
                                 }, void 0, false, {
                                     fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                    lineNumber: 332,
+                                    lineNumber: 358,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
                                     fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                    lineNumber: 333,
+                                    lineNumber: 359,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
                                     children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Other users currently editing this item will be unable to save their work. Change with caution.')
                                 }, void 0, false, {
                                     fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                    lineNumber: 334,
+                                    lineNumber: 360,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 331,
+                            lineNumber: 357,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 330,
+                        lineNumber: 356,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57273,7 +57344,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 339,
+                                lineNumber: 365,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
@@ -57296,7 +57367,7 @@ function App(param) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 341,
+                                        lineNumber: 367,
                                         columnNumber: 13
                                     }, this),
                                     categories && item && Object.keys(categories).map(function(type) {
@@ -57305,20 +57376,20 @@ function App(param) {
                                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)(categories[type][0])
                                         }, type, false, {
                                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                            lineNumber: 343,
+                                            lineNumber: 369,
                                             columnNumber: 15
                                         }, _this);
                                     })
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 340,
+                                lineNumber: 366,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 338,
+                        lineNumber: 364,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57332,7 +57403,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 351,
+                                lineNumber: 377,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("textarea", {
@@ -57347,13 +57418,13 @@ function App(param) {
                                 }
                             }, void 0, false, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 352,
+                                lineNumber: 378,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 350,
+                        lineNumber: 376,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57367,7 +57438,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 356,
+                                lineNumber: 382,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
@@ -57386,26 +57457,26 @@ function App(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 358,
+                                        lineNumber: 384,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                         className: "slider"
                                     }, void 0, false, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 361,
+                                        lineNumber: 387,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 357,
+                                lineNumber: 383,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 355,
+                        lineNumber: 381,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57419,7 +57490,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 366,
+                                lineNumber: 392,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
@@ -57438,26 +57509,26 @@ function App(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 368,
+                                        lineNumber: 394,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                         className: "slider"
                                     }, void 0, false, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 371,
+                                        lineNumber: 397,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 367,
+                                lineNumber: 393,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 365,
+                        lineNumber: 391,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57470,12 +57541,12 @@ function App(param) {
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
                         }, void 0, false, {
                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 376,
+                            lineNumber: 402,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 375,
+                        lineNumber: 401,
                         columnNumber: 9
                     }, this),
                     errorMessage && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57488,19 +57559,19 @@ function App(param) {
                             children: errorMessage
                         }, void 0, false, {
                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 380,
+                            lineNumber: 406,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 379,
+                        lineNumber: 405,
                         columnNumber: 26
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("hr", {
                         className: "w-100 mb-0"
                     }, void 0, false, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 383,
+                        lineNumber: 409,
                         columnNumber: 9
                     }, this),
                     objData && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57519,7 +57590,7 @@ function App(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 387,
+                                        lineNumber: 413,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("ul", {
@@ -57534,36 +57605,36 @@ function App(param) {
                                                 children: "add"
                                             }, void 0, false, {
                                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                                lineNumber: 390,
+                                                lineNumber: 416,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                            lineNumber: 389,
+                                            lineNumber: 415,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 388,
+                                        lineNumber: 414,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 386,
+                                lineNumber: 412,
                                 columnNumber: 11
                             }, this),
                             currentTab && tabs[currentTab]
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 385,
+                        lineNumber: 411,
                         columnNumber: 21
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 315,
+                lineNumber: 341,
                 columnNumber: 7
             }, this)
         ]
@@ -57798,7 +57869,7 @@ function Gallery(param) {
     var universe = param.universe, item = param.item, images = param.images, onRemoveImage = param.onRemoveImage, onUploadImage = param.onUploadImage, onChangeLabel = param.onChangeLabel;
     var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false), 2), uploadModal = _useState[0], setUploadModal = _useState[1];
     var modalAnchor = document.querySelector('#modal-anchor');
-    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
         children: [
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
                 className: "item-gallery d-flex gap-4 flex-wrap",
@@ -57981,7 +58052,197 @@ function Gallery(param) {
                 columnNumber: 9
             }, this), modalAnchor)
         ]
-    }, void 0, true);
+    }, void 0, true, {
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
+        lineNumber: 24,
+        columnNumber: 10
+    }, this);
+}
+
+
+/***/ }),
+
+/***/ "./src/components/SearchableSelect.tsx":
+/*!*********************************************!*\
+  !*** ./src/components/SearchableSelect.tsx ***!
+  \*********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ SearchableSelect)
+/* harmony export */ });
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "../node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+function _array_like_to_array(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
+    return arr2;
+}
+function _array_with_holes(arr) {
+    if (Array.isArray(arr)) return arr;
+}
+function _iterable_to_array_limit(arr, i) {
+    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+    if (_i == null) return;
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _s, _e;
+    try {
+        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
+            _arr.push(_s.value);
+            if (i && _arr.length === i) break;
+        }
+    } catch (err) {
+        _d = true;
+        _e = err;
+    } finally{
+        try {
+            if (!_n && _i["return"] != null) _i["return"]();
+        } finally{
+            if (_d) throw _e;
+        }
+    }
+    return _arr;
+}
+function _non_iterable_rest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _sliced_to_array(arr, i) {
+    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
+}
+function _unsupported_iterable_to_array(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _array_like_to_array(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
+}
+
+
+function SearchableSelect(param) {
+    var _this = this;
+    var options = param.options, onSelect = param.onSelect, groups = param.groups;
+    var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(''), 2), searchText = _useState[0], setSearchText = _useState[1];
+    var _useState1 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), selectedKey = _useState1[0], setSelectedKey = _useState1[1];
+    var _useState2 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false), 2), dropdownVisible = _useState2[0], setDropdownVisible = _useState2[1];
+    groups = groups !== null && groups !== void 0 ? groups : {};
+    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
+        if (selectedKey) onSelect(selectedKey);
+    }, [
+        selectedKey
+    ]);
+    var ungroupedOptions = Object.keys(options).filter(function(key) {
+        return !(key in groups);
+    });
+    var groupedOptions = Object.keys(options).filter(function(key) {
+        return key in groups;
+    });
+    var optionGroups = {};
+    var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
+    try {
+        for(var _iterator = groupedOptions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true){
+            var key = _step.value;
+            if (!(groups[key] in optionGroups)) optionGroups[groups[key]] = [];
+            optionGroups[groups[key]].push(key);
+        }
+    } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+    } finally{
+        try {
+            if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+            }
+        } finally{
+            if (_didIteratorError) {
+                throw _iteratorError;
+            }
+        }
+    }
+    var createOption = function(key) {
+        return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+            className: "option",
+            onClick: function() {
+                setSearchText(options[key]);
+                setSelectedKey(key);
+            },
+            children: options[key]
+        }, key, false, {
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\SearchableSelect.tsx",
+            lineNumber: 29,
+            columnNumber: 12
+        }, _this);
+    };
+    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+        className: "searchable-select",
+        children: [
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                value: searchText,
+                onChange: function(param) {
+                    var target = param.target;
+                    return setSearchText(target.value);
+                },
+                onFocus: function() {
+                    return setDropdownVisible(true);
+                },
+                onBlur: function() {
+                    return setTimeout(function() {
+                        return setDropdownVisible(false);
+                    }, 100);
+                }
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\SearchableSelect.tsx",
+                lineNumber: 36,
+                columnNumber: 5
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                className: "options-container",
+                style: {
+                    display: dropdownVisible ? 'block' : 'none'
+                },
+                children: [
+                    ungroupedOptions.map(function(key) {
+                        return createOption(key);
+                    }),
+                    Object.keys(optionGroups).map(function(group) {
+                        return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+                            children: [
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                                    className: "option-group-heading",
+                                    children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("b", {
+                                        children: group
+                                    }, void 0, false, {
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\SearchableSelect.tsx",
+                                        lineNumber: 47,
+                                        columnNumber: 13
+                                    }, _this)
+                                }, group, false, {
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\SearchableSelect.tsx",
+                                    lineNumber: 46,
+                                    columnNumber: 11
+                                }, _this),
+                                optionGroups[group].map(function(key) {
+                                    return createOption(key);
+                                })
+                            ]
+                        }, void 0, true);
+                    })
+                ]
+            }, void 0, true, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\SearchableSelect.tsx",
+                lineNumber: 42,
+                columnNumber: 5
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\SearchableSelect.tsx",
+        lineNumber: 35,
+        columnNumber: 10
+    }, this);
 }
 
 
@@ -58089,6 +58350,784 @@ function TabsBar(param) {
         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TabsBar.tsx",
         lineNumber: 10,
         columnNumber: 5
+    }, this);
+}
+
+
+/***/ }),
+
+/***/ "./src/components/TimePicker.tsx":
+/*!***************************************!*\
+  !*** ./src/components/TimePicker.tsx ***!
+  \***************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ TimePicker)
+/* harmony export */ });
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "../node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../helpers */ "./src/helpers.tsx");
+function _array_like_to_array(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
+    return arr2;
+}
+function _array_with_holes(arr) {
+    if (Array.isArray(arr)) return arr;
+}
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function _iterable_to_array_limit(arr, i) {
+    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+    if (_i == null) return;
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _s, _e;
+    try {
+        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
+            _arr.push(_s.value);
+            if (i && _arr.length === i) break;
+        }
+    } catch (err) {
+        _d = true;
+        _e = err;
+    } finally{
+        try {
+            if (!_n && _i["return"] != null) _i["return"]();
+        } finally{
+            if (_d) throw _e;
+        }
+    }
+    return _arr;
+}
+function _non_iterable_rest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            _define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
+function _sliced_to_array(arr, i) {
+    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
+}
+function _unsupported_iterable_to_array(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _array_like_to_array(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
+}
+
+
+
+// TODO - all of this needs to be generalized! (And split into a non-react file so the backend can use it for SSR.)
+function getYearValue(time) {
+    var Year = time.Year;
+    if (Year % 4 === 0 && (Year % 100 !== 0 || Year % 400 === 0)) return 316224000;
+    else return 315360000;
+}
+function getMonthValue(time) {
+    var Month = time.Month;
+    if (Month === 2) return getYearValue(time) === 316224000 ? 29 * 864000 : 28 * 864000;
+    else if (Month === 4 || Month === 6 || Month === 9 || Month === 11) return 30 * 864000;
+    else return 31 * 864000;
+}
+function nameMonth(month) {
+    return ({
+        1: 'January',
+        2: 'February',
+        3: 'March',
+        4: 'April',
+        5: 'May',
+        6: 'June',
+        7: 'July',
+        8: 'August',
+        9: 'September',
+        10: 'October',
+        11: 'November',
+        12: 'December'
+    })[month];
+}
+function nameDay(day) {
+    if (day % 10 === 1 && day % 100 !== 11) return "".concat(day, "st");
+    else if (day % 10 === 2 && day % 100 !== 12) return "".concat(day, "nd");
+    else if (day % 10 === 3 && day % 100 !== 13) return "".concat(day, "rd");
+    else return "".concat(day, "th");
+}
+var defaults = {
+    Year: 0,
+    Month: 1,
+    Day: 1,
+    Hour: 0,
+    Minute: 0,
+    Second: 0
+};
+var evals = {
+    Year: getYearValue,
+    Month: getMonthValue,
+    Day: function() {
+        return 864000;
+    },
+    Hour: function() {
+        return 36000;
+    },
+    Minute: function() {
+        return 600;
+    },
+    Second: function() {
+        return 10;
+    }
+};
+var names = {
+    Year: function(v) {
+        return v.toString();
+    },
+    Month: function(v) {
+        return nameMonth(v);
+    },
+    Day: function(v) {
+        return nameDay(v);
+    },
+    Hour: function(v) {
+        return v.toString();
+    },
+    Minute: function(v) {
+        return v.toString();
+    },
+    Second: function(v) {
+        return v.toString();
+    }
+};
+function computeTime(abstime) {
+    var curTime = abstime;
+    var time = _object_spread({}, defaults);
+    for(var key in time){
+        while(curTime >= evals[key](time)){
+            curTime -= evals[key](time);
+            time[key] += 1;
+        }
+    }
+    return time;
+}
+function computeAbsTime(time) {
+    var abstime = 0;
+    var _time = _object_spread({}, time);
+    for(var key in _time){
+        while(_time[key] > defaults[key]){
+            _time[key] -= 1;
+            abstime += evals[key](_time);
+        }
+    }
+    return abstime;
+}
+function TimePicker(param) {
+    var _this = this;
+    var abstime = param.abstime, onSelect = param.onSelect;
+    var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(computeTime(abstime)), 2), time = _useState[0], setTime = _useState[1];
+    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+        children: [
+            Object.keys(time).map(function(key) {
+                return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                    children: [
+                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                            children: [
+                                (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(key),
+                                ": "
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimePicker.tsx",
+                            lineNumber: 105,
+                            columnNumber: 9
+                        }, _this),
+                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                            value: time[key],
+                            onChange: function(param) {
+                                var target = param.target;
+                                var newTime = _object_spread({}, time);
+                                newTime[key] = Number(target.value);
+                                setTime(newTime);
+                            }
+                        }, void 0, false, {
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimePicker.tsx",
+                            lineNumber: 106,
+                            columnNumber: 9
+                        }, _this)
+                    ]
+                }, key, true, {
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimePicker.tsx",
+                    lineNumber: 104,
+                    columnNumber: 7
+                }, _this);
+            }),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                type: "button",
+                onClick: function() {
+                    return onSelect(computeAbsTime(time));
+                },
+                children: "Select"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimePicker.tsx",
+                lineNumber: 113,
+                columnNumber: 5
+            }, this)
+        ]
+    }, void 0, true);
+}
+
+
+/***/ }),
+
+/***/ "./src/components/TimelineEditor.tsx":
+/*!*******************************************!*\
+  !*** ./src/components/TimelineEditor.tsx ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ TimelineEditor)
+/* harmony export */ });
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "../node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../helpers */ "./src/helpers.tsx");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-dom */ "../node_modules/react-dom/index.js");
+/* harmony import */ var _TimePicker__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./TimePicker */ "./src/components/TimePicker.tsx");
+/* harmony import */ var _SearchableSelect__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./SearchableSelect */ "./src/components/SearchableSelect.tsx");
+function _array_like_to_array(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
+    return arr2;
+}
+function _array_with_holes(arr) {
+    if (Array.isArray(arr)) return arr;
+}
+function _array_without_holes(arr) {
+    if (Array.isArray(arr)) return _array_like_to_array(arr);
+}
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function _iterable_to_array(iter) {
+    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
+}
+function _iterable_to_array_limit(arr, i) {
+    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+    if (_i == null) return;
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _s, _e;
+    try {
+        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
+            _arr.push(_s.value);
+            if (i && _arr.length === i) break;
+        }
+    } catch (err) {
+        _d = true;
+        _e = err;
+    } finally{
+        try {
+            if (!_n && _i["return"] != null) _i["return"]();
+        } finally{
+            if (_d) throw _e;
+        }
+    }
+    return _arr;
+}
+function _non_iterable_rest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _non_iterable_spread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            _define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
+function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+        var symbols = Object.getOwnPropertySymbols(object);
+        if (enumerableOnly) {
+            symbols = symbols.filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+            });
+        }
+        keys.push.apply(keys, symbols);
+    }
+    return keys;
+}
+function _object_spread_props(target, source) {
+    source = source != null ? source : {};
+    if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+        ownKeys(Object(source)).forEach(function(key) {
+            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+    }
+    return target;
+}
+function _sliced_to_array(arr, i) {
+    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
+}
+function _to_consumable_array(arr) {
+    return _array_without_holes(arr) || _iterable_to_array(arr) || _unsupported_iterable_to_array(arr) || _non_iterable_spread();
+}
+function _unsupported_iterable_to_array(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _array_like_to_array(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
+}
+
+
+
+
+
+
+function TimelineEditor(param) {
+    var _this = this;
+    var item = param.item, onEventsUpdate = param.onEventsUpdate, eventItemMap = param.eventItemMap;
+    var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), timePickerModal = _useState[0], setTimePickerModal = _useState[1];
+    var _useState1 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false), 2), importEventModal = _useState1[0], setImportEventModal = _useState1[1];
+    var _useState2 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(''), 2), newEventTitle = _useState2[0], setNewEventTitle = _useState2[1];
+    var _useState3 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(0), 2), newEventTime = _useState3[0], setNewEventTime = _useState3[1];
+    var _useState4 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), importItem = _useState4[0], setImportItem = _useState4[1];
+    var _useState5 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), importEvent = _useState5[0], setImportEvent = _useState5[1];
+    var modalAnchor = document.querySelector('#modal-anchor');
+    var _item_events;
+    var sortedEvents = ((_item_events = item.events) !== null && _item_events !== void 0 ? _item_events : []).sort(function(a, b) {
+        return a.abstime > b.abstime ? 1 : -1;
+    });
+    var handleEventTitleChange = function(i, value) {
+        var newEvents = _to_consumable_array(item.events);
+        newEvents[i].event_title = value;
+        onEventsUpdate(newEvents);
+    };
+    var handleEventTimeChange = function(i, value) {
+        var newEvents = _to_consumable_array(item.events);
+        newEvents[i].abstime = Math.round(Number(value));
+        onEventsUpdate(newEvents);
+    };
+    var removeEvent = function(i) {
+        var newEvents = _to_consumable_array(item.events);
+        newEvents.splice(i, 1);
+        onEventsUpdate(newEvents);
+    };
+    var createNewEvent = function() {
+        var newEvents = _to_consumable_array(item.events);
+        if (!newEventTitle && (newEvents === null || newEvents === void 0 ? void 0 : newEvents.some(function(param) {
+            var event_title = param.event_title;
+            return !event_title;
+        }))) {
+            alert('Only one untitled event allowed per item!');
+            return;
+        }
+        newEvents.push({
+            event_title: newEventTitle,
+            abstime: newEventTime,
+            src_shortname: item.shortname,
+            src_title: item.title,
+            src_id: item.id
+        });
+        onEventsUpdate(newEvents);
+    };
+    var handleImportEvent = function() {
+        var newEvents = _to_consumable_array(item.events);
+        if (!(importItem && importEvent)) return;
+        var event = eventItemMap[importItem].find(function(param) {
+            var _param = _sliced_to_array(param, 4), event_title = _param[3];
+            return event_title === importEvent;
+        });
+        if (!event) return;
+        var _event = _sliced_to_array(event, 5), src_shortname = _event[0], src_title = _event[1], src_id = _event[2], event_title = _event[3], abstime = _event[4];
+        newEvents.push({
+            event_title: event_title,
+            abstime: abstime,
+            src_shortname: src_shortname,
+            src_title: src_title,
+            src_id: src_id
+        });
+        setImportEventModal(false);
+        onEventsUpdate(newEvents);
+    };
+    var createTimePickerModal = function(index, abstime) {
+        return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+            children: timePickerModal === index && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_3__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                className: "modal",
+                onClick: function() {
+                    return setTimePickerModal(null);
+                },
+                children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                    className: "modal-content",
+                    onClick: function(e) {
+                        return e.stopPropagation();
+                    },
+                    children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "sheet d-flex flex-col gap-1",
+                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_TimePicker__WEBPACK_IMPORTED_MODULE_4__["default"], {
+                            abstime: abstime,
+                            onSelect: function(time) {
+                                setTimePickerModal(null);
+                                if (index === -1) {
+                                    setNewEventTime(time);
+                                } else {
+                                    handleEventTimeChange(index, time);
+                                }
+                            }
+                        }, void 0, false, {
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                            lineNumber: 91,
+                            columnNumber: 17
+                        }, _this)
+                    }, void 0, false, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                        lineNumber: 90,
+                        columnNumber: 15
+                    }, _this)
+                }, void 0, false, {
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                    lineNumber: 89,
+                    columnNumber: 13
+                }, _this)
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                lineNumber: 88,
+                columnNumber: 11
+            }, _this), modalAnchor)
+        }, void 0, false);
+    };
+    var importItemOptions = {};
+    for(var id in eventItemMap){
+        var _eventItemMap_id_ = _sliced_to_array(eventItemMap[id][0], 2), title = _eventItemMap_id_[1];
+        importItemOptions[id] = title;
+    }
+    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+        children: [
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h4", {
+                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Events')
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                lineNumber: 115,
+                columnNumber: 5
+            }, this),
+            sortedEvents.map(function(event, i) {
+                return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                    children: [
+                        event.src_id !== item.id ? /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
+                            children: [
+                                event.event_title ? "".concat(event.event_title, " of ") : '',
+                                event.src_title,
+                                ": ",
+                                event.event_title
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                            lineNumber: 120,
+                            columnNumber: 11
+                        }, _this) : /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+                            children: [
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                    value: event.event_title,
+                                    placeholder: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Title'),
+                                    onChange: function(e) {
+                                        return handleEventTitleChange(i, e.target.value);
+                                    }
+                                }, void 0, false, {
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                    lineNumber: 125,
+                                    columnNumber: 13
+                                }, _this),
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                    id: "".concat(i, "_event_time"),
+                                    value: event.abstime,
+                                    placeholder: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Time'),
+                                    type: "number",
+                                    onChange: function(e) {
+                                        return handleEventTimeChange(i, Number(e.target.value));
+                                    }
+                                }, void 0, false, {
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                    lineNumber: 130,
+                                    columnNumber: 13
+                                }, _this),
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                                    type: "button",
+                                    onClick: function() {
+                                        return setTimePickerModal(i);
+                                    },
+                                    children: "\uD83D\uDCC5"
+                                }, void 0, false, {
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                    lineNumber: 142,
+                                    columnNumber: 13
+                                }, _this),
+                                createTimePickerModal(i, event.abstime)
+                            ]
+                        }, void 0, true),
+                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                            type: "button",
+                            onClick: function() {
+                                return removeEvent(i);
+                            },
+                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Remove')
+                        }, void 0, false, {
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                            lineNumber: 147,
+                            columnNumber: 9
+                        }, _this)
+                    ]
+                }, i, true, {
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                    lineNumber: 118,
+                    columnNumber: 7
+                }, _this);
+            }),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                lineNumber: 156,
+                columnNumber: 5
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h4", {
+                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Add Events')
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                lineNumber: 158,
+                columnNumber: 5
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                className: "d-flex flex-col gap-1 pa-1 align-start",
+                children: [
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("b", {
+                                children: [
+                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Title'),
+                                    ": "
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                lineNumber: 161,
+                                columnNumber: 9
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                id: "new_event_title",
+                                value: newEventTitle,
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return setNewEventTitle(target.value);
+                                }
+                            }, void 0, false, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                lineNumber: 162,
+                                columnNumber: 9
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                        lineNumber: 160,
+                        columnNumber: 7
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("b", {
+                                children: [
+                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Time'),
+                                    ": "
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                lineNumber: 166,
+                                columnNumber: 9
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                id: "new_event_time",
+                                value: newEventTime,
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return setNewEventTime(Number(target.value));
+                                },
+                                type: "number"
+                            }, void 0, false, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                lineNumber: 167,
+                                columnNumber: 9
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                                type: "button",
+                                onClick: function() {
+                                    return setTimePickerModal(-1);
+                                },
+                                children: "\uD83D\uDCC5"
+                            }, void 0, false, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                lineNumber: 173,
+                                columnNumber: 9
+                            }, this),
+                            createTimePickerModal(-1, 0)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                        lineNumber: 165,
+                        columnNumber: 7
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                        type: "button",
+                        onClick: createNewEvent,
+                        children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Create New Event')
+                    }, void 0, false, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                        lineNumber: 177,
+                        columnNumber: 7
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                lineNumber: 159,
+                columnNumber: 5
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                lineNumber: 185,
+                columnNumber: 5
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                children: [
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                        type: "button",
+                        onClick: function() {
+                            return setImportEventModal(true);
+                        },
+                        children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Import Event')
+                    }, void 0, false, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                        lineNumber: 188,
+                        columnNumber: 7
+                    }, this),
+                    importEventModal && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_3__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "modal",
+                        onClick: function() {
+                            return setImportEventModal(false);
+                        },
+                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                            className: "modal-content",
+                            onClick: function(e) {
+                                return e.stopPropagation();
+                            },
+                            children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                                className: "sheet d-flex flex-col gap-1",
+                                children: [
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_SearchableSelect__WEBPACK_IMPORTED_MODULE_5__["default"], {
+                                        options: importItemOptions,
+                                        onSelect: function(id) {
+                                            return setImportItem(Number(id));
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                        lineNumber: 194,
+                                        columnNumber: 17
+                                    }, this),
+                                    importItem && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_SearchableSelect__WEBPACK_IMPORTED_MODULE_5__["default"], {
+                                        options: eventItemMap[importItem].reduce(function(acc, param) {
+                                            var _param = _sliced_to_array(param, 4), eventTitle = _param[3];
+                                            return _object_spread_props(_object_spread({}, acc), _define_property({}, eventTitle, eventTitle));
+                                        }, {}),
+                                        onSelect: function(eventTitle) {
+                                            return setImportEvent(eventTitle);
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                        lineNumber: 195,
+                                        columnNumber: 32
+                                    }, this),
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                                        type: "button",
+                                        onClick: handleImportEvent,
+                                        children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Import')
+                                    }, void 0, false, {
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                        lineNumber: 196,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                lineNumber: 193,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                            lineNumber: 192,
+                            columnNumber: 13
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                        lineNumber: 191,
+                        columnNumber: 11
+                    }, this), modalAnchor)
+                ]
+            }, void 0, true, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                lineNumber: 187,
+                columnNumber: 5
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+        lineNumber: 114,
+        columnNumber: 10
     }, this);
 }
 

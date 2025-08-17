@@ -7,18 +7,24 @@ import { createPortal } from 'react-dom';
 import TabsBar from './components/TabsBar';
 import { useEditor } from '@tiptap/react';
 import Gallery, { type GalleryImage } from './components/Gallery';
+import TimelineEditor from './components/TimelineEditor';
+import type { ItemEvent } from '../../src/api/models/item';
 
 type Categories = {
   [key: string]: [string, string],
 };
 
-type Item = {
+export type Item = {
+  id: number,
   title: string,
   shortname: string,
   itemType: string,
   tags: string[],
   gallery: GalleryImage[],
+  events: ItemEvent[],
 };
+
+export type EventItem = [string, string, number, string, number];
 
 const BUILTIN_TABS = ['lineage', 'location', 'timeline', 'gallery'] as const;
 
@@ -36,7 +42,7 @@ export type AppProps = {
   universeShort: string,
 };
 
-async function fetchData(url: string, setter: (value: any) => void): Promise<any> {
+async function fetchData(url: string, setter: (value: any) => Promise<void> | void): Promise<any> {
   try {
     const res = await fetch(url, {
       method: 'GET',
@@ -47,7 +53,7 @@ async function fetchData(url: string, setter: (value: any) => void): Promise<any
     });
     if (!res.ok) throw new Error('Failed to fetch');
     const data = await res.json();
-    setter(data);
+    await setter(data);
   } catch (err) {
     console.error(err);
   }
@@ -104,6 +110,7 @@ export default function App({ itemShort, universeShort }: AppProps) {
   const [currentModal, setCurrentModal] = useState<ModalType | null>(null);
   const [currentTab, setCurrentTab] = useState<string | null>(null);
   const [tabNames, setTabNames] = useState<Record<string, string>>({});
+  const [eventItemMap, setEventItemMap] = useState<Record<number, EventItem[]>>();
   
   const editor = useEditor({
     extensions: editorExtensions,
@@ -164,10 +171,20 @@ export default function App({ itemShort, universeShort }: AppProps) {
   }
 
   useEffect(() => {
-    fetchData(`/api/universes/${universeShort}`, (data) => {
+    const categoryPromise = fetchData(`/api/universes/${universeShort}`, (data) => {
       setCategories(data.obj_data.cats);
     });
-    fetchData(`/api/universes/${universeShort}/items/${itemShort}`, (data) => {
+    const eventItemPromise = fetchData(`/api/universes/${universeShort}/events`, (events) => {
+      const newEventItemMap: Record<number, EventItem[]> = {};
+      for (const { src_id, src_title, src_shortname, event_title, abstime } of events) {
+        if (!(src_id in newEventItemMap)) {
+          newEventItemMap[src_id] = [];
+        }
+        newEventItemMap[src_id].push([src_shortname as string, src_title as string, Number(src_id), event_title as string, Number(abstime)]);
+      }
+      setEventItemMap(newEventItemMap);
+    });
+    fetchData(`/api/universes/${universeShort}/items/${itemShort}`, async (data) => {
       const objData = JSON.parse(data.obj_data) as ObjData;
       setObjData(objData);
       setTabNames(computeTabs(objData));
@@ -180,6 +197,7 @@ export default function App({ itemShort, universeShort }: AppProps) {
         editor.commands.setContent(json);
       }
       delete data.obj_data;
+      await Promise.all([categoryPromise, eventItemPromise]);
       setItem(data);
     });
   }, [itemShort, universeShort]);
@@ -247,9 +265,9 @@ export default function App({ itemShort, universeShort }: AppProps) {
       <div className='sheet d-flex flex-col gap-1' style={{ minWidth: '20rem' }}>
         <select onChange={({ target }) => setNewTabType(target.value)}>
           <option hidden disabled selected value={undefined}>{T('Tab Type')}...</option>
-          <option value='body' disabled={'body' in ['currentTabs']}>{T('Main Text')}</option>
+          <option value='body' disabled={'body' in objData}>{T('Main Text')}</option>
           {BUILTIN_TABS.map(type => (
-            <option key={type} value={type} disabled={type in ['currentTabs']}>{capitalize(T(type))}</option>
+            <option key={type} value={type} disabled={type in tabNames}>{capitalize(T(type))}</option>
           ))}
           <option value='custom'>{T('Custom Data')}</option>
         </select>
@@ -265,7 +283,7 @@ export default function App({ itemShort, universeShort }: AppProps) {
     ),
     gallery: (
       <Gallery universe={universeShort} item={itemShort} images={item.gallery} onRemoveImage={(id) => {
-        let newState = { ...item };
+        const newState = { ...item };
         for (let i = 0; i < newState.gallery.length; i++) {
           const img = newState.gallery[i];
           if (img.id === id) {
@@ -275,11 +293,11 @@ export default function App({ itemShort, universeShort }: AppProps) {
         }
         setItem(newState);
       }} onUploadImage={(img) => {
-        let newState = { ...item };
+        const newState = { ...item };
         newState.gallery.push(img);
         setItem(newState);
       }} onChangeLabel={(id, label) => {
-        let newState = { ...item };
+        const newState = { ...item };
         for (let i = 0; i < newState.gallery.length; i++) {
           const img = newState.gallery[i];
           if (img.id === id) {
@@ -289,6 +307,14 @@ export default function App({ itemShort, universeShort }: AppProps) {
         }
         setItem(newState);
       }} />
+    ),
+    timeline: (
+      <TimelineEditor item={item} onEventsUpdate={(newEvents) => {
+        const newState = { ...item };
+        console.log(newEvents)
+        newState.events = newEvents;
+        setItem(newState);
+      }} eventItemMap={eventItemMap ?? {}} />
     ),
   };
 
