@@ -118,7 +118,7 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
       <div key={i}>
         {event.src_id !== item.id ? (
           <span>
-            {event.event_title ? `${event.event_title} of ` : ''}{event.src_title}: {event.event_title}
+            {event.event_title ? `${event.event_title} of ` : ''}{event.src_title}: {event.abstime}
           </span>
         ) : (
           <>
@@ -133,11 +133,6 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
               placeholder={T('Time')}
               type='number'
               onChange={(e) => handleEventTimeChange(i, Number(e.target.value))}
-              // onBlur={(e) => {
-              //   const roundedValue = Math.round(Number(e.target.value));
-              //   e.target.value = roundedValue.toString();
-              //   handleEventTimeBlur(i, roundedValue);
-              // }}
             />
             <button type='button' onClick={() => setTimePickerModal(i)}>&#x1F4C5;</button>
             {createTimePickerModal(i, event.abstime)}

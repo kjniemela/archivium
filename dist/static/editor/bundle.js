@@ -58871,7 +58871,7 @@ function TimelineEditor(param) {
                                 event.event_title ? "".concat(event.event_title, " of ") : '',
                                 event.src_title,
                                 ": ",
-                                event.event_title
+                                event.abstime
                             ]
                         }, void 0, true, {
                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
@@ -58911,7 +58911,7 @@ function TimelineEditor(param) {
                                     children: "\uD83D\uDCC5"
                                 }, void 0, false, {
                                     fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                                    lineNumber: 142,
+                                    lineNumber: 137,
                                     columnNumber: 13
                                 }, _this),
                                 createTimePickerModal(i, event.abstime)
@@ -58925,7 +58925,7 @@ function TimelineEditor(param) {
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Remove')
                         }, void 0, false, {
                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                            lineNumber: 147,
+                            lineNumber: 142,
                             columnNumber: 9
                         }, _this)
                     ]
@@ -58937,14 +58937,14 @@ function TimelineEditor(param) {
             }),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                lineNumber: 156,
+                lineNumber: 151,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h4", {
                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Add Events')
             }, void 0, false, {
                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                lineNumber: 158,
+                lineNumber: 153,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -58959,7 +58959,7 @@ function TimelineEditor(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                                lineNumber: 161,
+                                lineNumber: 156,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -58971,13 +58971,13 @@ function TimelineEditor(param) {
                                 }
                             }, void 0, false, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                                lineNumber: 162,
+                                lineNumber: 157,
                                 columnNumber: 9
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                        lineNumber: 160,
+                        lineNumber: 155,
                         columnNumber: 7
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -58989,7 +58989,7 @@ function TimelineEditor(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                                lineNumber: 166,
+                                lineNumber: 161,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -59002,7 +59002,7 @@ function TimelineEditor(param) {
                                 type: "number"
                             }, void 0, false, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                                lineNumber: 167,
+                                lineNumber: 162,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -59013,14 +59013,14 @@ function TimelineEditor(param) {
                                 children: "\uD83D\uDCC5"
                             }, void 0, false, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                                lineNumber: 173,
+                                lineNumber: 168,
                                 columnNumber: 9
                             }, this),
                             createTimePickerModal(-1, 0)
                         ]
                     }, void 0, true, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                        lineNumber: 165,
+                        lineNumber: 160,
                         columnNumber: 7
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -59029,18 +59029,18 @@ function TimelineEditor(param) {
                         children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Create New Event')
                     }, void 0, false, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                        lineNumber: 177,
+                        lineNumber: 172,
                         columnNumber: 7
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                lineNumber: 159,
+                lineNumber: 154,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                lineNumber: 185,
+                lineNumber: 180,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -59053,7 +59053,7 @@ function TimelineEditor(param) {
                         children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Import Event')
                     }, void 0, false, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                        lineNumber: 188,
+                        lineNumber: 183,
                         columnNumber: 7
                     }, this),
                     importEventModal && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_3__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -59076,7 +59076,7 @@ function TimelineEditor(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                                        lineNumber: 194,
+                                        lineNumber: 189,
                                         columnNumber: 17
                                     }, this),
                                     importItem && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_SearchableSelect__WEBPACK_IMPORTED_MODULE_5__["default"], {
@@ -59089,7 +59089,7 @@ function TimelineEditor(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                                        lineNumber: 195,
+                                        lineNumber: 190,
                                         columnNumber: 32
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -59098,29 +59098,29 @@ function TimelineEditor(param) {
                                         children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Import')
                                     }, void 0, false, {
                                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                                        lineNumber: 196,
+                                        lineNumber: 191,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                                lineNumber: 193,
+                                lineNumber: 188,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                            lineNumber: 192,
+                            lineNumber: 187,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                        lineNumber: 191,
+                        lineNumber: 186,
                         columnNumber: 11
                     }, this), modalAnchor)
                 ]
             }, void 0, true, {
                 fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
-                lineNumber: 187,
+                lineNumber: 182,
                 columnNumber: 5
             }, this)
         ]
