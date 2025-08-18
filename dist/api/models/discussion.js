@@ -146,6 +146,8 @@ class DiscussionAPI {
         return [comments];
     }
     async postUniverseThread(user, universeShortname, { title }) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const universe = await this.api.universe.getOne(user, { shortname: universeShortname }, utils_1.perms.READ);
         if (!universe.discussion_enabled)
             throw new errors_1.ForbiddenError();
@@ -172,6 +174,8 @@ class DiscussionAPI {
      * @returns {Promise<[number, QueryResult?]>}
      */
     async postCommentToThread(user, threadId, { body, reply_to }) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const threads = await this.getThreads(user, { 'discussion.id': threadId }, true);
         const thread = threads[0];
         if (!thread)
@@ -198,6 +202,8 @@ class DiscussionAPI {
         return data;
     }
     async postCommentToItem(user, universeShortname, itemShortname, { body, reply_to }) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const universe = await this.api.universe.getOne(user, { shortname: universeShortname }, utils_1.perms.READ);
         if (!universe.discussion_enabled)
             throw new errors_1.ForbiddenError();
@@ -224,6 +230,8 @@ class DiscussionAPI {
         return data;
     }
     async postCommentToChapter(user, shortname, index, { body, reply_to }) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const story = await this.api.story.getOne(user, { 'story.shortname': shortname });
         const chapter = await this.api.story.getChapter(user, shortname, index);
         if (!chapter.is_published)
@@ -281,6 +289,8 @@ class DiscussionAPI {
         await (0, utils_1.executeQuery)('UPDATE comment SET body = NULL, author_id = NULL WHERE id = ?', [commentId]);
     }
     async deleteItemComment(user, universeShortname, itemShortname, commentId) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const item = await this.api.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.READ, true);
         const comment = (await (0, utils_1.executeQuery)(`
         SELECT comment.*

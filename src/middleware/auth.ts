@@ -11,12 +11,13 @@ const createSession = async (req: Request, res: Response, next: NextFunction) =>
     if (session) {
       req.session = {
         id: session.id,
-        hash: session.hash
+        hash: session.hash,
+        created_at: session.created_at,
       };
       if (session.user) {
         req.session = {
           ...req.session,
-          userId: session.userId,
+          user_id: session.user_id,
           user: session.user,
         }
       }
@@ -35,7 +36,8 @@ const createSession = async (req: Request, res: Response, next: NextFunction) =>
   });
   req.session = {
     id: session.id,
-    hash: session.hash
+    hash: session.hash,
+    created_at: session.created_at,
   };
   next();
 };

@@ -12,5 +12,8 @@ const themes = {
         glass: true,
         backgroundImage: '/static/assets/themes/space.jpg',
     },
+    custom: {
+        glass: false,
+    },
 };
 exports.default = themes;

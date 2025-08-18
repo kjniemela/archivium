@@ -6,6 +6,7 @@ import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { API } from '..';
 import { RequestError, ModelError, ValidationError, UnauthorizedError, ForbiddenError, NotFoundError } from '../../errors';
 import { HttpStatusCode } from 'axios';
+import { Theme, ThemeName } from '../../themes';
 
 export type UserSponsoredUniverses = { tier: number, universes: string[], universe_shorts: string[] }[];
 
@@ -28,7 +29,8 @@ export type User = {
   verified: boolean,
   suspect: boolean,
   email_notifications: boolean,
-  preferred_theme: string | null,
+  preferred_theme: ThemeName | null,
+  custom_theme: Theme | null,
   isContact?: boolean,
   hasPfp?: boolean,
   plan?: plans, 
@@ -73,23 +75,19 @@ export class UserImageAPI {
   }
 
   async getByUsername(username: string): Promise<UserImage | undefined> {
-    try {
-      const user = await this.user.getOne({ 'user.username': username });
-      if (!user) throw new NotFoundError();
-      let queryString = `
-        SELECT 
-          user_id, name, mimetype, data
-        FROM userimage
-        WHERE user_id = ?;
-      `;
-      const image = (await executeQuery(queryString, [user.id]))[0] as UserImage | undefined;
-      return image;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const user = await this.user.getOne({ 'user.username': username });
+    if (!user) throw new NotFoundError();
+    let queryString = `
+      SELECT 
+        user_id, name, mimetype, data
+      FROM userimage
+      WHERE user_id = ?;
+    `;
+    const image = (await executeQuery(queryString, [user.id]))[0] as UserImage | undefined;
+    return image;
   }
 
-  async post(sessionUser: User, file: Express.Multer.File | undefined, username: string): Promise<ResultSetHeader> {
+  async post(sessionUser: User | undefined, file: Express.Multer.File | undefined, username: string): Promise<ResultSetHeader> {
     if (!file) throw new ValidationError('No file provided');
     if (!sessionUser) throw new UnauthorizedError();
     if (sessionUser.username !== username) throw new ForbiddenError();
@@ -97,28 +95,20 @@ export class UserImageAPI {
     const { originalname, buffer, mimetype } = file;
     const user = await this.user.getOne({ 'user.username': username });
 
-    try {
-      let data;
-      await withTransaction(async (conn: PoolConnection) => {
-        await conn.execute('DELETE FROM userimage WHERE user_id = ?', [user.id]);
-        const queryString = `INSERT INTO userimage (user_id, name, mimetype, data) VALUES (?, ?, ?, ?);`;
-        [ data ] = await conn.execute(queryString, [ user.id, originalname.substring(0, 64), mimetype, buffer ]);
-      });
-      return data;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    let data;
+    await withTransaction(async (conn: PoolConnection) => {
+      await conn.execute('DELETE FROM userimage WHERE user_id = ?', [user.id]);
+      const queryString = `INSERT INTO userimage (user_id, name, mimetype, data) VALUES (?, ?, ?, ?);`;
+      [ data ] = await conn.execute(queryString, [ user.id, originalname.substring(0, 64), mimetype, buffer ]);
+    });
+    return data;
   }
 
-  async del(sessionUser: User, username: string): Promise<ResultSetHeader> {
-    try {
-      if (!sessionUser) throw new UnauthorizedError();
-      if (sessionUser.username !== username) throw new ForbiddenError();
-      const user = await this.user.getOne({ 'user.username': username });
-      return await executeQuery<ResultSetHeader>(`DELETE FROM userimage WHERE user_id = ?;`, [user.id]);
-    } catch (err) {
-      throw new ModelError(err);
-    }
+  async del(sessionUser: User | undefined, username: string): Promise<ResultSetHeader> {
+    if (!sessionUser) throw new UnauthorizedError();
+    if (sessionUser.username !== username) throw new ForbiddenError();
+    const user = await this.user.getOne({ 'user.username': username });
+    return await executeQuery<ResultSetHeader>(`DELETE FROM userimage WHERE user_id = ?;`, [user.id]);
   }
 }
 
@@ -139,33 +129,29 @@ export class UserAPI {
    * @returns {Promise<User>}
    */
   async getOne(options: any, includeAuth: boolean=false, includeNotifs=false): Promise<User> {
-    try {
-      if (!options || Object.keys(options).length === 0) throw new ValidationError('options required for api.get.user');
-      const parsedOptions = parseData(options);
-      const queryString = `
-        SELECT
-          user.*,
-          (ui.user_id IS NOT NULL) AS hasPfp,
-          up.plan
-          ${includeNotifs ? ', COUNT(notif.id) AS notifications' : ''}
-        FROM user
-        LEFT JOIN userimage AS ui ON user.id = ui.user_id
-        LEFT JOIN userplan AS up ON user.id = up.user_id
-        ${includeNotifs ? 'LEFT JOIN sentnotification AS notif ON user.id = notif.user_id AND NOT notif.is_read' : ''}
-        WHERE ${parsedOptions.strings.join(' AND ')}
-        GROUP BY user.id, up.plan
-        LIMIT 1;
-      `;
-      const user = (await executeQuery(queryString, parsedOptions.values))[0] as User;
-      if (!user) throw new NotFoundError();
-      if (!includeAuth) {
-        delete user.password;
-        delete user.salt;
-      }
-      return user;
-    } catch (err) {
-      throw new ModelError(err);
+    if (!options || Object.keys(options).length === 0) throw new ValidationError('options required for api.get.user');
+    const parsedOptions = parseData(options);
+    const queryString = `
+      SELECT
+        user.*,
+        (ui.user_id IS NOT NULL) AS hasPfp,
+        up.plan
+        ${includeNotifs ? ', COUNT(notif.id) AS notifications' : ''}
+      FROM user
+      LEFT JOIN userimage AS ui ON user.id = ui.user_id
+      LEFT JOIN userplan AS up ON user.id = up.user_id
+      ${includeNotifs ? 'LEFT JOIN sentnotification AS notif ON user.id = notif.user_id AND NOT notif.is_read' : ''}
+      WHERE ${parsedOptions.strings.join(' AND ')}
+      GROUP BY user.id, up.plan
+      LIMIT 1;
+    `;
+    const user = (await executeQuery(queryString, parsedOptions.values))[0] as User;
+    if (!user) throw new NotFoundError();
+    if (!includeAuth) {
+      delete user.password;
+      delete user.salt;
     }
+    return user;
   }
 
   /**
@@ -174,70 +160,58 @@ export class UserAPI {
    * @returns {Promise<User[]>}
    */
   async getMany(options: any=null, includeEmail=false): Promise<User[]> {
-    try {
-      const parsedOptions = parseData(options);
-      let queryString;
-      if (options) queryString = `
-        SELECT 
-          user.id, user.username, user.created_at, user.updated_at, ${includeEmail ? 'user.email, ' : ''}
-          (ui.user_id IS NOT NULL) as hasPfp
-        FROM user
-        LEFT JOIN userimage AS ui ON user.id = ui.user_id
-        WHERE ${parsedOptions.strings.join(' AND ')};
-      `;
-      else queryString = `SELECT id, username, created_at, updated_at ${includeEmail ? ', email' : ''} FROM user;`;
-      const users = await executeQuery(queryString, parsedOptions.values) as User[];
-      return users;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const parsedOptions = parseData(options);
+    let queryString;
+    if (options) queryString = `
+      SELECT 
+        user.id, user.username, user.created_at, user.updated_at, ${includeEmail ? 'user.email, ' : ''}
+        (ui.user_id IS NOT NULL) as hasPfp
+      FROM user
+      LEFT JOIN userimage AS ui ON user.id = ui.user_id
+      WHERE ${parsedOptions.strings.join(' AND ')};
+    `;
+    else queryString = `SELECT id, username, created_at, updated_at ${includeEmail ? ', email' : ''} FROM user;`;
+    const users = await executeQuery(queryString, parsedOptions.values) as User[];
+    return users;
   }
 
-  async getByUniverseShortname(user: User, shortname: string): Promise<(User & { items_authored: number })[]> {
+  async getByUniverseShortname(user: User | undefined, shortname: string): Promise<(User & { items_authored: number })[]> {
     const universe = await this.api.universe.getOne(user, { shortname });
     if (!universe) throw new NotFoundError();
-    try {
-      const queryString = `
-        SELECT 
-          user.id,
-          user.username,
-          user.created_at,
-          user.updated_at,
-          user.email,
-          COUNT(item.id) AS items_authored,
-          (ui.user_id IS NOT NULL) as hasPfp
-        FROM user
-        INNER JOIN authoruniverse AS au ON au.user_id = user.id
-        LEFT JOIN item ON item.universe_id = au.universe_id AND item.author_id = user.id
-        LEFT JOIN userimage AS ui ON user.id = ui.user_id
-        WHERE au.universe_id = ?
-        GROUP BY user.id;
-      `;
-      const users = await executeQuery(queryString, [universe.id]) as (User & { items_authored: number })[];
-      return users;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const queryString = `
+      SELECT 
+        user.id,
+        user.username,
+        user.created_at,
+        user.updated_at,
+        user.email,
+        COUNT(item.id) AS items_authored,
+        (ui.user_id IS NOT NULL) as hasPfp
+      FROM user
+      INNER JOIN authoruniverse AS au ON au.user_id = user.id
+      LEFT JOIN item ON item.universe_id = au.universe_id AND item.author_id = user.id
+      LEFT JOIN userimage AS ui ON user.id = ui.user_id
+      WHERE au.universe_id = ?
+      GROUP BY user.id;
+    `;
+    const users = await executeQuery(queryString, [universe.id]) as (User & { items_authored: number })[];
+    return users;
   }
 
-  async getSponsoredUniverses(user: User): Promise<UserSponsoredUniverses> {
+  async getSponsoredUniverses(user: User | undefined): Promise<UserSponsoredUniverses> {
     if (!user) throw new ValidationError('User required');
-    try {
-      const queryString = `
-        SELECT
-          usu.tier,
-          JSON_ARRAYAGG(universe.title) AS universes,
-          JSON_ARRAYAGG(universe.shortname) AS universe_shorts
-        FROM usersponsoreduniverse AS usu
-        INNER JOIN universe ON usu.universe_id = universe.id
-        WHERE usu.user_id = ?
-        GROUP BY usu.tier;
-      `;
-      const universes = await executeQuery(queryString, [user.id]) as UserSponsoredUniverses;
-      return universes;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const queryString = `
+      SELECT
+        usu.tier,
+        JSON_ARRAYAGG(universe.title) AS universes,
+        JSON_ARRAYAGG(universe.shortname) AS universe_shorts
+      FROM usersponsoreduniverse AS usu
+      INNER JOIN universe ON usu.universe_id = universe.id
+      WHERE usu.user_id = ?
+      GROUP BY usu.tier;
+    `;
+    const universes = await executeQuery(queryString, [user.id]) as UserSponsoredUniverses;
+    return universes;
   }
 
   post({ username, email, password, hp }: any) {
@@ -297,46 +271,39 @@ export class UserAPI {
 
     if (Number(user_id) !== Number(userIDToPut)) return [403];
 
-    try {
-      const keys = Object.keys(changes).filter(key => changes[key] !== undefined);
-      const values = keys.map(key => changes[key]);
-      const queryString = `
-        UPDATE user
-        SET
-          ${keys.map(key => `${key} = ?`).join(', ')}
-        WHERE id = ?;
-      `;
-      return [200, await executeQuery(queryString, [...values, userIDToPut])];
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const keys = Object.keys(changes).filter(key => changes[key] !== undefined);
+    const values = keys.map(key => changes[key]);
+    const queryString = `
+      UPDATE user
+      SET
+        ${keys.map(key => `${key} = ?`).join(', ')}
+      WHERE id = ?;
+    `;
+    return [200, await executeQuery(queryString, [...values, userIDToPut])];
   }
 
-  async putPreferences(sessionUser: User, username: string, { preferred_theme }): Promise<ResultSetHeader> {
+  async putPreferences(sessionUser: User | undefined, username: string, body: { preferred_theme: string, custom_theme: Theme }): Promise<ResultSetHeader> {
     if (!sessionUser) throw new UnauthorizedError();
+    const { preferred_theme, custom_theme } = body;
     const user = await this.getOne({ 'user.username': username }, true);
     if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
-    const changes = { preferred_theme };
-    try {
-      const keys = Object.keys(changes).filter(key => changes[key] !== undefined);
-      if (keys.length === 0) throw new ValidationError('No changes provided');
-      const values = keys.map(key => changes[key]);
-      const queryString = `
-        UPDATE user
-        SET
-          ${keys.map(key => `${key} = ?`).join(', ')}
-        WHERE id = ?;
-      `;
-      return await executeQuery<ResultSetHeader>(queryString, [...values, user.id]);
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const changes = { preferred_theme, custom_theme };
+    const keys = Object.keys(changes).filter(key => changes[key] !== undefined);
+    if (keys.length === 0) throw new ValidationError('No changes provided');
+    const values = keys.map(key => changes[key]);
+    const queryString = `
+      UPDATE user
+      SET
+        ${keys.map(key => `${key} = ?`).join(', ')}
+      WHERE id = ?;
+    `;
+    return await executeQuery<ResultSetHeader>(queryString, [...values, user.id]);
   }
 
-  async putUsername(sessionUser: User, oldUsername: string, newUsername: string): Promise<Date | ResultSetHeader | string> {
+  async putUsername(sessionUser: User | undefined, oldUsername: string, newUsername: string): Promise<Date | ResultSetHeader | string> {
     const user = await this.getOne({ 'user.username': oldUsername });
     if (!user) throw new NotFoundError();
-    if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
+    if (!sessionUser || Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
     const validationError = this.validateUsername(newUsername);
     if (validationError) throw new ValidationError(validationError);
     const now = new Date();
@@ -371,47 +338,39 @@ export class UserAPI {
       return data;
     } catch (err) {
       if (err.code === 'ER_DUP_ENTRY') throw new ValidationError('Username already taken.');
-      throw new ModelError(err);
+      throw err;
     }
   }
 
-  async putEmail(sessionUser: User, username: string, { email, password }): Promise<ResultSetHeader> {
+  async putEmail(sessionUser: User | undefined, username: string, { email, password }): Promise<ResultSetHeader> {
     const user = await this.getOne({ 'user.username': username }, true);
-    if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
+    if (!sessionUser || Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
     const isCorrectLogin = this.validatePassword(password, user.password, user.salt);
     if (!isCorrectLogin) throw new UnauthorizedError('Incorrect password');
-    try {
-      const data = await executeQuery<ResultSetHeader>(`
-        UPDATE user
-        SET
-          email = ?,
-          verified = ?
-        WHERE id = ?
-      `, [email, false, user.id]);
-      return data;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const data = await executeQuery<ResultSetHeader>(`
+      UPDATE user
+      SET
+        email = ?,
+        verified = ?
+      WHERE id = ?
+    `, [email, false, user.id]);
+    return data;
   }
 
-  async putPassword(sessionUser: User, username: string, { oldPassword, newPassword }): Promise<ResultSetHeader> {
+  async putPassword(sessionUser: User | undefined, username: string, { oldPassword, newPassword }): Promise<ResultSetHeader> {
     const user = await this.getOne({ 'user.username': username }, true);
-    if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
+    if (!sessionUser || Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
     const isCorrectLogin = this.validatePassword(oldPassword, user.password, user.salt);
     if (!isCorrectLogin) throw new UnauthorizedError('Incorrect password');
     const salt = utils.createRandom32String();
-    try {
-      const data = await executeQuery<ResultSetHeader>(`
-        UPDATE user
-        SET
-          salt = ?,
-          password = ?
-        WHERE id = ?
-      `, [salt, utils.createHash(newPassword, salt), user.id]);
-      return data;
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    const data = await executeQuery<ResultSetHeader>(`
+      UPDATE user
+      SET
+        salt = ?,
+        password = ?
+      WHERE id = ?
+    `, [salt, utils.createHash(newPassword, salt), user.id]);
+    return data;
   }
 
   /**
@@ -420,87 +379,75 @@ export class UserAPI {
    * @returns {Promise<[number, User?]>}
    */
   async doDeleteUser(userId): Promise<[number, User?]> {
-    try {
-      await withTransaction(async (conn) => {
-        await conn.execute('UPDATE comment SET body = NULL, author_id = NULL WHERE author_id = ?', [userId]);
-        await conn.execute('UPDATE item SET author_id = NULL WHERE author_id = ?', [userId]);
-        await conn.execute('UPDATE item SET last_updated_by = NULL WHERE last_updated_by = ?', [userId]);
-        await conn.execute('UPDATE universe SET author_id = NULL WHERE author_id = ?', [userId]);
+    await withTransaction(async (conn) => {
+      await conn.execute('UPDATE comment SET body = NULL, author_id = NULL WHERE author_id = ?', [userId]);
+      await conn.execute('UPDATE item SET author_id = NULL WHERE author_id = ?', [userId]);
+      await conn.execute('UPDATE item SET last_updated_by = NULL WHERE last_updated_by = ?', [userId]);
+      await conn.execute('UPDATE universe SET author_id = NULL WHERE author_id = ?', [userId]);
 
-        // Promote highest-ranking user of abandoned universes with at least one other admin
-        await conn.execute(`
-          UPDATE authoruniverse
+      // Promote highest-ranking user of abandoned universes with at least one other admin
+      await conn.execute(`
+        UPDATE authoruniverse
+        INNER JOIN (
+          SELECT MIN(au1.id) AS id
+          FROM authoruniverse AS au1
           INNER JOIN (
-            SELECT MIN(au1.id) AS id
-            FROM authoruniverse AS au1
-            INNER JOIN (
-              SELECT universe_id, MAX(permission_level) AS max_perm
-              FROM authoruniverse
-              WHERE universe_id IN (
-                SELECT universe_id FROM authoruniverse WHERE user_id = ?
-              ) AND user_id != ? AND permission_level >= ?
-              GROUP BY universe_id
-            ) au2 ON au1.universe_id = au2.universe_id AND au1.permission_level = au2.max_perm
-            WHERE au1.permission_level < ?
-            GROUP BY au1.universe_id
-          ) AS to_promote ON authoruniverse.id = to_promote.id
-          SET authoruniverse.permission_level = ?
-        `, [userId, userId, perms.ADMIN, perms.OWNER, perms.OWNER]);
+            SELECT universe_id, MAX(permission_level) AS max_perm
+            FROM authoruniverse
+            WHERE universe_id IN (
+              SELECT universe_id FROM authoruniverse WHERE user_id = ?
+            ) AND user_id != ? AND permission_level >= ?
+            GROUP BY universe_id
+          ) au2 ON au1.universe_id = au2.universe_id AND au1.permission_level = au2.max_perm
+          WHERE au1.permission_level < ?
+          GROUP BY au1.universe_id
+        ) AS to_promote ON authoruniverse.id = to_promote.id
+        SET authoruniverse.permission_level = ?
+      `, [userId, userId, perms.ADMIN, perms.OWNER, perms.OWNER]);
 
-        await conn.execute('DELETE FROM session WHERE user_id = ?', [userId]);
-        await conn.execute('DELETE FROM user WHERE id = ?', [userId]);
+      await conn.execute('DELETE FROM session WHERE user_id = ?', [userId]);
+      await conn.execute('DELETE FROM user WHERE id = ?', [userId]);
 
-        // Delete orphaned universes (universes with no other owner or admin)
-        await conn.execute(`
-          DELETE FROM universe
-          WHERE id NOT IN (
-            SELECT DISTINCT universe_id FROM authoruniverse WHERE permission_level >= ?
-          )
-        `, [perms.ADMIN]);
-      });
-      return [200];
-    } catch (err) {
-      throw new ModelError(err);
-    }
+      // Delete orphaned universes (universes with no other owner or admin)
+      await conn.execute(`
+        DELETE FROM universe
+        WHERE id NOT IN (
+          SELECT DISTINCT universe_id FROM authoruniverse WHERE permission_level >= ?
+        )
+      `, [perms.ADMIN]);
+    });
+    return [200];
   }
 
   async del(sessionUser, username, password): Promise<void> {
     if (!sessionUser) throw new UnauthorizedError();
-    try {  
-      const user = await this.getOne({ 'user.username': username }, true);
-      if (user) {
-        if (sessionUser.id !== user.id) {
-          throw new ForbiddenError('Can\'t delete user you\'re not logged in as!');
-        }
-        const isCorrectLogin = this.validatePassword(password, user.password, user.salt);
-        if (!isCorrectLogin) {
-          throw new ForbiddenError('Password incorrect!');
-        }
-        await executeQuery('INSERT INTO userdeleterequest (user_id) VALUES (?);', [user.id]);
-        await this.api.email.sendTemplateEmail(this.api.email.templates.DELETE, SITE_OWNER_EMAIL, { username });
-        return;
-      } else {
-        throw new NotFoundError();
+    const user = await this.getOne({ 'user.username': username }, true);
+    if (user) {
+      if (sessionUser.id !== user.id) {
+        throw new ForbiddenError('Can\'t delete user you\'re not logged in as!');
       }
-    } catch (err) {
-      throw new ModelError(err);
+      const isCorrectLogin = this.validatePassword(password, user.password, user.salt);
+      if (!isCorrectLogin) {
+        throw new ForbiddenError('Password incorrect!');
+      }
+      await executeQuery('INSERT INTO userdeleterequest (user_id) VALUES (?);', [user.id]);
+      await this.api.email.sendTemplateEmail(this.api.email.templates.DELETE, SITE_OWNER_EMAIL, { username });
+      return;
+    } else {
+      throw new NotFoundError();
     }
   }
 
   async getDeleteRequest(user) {
     if (!user) return [401];
     
-    try {
-      const request = (await executeQuery(
-        'SELECT * FROM userdeleterequest WHERE user_id = ?',
-        [user.id],
-      ))[0];
-      if (!request) return [404];
+    const request = (await executeQuery(
+      'SELECT * FROM userdeleterequest WHERE user_id = ?',
+      [user.id],
+    ))[0];
+    if (!request) return [404];
 
-      return [200, request];
-    } catch (err) {
-      throw new ModelError(err);
-    }
+    return [200, request];
   }
 
   async prepareVerification(userId) {

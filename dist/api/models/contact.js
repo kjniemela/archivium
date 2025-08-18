@@ -68,6 +68,8 @@ class ContactAPI {
         return users;
     }
     async post(user, username) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const target = await this.api.user.getOne({ 'user.username': username });
         if (!target)
             throw new errors_1.NotFoundError();
@@ -94,6 +96,8 @@ class ContactAPI {
         return result;
     }
     async put(user, username, accepted) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const target = await this.api.user.getOne({ 'user.username': username });
         const contact = await this.getOne(user, target.id);
         let result;

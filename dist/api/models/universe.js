@@ -140,6 +140,8 @@ class UniverseAPI {
         return body;
     }
     async post(user, body) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         try {
             const { title, shortname, is_public, discussion_enabled, discussion_open, obj_data } = body;
             const shortnameError = this.validateShortname(shortname);
@@ -213,7 +215,8 @@ class UniverseAPI {
         return universe.id;
     }
     async putPermissions(user, shortname, targetUser, permission_level) {
-        permission_level = Number(permission_level); // just yet another proof that we need typescript...
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const universe = await this.getOne(user, { shortname }, permission_level === utils_1.perms.OWNER ? utils_1.perms.OWNER : Math.max(utils_1.perms.ADMIN, permission_level + 1));
         if (universe.author_permissions[targetUser.id] > universe.author_permissions[user.id])
             throw new errors_1.ForbiddenError();

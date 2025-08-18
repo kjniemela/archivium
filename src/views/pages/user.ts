@@ -3,7 +3,7 @@ import api from '../../api';
 import md5 from 'md5';
 import { perms, Cond, getPfpUrl, handleNotFoundAsNull, handleErrorWithData } from '../../api/utils';
 import { RouteHandler } from '..';
-import { NotFoundError } from '../../errors';
+import { NotFoundError, UnauthorizedError } from '../../errors';
 
 export default {
   /* User Pages */
@@ -51,7 +51,7 @@ export default {
   },
   
   async settings(req, res) {
-    const user = await api.user.getOne({ 'user.id': req.session.user.id });
+    const user = await api.user.getOne({ 'user.id': req.session.user?.id });
     const typeSettingData = await api.notification.getTypeSettings(user);
     if (!typeSettingData) return;
     const typeSettings = {};
@@ -69,10 +69,7 @@ export default {
   },
 
   async requestVerify(req, res) {
-    if (!req.session.user) {
-      res.status(401);
-      return;
-    }
+    if (!req.session.user) throw new UnauthorizedError();
     if (req.session.user.verified) {
       res.redirect(`${ADDR_PREFIX}/`);
       return;
@@ -84,7 +81,7 @@ export default {
     }
     res.prepareRender('verify', { 
       user: req.session.user,
-      gravatarLink: `https://www.gravatar.com/avatar/${md5(req.session.user.email)}.jpg`,
+      gravatarLink: req.session.user.email && `https://www.gravatar.com/avatar/${md5(req.session.user.email)}.jpg`,
       nextPage: `${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`,
       reason: req.query.reason,
     });

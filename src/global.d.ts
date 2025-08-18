@@ -1,9 +1,10 @@
 import {Express} from 'express-serve-static-core';
 import { Theme } from './themes';
+import { Session } from './api/models/session';
 
 declare module 'express-serve-static-core' {
   interface Request extends Request {
-    session: any,
+    session: Session,
     startTime: Date,
     clientIp?: string,
     loginId?: number,

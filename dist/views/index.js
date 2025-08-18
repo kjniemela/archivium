@@ -122,8 +122,8 @@ function default_1(app) {
                     if (err instanceof errors_1.RequestError) {
                         res.status(err.code);
                     }
-                    if (err.cause) {
-                        logger_1.default.error(err.cause); // TODO might not be required?
+                    else {
+                        res.status(axios_1.HttpStatusCode.InternalServerError);
                     }
                 }
                 await doRender(req, res);

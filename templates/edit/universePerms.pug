@@ -34,13 +34,13 @@ block content
     a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{T('Go back')}
   .d-flex.flex-col.align-start
     .grid(style={ 'grid-template-columns': '1fr 1rem 1fr' })
-      each perm, aid in universe.author_permissions
+      each perm, authorId in universe.author_permissions
         form.grid.grid-inherit.align-center(method='POST' style={ 'grid-column': '1 / 4' })
-          input(class='username' name='username' type='hidden' value=universe.authors[aid])
-          b(style={ 'grid-column': '1 / 2' }) #{universe.authors[aid]}
+          input(class='username' name='username' type='hidden' value=universe.authors[authorId])
+          b(style={ 'grid-column': '1 / 2' }) #{universe.authors[authorId]}
           select(class='permission_level' name='permission_level' style={ 'grid-column': '3 / 4' } disabled=((perm === perms.OWNER && ownerCount === 1) || (perm > universe.author_permissions[contextUser.id])))
-            each permission_level in perms
-              option(value=permission_level selected=(permission_level === perm) disabled=(permission_level > universe.author_permissions[contextUser.id])) #{T(`perms_${permission_level}`)}
+            each permission_level in Object.keys(perms).filter((item) => !isNaN(Number(item)))
+              option(value=permission_level selected=(permission_level == perm) disabled=(permission_level > universe.author_permissions[contextUser.id])) #{T(`perms_${permission_level}`)}
       
   br
   hr

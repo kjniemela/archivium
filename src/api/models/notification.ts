@@ -85,14 +85,14 @@ export class NotificationAPI {
     return subscriptions;
   }
 
-  async isSubscribed(user: User, subscriptionData): Promise<boolean> {
+  async isSubscribed(user: User | undefined, subscriptionData): Promise<boolean> {
     const { endpoint } = subscriptionData;
     if (!endpoint || !user) return false;
     const subscription = await this.getByEndpoint(endpoint);
     return Boolean(subscription && subscription.user_id === user.id);
   }
 
-  async subscribe(user: User, subscriptionData): Promise<string> {
+  async subscribe(user: User | undefined, subscriptionData): Promise<string> {
     if (!user) throw new UnauthorizedError();
     const { endpoint, keys } = subscriptionData;
     if (!endpoint || !keys) throw new ValidationError('Missing subscription data');
@@ -115,7 +115,7 @@ export class NotificationAPI {
     return endpointHash;
   }
 
-  async unsubscribe(user: User, subscriptionData): Promise<NotificationSubscription> {
+  async unsubscribe(user: User | undefined, subscriptionData): Promise<NotificationSubscription> {
     if (!user) throw new UnauthorizedError();
     const { endpoint, keys } = subscriptionData;
     if (!endpoint || !keys) throw new ValidationError('Missing subscription data');
@@ -176,14 +176,14 @@ export class NotificationAPI {
     return notifications;
   }
 
-  async markRead(user: User, id: number, isRead: boolean): Promise<void> {
+  async markRead(user: User | undefined, id: number, isRead: boolean): Promise<void> {
     if (!(typeof isRead === 'boolean')) throw new ValidationError('Invalid read status');
     if (!user) throw new UnauthorizedError();
     const data = await executeQuery('UPDATE sentnotification SET is_read = ? WHERE id = ? AND user_id = ?', [isRead, id, user.id]);
     if (data.changedRows === 0) throw new NotFoundError();
   }
 
-  async markAllRead(user: User, isRead: boolean): Promise<void> {
+  async markAllRead(user: User | undefined, isRead: boolean): Promise<void> {
     if (!user) throw new UnauthorizedError();
     await executeQuery('UPDATE sentnotification SET is_read = ? WHERE user_id = ?', [isRead, user.id]);
   }
@@ -198,7 +198,7 @@ export class NotificationAPI {
     }
   }
 
-  async putSettings(user: User, changes): Promise<void> {
+  async putSettings(user: User | undefined, changes): Promise<void> {
     if (!user) throw new UnauthorizedError();
 
     if ('email_notifs' in changes) {

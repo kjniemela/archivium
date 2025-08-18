@@ -18,6 +18,7 @@ export enum plans {
   FREE,
   PREMIUM,
   BETA,
+  PREMIUM_BETA,
   SUPER,
 }
 
@@ -37,6 +38,7 @@ export const tierAllowance: Record<plans, Record<PaidTier | 'total', number>> = 
   [plans.FREE]: { total: 5, [tiers.PREMIUM]: 0 },
   [plans.PREMIUM]: { total: 20, [tiers.PREMIUM]: 5 },
   [plans.BETA]: { total: 5, [tiers.PREMIUM]: 1 },
+  [plans.PREMIUM_BETA]: { total: 20, [tiers.PREMIUM]: 5 },
   [plans.SUPER]: { total: 999, [tiers.PREMIUM]: 99  },
 };
 

@@ -365,6 +365,8 @@ class ItemAPI {
         }
     }
     async post(user, body, universeShortName) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const { title, shortname, item_type, parent_id, obj_data } = body;
         try {
             const shortnameError = this.api.universe.validateShortname(shortname);
@@ -623,6 +625,8 @@ class ItemAPI {
         return await (0, utils_1.executeQuery)(queryString, values);
     }
     async put(user, universeShortname, itemShortname, changes) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const { title, shortname, item_type, obj_data, tags } = changes;
         if (!title || !obj_data)
             throw new errors_1.ValidationError('Missing required fields');
@@ -669,6 +673,8 @@ class ItemAPI {
         return item.id;
     }
     async putData(user, universeShortname, itemShortname, changes) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE);
         item.obj_data = {
             ...JSON.parse(item.obj_data),
@@ -743,6 +749,8 @@ class ItemAPI {
         return data;
     }
     async snoozeUntil(user, universeShortname, itemShortname) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE);
         const snooze = (await (0, utils_1.executeQuery)(`SELECT * FROM snooze WHERE item_id = ${item.id} AND snoozed_by = ${user.id};`))[0];
         const now = new Date();
@@ -754,6 +762,8 @@ class ItemAPI {
         }
     }
     async subscribeNotifs(user, universeShortname, itemShortname, isSubscribed) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.READ);
         return await (0, utils_1.executeQuery)(`
         INSERT INTO itemnotification (item_id, user_id, is_enabled) VALUES (?, ?, ?)

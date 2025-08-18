@@ -8,6 +8,7 @@ const utils_1 = require("../../api/utils");
 const promises_1 = __importDefault(require("fs/promises"));
 const config_1 = require("../../config");
 const path_1 = __importDefault(require("path"));
+const errors_1 = require("../../errors");
 const staticDir = path_1.default.join(__dirname, '../../static');
 exports.default = {
     /* Terms and Agreements */
@@ -76,6 +77,8 @@ exports.default = {
     /* Note pages */
     async notes(req, res) {
         const user = req.session.user;
+        if (!user)
+            throw new errors_1.UnauthorizedError();
         const notes = await api_1.default.note.getByUsername(user, user.username);
         const noteAuthors = { [user.id]: user };
         res.prepareRender('notes', {

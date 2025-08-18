@@ -81,7 +81,7 @@ loadRoutes(app, upload);
 */
 async function logout(req: express.Request, res: express.Response) {
   await api.session.delete({ id: req.session.id });
-  res.clearCookie('archiviumuid', req.session.id);
+  res.clearCookie('archiviumuid');
 }
 
 app.get(`${ADDR_PREFIX}/login`, async (req, res, next) => {

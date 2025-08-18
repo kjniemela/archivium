@@ -99,7 +99,7 @@ export class EmailAPI {
     return false;
   }
 
-  async trySendVerifyLink(sessionUser: User, username: string): Promise<{ alreadyVerified: boolean }> {
+  async trySendVerifyLink(sessionUser: User | undefined, username: string): Promise<{ alreadyVerified: boolean }> {
     if (!sessionUser) throw new UnauthorizedError();
     if (sessionUser.username != username) throw new ForbiddenError();
     if (sessionUser.verified) return { alreadyVerified: true };

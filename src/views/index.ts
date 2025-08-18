@@ -92,9 +92,8 @@ export default function(app: Express) {
           logger.error(err);
           if (err instanceof RequestError) {
             res.status(err.code);
-          }
-          if (err.cause) {
-            logger.error(err.cause); // TODO might not be required?
+          } else {
+            res.status(HttpStatusCode.InternalServerError);
           }
         }
         await doRender(req, res);

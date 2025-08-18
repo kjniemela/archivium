@@ -11,7 +11,7 @@ export type Session = {
   user_id?: number;
   created_at: Date;
   user?: User;
-} & RowDataPacket;
+};
 
 export type SessionConditions = {
   id?: number;
@@ -35,7 +35,7 @@ export class SessionAPI {
   async getOne(options: SessionConditions): Promise<Session | undefined> {
     const parsedOptions = parseData(options);
     const queryString = `SELECT * FROM session WHERE ${parsedOptions.strings.join(' AND ')} LIMIT 1;`;
-    const data = await executeQuery<Session[]>(queryString, parsedOptions.values);
+    const data = await executeQuery(queryString, parsedOptions.values) as Session[];
     const session = data[0];
     if (!session || !session.user_id) return session;
     const user = await this.api.user.getOne({ 'user.id': session.user_id }, false, true);

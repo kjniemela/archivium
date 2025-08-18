@@ -38,7 +38,8 @@ exports.default = {
             const sponsored = user ? await api_1.default.user.getSponsoredUniverses(user) : null;
             const couldUpgrade = sponsored ? (sponsored.length === 0 || sponsored
                 .filter(row => row.tier > universe.tier)
-                .some(row => row.universes.length < utils_1.tierAllowance[user.plan][row.tier])) : false;
+            // .some(row => row.universes.length < tierAllowance[user.plan][row.tier])
+            ) : false;
             res.prepareRender('universe', { universe, authors: authorMap, threads, counts, totalItems, stories, couldUpgrade });
         }
         catch (err) {
@@ -75,10 +76,11 @@ exports.default = {
         res.prepareRender('editUniverse', { universe, error: res.error });
     },
     async createDiscussionThread(req, res) {
+        if (!req.session.user)
+            throw new errors_1.UnauthorizedError();
         const universe = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, utils_1.perms.READ);
         if (!universe.discussion_enabled || !universe.discussion_open && universe.author_permissions[req.session.user.id] < utils_1.perms.COMMENT) {
-            res.status(403);
-            return;
+            throw new errors_1.ForbiddenError();
         }
         res.prepareRender('createUniverseThread', { universe });
     },
@@ -88,10 +90,8 @@ exports.default = {
             'discussion.id': req.params.threadId,
             'universe.id': universe.id,
         });
-        if (threads.length === 0) {
-            res.status(404);
-            return;
-        }
+        if (threads.length === 0)
+            throw new errors_1.NotFoundError();
         const thread = threads[0];
         const [comments, users] = await api_1.default.discussion.getCommentsByThread(req.session.user, thread.id, false, true);
         const commenters = {};
