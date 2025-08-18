@@ -283,6 +283,7 @@ CREATE TABLE snooze (
 CREATE TABLE lineage (
   parent_id INT NOT NULL,
   child_id INT NOT NULL,
+  UNIQUE(parent_id, child_id),
   parent_title VARCHAR(64),
   child_title VARCHAR(64),
   FOREIGN KEY (parent_id) REFERENCES item (id) ON DELETE CASCADE,
