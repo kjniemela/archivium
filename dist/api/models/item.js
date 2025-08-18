@@ -432,29 +432,29 @@ class ItemAPI {
             const itemId = await this.put(user, universeShortname, itemShortname, changes, conn);
             item = await this.getOne(user, { 'item.id': itemId }, utils_1.perms.WRITE);
             // Handle lineage data
-            if (body.parents && body.children) {
+            if (body.parents || body.children) {
                 const [existingParents, existingChildren] = [{}, {}];
                 for (const { parent_shortname } of item.parents)
                     existingParents[parent_shortname] = true;
                 for (const { child_shortname } of item.children)
                     existingChildren[child_shortname] = true;
                 const [newParents, newChildren] = [{}, {}];
-                for (const shortname in body.parents ?? {}) {
-                    const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, shortname, utils_1.perms.WRITE).catch((0, utils_1.handleAsNull)([errors_1.NotFoundError, errors_1.ForbiddenError]));
+                for (const { parent_shortname, parent_label, child_label } of body.parents ?? []) {
+                    const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, parent_shortname, utils_1.perms.WRITE).catch((0, utils_1.handleAsNull)([errors_1.NotFoundError, errors_1.ForbiddenError]));
                     if (!parent)
                         continue;
-                    newParents[shortname] = true;
-                    if (!(shortname in existingParents)) {
-                        await this.putLineage(parent.id, item.id, ...body.parents[shortname], conn);
+                    newParents[parent_shortname] = true;
+                    if (!(parent_shortname in existingParents)) {
+                        await this.putLineage(parent.id, item.id, parent_label ?? null, child_label ?? null, conn);
                     }
                 }
-                for (const shortname in body.children ?? {}) {
-                    const child = await this.getByUniverseAndItemShortnames(user, universeShortname, shortname, utils_1.perms.WRITE).catch((0, utils_1.handleAsNull)([errors_1.NotFoundError, errors_1.ForbiddenError]));
+                for (const { child_shortname, parent_label, child_label } of body.children ?? []) {
+                    const child = await this.getByUniverseAndItemShortnames(user, universeShortname, child_shortname, utils_1.perms.WRITE).catch((0, utils_1.handleAsNull)([errors_1.NotFoundError, errors_1.ForbiddenError]));
                     if (!child)
                         continue;
-                    newChildren[shortname] = true;
-                    if (!(shortname in existingChildren)) {
-                        await this.putLineage(item.id, child.id, ...body.children[shortname].reverse(), conn);
+                    newChildren[child_shortname] = true;
+                    if (!(child_shortname in existingChildren)) {
+                        await this.putLineage(item.id, child.id, parent_label ?? null, child_label ?? null, conn);
                     }
                 }
                 for (const { parent_shortname } of item.parents) {

@@ -20,49 +20,39 @@ exports.defaultItemData = {
     },
     character(age = 0, parent = null, child = null) {
         return {
-            body: 'This is a test character.',
-            lineage: {
-                title: 'Lineage',
-                parents: parent ? { [parent.shortname]: [null, null] } : {},
-                children: child ? { [child.shortname]: [null, null] } : {},
-            },
-            timeline: {
-                title: 'Timeline',
+            _tables: (self) => ({
                 events: [
-                    { title: 'Birth', time: (age * 316224000) + Math.round(Math.random() * 7654321), imported: false },
-                    { title: 'Death', time: (age * 316224000) + 31557600000 + Math.round(Math.random() * 7654321), imported: false },
+                    { event_title: 'Birth', abstime: (age * 316224000) + Math.round(Math.random() * 7654321), src_id: self.id, src_shortname: self.shortname, src_title: self.title },
+                    { event_title: 'Death', abstime: (age * 316224000) + 31557600000 + Math.round(Math.random() * 7654321), src_id: self.id, src_shortname: self.shortname, src_title: self.title },
                 ],
-            },
+                parents: parent ? [{ parent_shortname: parent.shortname, parent_title: parent.title }] : [],
+                children: child ? [{ child_shortname: child.shortname, child_title: child.title }] : [],
+            }),
+            body: 'This is a test character.',
+            lineage: { title: 'Lineage' },
+            timeline: { title: 'Timeline' },
         };
     },
     event: {
         body: 'This is a test event.',
-        timeline: {
-            title: 'Timeline',
+        _tables: (self) => ({
             events: [
-                { title: null, time: Math.round(Math.random() * 31557600000), imported: false },
+                { event_title: null, abstime: Math.round(Math.random() * 31557600000), src_id: self.id, src_shortname: self.shortname, src_title: self.title },
             ],
-        },
+        }),
+        timeline: { title: 'Timeline' },
         comments: true,
     },
     timeline(items) {
-        const imports = items.reduce((list, item) => ([
-            ...list,
-            ...item.events.filter(e => e.src_id === item.id).map(e => ([
-                { id: e.src_id, title: e.src_title, shortname: e.src_shortname },
-                { title: e.event_title, time: e.abstime },
-            ])),
-        ]), []);
         const events = items.reduce((list, item) => ([
             ...list,
-            ...item.events.map(e => ({ title: e.event_title, time: e.abstime, imported: e.src_id === item.id, src: e.src_title, srcId: e.src_id })),
+            ...item.events ?? [],
         ]), []);
         return {
-            timeline: {
-                title: 'Timeline',
-                imports,
+            _tables: () => ({
                 events,
-            },
+            }),
+            timeline: { title: 'Timeline' },
         };
     },
 };

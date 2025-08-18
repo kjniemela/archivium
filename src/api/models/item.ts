@@ -537,25 +537,25 @@ export class ItemAPI {
       item = await this.getOne(user, { 'item.id': itemId }, perms.WRITE);
 
       // Handle lineage data
-      if (body.parents && body.children) {
+      if (body.parents || body.children) {
         const [existingParents, existingChildren] = [{}, {}];
         for (const { parent_shortname } of item.parents) existingParents[parent_shortname] = true;
         for (const { child_shortname } of item.children) existingChildren[child_shortname] = true;
         const [newParents, newChildren] = [{}, {}];
-        for (const shortname in body.parents ?? {}) {
-          const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, shortname, perms.WRITE).catch(handleAsNull([NotFoundError, ForbiddenError]));
+        for (const { parent_shortname, parent_label, child_label } of body.parents ?? []) {
+          const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, parent_shortname, perms.WRITE).catch(handleAsNull([NotFoundError, ForbiddenError]));
           if (!parent) continue;
-          newParents[shortname] = true;
-          if (!(shortname in existingParents)) {
-            await this.putLineage(parent.id, item.id, ...body.parents[shortname] as [string, string], conn);
+          newParents[parent_shortname] = true;
+          if (!(parent_shortname in existingParents)) {
+            await this.putLineage(parent.id, item.id, parent_label ?? null, child_label ?? null, conn);
           }
         }
-        for (const shortname in body.children ?? {}) {
-          const child = await this.getByUniverseAndItemShortnames(user, universeShortname, shortname, perms.WRITE).catch(handleAsNull([NotFoundError, ForbiddenError]));
+        for (const { child_shortname, parent_label, child_label } of body.children ?? []) {
+          const child = await this.getByUniverseAndItemShortnames(user, universeShortname, child_shortname, perms.WRITE).catch(handleAsNull([NotFoundError, ForbiddenError]));
           if (!child) continue;
-          newChildren[shortname] = true;
-          if (!(shortname in existingChildren)) {
-            await this.putLineage(item.id, child.id, ...body.children[shortname].reverse() as [string, string], conn);
+          newChildren[child_shortname] = true;
+          if (!(child_shortname in existingChildren)) {
+            await this.putLineage(item.id, child.id, parent_label ?? null, child_label ?? null, conn);
           }
         }
         for (const { parent_shortname } of item.parents) {
