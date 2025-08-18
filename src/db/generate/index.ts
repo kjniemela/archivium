@@ -8,7 +8,7 @@ import { defaultUniverseData, defaultItemData } from './defaults.js';
 import { User } from '../../api/models/user';
 import { Universe } from '../../api/models/universe';
 import { Chapter, Story } from '../../api/models/story';
-import { Item } from '../../api/models/item';
+import { BasicItem, Item } from '../../api/models/item';
 import { Thread } from '../../api/models/discussion';
 import { Note } from '../../api/models/note';
 
@@ -74,7 +74,7 @@ async function postComment(poster: User, thread: Thread, comment: string): Promi
   await api.discussion.postCommentToThread(poster, thread.id, { body: comment });
 }
 
-async function createNote(owner: User, title: string, body: string, is_public: boolean, tags: string[], items: Item[] = [], boards: any[] = []): Promise<Note> {
+async function createNote(owner: User, title: string, body: string, is_public: boolean, tags: string[], items: BasicItem[] = [], boards: any[] = []): Promise<Note> {
   const uuid = await api.note.post(owner, { title, body, is_public, tags });
   const note = await api.note.getOne(owner, uuid);
   for (const item of items) {

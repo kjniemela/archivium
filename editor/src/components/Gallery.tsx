@@ -1,12 +1,7 @@
 import { useState } from 'react';
 import { postFormData, T } from '../helpers';
 import { createPortal } from 'react-dom';
-
-export type GalleryImage = {
-  id: number,
-  name: string,
-  label: string,
-};
+import type { GalleryImage } from '../../../src/api/models/item';
 
 type GalleryProps = {
   universe: string,

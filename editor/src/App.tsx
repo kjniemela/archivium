@@ -6,22 +6,12 @@ import { editorExtensions } from '../../src/lib/editor';
 import { createPortal } from 'react-dom';
 import TabsBar from './components/TabsBar';
 import { useEditor } from '@tiptap/react';
-import Gallery, { type GalleryImage } from './components/Gallery';
+import Gallery from './components/Gallery';
 import TimelineEditor from './components/TimelineEditor';
-import type { ItemEvent } from '../../src/api/models/item';
+import type { Item } from '../../src/api/models/item';
 
 type Categories = {
   [key: string]: [string, string],
-};
-
-export type Item = {
-  id: number,
-  title: string,
-  shortname: string,
-  itemType: string,
-  tags: string[],
-  gallery: GalleryImage[],
-  events: ItemEvent[],
 };
 
 export type EventItem = [string, string, number, string, number];
@@ -363,7 +353,7 @@ export default function App({ itemShort, universeShort }: AppProps) {
 
         <div className='inputGroup'>
           <label htmlFor='item_type'>{T('Type')}:</label>
-          <select id='item_type' name='item_type' defaultValue={item?.itemType} onChange={({ target }) => item && setItem({ ...item, itemType: target.value })}>
+          <select id='item_type' name='item_type' defaultValue={item?.item_type} onChange={({ target }) => item && setItem({ ...item, item_type: target.value })}>
             <option hidden disabled>{T('Select one')}...</option>
             {(categories && item) && Object.keys(categories).map(type => (
               <option key={type} value={type}>

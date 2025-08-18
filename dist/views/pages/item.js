@@ -46,7 +46,7 @@ exports.default = {
     },
     async view(req, res) {
         const universe = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
-        let item;
+        let item; // TODO this is ugly
         try {
             item = await api_1.default.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortname, req.params.itemShortname);
         }
@@ -67,7 +67,7 @@ exports.default = {
         item.obj_data = JSON.parse(item.obj_data);
         item.itemTypeName = ((universe.obj_data['cats'] ?? {})[item.item_type] ?? ['Missing Category'])[0];
         item.itemTypeColor = ((universe.obj_data['cats'] ?? {})[item.item_type] ?? [, , '#f3f3f3'])[2];
-        if (item.gallery.length > 0) {
+        if (item.gallery && item.gallery.length > 0) {
             item.gallery = item.gallery.sort((a, b) => a.id > b.id ? 1 : -1);
         }
         if ('body' in item.obj_data && typeof item.obj_data.body !== 'string') {

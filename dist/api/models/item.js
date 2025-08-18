@@ -110,9 +110,9 @@ class ItemAPI {
         this.image = new ItemImageAPI(this);
         this.api = api;
     }
-    async getOne(user, conditions = {}, permissionsRequired = utils_1.perms.READ, basicOnly = false, options = {}) {
+    async getOneBasic(user, conditions = {}, permissionsRequired = utils_1.perms.READ, options = {}) {
         const parsedConditions = (0, utils_1.parseData)(conditions);
-        const data = await this.getMany(user, parsedConditions, permissionsRequired, { ...options, limit: 1 });
+        const data = await this.getMany(user /* TODO temp type hack */, parsedConditions, permissionsRequired, { ...options, limit: 1 });
         const item = data[0];
         if (!item) {
             if (user)
@@ -120,68 +120,76 @@ class ItemAPI {
             else
                 throw new errors_1.UnauthorizedError();
         }
-        if (!basicOnly) {
-            const events = await (0, utils_1.executeQuery)(`
-        SELECT DISTINCT
-          itemevent.event_title, itemevent.abstime,
-          item.shortname AS src_shortname, item.title AS src_title, item.id AS src_id
-        FROM itemevent
-        LEFT JOIN timelineitem ON timelineitem.event_id = itemevent.id
-        INNER JOIN item ON itemevent.item_id = item.id
-        WHERE itemevent.item_id = ? OR timelineitem.timeline_id = ?
-        ORDER BY itemevent.abstime DESC
-      `, [item.id, item.id]);
-            item.events = events;
-            const gallery = await (0, utils_1.executeQuery)(`
-        SELECT
-          itemimage.id, itemimage.name, itemimage.label
-        FROM itemimage
-        WHERE itemimage.item_id = ?
-      `, [item.id]);
-            item.gallery = gallery;
-            const children = await (0, utils_1.executeQuery)(`
-        SELECT
-          item.shortname AS child_shortname, item.title AS child_title,
-          lineage.child_title AS child_label, lineage.parent_title AS parent_label
-        FROM lineage
-        INNER JOIN item ON item.id = lineage.child_id
-        WHERE lineage.parent_id = ?
-      `, [item.id]);
-            item.children = children;
-            const parents = await (0, utils_1.executeQuery)(`
-        SELECT
-          item.shortname AS parent_shortname, item.title AS parent_title,
-          lineage.child_title AS child_label, lineage.parent_title AS parent_label
-        FROM lineage
-        INNER JOIN item ON item.id = lineage.parent_id
-        WHERE lineage.child_id = ?
-      `, [item.id]);
-            item.parents = parents;
-            if (item.obj_data) {
-                const objData = JSON.parse(item.obj_data);
-                if (typeof objData.body === 'string') {
-                    const links = await (0, utils_1.executeQuery)(`
-            SELECT to_universe_short, to_item_short, href
-            FROM itemlink
-            WHERE from_item = ?
-          `, [item.id]);
-                    const replacements = {};
-                    const attachments = {};
-                    for (const { to_universe_short, to_item_short, href } of links) {
-                        const replacement = to_universe_short === item.universe_short ? `${to_item_short}` : `${to_universe_short}/${to_item_short}`;
-                        replacements[href] = replacement;
-                        const match = href.match(/[?#]/);
-                        const attachment = match ? `${match[0]}${href.slice(match.index + 1)}` : '';
-                        attachments[href] = attachment;
-                    }
-                    objData.body = objData.body.replace(/(?<!\\)(\[[^\]]*?\])\(([^)]+)\)/g, (match, brackets, parens) => {
-                        if (parens in replacements) {
-                            return `${brackets}(@${replacements[parens]}${attachments[parens]})`;
-                        }
-                        return match;
-                    });
-                    item.obj_data = JSON.stringify(objData);
+        return item;
+    }
+    async getOne(user, conditions = {}, permissionsRequired = utils_1.perms.READ, options = {}) {
+        const item = {
+            ...await this.getOneBasic(user, conditions, permissionsRequired, options),
+            events: [],
+            gallery: [],
+            parents: [],
+            children: [],
+        };
+        const events = await (0, utils_1.executeQuery)(`
+      SELECT DISTINCT
+        itemevent.event_title, itemevent.abstime,
+        item.shortname AS src_shortname, item.title AS src_title, item.id AS src_id
+      FROM itemevent
+      LEFT JOIN timelineitem ON timelineitem.event_id = itemevent.id
+      INNER JOIN item ON itemevent.item_id = item.id
+      WHERE itemevent.item_id = ? OR timelineitem.timeline_id = ?
+      ORDER BY itemevent.abstime DESC
+    `, [item.id, item.id]);
+        item.events = events;
+        const gallery = await (0, utils_1.executeQuery)(`
+      SELECT
+        itemimage.id, itemimage.name, itemimage.label
+      FROM itemimage
+      WHERE itemimage.item_id = ?
+    `, [item.id]);
+        item.gallery = gallery;
+        const children = await (0, utils_1.executeQuery)(`
+      SELECT
+        item.shortname AS child_shortname, item.title AS child_title,
+        lineage.child_title AS child_label, lineage.parent_title AS parent_label
+      FROM lineage
+      INNER JOIN item ON item.id = lineage.child_id
+      WHERE lineage.parent_id = ?
+    `, [item.id]);
+        item.children = children;
+        const parents = await (0, utils_1.executeQuery)(`
+      SELECT
+        item.shortname AS parent_shortname, item.title AS parent_title,
+        lineage.child_title AS child_label, lineage.parent_title AS parent_label
+      FROM lineage
+      INNER JOIN item ON item.id = lineage.parent_id
+      WHERE lineage.child_id = ?
+    `, [item.id]);
+        item.parents = parents;
+        if (item.obj_data) {
+            const objData = JSON.parse(item.obj_data);
+            if (typeof objData.body === 'string') {
+                const links = await (0, utils_1.executeQuery)(`
+          SELECT to_universe_short, to_item_short, href
+          FROM itemlink
+          WHERE from_item = ?
+        `, [item.id]);
+                const replacements = {};
+                const attachments = {};
+                for (const { to_universe_short, to_item_short, href } of links) {
+                    const replacement = to_universe_short === item.universe_short ? `${to_item_short}` : `${to_universe_short}/${to_item_short}`;
+                    replacements[href] = replacement;
+                    const match = href.match(/[?#]/);
+                    const attachment = match ? `${match[0]}${href.slice(match.index + 1)}` : '';
+                    attachments[href] = attachment;
                 }
+                objData.body = objData.body.replace(/(?<!\\)(\[[^\]]*?\])\(([^)]+)\)/g, (match, brackets, parens) => {
+                    if (parens in replacements) {
+                        return `${brackets}(@${replacements[parens]}${attachments[parens]})`;
+                    }
+                    return match;
+                });
+                item.obj_data = JSON.stringify(objData);
             }
             if (user) {
                 const notifs = await (0, utils_1.executeQuery)(`
@@ -333,7 +341,10 @@ class ItemAPI {
             'universe.shortname': universeShortname,
             'item.shortname': itemShortname,
         };
-        return await this.getOne(user, conditions, permissionsRequired, basicOnly, { includeData: true });
+        if (basicOnly)
+            return await this.getOneBasic(user, conditions, permissionsRequired, { includeData: true });
+        else
+            return await this.getOne(user, conditions, permissionsRequired, { includeData: true });
     }
     /**
      *

@@ -50,9 +50,9 @@ export default {
   async view(req, res) {
     const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
 
-    let item: Item & { [key: string]: any };
+    let item: Item & { [key: string]: any }; // TODO this is ugly
     try {
-      item = await api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortname, req.params.itemShortname);
+      item = await api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortname, req.params.itemShortname) as Item;
     } catch (err) {
       if (err instanceof ForbiddenError) {
         if (req.session.user && universe.author_permissions[req.session.user.id] >= perms.READ) {
@@ -71,7 +71,7 @@ export default {
     item.obj_data = JSON.parse(item.obj_data as string) as Record<string, any>;
     item.itemTypeName = ((universe.obj_data['cats'] ?? {})[item.item_type] ?? ['Missing Category'])[0];
     item.itemTypeColor = ((universe.obj_data['cats'] ?? {})[item.item_type] ?? [,,'#f3f3f3'])[2];
-    if (item.gallery.length > 0) {
+    if (item.gallery && item.gallery.length > 0) {
       item.gallery = item.gallery.sort((a, b) => a.id > b.id ? 1 : -1);
     }
 

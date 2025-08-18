@@ -32,14 +32,29 @@ export type ItemEvent = {
   src_shortname: string,
   src_title: string,
   src_id: number,
-}
+};
 
-export type Item = {
-  events?: ItemEvent[];
-  gallery?: any;
-  parents?: any;
-  children?: any,
-  notifs_enabled: boolean;
+export type GalleryImage = {
+  id: number,
+  name: string,
+  label: string,
+};
+
+export type Child = {
+  child_shortname: string,
+  child_title: string,
+  child_label: string,
+  parent_label: string,
+};
+
+export type Parent = {
+  parent_shortname: string,
+  parent_title: string,
+  child_label: string,
+  parent_label: string,
+};
+
+export type BasicItem = {
   id: number,
   title: string,
   shortname: string,
@@ -50,16 +65,17 @@ export type Item = {
   author: string,
   universe: string,
   universe_short: string,
-  tags?: string[],
-  obj_data?: Object | string,
-  author_id?: number,
-  description?: string,
-  is_published?: boolean,
-  parent_id?: number,
-  images?: ItemImage[],
-  comment_count?: number,
-  first_activity?: Date,
-  last_activity?: Date,
+  notifs_enabled: boolean;
+  author_id: number | null,
+  tags: string[],
+  obj_data: Object | string, // TODO we should try to never stringify this if possible
+};
+
+export type Item = BasicItem & {
+  events: ItemEvent[];
+  gallery: GalleryImage[];
+  parents: Parent[];
+  children: Child[],
 };
 
 function getQuery(selects: [string, string?, (string | string[])?][] = [], permsCond?: Cond, whereConds?: Cond, options: ItemOptions = {}) {
@@ -176,8 +192,7 @@ export class ItemAPI {
     this.api = api;
   }
 
-  async getOne(user: User | undefined, conditions: any = {}, permissionsRequired = perms.READ, basicOnly = false, options: ItemOptions = {}): Promise<Item> {
-
+  async getOneBasic(user: User | undefined, conditions: any={}, permissionsRequired=perms.READ, options: ItemOptions = {}): Promise<BasicItem> {
     const parsedConditions = parseData(conditions);
 
     const data = await this.getMany(user, parsedConditions, permissionsRequired, { ...options, limit: 1 });
@@ -187,72 +202,82 @@ export class ItemAPI {
       else throw new UnauthorizedError();
     }
 
-    if (!basicOnly) {
-      const events = await executeQuery(`
-        SELECT DISTINCT
-          itemevent.event_title, itemevent.abstime,
-          item.shortname AS src_shortname, item.title AS src_title, item.id AS src_id
-        FROM itemevent
-        LEFT JOIN timelineitem ON timelineitem.event_id = itemevent.id
-        INNER JOIN item ON itemevent.item_id = item.id
-        WHERE itemevent.item_id = ? OR timelineitem.timeline_id = ?
-        ORDER BY itemevent.abstime DESC
-      `, [item.id, item.id]);
-      item.events = events as ItemEvent[];
+    return item;
+  }
 
-      const gallery = await executeQuery(`
-        SELECT
-          itemimage.id, itemimage.name, itemimage.label
-        FROM itemimage
-        WHERE itemimage.item_id = ?
-      `, [item.id]);
-      item.gallery = gallery;
+  async getOne(user: User | undefined, conditions: any = {}, permissionsRequired = perms.READ, options: ItemOptions = {}): Promise<Item> {
+    const item: Item = {
+      ...await this.getOneBasic(user, conditions, permissionsRequired, options),
+      events: [],
+      gallery: [],
+      parents: [],
+      children: [],
+    };
 
-      const children = await executeQuery(`
-        SELECT
-          item.shortname AS child_shortname, item.title AS child_title,
-          lineage.child_title AS child_label, lineage.parent_title AS parent_label
-        FROM lineage
-        INNER JOIN item ON item.id = lineage.child_id
-        WHERE lineage.parent_id = ?
-      `, [item.id]);
-      item.children = children;
+    const events = await executeQuery(`
+      SELECT DISTINCT
+        itemevent.event_title, itemevent.abstime,
+        item.shortname AS src_shortname, item.title AS src_title, item.id AS src_id
+      FROM itemevent
+      LEFT JOIN timelineitem ON timelineitem.event_id = itemevent.id
+      INNER JOIN item ON itemevent.item_id = item.id
+      WHERE itemevent.item_id = ? OR timelineitem.timeline_id = ?
+      ORDER BY itemevent.abstime DESC
+    `, [item.id, item.id]);
+    item.events = events as ItemEvent[];
 
-      const parents = await executeQuery(`
-        SELECT
-          item.shortname AS parent_shortname, item.title AS parent_title,
-          lineage.child_title AS child_label, lineage.parent_title AS parent_label
-        FROM lineage
-        INNER JOIN item ON item.id = lineage.parent_id
-        WHERE lineage.child_id = ?
-      `, [item.id]);
-      item.parents = parents;
+    const gallery = await executeQuery(`
+      SELECT
+        itemimage.id, itemimage.name, itemimage.label
+      FROM itemimage
+      WHERE itemimage.item_id = ?
+    `, [item.id]) as GalleryImage[];
+    item.gallery = gallery;
 
-      if (item.obj_data) {
-        const objData = JSON.parse(item.obj_data as string);
-        if (typeof objData.body === 'string') {
-          const links = await executeQuery(`
-            SELECT to_universe_short, to_item_short, href
-            FROM itemlink
-            WHERE from_item = ?
-          `, [item.id]);
-          const replacements = {};
-          const attachments = {};
-          for (const { to_universe_short, to_item_short, href } of links) {
-            const replacement = to_universe_short === item.universe_short ? `${to_item_short}` : `${to_universe_short}/${to_item_short}`;
-            replacements[href] = replacement;
-            const match = href.match(/[?#]/);
-            const attachment = match ? `${match[0]}${href.slice(match.index + 1)}` : '';
-            attachments[href] = attachment;
-          }
-          objData.body = objData.body.replace(/(?<!\\)(\[[^\]]*?\])\(([^)]+)\)/g, (match, brackets, parens) => {
-            if (parens in replacements) {
-              return `${brackets}(@${replacements[parens]}${attachments[parens]})`;
-            }
-            return match;
-          });
-          item.obj_data = JSON.stringify(objData);
+    const children = await executeQuery(`
+      SELECT
+        item.shortname AS child_shortname, item.title AS child_title,
+        lineage.child_title AS child_label, lineage.parent_title AS parent_label
+      FROM lineage
+      INNER JOIN item ON item.id = lineage.child_id
+      WHERE lineage.parent_id = ?
+    `, [item.id]);
+    item.children = children as Child[];
+
+    const parents = await executeQuery(`
+      SELECT
+        item.shortname AS parent_shortname, item.title AS parent_title,
+        lineage.child_title AS child_label, lineage.parent_title AS parent_label
+      FROM lineage
+      INNER JOIN item ON item.id = lineage.parent_id
+      WHERE lineage.child_id = ?
+    `, [item.id]);
+    item.parents = parents as Parent[];
+
+    if (item.obj_data) {
+      const objData = JSON.parse(item.obj_data as string);
+      if (typeof objData.body === 'string') {
+        const links = await executeQuery(`
+          SELECT to_universe_short, to_item_short, href
+          FROM itemlink
+          WHERE from_item = ?
+        `, [item.id]);
+        const replacements = {};
+        const attachments = {};
+        for (const { to_universe_short, to_item_short, href } of links) {
+          const replacement = to_universe_short === item.universe_short ? `${to_item_short}` : `${to_universe_short}/${to_item_short}`;
+          replacements[href] = replacement;
+          const match = href.match(/[?#]/);
+          const attachment = match ? `${match[0]}${href.slice(match.index + 1)}` : '';
+          attachments[href] = attachment;
         }
+        objData.body = objData.body.replace(/(?<!\\)(\[[^\]]*?\])\(([^)]+)\)/g, (match, brackets, parens) => {
+          if (parens in replacements) {
+            return `${brackets}(@${replacements[parens]}${attachments[parens]})`;
+          }
+          return match;
+        });
+        item.obj_data = JSON.stringify(objData);
       }
 
       if (user) {
@@ -424,14 +449,15 @@ export class ItemAPI {
     itemShortname: string,
     permissionsRequired = perms.READ,
     basicOnly = false
-  ): Promise<Item> {
+  ): Promise<Item | BasicItem> {
 
     const conditions = {
       'universe.shortname': universeShortname,
       'item.shortname': itemShortname,
     };
 
-    return await this.getOne(user, conditions, permissionsRequired, basicOnly, { includeData: true });
+    if (basicOnly) return await this.getOneBasic(user, conditions, permissionsRequired, { includeData: true });
+    else return await this.getOne(user, conditions, permissionsRequired, { includeData: true });
   }
 
   /**
@@ -741,7 +767,7 @@ export class ItemAPI {
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE);
 
     const objData = JSON.parse(obj_data);
-    await this.handleLinks(item, objData, conn);
+    await this.handleLinks(item as Item, objData, conn);
 
     if (tags) {
       const trimmedTags = tags.map(tag => tag[0] === '#' ? tag.substring(1) : tag);
@@ -807,7 +833,7 @@ export class ItemAPI {
 
     let data!: ResultSetHeader;
     await withTransaction(async (conn) => {
-      await this.handleLinks(item, item.obj_data, conn);
+      await this.handleLinks(item as Item, item.obj_data, conn);
 
       const queryString = `UPDATE item SET obj_data = ?, updated_at = ?, last_updated_by = ? WHERE id = ?;`;
       [data] = await conn.execute<ResultSetHeader>(queryString, [JSON.stringify(item.obj_data), new Date(), user.id, item.id]);
