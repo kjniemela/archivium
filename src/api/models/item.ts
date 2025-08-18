@@ -564,15 +564,20 @@ export class ItemAPI {
 
       // Handle lineage data
       if (body.parents || body.children) {
-        const [existingParents, existingChildren] = [{}, {}];
-        for (const { parent_shortname } of item.parents) existingParents[parent_shortname] = true;
-        for (const { child_shortname } of item.children) existingChildren[child_shortname] = true;
+        const existingParents: { [key: string]: Parent } = {};
+        const existingChildren: { [key: string]: Child } = {};
+        for (const parent of item.parents) existingParents[parent.parent_shortname] = parent;
+        for (const child of item.children) existingChildren[child.child_shortname] = child;
         const [newParents, newChildren] = [{}, {}];
         for (const { parent_shortname, parent_label, child_label } of body.parents ?? []) {
           const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, parent_shortname, perms.WRITE).catch(handleAsNull([NotFoundError, ForbiddenError]));
           if (!parent) continue;
           newParents[parent_shortname] = true;
-          if (!(parent_shortname in existingParents)) {
+          if (
+            !(parent_shortname in existingParents)
+            || existingParents[parent_shortname].parent_label !== parent_label
+            || existingParents[parent_shortname].child_label !== child_label
+          ) {
             await this.putLineage(parent.id, item.id, parent_label ?? null, child_label ?? null, conn);
           }
         }
@@ -580,7 +585,11 @@ export class ItemAPI {
           const child = await this.getByUniverseAndItemShortnames(user, universeShortname, child_shortname, perms.WRITE).catch(handleAsNull([NotFoundError, ForbiddenError]));
           if (!child) continue;
           newChildren[child_shortname] = true;
-          if (!(child_shortname in existingChildren)) {
+          if (
+            !(child_shortname in existingChildren)
+            || existingChildren[child_shortname].parent_label !== parent_label
+            || existingChildren[child_shortname].child_label !== child_label
+          ) {
             await this.putLineage(item.id, child.id, parent_label ?? null, child_label ?? null, conn);
           }
         }
@@ -863,8 +872,11 @@ export class ItemAPI {
    * @returns 
    */
   async putLineage(parent_id: number, child_id: number, parent_title: string, child_title: string, conn?: PoolConnection): Promise<ResultSetHeader> {
-    const queryString = `INSERT INTO lineage (parent_id, child_id, parent_title, child_title) VALUES (?, ?, ?, ?);`;
-    const data = await executeQuery<ResultSetHeader>(queryString, [parent_id, child_id, parent_title, child_title], conn);
+    const queryString = `
+      INSERT INTO lineage (parent_id, child_id, parent_title, child_title) VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE parent_title = ?, child_title = ?
+    `;
+    const data = await executeQuery<ResultSetHeader>(queryString, [parent_id, child_id, parent_title, child_title, parent_title, child_title], conn);
     return data;
   }
 
