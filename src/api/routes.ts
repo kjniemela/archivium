@@ -183,7 +183,14 @@ export default function (app: Express, upload: Multer) {
           ]),
         ]),
         new APIRoute('/items', {
-          GET: (req) => api.item.getByUniverseShortname(req.session.user, req.params.universeShortName),
+          GET: (req) => api.item.getByUniverseShortname(req.session.user, req.params.universeShortName, Math.max(perms.READ, Number(req.query.perms)) || perms.READ, {
+            sort: req.getQueryParam('sort'),
+            sortDesc: req.getQueryParam('sort_order') === 'desc',
+            limit: req.getQueryParamAsNumber('limit'),
+            type: req.getQueryParam('type'),
+            tag: req.getQueryParam('tag'),
+            author: req.getQueryParam('author'),
+          }),
           POST: (req) => api.item.post(req.session.user, req.body, req.params.universeShortName),
         }, [
           new APIRoute('/:itemShortName', {

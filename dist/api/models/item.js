@@ -112,7 +112,7 @@ class ItemAPI {
     }
     async getOneBasic(user, conditions = {}, permissionsRequired = utils_1.perms.READ, options = {}) {
         const parsedConditions = (0, utils_1.parseData)(conditions);
-        const data = await this.getMany(user /* TODO temp type hack */, parsedConditions, permissionsRequired, { ...options, limit: 1 });
+        const data = await this.getMany(user, parsedConditions, permissionsRequired, { ...options, limit: 1 });
         const item = data[0];
         if (!item) {
             if (user)
@@ -444,18 +444,21 @@ class ItemAPI {
             item = await this.getOne(user, { 'item.id': itemId }, utils_1.perms.WRITE);
             // Handle lineage data
             if (body.parents || body.children) {
-                const [existingParents, existingChildren] = [{}, {}];
-                for (const { parent_shortname } of item.parents)
-                    existingParents[parent_shortname] = true;
-                for (const { child_shortname } of item.children)
-                    existingChildren[child_shortname] = true;
+                const existingParents = {};
+                const existingChildren = {};
+                for (const parent of item.parents)
+                    existingParents[parent.parent_shortname] = parent;
+                for (const child of item.children)
+                    existingChildren[child.child_shortname] = child;
                 const [newParents, newChildren] = [{}, {}];
                 for (const { parent_shortname, parent_label, child_label } of body.parents ?? []) {
                     const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, parent_shortname, utils_1.perms.WRITE).catch((0, utils_1.handleAsNull)([errors_1.NotFoundError, errors_1.ForbiddenError]));
                     if (!parent)
                         continue;
                     newParents[parent_shortname] = true;
-                    if (!(parent_shortname in existingParents)) {
+                    if (!(parent_shortname in existingParents)
+                        || existingParents[parent_shortname].parent_label !== parent_label
+                        || existingParents[parent_shortname].child_label !== child_label) {
                         await this.putLineage(parent.id, item.id, parent_label ?? null, child_label ?? null, conn);
                     }
                 }
@@ -464,7 +467,9 @@ class ItemAPI {
                     if (!child)
                         continue;
                     newChildren[child_shortname] = true;
-                    if (!(child_shortname in existingChildren)) {
+                    if (!(child_shortname in existingChildren)
+                        || existingChildren[child_shortname].parent_label !== parent_label
+                        || existingChildren[child_shortname].child_label !== child_label) {
                         await this.putLineage(item.id, child.id, parent_label ?? null, child_label ?? null, conn);
                     }
                 }
@@ -723,8 +728,11 @@ class ItemAPI {
      * @returns
      */
     async putLineage(parent_id, child_id, parent_title, child_title, conn) {
-        const queryString = `INSERT INTO lineage (parent_id, child_id, parent_title, child_title) VALUES (?, ?, ?, ?);`;
-        const data = await (0, utils_1.executeQuery)(queryString, [parent_id, child_id, parent_title, child_title], conn);
+        const queryString = `
+      INSERT INTO lineage (parent_id, child_id, parent_title, child_title) VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE parent_title = ?, child_title = ?
+    `;
+        const data = await (0, utils_1.executeQuery)(queryString, [parent_id, child_id, parent_title, child_title, parent_title, child_title], conn);
         return data;
     }
     /**

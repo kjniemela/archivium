@@ -9,6 +9,7 @@ import { useEditor } from '@tiptap/react';
 import Gallery from './components/Gallery';
 import TimelineEditor from './components/TimelineEditor';
 import type { Item } from '../../src/api/models/item';
+import LineageEditor from './components/LineageEditor';
 
 type Categories = {
   [key: string]: [string, string],
@@ -73,7 +74,6 @@ window.onbeforeunload = (event) => {
   }
 };
 let saveTimeout: NodeJS.Timeout | null = null;
-let previousData: (Item & { obj_data: ObjData }) | null = null;
 
 const saveBtn = document.getElementById('save-btn');
 if (saveBtn) {
@@ -101,6 +101,8 @@ export default function App({ itemShort, universeShort }: AppProps) {
   const [currentTab, setCurrentTab] = useState<string | null>(null);
   const [tabNames, setTabNames] = useState<Record<string, string>>({});
   const [eventItemMap, setEventItemMap] = useState<Record<number, EventItem[]>>();
+  const [lineageItemMap, setLineageItemMap] = useState<Record<number, string>>();
+  const [previousData, setPreviousData] = useState<(Item & { obj_data: ObjData }) | null>(null);
   
   const editor = useEditor({
     extensions: editorExtensions,
@@ -119,8 +121,8 @@ export default function App({ itemShort, universeShort }: AppProps) {
       setSaveText('Saving...');
       console.log('SAVING...');
       const data = {
-        ...item,
-        obj_data: { ...objData },
+        ...structuredClone(item),
+        obj_data: { ...structuredClone(objData) },
       };
 
       if (deepCompare(data, previousData)) {
@@ -146,13 +148,13 @@ export default function App({ itemShort, universeShort }: AppProps) {
         }
         console.log('SAVED.');
         setSaveText('Saved');
-        previousData = data;
+        setPreviousData(data);
         setNeedsSaving(false);
       } catch (err) {
         console.error('Failed to save!');
         console.error(err);
         setSaveText('Error');
-        previousData = null;
+        setPreviousData(null);
         if (err instanceof TypeError) {
           setErrorMessage('Network error. Make sure you are connected to the internet and try again.');
         }
@@ -174,6 +176,14 @@ export default function App({ itemShort, universeShort }: AppProps) {
       }
       setEventItemMap(newEventItemMap);
     });
+    const lineageItemPromise = fetchData(`/api/universes/${universeShort}/items?type=character`, (items) => {
+      const newLineageItemMap: Record<number, string> = {};
+      for (const { shortname, title } of items) {
+        if (shortname === itemShort) continue;
+        newLineageItemMap[shortname] = title;
+      }
+      setLineageItemMap(newLineageItemMap);
+    });
     fetchData(`/api/universes/${universeShort}/items/${itemShort}`, async (data) => {
       const objData = JSON.parse(data.obj_data) as ObjData;
       setObjData(objData);
@@ -187,7 +197,7 @@ export default function App({ itemShort, universeShort }: AppProps) {
         editor.commands.setContent(json);
       }
       delete data.obj_data;
-      await Promise.all([categoryPromise, eventItemPromise]);
+      await Promise.all([categoryPromise, eventItemPromise, lineageItemPromise]);
       setItem(data);
     });
   }, [itemShort, universeShort]);
@@ -305,6 +315,9 @@ export default function App({ itemShort, universeShort }: AppProps) {
         newState.events = newEvents;
         setItem(newState);
       }} eventItemMap={eventItemMap ?? {}} />
+    ),
+    lineage: (
+      <LineageEditor item={item} onUpdate={(newItem) => setItem(newItem)} itemMap={lineageItemMap ?? {}} />
     ),
   };
 

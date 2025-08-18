@@ -178,7 +178,14 @@ function default_1(app, upload) {
                     ]),
                 ]),
                 new APIRoute('/items', {
-                    GET: (req) => _1.default.item.getByUniverseShortname(req.session.user, req.params.universeShortName),
+                    GET: (req) => _1.default.item.getByUniverseShortname(req.session.user, req.params.universeShortName, Math.max(utils_1.perms.READ, Number(req.query.perms)) || utils_1.perms.READ, {
+                        sort: req.getQueryParam('sort'),
+                        sortDesc: req.getQueryParam('sort_order') === 'desc',
+                        limit: req.getQueryParamAsNumber('limit'),
+                        type: req.getQueryParam('type'),
+                        tag: req.getQueryParam('tag'),
+                        author: req.getQueryParam('author'),
+                    }),
                     POST: (req) => _1.default.item.post(req.session.user, req.body, req.params.universeShortName),
                 }, [
                     new APIRoute('/:itemShortName', {
