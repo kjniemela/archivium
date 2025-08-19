@@ -734,8 +734,27 @@ h4, h5 {
 /* Tiptap Editor styles */
 .tiptap {
   background-color: #fefefe;
-  border-radius: 0.25rem;
+  border-radius: 0 0 0.25rem 0.25rem;
   padding: 0.25rem 1.25rem;
+}
+
+.tiptap-navbar {
+  background-color: #f3f3f3;
+  border-radius: 0.25rem 0.25rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.125rem;
+  padding: 0.25rem;
+}
+
+.tiptap-navbar button {
+  border: 0;
+  padding: 0.125rem 0.25rem;
+  background-color: #f3f3f3;
+}
+
+.tiptap-navbar button.is-active {
+  background-color: #ddd;
 }
 
 /* EasyMDE styles */

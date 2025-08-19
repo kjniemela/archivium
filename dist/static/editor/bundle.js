@@ -57910,22 +57910,335 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
 /* harmony import */ var _tiptap_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/react */ "../node_modules/@tiptap/react/dist/index.js");
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../helpers */ "./src/helpers.tsx");
 
 
+
+function MenuBar(param) {
+    var editor = param.editor;
+    // Read the current editor's state, and re-render the component when it changes
+    var editorState = (0,_tiptap_react__WEBPACK_IMPORTED_MODULE_1__.useEditorState)({
+        editor: editor,
+        selector: function(ctx) {
+            var _ctx_editor_isActive, _ctx_editor_can_chain_toggleBold_run, _ctx_editor_isActive1, _ctx_editor_can_chain_toggleItalic_run, _ctx_editor_isActive2, _ctx_editor_can_chain_toggleStrike_run, _ctx_editor_isActive3, _ctx_editor_can_chain_toggleCode_run, _ctx_editor_can_chain_unsetAllMarks_run, _ctx_editor_isActive4, _ctx_editor_isActive5, _ctx_editor_isActive6, _ctx_editor_isActive7, _ctx_editor_isActive8, _ctx_editor_isActive9, _ctx_editor_isActive10, _ctx_editor_isActive11, _ctx_editor_isActive12, _ctx_editor_isActive13, _ctx_editor_isActive14, _ctx_editor_isActive15, _ctx_editor_can_chain_undo_run, _ctx_editor_can_chain_redo_run;
+            return {
+                isBold: (_ctx_editor_isActive = ctx.editor.isActive('bold')) !== null && _ctx_editor_isActive !== void 0 ? _ctx_editor_isActive : false,
+                canBold: (_ctx_editor_can_chain_toggleBold_run = ctx.editor.can().chain().toggleBold().run()) !== null && _ctx_editor_can_chain_toggleBold_run !== void 0 ? _ctx_editor_can_chain_toggleBold_run : false,
+                isItalic: (_ctx_editor_isActive1 = ctx.editor.isActive('italic')) !== null && _ctx_editor_isActive1 !== void 0 ? _ctx_editor_isActive1 : false,
+                canItalic: (_ctx_editor_can_chain_toggleItalic_run = ctx.editor.can().chain().toggleItalic().run()) !== null && _ctx_editor_can_chain_toggleItalic_run !== void 0 ? _ctx_editor_can_chain_toggleItalic_run : false,
+                isStrike: (_ctx_editor_isActive2 = ctx.editor.isActive('strike')) !== null && _ctx_editor_isActive2 !== void 0 ? _ctx_editor_isActive2 : false,
+                canStrike: (_ctx_editor_can_chain_toggleStrike_run = ctx.editor.can().chain().toggleStrike().run()) !== null && _ctx_editor_can_chain_toggleStrike_run !== void 0 ? _ctx_editor_can_chain_toggleStrike_run : false,
+                isCode: (_ctx_editor_isActive3 = ctx.editor.isActive('code')) !== null && _ctx_editor_isActive3 !== void 0 ? _ctx_editor_isActive3 : false,
+                canCode: (_ctx_editor_can_chain_toggleCode_run = ctx.editor.can().chain().toggleCode().run()) !== null && _ctx_editor_can_chain_toggleCode_run !== void 0 ? _ctx_editor_can_chain_toggleCode_run : false,
+                canClearMarks: (_ctx_editor_can_chain_unsetAllMarks_run = ctx.editor.can().chain().unsetAllMarks().run()) !== null && _ctx_editor_can_chain_unsetAllMarks_run !== void 0 ? _ctx_editor_can_chain_unsetAllMarks_run : false,
+                isParagraph: (_ctx_editor_isActive4 = ctx.editor.isActive('paragraph')) !== null && _ctx_editor_isActive4 !== void 0 ? _ctx_editor_isActive4 : false,
+                isHeading1: (_ctx_editor_isActive5 = ctx.editor.isActive('heading', {
+                    level: 1
+                })) !== null && _ctx_editor_isActive5 !== void 0 ? _ctx_editor_isActive5 : false,
+                isHeading2: (_ctx_editor_isActive6 = ctx.editor.isActive('heading', {
+                    level: 2
+                })) !== null && _ctx_editor_isActive6 !== void 0 ? _ctx_editor_isActive6 : false,
+                isHeading3: (_ctx_editor_isActive7 = ctx.editor.isActive('heading', {
+                    level: 3
+                })) !== null && _ctx_editor_isActive7 !== void 0 ? _ctx_editor_isActive7 : false,
+                isHeading4: (_ctx_editor_isActive8 = ctx.editor.isActive('heading', {
+                    level: 4
+                })) !== null && _ctx_editor_isActive8 !== void 0 ? _ctx_editor_isActive8 : false,
+                isHeading5: (_ctx_editor_isActive9 = ctx.editor.isActive('heading', {
+                    level: 5
+                })) !== null && _ctx_editor_isActive9 !== void 0 ? _ctx_editor_isActive9 : false,
+                isHeading6: (_ctx_editor_isActive10 = ctx.editor.isActive('heading', {
+                    level: 6
+                })) !== null && _ctx_editor_isActive10 !== void 0 ? _ctx_editor_isActive10 : false,
+                isBulletList: (_ctx_editor_isActive11 = ctx.editor.isActive('bulletList')) !== null && _ctx_editor_isActive11 !== void 0 ? _ctx_editor_isActive11 : false,
+                isOrderedList: (_ctx_editor_isActive12 = ctx.editor.isActive('orderedList')) !== null && _ctx_editor_isActive12 !== void 0 ? _ctx_editor_isActive12 : false,
+                isCodeBlock: (_ctx_editor_isActive13 = ctx.editor.isActive('codeBlock')) !== null && _ctx_editor_isActive13 !== void 0 ? _ctx_editor_isActive13 : false,
+                isAside: (_ctx_editor_isActive14 = ctx.editor.isActive('aside')) !== null && _ctx_editor_isActive14 !== void 0 ? _ctx_editor_isActive14 : false,
+                isBlockquote: (_ctx_editor_isActive15 = ctx.editor.isActive('blockquote')) !== null && _ctx_editor_isActive15 !== void 0 ? _ctx_editor_isActive15 : false,
+                canUndo: (_ctx_editor_can_chain_undo_run = ctx.editor.can().chain().undo().run()) !== null && _ctx_editor_can_chain_undo_run !== void 0 ? _ctx_editor_can_chain_undo_run : false,
+                canRedo: (_ctx_editor_can_chain_redo_run = ctx.editor.can().chain().redo().run()) !== null && _ctx_editor_can_chain_redo_run !== void 0 ? _ctx_editor_can_chain_redo_run : false
+            };
+        }
+    });
+    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+        className: "tiptap-navbar",
+        children: [
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleBold().run();
+                },
+                disabled: !editorState.canBold,
+                className: "material-symbols-outlined ".concat(editorState.isBold ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Bold'),
+                children: "format_bold"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 43,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleItalic().run();
+                },
+                disabled: !editorState.canItalic,
+                className: "material-symbols-outlined ".concat(editorState.isItalic ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Italic'),
+                children: "format_italic"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 51,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleStrike().run();
+                },
+                disabled: !editorState.canStrike,
+                className: "material-symbols-outlined ".concat(editorState.isStrike ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Strikethrough'),
+                children: "strikethrough_s"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 59,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleCode().run();
+                },
+                disabled: !editorState.canCode,
+                className: "material-symbols-outlined ".concat(editorState.isCode ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Code'),
+                children: "code"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 67,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().unsetAllMarks().run();
+                },
+                className: "material-symbols-outlined",
+                title: "Clear Formatting",
+                children: "format_clear"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 75,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleHeading({
+                        level: 1
+                    }).run();
+                },
+                className: "material-symbols-outlined ".concat(editorState.isHeading1 ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Heading 1'),
+                children: "format_h1"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 89,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleHeading({
+                        level: 2
+                    }).run();
+                },
+                className: "material-symbols-outlined ".concat(editorState.isHeading2 ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Heading 2'),
+                children: "format_h2"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 96,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleHeading({
+                        level: 3
+                    }).run();
+                },
+                className: "material-symbols-outlined ".concat(editorState.isHeading3 ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Heading 3'),
+                children: "format_h3"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 103,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleHeading({
+                        level: 4
+                    }).run();
+                },
+                className: "material-symbols-outlined ".concat(editorState.isHeading4 ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Heading 4'),
+                children: "format_h4"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 110,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleHeading({
+                        level: 5
+                    }).run();
+                },
+                className: "material-symbols-outlined ".concat(editorState.isHeading5 ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Heading 5'),
+                children: "format_h5"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 117,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleHeading({
+                        level: 6
+                    }).run();
+                },
+                className: "material-symbols-outlined ".concat(editorState.isHeading6 ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Heading 6'),
+                children: "format_h6"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 124,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleBulletList().run();
+                },
+                className: "material-symbols-outlined ".concat(editorState.isBulletList ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Bullet List'),
+                children: "format_list_bulleted"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 131,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleOrderedList().run();
+                },
+                className: "material-symbols-outlined ".concat(editorState.isOrderedList ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Numbered List'),
+                children: "format_list_numbered"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 138,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleCodeBlock().run();
+                },
+                className: "material-symbols-outlined ".concat(editorState.isCodeBlock ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Code Block'),
+                children: "code_blocks"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 145,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleAside().run();
+                },
+                className: "material-symbols-outlined ".concat(editorState.isAside ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Aside'),
+                children: "view_sidebar"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 152,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().toggleBlockquote().run();
+                },
+                className: "material-symbols-outlined ".concat(editorState.isBlockquote ? 'is-active' : ''),
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Blockquote'),
+                children: "format_quote"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 159,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().setHorizontalRule().run();
+                },
+                className: "material-symbols-outlined",
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Horizontal Rule'),
+                children: "horizontal_rule"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 166,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().undo().run();
+                },
+                disabled: !editorState.canUndo,
+                className: "material-symbols-outlined",
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Undo'),
+                children: "undo"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 174,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                onClick: function() {
+                    return editor.chain().focus().redo().run();
+                },
+                disabled: !editorState.canRedo,
+                className: "material-symbols-outlined",
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Redo'),
+                children: "redo"
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 182,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+        lineNumber: 42,
+        columnNumber: 5
+    }, this);
+}
 function EditorFrame(param) {
     var editor = param.editor;
     return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
         className: "markdown",
-        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_tiptap_react__WEBPACK_IMPORTED_MODULE_1__.EditorContent, {
-            editor: editor
-        }, void 0, false, {
-            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
-            lineNumber: 9,
-            columnNumber: 5
-        }, this)
-    }, void 0, false, {
+        children: [
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(MenuBar, {
+                editor: editor
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 196,
+                columnNumber: 5
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_tiptap_react__WEBPACK_IMPORTED_MODULE_1__.EditorContent, {
+                editor: editor
+            }, void 0, false, {
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
+                lineNumber: 197,
+                columnNumber: 5
+            }, this)
+        ]
+    }, void 0, true, {
         fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
-        lineNumber: 8,
+        lineNumber: 195,
         columnNumber: 10
     }, this);
 }
