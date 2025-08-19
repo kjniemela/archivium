@@ -10,6 +10,7 @@ import Gallery from './components/Gallery';
 import TimelineEditor from './components/TimelineEditor';
 import type { Item } from '../../src/api/models/item';
 import LineageEditor from './components/LineageEditor';
+import CustomDataEditor from './components/CustomDataEditor';
 
 type Categories = {
   [key: string]: [string, string],
@@ -108,6 +109,8 @@ export default function App({ itemShort, universeShort }: AppProps) {
     extensions: editorExtensions,
     onUpdate: ({ editor }) => {
       if (!objData) return;
+      setNeedsSaving(true);
+      setSaveText('Save Changes');
       debouncedOnUpdate(editor, (content) => setObjData({ ...objData, body: content }));
     },
   });
@@ -277,7 +280,18 @@ export default function App({ itemShort, universeShort }: AppProps) {
     ),
   };
 
+  const customTabs: Record<string, ReactElement> = {};
+  for (const tab in objData.tabs) {
+    customTabs[tab] = <CustomDataEditor data={objData.tabs[tab]} onUpdate={(newData) => {
+      const newState = { ...objData };
+      if (!newState.tabs) newState.tabs = {};
+      newState.tabs[tab] = newData;
+      setObjData(newState);
+    }} />;
+  }
+
   const tabs: Record<string, ReactElement | null> = {
+    ...customTabs,
     body: (
       <EditorFrame editor={editor} />
     ),
