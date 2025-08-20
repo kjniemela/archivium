@@ -95,6 +95,7 @@ function computeTabs(objData: ObjData): Record<string, string> {
 }
 
 export default function App({ itemShort, universeShort }: AppProps) {
+  const [initContent, setInitContent] = useState<any | null>(null);
   const [categories, setCategories] = useState<Categories | null>(null);
   const [item, setItem] = useState<Item | null>(null);
   const [objData, setObjData] = useState<ObjData | null>(null);
@@ -205,22 +206,28 @@ export default function App({ itemShort, universeShort }: AppProps) {
       setLineageItemMap(newLineageItemMap);
     });
     fetchData(`/api/universes/${universeShort}/items/${itemShort}`, async (data) => {
+      await Promise.all([categoryPromise, eventItemPromise, lineageItemPromise]);
       const objData = JSON.parse(data.obj_data) as ObjData;
-      setObjData(objData);
-      setTabNames(computeTabs(objData));
       if (typeof objData.body === 'string') {
-        renderMarkdown(universeShort, objData.body, { item: { ...data, obj_data: objData } }).then((text: string) => {
-          editor.commands.setContent(text);
+        await renderMarkdown(universeShort, objData.body, { item: { ...data, obj_data: objData } }).then((text: string) => {
+          setInitContent(text);
         });
       } else if (objData.body) {
         const json = indexedToJson(objData.body);
-        editor.commands.setContent(json);
+        setInitContent(json);
       }
       delete data.obj_data;
-      await Promise.all([categoryPromise, eventItemPromise, lineageItemPromise]);
+      setObjData(objData);
+      setTabNames(computeTabs(objData));
       setItem(data);
     });
   }, [itemShort, universeShort]);
+
+  useEffect(() => {
+    if (editor && initContent) {
+      editor.commands.setContent(initContent);
+    }
+  }, [editor, initContent]);
 
   useEffect(() => {
     if (item && objData) {

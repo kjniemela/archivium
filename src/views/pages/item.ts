@@ -12,6 +12,7 @@ import { IndexedDocument, indexedToJson } from '../../lib/tiptapHelpers';
 import logger from '../../logger';
 import { universeLink } from '../../templates';
 import { editorExtensions } from '../../lib/editor';
+import StarterKit from '@tiptap/starter-kit';
 
 export default {
   async list(req, res) {
@@ -78,7 +79,7 @@ export default {
     if ('body' in item.obj_data && typeof item.obj_data.body !== 'string') {
       try {
         const jsonBody = indexedToJson(item.obj_data.body as IndexedDocument);
-        const htmlBody = renderToHTMLString({ extensions: editorExtensions, content: jsonBody });
+        const htmlBody = renderToHTMLString({ extensions: [StarterKit, ...editorExtensions], content: jsonBody });
         const sanitizedHtml = sanitizeHtml(htmlBody, {
           allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
           allowedAttributes: {

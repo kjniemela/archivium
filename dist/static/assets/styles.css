@@ -751,6 +751,7 @@ h4, h5 {
   border: 0;
   padding: 0.125rem 0.25rem;
   background-color: #f3f3f3;
+  cursor: pointer;
 }
 
 .tiptap-navbar button.is-active {
