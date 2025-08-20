@@ -233,7 +233,7 @@ function MenuBar({ editor }: { editor: Editor }) {
 }
 
 export default function EditorFrame({ editor }: RichEditorProps) {
-  return <div className='markdown'>
+  return <div className='tiptap-editor markdown'>
     <MenuBar editor={editor} />
     <EditorContent editor={editor} />
   </div>;

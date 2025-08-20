@@ -6,6 +6,7 @@ html(lang='en')
   head
     block title
       title #{T('Archivium')}
+    meta(name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0')
     link(rel='manifest' href='/static/manifest.json')
     link(rel='stylesheet' href=`${ADDR_PREFIX}/static/assets/styles.css`)
     link(rel='icon' type='image/x-icon' href=`${ADDR_PREFIX}/static/assets/icons/archivium.ico`)
@@ -59,7 +60,7 @@ html(lang='en')
 
   body
     header
-      nav.navbar.ma-2.mb-0
+      nav.navbar.mb-0
         ul.navbarBtns.shrink-1.scroll-x
           li.navbarBtn
             a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/`) #{T('Home')}

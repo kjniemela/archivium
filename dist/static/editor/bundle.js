@@ -58321,7 +58321,7 @@ function MenuBar(param) {
 function EditorFrame(param) {
     var editor = param.editor;
     return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-        className: "markdown",
+        className: "tiptap-editor markdown",
         children: [
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(MenuBar, {
                 editor: editor
