@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { EditorContent, Editor, useEditorState } from '@tiptap/react';
 import { T } from '../helpers';
 
@@ -27,6 +28,7 @@ function MenuBar({ editor }: { editor: Editor }) {
         isHeading4: ctx.editor.isActive('heading', { level: 4 }) ?? false,
         isHeading5: ctx.editor.isActive('heading', { level: 5 }) ?? false,
         isHeading6: ctx.editor.isActive('heading', { level: 6 }) ?? false,
+        isLink: ctx.editor.isActive('link') ?? false,
         isBulletList: ctx.editor.isActive('bulletList') ?? false,
         isOrderedList: ctx.editor.isActive('orderedList') ?? false,
         isCodeBlock: ctx.editor.isActive('codeBlock') ?? false,
@@ -36,7 +38,31 @@ function MenuBar({ editor }: { editor: Editor }) {
         canRedo: ctx.editor.can().chain().redo().run() ?? false,
       }
     },
-  })
+  });
+
+  const setLink = useCallback(() => {
+    const previousUrl = editor.getAttributes('link').href;
+    const url = window.prompt('URL', previousUrl);
+
+    // cancelled
+    if (url === null) {
+      return;
+    }
+
+    // empty
+    if (url === '') {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+
+      return;
+    }
+
+    // update link
+    try {
+      editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    } catch (e: any) {
+      alert(e.message);
+    }
+  }, [editor]);
 
   return (
     <div className='tiptap-navbar'>
@@ -127,6 +153,21 @@ function MenuBar({ editor }: { editor: Editor }) {
         title={T('Heading 6')}
       >
         format_h6
+      </button>
+      <button
+        onClick={setLink}
+        className={`material-symbols-outlined ${editorState.isLink ? 'is-active' : ''}`}
+        title={T('Link')}
+      >
+        link
+      </button>
+      <button
+        onClick={() => editor.chain().focus().unsetLink().run()}
+        disabled={!editorState.isLink}
+        className={'material-symbols-outlined'}
+        title={T('Remove Link')}
+      >
+        link_off
       </button>
       <button
         onClick={() => editor.chain().focus().toggleBulletList().run()}

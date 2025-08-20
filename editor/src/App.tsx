@@ -6,11 +6,13 @@ import { editorExtensions } from '../../src/lib/editor';
 import { createPortal } from 'react-dom';
 import TabsBar from './components/TabsBar';
 import { useEditor } from '@tiptap/react';
+import Link from '@tiptap/extension-link'
 import Gallery from './components/Gallery';
 import TimelineEditor from './components/TimelineEditor';
 import type { Item } from '../../src/api/models/item';
 import LineageEditor from './components/LineageEditor';
 import CustomDataEditor from './components/CustomDataEditor';
+import StarterKit from '@tiptap/starter-kit';
 
 type Categories = {
   [key: string]: [string, string],
@@ -106,7 +108,22 @@ export default function App({ itemShort, universeShort }: AppProps) {
   const [previousData, setPreviousData] = useState<(Item & { obj_data: ObjData }) | null>(null);
   
   const editor = useEditor({
-    extensions: editorExtensions,
+    extensions: [
+      StarterKit.configure({
+        link: false,
+      }),
+      ...editorExtensions,
+      Link.configure({
+        enableClickSelection: true,
+        openOnClick: false,
+        autolink: true,
+        HTMLAttributes: {
+          rel: 'noopener noreferrer nofollow',
+          target: '_blank',
+          class: 'link link-animated',
+        },
+      }),
+    ],
     onUpdate: ({ editor }) => {
       if (!objData) return;
       setNeedsSaving(true);
