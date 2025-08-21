@@ -79,14 +79,6 @@ window.onbeforeunload = (event) => {
 };
 let saveTimeout: NodeJS.Timeout | null = null;
 
-const saveBtn = document.getElementById('save-btn');
-if (saveBtn) {
-  saveBtn.addEventListener('click', () => {
-    const saveChangesBtn = document.getElementById('save-changes');
-    saveChangesBtn?.click();
-  });
-}
-
 function computeTabs(objData: ObjData): Record<string, string> {
   return {
     ...(objData.body ? { body: T('Main Text') } : {}),
@@ -136,7 +128,7 @@ export default function App({ itemShort, universeShort, displayUniverse, addrPre
     },
   });
   
-  async function save(delay: number) {
+  async function save(delay: number, callback?: () => void) {
     if (saveTimeout) {
       clearTimeout(saveTimeout);
     }
@@ -174,6 +166,7 @@ export default function App({ itemShort, universeShort, displayUniverse, addrPre
         setSaveText('Saved');
         setPreviousData(data);
         setNeedsSaving(false);
+        if (callback) callback();
       } catch (err) {
         console.error('Failed to save!');
         console.error(err);
@@ -264,6 +257,7 @@ export default function App({ itemShort, universeShort, displayUniverse, addrPre
 
   const modalAnchor = document.querySelector('#modal-anchor');
   const saveBtnAnchor = document.querySelector('#save-btn');
+  const previewBtnAnchor = document.querySelector('#preview-btn');
 
   const [newTabType, setNewTabType] = useState<string | undefined>(undefined);
   const [newTabName, setNewTabName] = useState<string>('');
@@ -399,8 +393,14 @@ export default function App({ itemShort, universeShort, displayUniverse, addrPre
     <>
       {/* Save Button */}
       {saveBtnAnchor && createPortal(
-        <a className='navbarBtnLink navbarText'>{T(saveText)}</a>,
+        <a className='navbarBtnLink navbarText' onClick={() => save(0)}>{T(saveText)}</a>,
         saveBtnAnchor,
+      )}
+      {previewBtnAnchor && createPortal(
+        <a className='navbarBtnLink navbarText' onClick={() => save(0, () => {
+          location.href = `${context.universeLink(universeShort)}/items/${itemShort}`;
+        })}>{T('Preview')}</a>,
+        previewBtnAnchor,
       )}
       {/* Modals */}
       {modalAnchor && (

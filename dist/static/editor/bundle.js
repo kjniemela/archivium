@@ -56973,13 +56973,6 @@ window.onbeforeunload = function(event) {
     }
 };
 var saveTimeout = null;
-var saveBtn = document.getElementById('save-btn');
-if (saveBtn) {
-    saveBtn.addEventListener('click', function() {
-        var saveChangesBtn = document.getElementById('save-changes');
-        saveChangesBtn === null || saveChangesBtn === void 0 ? void 0 : saveChangesBtn.click();
-    });
-}
 function computeTabs(objData) {
     return _object_spread({}, objData.body ? {
         body: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Main Text')
@@ -57004,7 +56997,7 @@ function App(param) {
             }
         }, void 0, false, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 327,
+            lineNumber: 321,
             columnNumber: 23
         }, _this);
     };
@@ -57051,7 +57044,7 @@ function App(param) {
             });
         }
     });
-    function save(delay) {
+    function save(delay, callback) {
         return _async_to_generator(function() {
             return _ts_generator(this, function(_state) {
                 if (saveTimeout) {
@@ -57114,6 +57107,7 @@ function App(param) {
                                     setSaveText('Saved');
                                     setPreviousData(data);
                                     setNeedsSaving(false);
+                                    if (callback) callback();
                                     return [
                                         3,
                                         5
@@ -57342,6 +57336,7 @@ function App(param) {
     ]);
     var modalAnchor = document.querySelector('#modal-anchor');
     var saveBtnAnchor = document.querySelector('#save-btn');
+    var previewBtnAnchor = document.querySelector('#preview-btn');
     var _useState12 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(undefined), 2), newTabType = _useState12[0], setNewTabType = _useState12[1];
     var _useState13 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(''), 2), newTabName = _useState13[0], setNewTabName = _useState13[1];
     function addTabByType() {
@@ -57389,12 +57384,12 @@ function App(param) {
                 }
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                lineNumber: 304,
+                lineNumber: 298,
                 columnNumber: 7
             }, this)
         }, void 0, false, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 303,
+            lineNumber: 297,
             columnNumber: 12
         }, this);
     }
@@ -57422,7 +57417,7 @@ function App(param) {
                             ]
                         }, void 0, true, {
                             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 312,
+                            lineNumber: 306,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
@@ -57431,7 +57426,7 @@ function App(param) {
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Main Text')
                         }, void 0, false, {
                             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 313,
+                            lineNumber: 307,
                             columnNumber: 11
                         }, this),
                         BUILTIN_TABS.map(function(type) {
@@ -57441,7 +57436,7 @@ function App(param) {
                                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(type))
                             }, type, false, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 315,
+                                lineNumber: 309,
                                 columnNumber: 13
                             }, _this1);
                         }),
@@ -57450,13 +57445,13 @@ function App(param) {
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Custom Data')
                         }, void 0, false, {
                             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 317,
+                            lineNumber: 311,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                    lineNumber: 311,
+                    lineNumber: 305,
                     columnNumber: 9
                 }, this),
                 newTabType === 'custom' && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -57469,7 +57464,7 @@ function App(param) {
                     }
                 }, void 0, false, {
                     fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                    lineNumber: 319,
+                    lineNumber: 313,
                     columnNumber: 37
                 }, this),
                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -57480,13 +57475,13 @@ function App(param) {
                     children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('New Tab')
                 }, void 0, false, {
                     fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                    lineNumber: 320,
+                    lineNumber: 314,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 310,
+            lineNumber: 304,
             columnNumber: 7
         }, this)
     };
@@ -57542,7 +57537,7 @@ function App(param) {
             }
         }, void 0, false, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 338,
+            lineNumber: 332,
             columnNumber: 7
         }, this),
         gallery: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_Gallery__WEBPACK_IMPORTED_MODULE_9__["default"], {
@@ -57578,7 +57573,7 @@ function App(param) {
             }
         }, void 0, false, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 359,
+            lineNumber: 353,
             columnNumber: 7
         }, this),
         timeline: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_TimelineEditor__WEBPACK_IMPORTED_MODULE_10__["default"], {
@@ -57592,7 +57587,7 @@ function App(param) {
             eventItemMap: eventItemMap !== null && eventItemMap !== void 0 ? eventItemMap : {}
         }, void 0, false, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 386,
+            lineNumber: 380,
             columnNumber: 7
         }, this),
         lineage: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_LineageEditor__WEBPACK_IMPORTED_MODULE_11__["default"], {
@@ -57603,7 +57598,7 @@ function App(param) {
             itemMap: lineageItemMap !== null && lineageItemMap !== void 0 ? lineageItemMap : {}
         }, void 0, false, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 394,
+            lineNumber: 388,
             columnNumber: 7
         }, this)
     });
@@ -57612,12 +57607,28 @@ function App(param) {
         children: [
             saveBtnAnchor && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("a", {
                 className: "navbarBtnLink navbarText",
+                onClick: function() {
+                    return save(0);
+                },
                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                lineNumber: 402,
+                lineNumber: 396,
                 columnNumber: 9
             }, this), saveBtnAnchor),
+            previewBtnAnchor && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("a", {
+                className: "navbarBtnLink navbarText",
+                onClick: function() {
+                    return save(0, function() {
+                        location.href = "".concat(context.universeLink(universeShort), "/items/").concat(itemShort);
+                    });
+                },
+                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Preview')
+            }, void 0, false, {
+                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
+                lineNumber: 400,
+                columnNumber: 9
+            }, this), previewBtnAnchor),
             modalAnchor && currentModal && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
                 className: "modal",
                 onClick: function() {
