@@ -34,7 +34,7 @@ function jsonToIndexed(doc) {
     const structure = (doc.content || []).map(walk);
     return { text: textBuffer, structure };
 }
-function indexedToJson(indexed) {
+function indexedToJson(indexed, linkHandler) {
     const { text, structure } = indexed;
     function walk(node) {
         if (node.type === 'text') {
@@ -46,6 +46,11 @@ function indexedToJson(indexed) {
                 combinedNode.marks = node.marks;
             if (node.attrs && Object.keys(node.attrs).length > 0)
                 combinedNode.attrs = node.attrs;
+            for (const mark of combinedNode.marks ?? []) {
+                if (mark.attrs && mark.attrs.href && linkHandler) {
+                    linkHandler(mark.attrs.href);
+                }
+            }
             return combinedNode;
         }
         const combinedNode = { type: node.type };

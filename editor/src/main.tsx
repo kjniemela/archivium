@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App, { type AppProps } from './App.tsx'
 
 const root: HTMLElement = document.querySelector('#root')!;
-const dataset: AppProps = root.dataset;
+const dataset: AppProps = root.dataset as AppProps;
 
 createRoot(root).render(
   <StrictMode>

@@ -4,9 +4,10 @@ import { T } from '../helpers';
 
 type RichEditorProps = {
   editor: Editor;
+  getLink: (previousUrl: string) => Promise<string | null>;
 };
 
-function MenuBar({ editor }: { editor: Editor }) {
+function MenuBar({ editor, getLink }: RichEditorProps) {
   // Read the current editor's state, and re-render the component when it changes
   const editorState = useEditorState({
     editor,
@@ -42,26 +43,24 @@ function MenuBar({ editor }: { editor: Editor }) {
 
   const setLink = useCallback(() => {
     const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('URL', previousUrl);
 
-    // cancelled
-    if (url === null) {
-      return;
-    }
+    getLink(previousUrl).then((url) => {
+      if (url === null) {
+        return;
+      }
 
-    // empty
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+      if (url === '') {
+        editor.chain().focus().extendMarkRange('link').unsetLink().run();
 
-      return;
-    }
+        return;
+      }
 
-    // update link
-    try {
-      editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
-    } catch (e: any) {
-      alert(e.message);
-    }
+      try {
+        editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+      } catch (e: any) {
+        alert(e.message);
+      }
+    });
   }, [editor]);
 
   return (
@@ -105,13 +104,6 @@ function MenuBar({ editor }: { editor: Editor }) {
       >
         format_clear
       </button>
-      {/* <button onClick={() => editor.chain().focus().clearNodes().run()}>Clear nodes</button> */}
-      {/* <button
-        onClick={() => editor.chain().focus().setParagraph().run()}
-        className={`material-symbols-outlined ${editorState.isParagraph ? 'is-active' : ''}`}
-      >
-        format_paragraph
-      </button> */}
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         className={`material-symbols-outlined ${editorState.isHeading1 ? 'is-active' : ''}`}
@@ -211,7 +203,6 @@ function MenuBar({ editor }: { editor: Editor }) {
       >
         horizontal_rule
       </button>
-      {/* <button onClick={() => editor.chain().focus().setHardBreak().run()}>Hard break</button> */}
       <button
         onClick={() => editor.chain().focus().undo().run()} 
         disabled={!editorState.canUndo}
@@ -232,9 +223,9 @@ function MenuBar({ editor }: { editor: Editor }) {
   )
 }
 
-export default function EditorFrame({ editor }: RichEditorProps) {
+export default function EditorFrame({ editor, getLink }: RichEditorProps) {
   return <div className='tiptap-editor markdown'>
-    <MenuBar editor={editor} />
+    <MenuBar editor={editor} getLink={getLink} />
     <EditorContent editor={editor} />
   </div>;
 }

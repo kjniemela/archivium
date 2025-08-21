@@ -1,18 +1,16 @@
 import { useState, useEffect, type ReactElement } from 'react';
-import { capitalize, deepCompare, renderMarkdown, T } from './helpers';
+import { BulkExistsFetcher, capitalize, deepCompare, renderMarkdown, T } from './helpers';
 import EditorFrame from './components/EditorFrame';
 import { indexedToJson, jsonToIndexed, type IndexedDocument } from '../../src/lib/tiptapHelpers';
-import { editorExtensions } from '../../src/lib/editor';
+import { editorExtensions, extractLinkData, type LinkData, type LinkingContext } from '../../src/lib/editor';
 import { createPortal } from 'react-dom';
 import TabsBar from './components/TabsBar';
 import { useEditor } from '@tiptap/react';
-import Link from '@tiptap/extension-link'
 import Gallery from './components/Gallery';
 import TimelineEditor from './components/TimelineEditor';
 import type { Item } from '../../src/api/models/item';
 import LineageEditor from './components/LineageEditor';
 import CustomDataEditor from './components/CustomDataEditor';
-import StarterKit from '@tiptap/starter-kit';
 
 type Categories = {
   [key: string]: [string, string],
@@ -34,6 +32,9 @@ type ModalType = 'newTab';
 export type AppProps = {
   itemShort: string,
   universeShort: string,
+  displayUniverse: string,
+  addrPrefix: string,
+  domain: string,
 };
 
 async function fetchData(url: string, setter: (value: any) => Promise<void> | void): Promise<any> {
@@ -53,13 +54,13 @@ async function fetchData(url: string, setter: (value: any) => Promise<void> | vo
   }
 }
 
-let timeoutId: NodeJS.Timeout | null = null;
+let updateTimeoutId: NodeJS.Timeout | null = null;
 function debouncedOnUpdate(editor: any, onChange: (content: IndexedDocument) => void) {
-  if (timeoutId) {
-    clearTimeout(timeoutId);
+  if (updateTimeoutId) {
+    clearTimeout(updateTimeoutId);
   }
 
-  timeoutId = setTimeout(() => {
+  updateTimeoutId = setTimeout(() => {
     const json = editor.getJSON();
     const indexed = jsonToIndexed(json);
     onChange(indexed);
@@ -94,7 +95,9 @@ function computeTabs(objData: ObjData): Record<string, string> {
   };
 }
 
-export default function App({ itemShort, universeShort }: AppProps) {
+const itemExistsCache: { [universe: string]: { [item: string]: boolean } } = {};
+
+export default function App({ itemShort, universeShort, displayUniverse, addrPrefix, domain }: AppProps) {
   const [initContent, setInitContent] = useState<any | null>(null);
   const [categories, setCategories] = useState<Categories | null>(null);
   const [item, setItem] = useState<Item | null>(null);
@@ -107,24 +110,24 @@ export default function App({ itemShort, universeShort }: AppProps) {
   const [eventItemMap, setEventItemMap] = useState<Record<number, EventItem[]>>();
   const [lineageItemMap, setLineageItemMap] = useState<Record<number, string>>();
   const [previousData, setPreviousData] = useState<(Item & { obj_data: ObjData }) | null>(null);
+
+  const context: LinkingContext = {
+    currentUniverse: universeShort,
+    universeLink(universe) {
+      if (displayUniverse) {
+        if (displayUniverse === universe) return addrPrefix;
+        else return `https://${domain}${addrPrefix}/universes/${universe}`;
+      } else {
+        return `${addrPrefix}/universes/${universe}`;
+      }
+    },
+    itemExists(universe, item): boolean {
+      return (itemExistsCache[universe] ?? {})[item] ?? false;
+    },
+  };
   
   const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        link: false,
-      }),
-      ...editorExtensions,
-      Link.configure({
-        enableClickSelection: true,
-        openOnClick: false,
-        autolink: true,
-        HTMLAttributes: {
-          rel: 'noopener noreferrer nofollow',
-          target: '_blank',
-          class: 'link link-animated',
-        },
-      }),
-    ],
+    extensions: editorExtensions(true, context),
     onUpdate: ({ editor }) => {
       if (!objData) return;
       setNeedsSaving(true);
@@ -161,7 +164,7 @@ export default function App({ itemShort, universeShort }: AppProps) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(data),
-        })
+        });
         const err = await response.json();
         if (!response.ok) {
           setErrorMessage(err);
@@ -213,7 +216,22 @@ export default function App({ itemShort, universeShort }: AppProps) {
           setInitContent(text);
         });
       } else if (objData.body) {
-        const json = indexedToJson(objData.body);
+        const links: LinkData[] = [];
+        const json = indexedToJson(objData.body, (href) => links.push(extractLinkData(href)));
+        const bulkFetcher = new BulkExistsFetcher();
+        const fetchPromises = links.map(async (link) => {
+          if (link.item) {
+            const universe = link.universe ?? universeShort;
+            if (!(universeShort in itemExistsCache)) {
+              itemExistsCache[universe] = {};
+            }
+            if (!(link.item in itemExistsCache[universe])) {
+              itemExistsCache[universe][link.item] = await bulkFetcher.exists(universe, link.item);
+            }
+          }
+        });
+        bulkFetcher.fetchAll();
+        await Promise.all(fetchPromises);
         setInitContent(json);
       }
       delete data.obj_data;
@@ -317,7 +335,25 @@ export default function App({ itemShort, universeShort }: AppProps) {
   const tabs: Record<string, ReactElement | null> = {
     ...customTabs,
     body: (
-      <EditorFrame editor={editor} />
+      <EditorFrame editor={editor} getLink={async (previousUrl) => {
+        const url = window.prompt('URL', previousUrl);
+        if (url?.startsWith('@')) {
+          const link = extractLinkData(url);
+          if (link.item) {
+            const universe = link.universe ?? universeShort;
+            if (!(universeShort in itemExistsCache)) {
+              itemExistsCache[universe] = {};
+            }
+            if (!(link.item in itemExistsCache[universe])) {
+              const existsFetcher = new BulkExistsFetcher();
+              const fetchPromise = existsFetcher.exists(universe, link.item);
+              existsFetcher.fetchAll();
+              itemExistsCache[universe][link.item] = await fetchPromise;
+            }
+          }
+        }
+        return url;
+      }} />
     ),
     gallery: (
       <Gallery universe={universeShort} item={itemShort} images={item.gallery} onRemoveImage={(id) => {

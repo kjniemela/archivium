@@ -98,6 +98,37 @@ export function deepCompare(a: any, b: any): boolean {
   return true;
 }
 
+export class BulkExistsFetcher {
+  data: { [universe: string]: string[] } = {};
+  resolvers: { [key: string]: (exists: boolean) => void } = {};
+  promises: { [key: string]: Promise<boolean> } = {};
+
+  exists(universe: string, item: string): Promise<boolean> {
+    if (`${universe}/${item}` in this.promises) return this.promises[`${universe}/${item}`];
+    if (!(universe in this.data)) this.data[universe] = [];
+    const promise = new Promise<boolean>(async (resolve) => {
+      this.data[universe].push(item);
+      this.resolvers[`${universe}/${item}`] = resolve;
+    });
+    this.promises[`${universe}/${item}`] = promise;
+    return promise;
+  }
+
+  async fetchAll() {
+    const result = await (await fetch('/api/exists', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(this.data),
+    })).json();
+    for (const universe in result) {
+      for (const item in result[universe]) {
+        this.resolvers[`${universe}/${item}`](result[universe][item] as boolean);
+      }
+    }
+  }
+}
 
 function createElement(
   type: string, 

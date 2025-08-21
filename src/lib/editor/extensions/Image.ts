@@ -1,7 +1,7 @@
-import TipTapImage from '@tiptap/extension-image';
+import TiptapImage from '@tiptap/extension-image';
 import { mergeAttributes } from '@tiptap/core';
 
-const Image = TipTapImage.extend({
+const Image = TiptapImage.extend({
   renderHTML({ HTMLAttributes }) {
     return [
       'div',

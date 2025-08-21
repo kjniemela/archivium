@@ -11,7 +11,7 @@ import { ForbiddenError, NotFoundError } from '../../errors';
 import { IndexedDocument, indexedToJson } from '../../lib/tiptapHelpers';
 import logger from '../../logger';
 import { universeLink } from '../../templates';
-import { editorExtensions } from '../../lib/editor';
+import { editorExtensions, extractLinkData, LinkData, LinkingContext } from '../../lib/editor';
 import StarterKit from '@tiptap/starter-kit';
 
 export default {
@@ -78,8 +78,27 @@ export default {
 
     if ('body' in item.obj_data && typeof item.obj_data.body !== 'string') {
       try {
-        const jsonBody = indexedToJson(item.obj_data.body as IndexedDocument);
-        const htmlBody = renderToHTMLString({ extensions: [StarterKit, ...editorExtensions], content: jsonBody });
+        const links: LinkData[] = [];
+        const jsonBody = indexedToJson(item.obj_data.body as IndexedDocument, (href) => links.push(extractLinkData(href)));
+        const itemsPerUniverse = {};
+        /* Because Tiptap rendering cannot be async, we extract the links we'll need to check ahead of time. */
+        await Promise.all(links.map(async (link) => {
+          if (link.item) {
+            const universeShort = link.universe ?? universe.shortname;
+            if (!(universeShort in itemsPerUniverse)) {
+              itemsPerUniverse[universeShort] = {};
+            }
+            if (!(link.item in itemsPerUniverse[universeShort])) {
+              itemsPerUniverse[universeShort][link.item] = await api.item.exists(req.session.user, universeShort, link.item);
+            }
+          }
+        }));
+        const renderContext: LinkingContext = {
+          currentUniverse: universe.shortname,
+          universeLink: (universeShort) => universeLink(req, universeShort),
+          itemExists: (universe, item) => (universe in itemsPerUniverse) && itemsPerUniverse[universe][item],
+        };
+        const htmlBody = renderToHTMLString({ extensions: editorExtensions(false, renderContext), content: jsonBody });
         const sanitizedHtml = sanitizeHtml(htmlBody, {
           allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
           allowedAttributes: {

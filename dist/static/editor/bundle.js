@@ -55333,6 +55333,114 @@ var Image = _tiptap_extension_image__WEBPACK_IMPORTED_MODULE_0__["default"].exte
 
 /***/ }),
 
+/***/ "../src/lib/editor/extensions/Link.ts":
+/*!********************************************!*\
+  !*** ../src/lib/editor/extensions/Link.ts ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _tiptap_extension_link__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/extension-link */ "../node_modules/@tiptap/extension-link/dist/index.js");
+/* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function _object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            _define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
+function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+        var symbols = Object.getOwnPropertySymbols(object);
+        if (enumerableOnly) {
+            symbols = symbols.filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+            });
+        }
+        keys.push.apply(keys, symbols);
+    }
+    return keys;
+}
+function _object_spread_props(target, source) {
+    source = source != null ? source : {};
+    if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+        ownKeys(Object(source)).forEach(function(key) {
+            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+    }
+    return target;
+}
+
+
+var Link = _tiptap_extension_link__WEBPACK_IMPORTED_MODULE_0__["default"].configure({
+    autolink: true,
+    HTMLAttributes: {
+        rel: false,
+        target: false,
+        class: 'link link-animated'
+    }
+}).extend({
+    addOptions: function addOptions() {
+        var _this_parent, _this;
+        var _this_parent1;
+        var parent = (_this_parent1 = (_this_parent = (_this = this).parent) === null || _this_parent === void 0 ? void 0 : _this_parent.call(_this)) !== null && _this_parent1 !== void 0 ? _this_parent1 : {};
+        return _object_spread_props(_object_spread({}, parent), {
+            shorthandResolver: function(s) {
+                return {
+                    href: s,
+                    pending: true
+                };
+            }
+        });
+    },
+    renderHTML: function renderHTML(param) {
+        var HTMLAttributes = param.HTMLAttributes;
+        var resolved = this.options.shorthandResolver(HTMLAttributes.href, this.options.context);
+        var href = resolved.href;
+        var _resolved_exists;
+        var exists = (_resolved_exists = resolved.exists) !== null && _resolved_exists !== void 0 ? _resolved_exists : true;
+        return [
+            'a',
+            (0,_tiptap_core__WEBPACK_IMPORTED_MODULE_1__.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes, {
+                href: href,
+                class: exists ? '' : 'link-broken'
+            }),
+            0
+        ];
+    }
+});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Link);
+
+
+/***/ }),
+
 /***/ "../src/lib/editor/index.ts":
 /*!**********************************!*\
   !*** ../src/lib/editor/index.ts ***!
@@ -55341,16 +55449,117 @@ var Image = _tiptap_extension_image__WEBPACK_IMPORTED_MODULE_0__["default"].exte
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   editorExtensions: () => (/* binding */ editorExtensions)
+/* harmony export */   editorExtensions: () => (/* binding */ editorExtensions),
+/* harmony export */   extractLinkData: () => (/* binding */ extractLinkData),
+/* harmony export */   shorthandResolver: () => (/* binding */ shorthandResolver)
 /* harmony export */ });
-/* harmony import */ var _extensions_Aside__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./extensions/Aside */ "../src/lib/editor/extensions/Aside.ts");
-/* harmony import */ var _extensions_Image__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./extensions/Image */ "../src/lib/editor/extensions/Image.ts");
+/* harmony import */ var _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/starter-kit */ "../node_modules/@tiptap/starter-kit/dist/index.js");
+/* harmony import */ var _extensions_Aside__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./extensions/Aside */ "../src/lib/editor/extensions/Aside.ts");
+/* harmony import */ var _extensions_Image__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./extensions/Image */ "../src/lib/editor/extensions/Image.ts");
+/* harmony import */ var _extensions_Link__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./extensions/Link */ "../src/lib/editor/extensions/Link.ts");
+function _array_like_to_array(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
+    return arr2;
+}
+function _array_with_holes(arr) {
+    if (Array.isArray(arr)) return arr;
+}
+function _iterable_to_array_limit(arr, i) {
+    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+    if (_i == null) return;
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _s, _e;
+    try {
+        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
+            _arr.push(_s.value);
+            if (i && _arr.length === i) break;
+        }
+    } catch (err) {
+        _d = true;
+        _e = err;
+    } finally{
+        try {
+            if (!_n && _i["return"] != null) _i["return"]();
+        } finally{
+            if (_d) throw _e;
+        }
+    }
+    return _arr;
+}
+function _non_iterable_rest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _sliced_to_array(arr, i) {
+    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
+}
+function _unsupported_iterable_to_array(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _array_like_to_array(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
+}
 
 
-var editorExtensions = [
-    _extensions_Aside__WEBPACK_IMPORTED_MODULE_0__["default"],
-    _extensions_Image__WEBPACK_IMPORTED_MODULE_1__["default"]
-];
+
+
+function extractLinkData(href) {
+    var data = {};
+    var _href_substring_split = _sliced_to_array(href.substring(1).split('/'), 2), first = _href_substring_split[0], second = _href_substring_split[1];
+    if (first) {
+        data.universe = first;
+        if (!second) {
+            second = first;
+            delete data.universe;
+        }
+        var _second_split = _sliced_to_array(second.split('#'), 2), itemQuery = _second_split[0], hash = _second_split[1];
+        var _itemQuery_split = _sliced_to_array(itemQuery.split('?'), 2), item = _itemQuery_split[0], query = _itemQuery_split[1];
+        data.item = item;
+        data.hash = hash;
+        data.query = query;
+    }
+    return data;
+}
+function shorthandResolver(href, ctx) {
+    if (!href) return {
+        href: ''
+    };
+    if (ctx) {
+        if (href.startsWith('@')) {
+            var _extractLinkData = extractLinkData(href), universe = _extractLinkData.universe, item = _extractLinkData.item, hash = _extractLinkData.hash, query = _extractLinkData.query;
+            if (item) {
+                ;
+                var universeLink = ctx.universeLink(universe !== null && universe !== void 0 ? universe : ctx.currentUniverse);
+                return {
+                    href: "".concat(universeLink, "/items/").concat(item).concat(query ? "?".concat(query) : '').concat(hash ? "#".concat(hash) : ''),
+                    exists: ctx.itemExists(universe !== null && universe !== void 0 ? universe : ctx.currentUniverse, item)
+                };
+            }
+        }
+    }
+    return {
+        href: href
+    };
+}
+var editorExtensions = function(editMode, context) {
+    return [
+        _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_0__["default"].configure({
+            link: false
+        }),
+        _extensions_Aside__WEBPACK_IMPORTED_MODULE_1__["default"],
+        _extensions_Image__WEBPACK_IMPORTED_MODULE_2__["default"],
+        _extensions_Link__WEBPACK_IMPORTED_MODULE_3__["default"].configure({
+            enableClickSelection: editMode,
+            openOnClick: !editMode,
+            shorthandResolver: shorthandResolver,
+            context: context
+        })
+    ];
+};
 
 
 /***/ }),
@@ -55403,7 +55612,7 @@ function jsonToIndexed(doc) {
         structure: structure
     };
 }
-function indexedToJson(indexed) {
+function indexedToJson(indexed, linkHandler) {
     var text = indexed.text, structure = indexed.structure;
     function walk(node) {
         if (node.type === 'text') {
@@ -55413,6 +55622,29 @@ function indexedToJson(indexed) {
             };
             if (node.marks && node.marks.length > 0) combinedNode.marks = node.marks;
             if (node.attrs && Object.keys(node.attrs).length > 0) combinedNode.attrs = node.attrs;
+            var _combinedNode_marks;
+            var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
+            try {
+                for(var _iterator = ((_combinedNode_marks = combinedNode.marks) !== null && _combinedNode_marks !== void 0 ? _combinedNode_marks : [])[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true){
+                    var mark = _step.value;
+                    if (mark.attrs && mark.attrs.href && linkHandler) {
+                        linkHandler(mark.attrs.href);
+                    }
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally{
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return != null) {
+                        _iterator.return();
+                    }
+                } finally{
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
             return combinedNode;
         }
         var combinedNode1 = {
@@ -56415,12 +56647,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-dom */ "../node_modules/react-dom/index.js");
 /* harmony import */ var _components_TabsBar__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/TabsBar */ "./src/components/TabsBar.tsx");
 /* harmony import */ var _tiptap_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @tiptap/react */ "../node_modules/@tiptap/react/dist/index.js");
-/* harmony import */ var _tiptap_extension_link__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @tiptap/extension-link */ "../node_modules/@tiptap/extension-link/dist/index.js");
-/* harmony import */ var _components_Gallery__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./components/Gallery */ "./src/components/Gallery.tsx");
-/* harmony import */ var _components_TimelineEditor__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./components/TimelineEditor */ "./src/components/TimelineEditor.tsx");
-/* harmony import */ var _components_LineageEditor__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./components/LineageEditor */ "./src/components/LineageEditor.tsx");
-/* harmony import */ var _components_CustomDataEditor__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./components/CustomDataEditor */ "./src/components/CustomDataEditor.tsx");
-/* harmony import */ var _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @tiptap/starter-kit */ "../node_modules/@tiptap/starter-kit/dist/index.js");
+/* harmony import */ var _components_Gallery__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/Gallery */ "./src/components/Gallery.tsx");
+/* harmony import */ var _components_TimelineEditor__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./components/TimelineEditor */ "./src/components/TimelineEditor.tsx");
+/* harmony import */ var _components_LineageEditor__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./components/LineageEditor */ "./src/components/LineageEditor.tsx");
+/* harmony import */ var _components_CustomDataEditor__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./components/CustomDataEditor */ "./src/components/CustomDataEditor.tsx");
 function _array_like_to_array(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
     for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
@@ -56428,9 +56658,6 @@ function _array_like_to_array(arr, len) {
 }
 function _array_with_holes(arr) {
     if (Array.isArray(arr)) return arr;
-}
-function _array_without_holes(arr) {
-    if (Array.isArray(arr)) return _array_like_to_array(arr);
 }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
@@ -56481,9 +56708,6 @@ function _instanceof(left, right) {
         return left instanceof right;
     }
 }
-function _iterable_to_array(iter) {
-    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
-}
 function _iterable_to_array_limit(arr, i) {
     var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
     if (_i == null) return;
@@ -56510,9 +56734,6 @@ function _iterable_to_array_limit(arr, i) {
 }
 function _non_iterable_rest() {
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-function _non_iterable_spread() {
-    throw new TypeError("Invalid attempt to spread non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 function _object_spread(target) {
     for(var i = 1; i < arguments.length; i++){
@@ -56555,9 +56776,6 @@ function _object_spread_props(target, source) {
 }
 function _sliced_to_array(arr, i) {
     return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
-}
-function _to_consumable_array(arr) {
-    return _array_without_holes(arr) || _iterable_to_array(arr) || _unsupported_iterable_to_array(arr) || _non_iterable_spread();
 }
 function _unsupported_iterable_to_array(o, minLen) {
     if (!o) return;
@@ -56671,8 +56889,6 @@ function _ts_generator(thisArg, body) {
 
 
 
-
-
 var BUILTIN_TABS = [
     'lineage',
     'location',
@@ -56735,12 +56951,12 @@ function fetchData(url, setter) {
         });
     })();
 }
-var timeoutId = null;
+var updateTimeoutId = null;
 function debouncedOnUpdate(editor, onChange) {
-    if (timeoutId) {
-        clearTimeout(timeoutId);
+    if (updateTimeoutId) {
+        clearTimeout(updateTimeoutId);
     }
-    timeoutId = setTimeout(function() {
+    updateTimeoutId = setTimeout(function() {
         var json = editor.getJSON();
         var indexed = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__.jsonToIndexed)(json);
         onChange(indexed);
@@ -56775,9 +56991,10 @@ function computeTabs(objData) {
         return _object_spread_props(_object_spread({}, acc), _define_property({}, tab, objData[tab].title));
     }, {}));
 }
+var itemExistsCache = {};
 function App(param) {
     var _this, _loop = function(tab) {
-        customTabs[tab] = /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_CustomDataEditor__WEBPACK_IMPORTED_MODULE_13__["default"], {
+        customTabs[tab] = /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_CustomDataEditor__WEBPACK_IMPORTED_MODULE_12__["default"], {
             data: objData.tabs[tab],
             onUpdate: function(newData) {
                 var newState = _object_spread({}, objData);
@@ -56787,12 +57004,12 @@ function App(param) {
             }
         }, void 0, false, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 309,
+            lineNumber: 327,
             columnNumber: 23
         }, _this);
     };
     var _this1 = this;
-    var itemShort = param.itemShort, universeShort = param.universeShort;
+    var itemShort = param.itemShort, universeShort = param.universeShort, displayUniverse = param.displayUniverse, addrPrefix = param.addrPrefix, domain = param.domain;
     var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), initContent = _useState[0], setInitContent = _useState[1];
     var _useState1 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), categories = _useState1[0], setCategories = _useState1[1];
     var _useState2 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), item = _useState2[0], setItem = _useState2[1];
@@ -56805,23 +57022,23 @@ function App(param) {
     var _useState9 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(), 2), eventItemMap = _useState9[0], setEventItemMap = _useState9[1];
     var _useState10 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(), 2), lineageItemMap = _useState10[0], setLineageItemMap = _useState10[1];
     var _useState11 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), previousData = _useState11[0], setPreviousData = _useState11[1];
+    var context = {
+        currentUniverse: universeShort,
+        universeLink: function universeLink(universe) {
+            if (displayUniverse) {
+                if (displayUniverse === universe) return addrPrefix;
+                else return "https://".concat(domain).concat(addrPrefix, "/universes/").concat(universe);
+            } else {
+                return "".concat(addrPrefix, "/universes/").concat(universe);
+            }
+        },
+        itemExists: function itemExists(universe, item) {
+            var _itemExistsCache_universe, _item;
+            return (_item = ((_itemExistsCache_universe = itemExistsCache[universe]) !== null && _itemExistsCache_universe !== void 0 ? _itemExistsCache_universe : {})[item]) !== null && _item !== void 0 ? _item : false;
+        }
+    };
     var editor = (0,_tiptap_react__WEBPACK_IMPORTED_MODULE_8__.useEditor)({
-        extensions: [
-            _tiptap_starter_kit__WEBPACK_IMPORTED_MODULE_14__["default"].configure({
-                link: false
-            })
-        ].concat(_to_consumable_array(_src_lib_editor__WEBPACK_IMPORTED_MODULE_5__.editorExtensions), [
-            _tiptap_extension_link__WEBPACK_IMPORTED_MODULE_9__["default"].configure({
-                enableClickSelection: true,
-                openOnClick: false,
-                autolink: true,
-                HTMLAttributes: {
-                    rel: 'noopener noreferrer nofollow',
-                    target: '_blank',
-                    class: 'link link-animated'
-                }
-            })
-        ]),
+        extensions: (0,_src_lib_editor__WEBPACK_IMPORTED_MODULE_5__.editorExtensions)(true, context),
         onUpdate: function(param) {
             var editor = param.editor;
             if (!objData) return;
@@ -56992,7 +57209,7 @@ function App(param) {
         });
         fetchData("/api/universes/".concat(universeShort, "/items/").concat(itemShort), function(data) {
             return _async_to_generator(function() {
-                var objData, json;
+                var objData, links, json, bulkFetcher, fetchPromises;
                 return _ts_generator(this, function(_state) {
                     switch(_state.label){
                         case 0:
@@ -57025,15 +57242,63 @@ function App(param) {
                             _state.sent();
                             return [
                                 3,
-                                4
+                                5
                             ];
                         case 3:
-                            if (objData.body) {
-                                json = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__.indexedToJson)(objData.body);
-                                setInitContent(json);
-                            }
-                            _state.label = 4;
+                            if (!objData.body) return [
+                                3,
+                                5
+                            ];
+                            links = [];
+                            json = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__.indexedToJson)(objData.body, function(href) {
+                                return links.push((0,_src_lib_editor__WEBPACK_IMPORTED_MODULE_5__.extractLinkData)(href));
+                            });
+                            bulkFetcher = new _helpers__WEBPACK_IMPORTED_MODULE_2__.BulkExistsFetcher();
+                            fetchPromises = links.map(function(link) {
+                                return _async_to_generator(function() {
+                                    var _link_universe, universe, _, _1;
+                                    return _ts_generator(this, function(_state) {
+                                        switch(_state.label){
+                                            case 0:
+                                                if (!link.item) return [
+                                                    3,
+                                                    2
+                                                ];
+                                                universe = (_link_universe = link.universe) !== null && _link_universe !== void 0 ? _link_universe : universeShort;
+                                                if (!(universeShort in itemExistsCache)) {
+                                                    itemExistsCache[universe] = {};
+                                                }
+                                                if (!!(link.item in itemExistsCache[universe])) return [
+                                                    3,
+                                                    2
+                                                ];
+                                                _ = itemExistsCache[universe];
+                                                _1 = link.item;
+                                                return [
+                                                    4,
+                                                    bulkFetcher.exists(universe, link.item)
+                                                ];
+                                            case 1:
+                                                _[_1] = _state.sent();
+                                                _state.label = 2;
+                                            case 2:
+                                                return [
+                                                    2
+                                                ];
+                                        }
+                                    });
+                                })();
+                            });
+                            bulkFetcher.fetchAll();
+                            return [
+                                4,
+                                Promise.all(fetchPromises)
+                            ];
                         case 4:
+                            _state.sent();
+                            setInitContent(json);
+                            _state.label = 5;
+                        case 5:
                             delete data.obj_data;
                             setObjData(objData);
                             setTabNames(computeTabs(objData));
@@ -57124,12 +57389,12 @@ function App(param) {
                 }
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                lineNumber: 286,
+                lineNumber: 304,
                 columnNumber: 7
             }, this)
         }, void 0, false, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 285,
+            lineNumber: 303,
             columnNumber: 12
         }, this);
     }
@@ -57157,7 +57422,7 @@ function App(param) {
                             ]
                         }, void 0, true, {
                             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 294,
+                            lineNumber: 312,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
@@ -57166,7 +57431,7 @@ function App(param) {
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Main Text')
                         }, void 0, false, {
                             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 295,
+                            lineNumber: 313,
                             columnNumber: 11
                         }, this),
                         BUILTIN_TABS.map(function(type) {
@@ -57176,7 +57441,7 @@ function App(param) {
                                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(type))
                             }, type, false, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 297,
+                                lineNumber: 315,
                                 columnNumber: 13
                             }, _this1);
                         }),
@@ -57185,13 +57450,13 @@ function App(param) {
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Custom Data')
                         }, void 0, false, {
                             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 299,
+                            lineNumber: 317,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                    lineNumber: 293,
+                    lineNumber: 311,
                     columnNumber: 9
                 }, this),
                 newTabType === 'custom' && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -57204,7 +57469,7 @@ function App(param) {
                     }
                 }, void 0, false, {
                     fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                    lineNumber: 301,
+                    lineNumber: 319,
                     columnNumber: 37
                 }, this),
                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -57215,13 +57480,13 @@ function App(param) {
                     children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('New Tab')
                 }, void 0, false, {
                     fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                    lineNumber: 302,
+                    lineNumber: 320,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 292,
+            lineNumber: 310,
             columnNumber: 7
         }, this)
     };
@@ -57229,13 +57494,58 @@ function App(param) {
     for(var tab in objData.tabs)_this = this, _loop(tab);
     var tabs = _object_spread_props(_object_spread({}, customTabs), {
         body: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_EditorFrame__WEBPACK_IMPORTED_MODULE_3__["default"], {
-            editor: editor
+            editor: editor,
+            getLink: function(previousUrl) {
+                return _async_to_generator(function() {
+                    var url, link, _link_universe, universe, existsFetcher, fetchPromise, _, _1;
+                    return _ts_generator(this, function(_state) {
+                        switch(_state.label){
+                            case 0:
+                                url = window.prompt('URL', previousUrl);
+                                if (!(url === null || url === void 0 ? void 0 : url.startsWith('@'))) return [
+                                    3,
+                                    2
+                                ];
+                                link = (0,_src_lib_editor__WEBPACK_IMPORTED_MODULE_5__.extractLinkData)(url);
+                                if (!link.item) return [
+                                    3,
+                                    2
+                                ];
+                                universe = (_link_universe = link.universe) !== null && _link_universe !== void 0 ? _link_universe : universeShort;
+                                if (!(universeShort in itemExistsCache)) {
+                                    itemExistsCache[universe] = {};
+                                }
+                                if (!!(link.item in itemExistsCache[universe])) return [
+                                    3,
+                                    2
+                                ];
+                                existsFetcher = new _helpers__WEBPACK_IMPORTED_MODULE_2__.BulkExistsFetcher();
+                                fetchPromise = existsFetcher.exists(universe, link.item);
+                                existsFetcher.fetchAll();
+                                _ = itemExistsCache[universe];
+                                _1 = link.item;
+                                return [
+                                    4,
+                                    fetchPromise
+                                ];
+                            case 1:
+                                _[_1] = _state.sent();
+                                _state.label = 2;
+                            case 2:
+                                return [
+                                    2,
+                                    url
+                                ];
+                        }
+                    });
+                })();
+            }
         }, void 0, false, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 320,
+            lineNumber: 338,
             columnNumber: 7
         }, this),
-        gallery: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_Gallery__WEBPACK_IMPORTED_MODULE_10__["default"], {
+        gallery: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_Gallery__WEBPACK_IMPORTED_MODULE_9__["default"], {
             universe: universeShort,
             item: itemShort,
             images: item.gallery,
@@ -57268,10 +57578,10 @@ function App(param) {
             }
         }, void 0, false, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 323,
+            lineNumber: 359,
             columnNumber: 7
         }, this),
-        timeline: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_TimelineEditor__WEBPACK_IMPORTED_MODULE_11__["default"], {
+        timeline: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_TimelineEditor__WEBPACK_IMPORTED_MODULE_10__["default"], {
             item: item,
             onEventsUpdate: function(newEvents) {
                 var newState = _object_spread({}, item);
@@ -57282,10 +57592,10 @@ function App(param) {
             eventItemMap: eventItemMap !== null && eventItemMap !== void 0 ? eventItemMap : {}
         }, void 0, false, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 350,
+            lineNumber: 386,
             columnNumber: 7
         }, this),
-        lineage: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_LineageEditor__WEBPACK_IMPORTED_MODULE_12__["default"], {
+        lineage: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_LineageEditor__WEBPACK_IMPORTED_MODULE_11__["default"], {
             item: item,
             onUpdate: function(newItem) {
                 return setItem(newItem);
@@ -57293,7 +57603,7 @@ function App(param) {
             itemMap: lineageItemMap !== null && lineageItemMap !== void 0 ? lineageItemMap : {}
         }, void 0, false, {
             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 358,
+            lineNumber: 394,
             columnNumber: 7
         }, this)
     });
@@ -57305,7 +57615,7 @@ function App(param) {
                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                lineNumber: 366,
+                lineNumber: 402,
                 columnNumber: 9
             }, this), saveBtnAnchor),
             modalAnchor && currentModal && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57321,19 +57631,19 @@ function App(param) {
                     children: modals[currentModal]
                 }, void 0, false, {
                     fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                    lineNumber: 373,
+                    lineNumber: 409,
                     columnNumber: 13
                 }, this)
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                lineNumber: 372,
+                lineNumber: 408,
                 columnNumber: 11
             }, this), modalAnchor),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h2", {
                 children: item ? (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Edit %s', item.title) : (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Edit')
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                lineNumber: 381,
+                lineNumber: 417,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57348,7 +57658,7 @@ function App(param) {
                                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Title')
                             }, void 0, false, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 384,
+                                lineNumber: 420,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -57364,13 +57674,13 @@ function App(param) {
                                 }
                             }, void 0, false, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 385,
+                                lineNumber: 421,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 383,
+                        lineNumber: 419,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57384,7 +57694,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 391,
+                                lineNumber: 427,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -57400,13 +57710,13 @@ function App(param) {
                                 }
                             }, void 0, false, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 392,
+                                lineNumber: 428,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 390,
+                        lineNumber: 426,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57420,30 +57730,30 @@ function App(param) {
                                     children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('NOTE: changes to the shortname will not auto-save.')
                                 }, void 0, false, {
                                     fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                    lineNumber: 399,
+                                    lineNumber: 435,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
                                     fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                    lineNumber: 400,
+                                    lineNumber: 436,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
                                     children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Other users currently editing this item will be unable to save their work. Change with caution.')
                                 }, void 0, false, {
                                     fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                    lineNumber: 401,
+                                    lineNumber: 437,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 398,
+                            lineNumber: 434,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 397,
+                        lineNumber: 433,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57457,7 +57767,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 406,
+                                lineNumber: 442,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
@@ -57480,7 +57790,7 @@ function App(param) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 408,
+                                        lineNumber: 444,
                                         columnNumber: 13
                                     }, this),
                                     categories && item && Object.keys(categories).map(function(type) {
@@ -57489,20 +57799,20 @@ function App(param) {
                                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)(categories[type][0])
                                         }, type, false, {
                                             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                            lineNumber: 410,
+                                            lineNumber: 446,
                                             columnNumber: 15
                                         }, _this1);
                                     })
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 407,
+                                lineNumber: 443,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 405,
+                        lineNumber: 441,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57516,7 +57826,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 418,
+                                lineNumber: 454,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("textarea", {
@@ -57531,13 +57841,13 @@ function App(param) {
                                 }
                             }, void 0, false, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 419,
+                                lineNumber: 455,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 417,
+                        lineNumber: 453,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57551,7 +57861,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 423,
+                                lineNumber: 459,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
@@ -57570,26 +57880,26 @@ function App(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 425,
+                                        lineNumber: 461,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                         className: "slider"
                                     }, void 0, false, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 428,
+                                        lineNumber: 464,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 424,
+                                lineNumber: 460,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 422,
+                        lineNumber: 458,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57603,7 +57913,7 @@ function App(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 433,
+                                lineNumber: 469,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
@@ -57622,26 +57932,26 @@ function App(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 435,
+                                        lineNumber: 471,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                         className: "slider"
                                     }, void 0, false, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 438,
+                                        lineNumber: 474,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 434,
+                                lineNumber: 470,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 432,
+                        lineNumber: 468,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57654,12 +57964,12 @@ function App(param) {
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
                         }, void 0, false, {
                             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 443,
+                            lineNumber: 479,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 442,
+                        lineNumber: 478,
                         columnNumber: 9
                     }, this),
                     errorMessage && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57672,19 +57982,19 @@ function App(param) {
                             children: errorMessage
                         }, void 0, false, {
                             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 447,
+                            lineNumber: 483,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 446,
+                        lineNumber: 482,
                         columnNumber: 26
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("hr", {
                         className: "w-100 mb-0"
                     }, void 0, false, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 450,
+                        lineNumber: 486,
                         columnNumber: 9
                     }, this),
                     objData && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57703,7 +58013,7 @@ function App(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 454,
+                                        lineNumber: 490,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("ul", {
@@ -57718,36 +58028,36 @@ function App(param) {
                                                 children: "add"
                                             }, void 0, false, {
                                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                                lineNumber: 457,
+                                                lineNumber: 493,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                            lineNumber: 456,
+                                            lineNumber: 492,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 455,
+                                        lineNumber: 491,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 453,
+                                lineNumber: 489,
                                 columnNumber: 11
                             }, this),
                             currentTab && tabs[currentTab]
                         ]
                     }, void 0, true, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 452,
+                        lineNumber: 488,
                         columnNumber: 21
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                lineNumber: 382,
+                lineNumber: 418,
                 columnNumber: 7
             }, this)
         ]
@@ -57970,7 +58280,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function MenuBar(param) {
-    var editor = param.editor;
+    var editor = param.editor, getLink = param.getLink;
     // Read the current editor's state, and re-render the component when it changes
     var editorState = (0,_tiptap_react__WEBPACK_IMPORTED_MODULE_2__.useEditorState)({
         editor: editor,
@@ -58018,24 +58328,22 @@ function MenuBar(param) {
     });
     var setLink = (0,react__WEBPACK_IMPORTED_MODULE_1__.useCallback)(function() {
         var previousUrl = editor.getAttributes('link').href;
-        var url = window.prompt('URL', previousUrl);
-        // cancelled
-        if (url === null) {
-            return;
-        }
-        // empty
-        if (url === '') {
-            editor.chain().focus().extendMarkRange('link').unsetLink().run();
-            return;
-        }
-        // update link
-        try {
-            editor.chain().focus().extendMarkRange('link').setLink({
-                href: url
-            }).run();
-        } catch (e) {
-            alert(e.message);
-        }
+        getLink(previousUrl).then(function(url) {
+            if (url === null) {
+                return;
+            }
+            if (url === '') {
+                editor.chain().focus().extendMarkRange('link').unsetLink().run();
+                return;
+            }
+            try {
+                editor.chain().focus().extendMarkRange('link').setLink({
+                    href: url
+                }).run();
+            } catch (e) {
+                alert(e.message);
+            }
+        });
     }, [
         editor
     ]);
@@ -58052,7 +58360,7 @@ function MenuBar(param) {
                 children: "format_bold"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 69,
+                lineNumber: 68,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58065,7 +58373,7 @@ function MenuBar(param) {
                 children: "format_italic"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 77,
+                lineNumber: 76,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58078,7 +58386,7 @@ function MenuBar(param) {
                 children: "strikethrough_s"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 85,
+                lineNumber: 84,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58091,7 +58399,7 @@ function MenuBar(param) {
                 children: "code"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 93,
+                lineNumber: 92,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58103,7 +58411,7 @@ function MenuBar(param) {
                 children: "format_clear"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 101,
+                lineNumber: 100,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58117,7 +58425,7 @@ function MenuBar(param) {
                 children: "format_h1"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 115,
+                lineNumber: 107,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58131,7 +58439,7 @@ function MenuBar(param) {
                 children: "format_h2"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 122,
+                lineNumber: 114,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58145,7 +58453,7 @@ function MenuBar(param) {
                 children: "format_h3"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 129,
+                lineNumber: 121,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58159,7 +58467,7 @@ function MenuBar(param) {
                 children: "format_h4"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 136,
+                lineNumber: 128,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58173,7 +58481,7 @@ function MenuBar(param) {
                 children: "format_h5"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 143,
+                lineNumber: 135,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58187,7 +58495,7 @@ function MenuBar(param) {
                 children: "format_h6"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 150,
+                lineNumber: 142,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58197,7 +58505,7 @@ function MenuBar(param) {
                 children: "link"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 157,
+                lineNumber: 149,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58210,7 +58518,7 @@ function MenuBar(param) {
                 children: "link_off"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 164,
+                lineNumber: 156,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58222,7 +58530,7 @@ function MenuBar(param) {
                 children: "format_list_bulleted"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 172,
+                lineNumber: 164,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58234,7 +58542,7 @@ function MenuBar(param) {
                 children: "format_list_numbered"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 179,
+                lineNumber: 171,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58246,7 +58554,7 @@ function MenuBar(param) {
                 children: "code_blocks"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 186,
+                lineNumber: 178,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58258,7 +58566,7 @@ function MenuBar(param) {
                 children: "view_sidebar"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 193,
+                lineNumber: 185,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58270,7 +58578,7 @@ function MenuBar(param) {
                 children: "format_quote"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 200,
+                lineNumber: 192,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58282,7 +58590,7 @@ function MenuBar(param) {
                 children: "horizontal_rule"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 207,
+                lineNumber: 199,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58295,7 +58603,7 @@ function MenuBar(param) {
                 children: "undo"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 215,
+                lineNumber: 206,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -58308,39 +58616,40 @@ function MenuBar(param) {
                 children: "redo"
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 223,
+                lineNumber: 214,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-        lineNumber: 68,
+        lineNumber: 67,
         columnNumber: 5
     }, this);
 }
 function EditorFrame(param) {
-    var editor = param.editor;
+    var editor = param.editor, getLink = param.getLink;
     return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
         className: "tiptap-editor markdown",
         children: [
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(MenuBar, {
-                editor: editor
+                editor: editor,
+                getLink: getLink
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 237,
+                lineNumber: 228,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_tiptap_react__WEBPACK_IMPORTED_MODULE_2__.EditorContent, {
                 editor: editor
             }, void 0, false, {
                 fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-                lineNumber: 238,
+                lineNumber: 229,
                 columnNumber: 5
             }, this)
         ]
     }, void 0, true, {
         fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
-        lineNumber: 236,
+        lineNumber: 227,
         columnNumber: 10
     }, this);
 }
@@ -60156,6 +60465,7 @@ function TimelineEditor(param) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   BulkExistsFetcher: () => (/* binding */ BulkExistsFetcher),
 /* harmony export */   T: () => (/* binding */ T),
 /* harmony export */   capitalize: () => (/* binding */ capitalize),
 /* harmony export */   deepCompare: () => (/* binding */ deepCompare),
@@ -60545,6 +60855,77 @@ function deepCompare(a, b) {
     }
     return true;
 }
+var BulkExistsFetcher = /*#__PURE__*/ function() {
+    "use strict";
+    function BulkExistsFetcher() {
+        _class_call_check(this, BulkExistsFetcher);
+        _define_property(this, "data", {});
+        _define_property(this, "resolvers", {});
+        _define_property(this, "promises", {});
+    }
+    _create_class(BulkExistsFetcher, [
+        {
+            key: "exists",
+            value: function exists(universe, item) {
+                var _this = this;
+                if ("".concat(universe, "/").concat(item) in this.promises) return this.promises["".concat(universe, "/").concat(item)];
+                if (!(universe in this.data)) this.data[universe] = [];
+                var promise = new Promise(function(resolve) {
+                    return _async_to_generator(function() {
+                        return _ts_generator(this, function(_state) {
+                            this.data[universe].push(item);
+                            this.resolvers["".concat(universe, "/").concat(item)] = resolve;
+                            return [
+                                2
+                            ];
+                        });
+                    }).call(_this);
+                });
+                this.promises["".concat(universe, "/").concat(item)] = promise;
+                return promise;
+            }
+        },
+        {
+            key: "fetchAll",
+            value: function fetchAll() {
+                return _async_to_generator(function() {
+                    var result, universe, item;
+                    return _ts_generator(this, function(_state) {
+                        switch(_state.label){
+                            case 0:
+                                return [
+                                    4,
+                                    fetch('/api/exists', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify(this.data)
+                                    })
+                                ];
+                            case 1:
+                                return [
+                                    4,
+                                    _state.sent().json()
+                                ];
+                            case 2:
+                                result = _state.sent();
+                                for(var universe in result){
+                                    for(var item in result[universe]){
+                                        this.resolvers["".concat(universe, "/").concat(item)](result[universe][item]);
+                                    }
+                                }
+                                return [
+                                    2
+                                ];
+                        }
+                    });
+                }).call(this);
+            }
+        }
+    ]);
+    return BulkExistsFetcher;
+}();
 function createElement(type) {
     var options = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {
         attrs: {},

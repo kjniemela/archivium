@@ -12,7 +12,6 @@ const tiptapHelpers_1 = require("../../lib/tiptapHelpers");
 const logger_1 = __importDefault(require("../../logger"));
 const templates_1 = require("../../templates");
 const editor_1 = require("../../lib/editor");
-const starter_kit_1 = __importDefault(require("@tiptap/starter-kit"));
 exports.default = {
     async list(req, res) {
         const search = req.getQueryParam('search');
@@ -73,8 +72,27 @@ exports.default = {
         }
         if ('body' in item.obj_data && typeof item.obj_data.body !== 'string') {
             try {
-                const jsonBody = (0, tiptapHelpers_1.indexedToJson)(item.obj_data.body);
-                const htmlBody = (0, html_string_1.renderToHTMLString)({ extensions: [starter_kit_1.default, ...editor_1.editorExtensions], content: jsonBody });
+                const links = [];
+                const jsonBody = (0, tiptapHelpers_1.indexedToJson)(item.obj_data.body, (href) => links.push((0, editor_1.extractLinkData)(href)));
+                const itemsPerUniverse = {};
+                /* Because Tiptap rendering cannot be async, we extract the links we'll need to check ahead of time. */
+                await Promise.all(links.map(async (link) => {
+                    if (link.item) {
+                        const universeShort = link.universe ?? universe.shortname;
+                        if (!(universeShort in itemsPerUniverse)) {
+                            itemsPerUniverse[universeShort] = {};
+                        }
+                        if (!(link.item in itemsPerUniverse[universeShort])) {
+                            itemsPerUniverse[universeShort][link.item] = await api_1.default.item.exists(req.session.user, universeShort, link.item);
+                        }
+                    }
+                }));
+                const renderContext = {
+                    currentUniverse: universe.shortname,
+                    universeLink: (universeShort) => (0, templates_1.universeLink)(req, universeShort),
+                    itemExists: (universe, item) => (universe in itemsPerUniverse) && itemsPerUniverse[universe][item],
+                };
+                const htmlBody = (0, html_string_1.renderToHTMLString)({ extensions: (0, editor_1.editorExtensions)(false, renderContext), content: jsonBody });
                 const sanitizedHtml = (0, sanitize_html_1.default)(htmlBody, {
                     allowedTags: sanitize_html_1.default.defaults.allowedTags.concat(['img']),
                     allowedAttributes: {

@@ -58,7 +58,7 @@ export function jsonToIndexed(doc: any): IndexedDocument {
   return { text: textBuffer, structure };
 }
 
-export function indexedToJson(indexed: IndexedDocument): any {
+export function indexedToJson(indexed: IndexedDocument, linkHandler?: (href: string) => void): any {
   const { text, structure } = indexed;
 
   function walk(node: OffsetTextNode): any {
@@ -69,6 +69,11 @@ export function indexedToJson(indexed: IndexedDocument): any {
       };
       if (node.marks && node.marks.length > 0) combinedNode.marks = node.marks;
       if (node.attrs && Object.keys(node.attrs).length > 0) combinedNode.attrs = node.attrs;
+      for (const mark of combinedNode.marks ?? []) {
+        if (mark.attrs && mark.attrs.href && linkHandler) {
+          linkHandler(mark.attrs.href);
+        }
+      }
       return combinedNode;
     }
 
