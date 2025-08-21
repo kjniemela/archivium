@@ -18,13 +18,13 @@ describe('Item spec', () => {
     cy.visit('/universes/public-test-universe/items/test-character?tab=body');
     cy.get('#action-bar').contains('Edit').click();
 
-    cy.get('#body .CodeMirror').should('be.visible');
+    cy.get('.tiptap-editor .tiptap').should('be.visible');
     cy.window().then((win) => {
-      console.log(win)
-      console.log(win.easyMDE)
-      const oldContent = win.easyMDE.codemirror.getValue();
-      cy.get('#body .CodeMirror').click().type('{ctrl}a{backspace}');
-      cy.get('#body .CodeMirror').type('Here is a [test link](@test-event).');
+      // TODO technically not correct...
+      const oldContent = win.document.querySelector('.tiptap-editor .tiptap').textContent;
+      cy.get('.tiptap-editor .tiptap').click().type('{ctrl}a{backspace}');
+      cy.get('.tiptap-editor .tiptap').type('Here is a [test link](@test-event).');
+      cy.wait(600);
       cy.get('#preview-btn').click();
 
       cy.get('[data-tab="body"]').should('contain', 'Here is a test link.');
@@ -34,8 +34,9 @@ describe('Item spec', () => {
       cy.url().should('include', '/universes/public-test-universe/items/test-event');
 
       cy.visit('/universes/public-test-universe/items/test-character/edit');
-      cy.get('#body .CodeMirror').type('{ctrl}a{backspace}');
-      cy.get('#body .CodeMirror').type(oldContent);
+      cy.get('.tiptap-editor .tiptap').type('{ctrl}a{backspace}');
+      cy.get('.tiptap-editor .tiptap').type(oldContent);
+      cy.wait(600);
       cy.get('#preview-btn').click();
     });
   });
@@ -49,13 +50,13 @@ describe('Item spec', () => {
     cy.get('.tabs-buttons').contains('Timeline').click();
     cy.get('#new_event_title').type('Cypress Event');
     cy.get('#new_event_time').siblings('button').click();
-    cy.get('#time-picker-new_event_time input').first().type('2004');
-    cy.get('#time-picker-new_event_time button').click();
-    cy.get('[data-tab="Timeline"] button').contains('Create New Event').click();
+    cy.get('#time-picker-modal input').first().type('2004');
+    cy.get('#time-picker-modal button').click();
+    cy.get('[data-tab="timeline"] button').contains('Create New Event').click();
     cy.get(`#${timelineEvents}_event_time`).siblings('input').should('have.value', 'Cypress Event');
+    cy.wait(600);
     cy.get('#preview-btn').click();
 
-    cy.visit('/universes/public-test-universe/items/test-timeline?tab=timeline');
     cy.get('.timeline>.flex-col').children().should('have.length', timelineEvents + 1);
     cy.get('.timeline>.flex-col>div').first().should('contain', 'January 1st 2004, 0:00 — Cypress Event');
     cy.get('#action-bar').contains('Edit').click();
@@ -63,9 +64,9 @@ describe('Item spec', () => {
     cy.get('.tabs-buttons').should('be.visible');
     cy.get('.tabs-buttons').contains('Timeline').click();
     cy.get(`#${timelineEvents}_event_time`).siblings('button').contains('Remove').click();
+    cy.wait(600);
     cy.get('#preview-btn').click();
 
-    cy.visit('/universes/public-test-universe/items/test-timeline?tab=timeline');
     cy.get('.timeline>.flex-col').children().should('have.length', timelineEvents);
   });
 
@@ -75,20 +76,22 @@ describe('Item spec', () => {
     cy.get('.tabs-buttons').contains('Timeline').click();
     cy.get('#new_event_title').type('Cypress Event');
     cy.get('#new_event_time').siblings('button').click();
-    cy.get('#time-picker-new_event_time input').first().type('2007');
-    cy.get('#time-picker-new_event_time button').click();
-    cy.get('[data-tab="Timeline"] button').contains('Create New Event').click();
+    cy.get('#time-picker-modal input').first().type('2007');
+    cy.get('#time-picker-modal button').click();
+    cy.get('[data-tab="timeline"] button').contains('Create New Event').click();
+    cy.wait(600);
     cy.get('#save-btn').click();
 
     cy.visit('/universes/public-test-universe/items/test-timeline/edit');
 
     cy.get('.tabs-buttons').contains('Timeline').click();
-    cy.get('[data-tab="Timeline"] button').contains('Import Event').click();
-    cy.get('#import-event-item').siblings('input').type('Test Event');
-    cy.get('#import-event-item').siblings('div').find('div').filter(':visible').first().click();
-    cy.get('#import-event-event').siblings('input').type('Cypress Event');
-    cy.get('#import-event-event').siblings('div').find('div').filter(':visible').first().click();
+    cy.get('[data-tab="timeline"] button').contains('Import Event').click();
+    cy.get('#import-event-item').children('input').type('Test Event');
+    cy.get('#import-event-item').children('div').find('div').filter(':visible').first().click();
+    cy.get('#import-event-event').children('input').type('Cypress Event');
+    cy.get('#import-event-event').children('div').find('div').filter(':visible').first().click();
     cy.get('#import-event button').contains('Import').click();
+    cy.wait(600);
     cy.get('#save-btn').click();
 
     cy.visit('/universes/public-test-universe/items/test-timeline?tab=timeline');
@@ -101,6 +104,7 @@ describe('Item spec', () => {
 
     cy.get('.tabs-buttons').contains('Timeline').click();
     cy.get('input').filter((k, el) => el.value === 'Cypress Event').siblings('button').contains('Remove').click();
+    cy.wait(600);
     cy.get('#save-btn').click();
 
     cy.visit('/universes/public-test-universe/items/test-timeline?tab=timeline');

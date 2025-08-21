@@ -55345,6 +55345,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _tiptap_extension_link__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tiptap/extension-link */ "../node_modules/@tiptap/extension-link/dist/index.js");
 /* harmony import */ var _tiptap_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tiptap/core */ "../node_modules/@tiptap/core/dist/index.js");
+function _array_like_to_array(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
+    return arr2;
+}
+function _array_with_holes(arr) {
+    if (Array.isArray(arr)) return arr;
+}
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -55357,6 +55365,33 @@ function _define_property(obj, key, value) {
         obj[key] = value;
     }
     return obj;
+}
+function _iterable_to_array_limit(arr, i) {
+    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+    if (_i == null) return;
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _s, _e;
+    try {
+        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
+            _arr.push(_s.value);
+            if (i && _arr.length === i) break;
+        }
+    } catch (err) {
+        _d = true;
+        _e = err;
+    } finally{
+        try {
+            if (!_n && _i["return"] != null) _i["return"]();
+        } finally{
+            if (_d) throw _e;
+        }
+    }
+    return _arr;
+}
+function _non_iterable_rest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 function _object_spread(target) {
     for(var i = 1; i < arguments.length; i++){
@@ -55397,13 +55432,25 @@ function _object_spread_props(target, source) {
     }
     return target;
 }
+function _sliced_to_array(arr, i) {
+    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
+}
+function _unsupported_iterable_to_array(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _array_like_to_array(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
+}
 
 
+var MD_LINK_RE = /\[([^\]]+)\]\(([^)\s]+)\)$/;
 var Link = _tiptap_extension_link__WEBPACK_IMPORTED_MODULE_0__["default"].configure({
     autolink: true,
     HTMLAttributes: {
-        rel: false,
-        target: false,
+        rel: '',
+        target: '',
         class: 'link link-animated'
     }
 }).extend({
@@ -55433,6 +55480,25 @@ var Link = _tiptap_extension_link__WEBPACK_IMPORTED_MODULE_0__["default"].config
                 class: exists ? '' : 'link-broken'
             }),
             0
+        ];
+    },
+    addInputRules: function addInputRules() {
+        var type = this.type;
+        return [
+            new _tiptap_core__WEBPACK_IMPORTED_MODULE_1__.InputRule({
+                find: MD_LINK_RE,
+                handler: function handler(param) {
+                    var state = param.state, range = param.range, match = param.match;
+                    var _match = _sliced_to_array(match, 3), label = _match[1], target = _match[2];
+                    if (!label || !target) return null;
+                    var tr = state.tr;
+                    tr.insertText(label, range.from, range.to);
+                    tr.addMark(range.from, range.from + label.length, type.create({
+                        href: target
+                    }));
+                    tr.removeStoredMark(type);
+                }
+            })
         ];
     }
 });
@@ -55575,6 +55641,44 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   indexedToJson: () => (/* binding */ indexedToJson),
 /* harmony export */   jsonToIndexed: () => (/* binding */ jsonToIndexed)
 /* harmony export */ });
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function _object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            _define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
+function cleanupMark(mark) {
+    var newMark = _object_spread({}, mark);
+    if (newMark.type === 'link') {
+        newMark.attrs = {
+            href: newMark.attrs.href,
+            class: newMark.attrs.class
+        };
+    }
+    return newMark;
+}
 function jsonToIndexed(doc) {
     var textBuffer = '';
     var pos = 0;
@@ -55583,12 +55687,12 @@ function jsonToIndexed(doc) {
             var start = pos;
             textBuffer += node.text || '';
             pos += (node.text || '').length;
-            var _node_marks, _node_attrs;
+            var _node_attrs;
             return {
                 type: 'text',
                 start: start,
                 end: pos,
-                marks: (_node_marks = node.marks) !== null && _node_marks !== void 0 ? _node_marks : [],
+                marks: (node.marks || []).map(cleanupMark),
                 attrs: (_node_attrs = node.attrs) !== null && _node_attrs !== void 0 ? _node_attrs : {}
             };
         }
@@ -55601,7 +55705,7 @@ function jsonToIndexed(doc) {
         var _node_attrs1;
         return {
             type: node.type,
-            marks: node.marks || [],
+            marks: (node.marks || []).map(cleanupMark),
             attrs: (_node_attrs1 = node.attrs) !== null && _node_attrs1 !== void 0 ? _node_attrs1 : {},
             content: content
         };
@@ -56996,8 +57100,8 @@ function App(param) {
                 setObjData(newState);
             }
         }, void 0, false, {
-            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 321,
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+            lineNumber: 322,
             columnNumber: 23
         }, _this);
     };
@@ -57068,6 +57172,7 @@ function App(param) {
                                         console.log('NO CHANGE');
                                         setSaveText('Saved');
                                         setNeedsSaving(false);
+                                        if (callback) callback();
                                         return [
                                             2
                                         ];
@@ -57156,7 +57261,7 @@ function App(param) {
                         src_shortname,
                         src_title,
                         Number(src_id),
-                        event_title,
+                        event_title !== null && event_title !== void 0 ? event_title : '',
                         Number(abstime)
                     ]);
                 }
@@ -57383,13 +57488,13 @@ function App(param) {
                     marginTop: 'max(0px, calc(50vh - 50px - var(--page-margin-top)))'
                 }
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                lineNumber: 298,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                lineNumber: 299,
                 columnNumber: 7
             }, this)
         }, void 0, false, {
-            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 297,
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+            lineNumber: 298,
             columnNumber: 12
         }, this);
     }
@@ -57416,8 +57521,8 @@ function App(param) {
                                 "..."
                             ]
                         }, void 0, true, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 306,
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                            lineNumber: 307,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
@@ -57425,8 +57530,8 @@ function App(param) {
                             disabled: 'body' in objData,
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Main Text')
                         }, void 0, false, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 307,
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                            lineNumber: 308,
                             columnNumber: 11
                         }, this),
                         BUILTIN_TABS.map(function(type) {
@@ -57435,8 +57540,8 @@ function App(param) {
                                 disabled: type in tabNames,
                                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(type))
                             }, type, false, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 309,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 310,
                                 columnNumber: 13
                             }, _this1);
                         }),
@@ -57444,14 +57549,14 @@ function App(param) {
                             value: "custom",
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Custom Data')
                         }, void 0, false, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 311,
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                            lineNumber: 312,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
-                    fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                    lineNumber: 305,
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                    lineNumber: 306,
                     columnNumber: 9
                 }, this),
                 newTabType === 'custom' && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -57463,8 +57568,8 @@ function App(param) {
                         return setNewTabName(target.value);
                     }
                 }, void 0, false, {
-                    fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                    lineNumber: 313,
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                    lineNumber: 314,
                     columnNumber: 37
                 }, this),
                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -57474,14 +57579,14 @@ function App(param) {
                     },
                     children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('New Tab')
                 }, void 0, false, {
-                    fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                    lineNumber: 314,
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                    lineNumber: 315,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
-            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 304,
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+            lineNumber: 305,
             columnNumber: 7
         }, this)
     };
@@ -57536,8 +57641,8 @@ function App(param) {
                 })();
             }
         }, void 0, false, {
-            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 332,
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+            lineNumber: 333,
             columnNumber: 7
         }, this),
         gallery: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_Gallery__WEBPACK_IMPORTED_MODULE_9__["default"], {
@@ -57572,8 +57677,8 @@ function App(param) {
                 setItem(newState);
             }
         }, void 0, false, {
-            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 353,
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+            lineNumber: 354,
             columnNumber: 7
         }, this),
         timeline: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_TimelineEditor__WEBPACK_IMPORTED_MODULE_10__["default"], {
@@ -57586,8 +57691,8 @@ function App(param) {
             },
             eventItemMap: eventItemMap !== null && eventItemMap !== void 0 ? eventItemMap : {}
         }, void 0, false, {
-            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 380,
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+            lineNumber: 381,
             columnNumber: 7
         }, this),
         lineage: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_LineageEditor__WEBPACK_IMPORTED_MODULE_11__["default"], {
@@ -57597,8 +57702,8 @@ function App(param) {
             },
             itemMap: lineageItemMap !== null && lineageItemMap !== void 0 ? lineageItemMap : {}
         }, void 0, false, {
-            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-            lineNumber: 388,
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+            lineNumber: 389,
             columnNumber: 7
         }, this)
     });
@@ -57612,8 +57717,8 @@ function App(param) {
                 },
                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                lineNumber: 396,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                lineNumber: 397,
                 columnNumber: 9
             }, this), saveBtnAnchor),
             previewBtnAnchor && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("a", {
@@ -57625,8 +57730,8 @@ function App(param) {
                 },
                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Preview')
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                lineNumber: 400,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                lineNumber: 401,
                 columnNumber: 9
             }, this), previewBtnAnchor),
             modalAnchor && currentModal && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57641,20 +57746,20 @@ function App(param) {
                     },
                     children: modals[currentModal]
                 }, void 0, false, {
-                    fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                    lineNumber: 409,
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                    lineNumber: 410,
                     columnNumber: 13
                 }, this)
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                lineNumber: 408,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                lineNumber: 409,
                 columnNumber: 11
             }, this), modalAnchor),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h2", {
                 children: item ? (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Edit %s', item.title) : (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Edit')
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                lineNumber: 417,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                lineNumber: 418,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57668,8 +57773,8 @@ function App(param) {
                                 htmlFor: "title",
                                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Title')
                             }, void 0, false, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 420,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 421,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -57684,14 +57789,14 @@ function App(param) {
                                     }));
                                 }
                             }, void 0, false, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 421,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 422,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 419,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 420,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57704,8 +57809,8 @@ function App(param) {
                                     ":"
                                 ]
                             }, void 0, true, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 427,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 428,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -57720,14 +57825,14 @@ function App(param) {
                                     }));
                                 }
                             }, void 0, false, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 428,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 429,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 426,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 427,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57740,31 +57845,31 @@ function App(param) {
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
                                     children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('NOTE: changes to the shortname will not auto-save.')
                                 }, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                    lineNumber: 435,
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                    lineNumber: 436,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                    lineNumber: 436,
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                    lineNumber: 437,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
                                     children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Other users currently editing this item will be unable to save their work. Change with caution.')
                                 }, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                    lineNumber: 437,
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                    lineNumber: 438,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 434,
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                            lineNumber: 435,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 433,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 434,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57777,8 +57882,8 @@ function App(param) {
                                     ":"
                                 ]
                             }, void 0, true, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 442,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 443,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
@@ -57800,8 +57905,8 @@ function App(param) {
                                             "..."
                                         ]
                                     }, void 0, true, {
-                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 444,
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 445,
                                         columnNumber: 13
                                     }, this),
                                     categories && item && Object.keys(categories).map(function(type) {
@@ -57809,21 +57914,21 @@ function App(param) {
                                             value: type,
                                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)(categories[type][0])
                                         }, type, false, {
-                                            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                            lineNumber: 446,
+                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                            lineNumber: 447,
                                             columnNumber: 15
                                         }, _this1);
                                     })
                                 ]
                             }, void 0, true, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 443,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 444,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 441,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 442,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57836,8 +57941,8 @@ function App(param) {
                                     ":"
                                 ]
                             }, void 0, true, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 454,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 455,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("textarea", {
@@ -57851,14 +57956,14 @@ function App(param) {
                                     }));
                                 }
                             }, void 0, false, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 455,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 456,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 453,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 454,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57871,8 +57976,8 @@ function App(param) {
                                     ":"
                                 ]
                             }, void 0, true, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 459,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 460,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
@@ -57890,27 +57995,27 @@ function App(param) {
                                             }));
                                         }
                                     }, void 0, false, {
-                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 461,
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 462,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                         className: "slider"
                                     }, void 0, false, {
-                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 464,
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 465,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 460,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 461,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 458,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 459,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57923,8 +58028,8 @@ function App(param) {
                                     ":"
                                 ]
                             }, void 0, true, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 469,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 470,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
@@ -57942,27 +58047,27 @@ function App(param) {
                                             }));
                                         }
                                     }, void 0, false, {
-                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 471,
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 472,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                         className: "slider"
                                     }, void 0, false, {
-                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 474,
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 475,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 470,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 471,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 468,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 469,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57974,13 +58079,13 @@ function App(param) {
                             },
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
                         }, void 0, false, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 479,
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                            lineNumber: 480,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 478,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 479,
                         columnNumber: 9
                     }, this),
                     errorMessage && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -57992,20 +58097,20 @@ function App(param) {
                             },
                             children: errorMessage
                         }, void 0, false, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                            lineNumber: 483,
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                            lineNumber: 484,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 482,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 483,
                         columnNumber: 26
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("hr", {
                         className: "w-100 mb-0"
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 486,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 487,
                         columnNumber: 9
                     }, this),
                     objData && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -58023,8 +58128,8 @@ function App(param) {
                                             return removeTab(tab);
                                         }
                                     }, void 0, false, {
-                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 490,
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 491,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("ul", {
@@ -58038,37 +58143,44 @@ function App(param) {
                                                 },
                                                 children: "add"
                                             }, void 0, false, {
-                                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                                lineNumber: 493,
+                                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                                lineNumber: 494,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
-                                            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                            lineNumber: 492,
+                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                            lineNumber: 493,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
-                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                        lineNumber: 491,
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                        lineNumber: 492,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                                lineNumber: 489,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 490,
                                 columnNumber: 11
                             }, this),
-                            currentTab && tabs[currentTab]
+                            currentTab && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                                "data-tab": currentTab,
+                                children: tabs[currentTab]
+                            }, void 0, false, {
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                                lineNumber: 500,
+                                columnNumber: 13
+                            }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                        lineNumber: 488,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                        lineNumber: 489,
                         columnNumber: 21
                     }, this)
                 ]
             }, void 0, true, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
-                lineNumber: 418,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
+                lineNumber: 419,
                 columnNumber: 7
             }, this)
         ]
@@ -58204,7 +58316,7 @@ function CustomDataEditor(param) {
                                     ": "
                                 ]
                             }, void 0, true, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/CustomDataEditor.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\CustomDataEditor.tsx",
                                 lineNumber: 37,
                                 columnNumber: 11
                             }, _this),
@@ -58215,7 +58327,7 @@ function CustomDataEditor(param) {
                                     return updateKey(key, target.value);
                                 }
                             }, void 0, false, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/CustomDataEditor.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\CustomDataEditor.tsx",
                                 lineNumber: 38,
                                 columnNumber: 11
                             }, _this),
@@ -58225,19 +58337,19 @@ function CustomDataEditor(param) {
                                 },
                                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Remove')
                             }, void 0, false, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/CustomDataEditor.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\CustomDataEditor.tsx",
                                 lineNumber: 39,
                                 columnNumber: 11
                             }, _this)
                         ]
                     }, key, true, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/CustomDataEditor.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\CustomDataEditor.tsx",
                         lineNumber: 36,
                         columnNumber: 9
                     }, _this);
                 })
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/CustomDataEditor.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\CustomDataEditor.tsx",
                 lineNumber: 34,
                 columnNumber: 5
             }, this),
@@ -58245,7 +58357,7 @@ function CustomDataEditor(param) {
                 onClick: addKey,
                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Add New Key')
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/CustomDataEditor.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\CustomDataEditor.tsx",
                 lineNumber: 43,
                 columnNumber: 5
             }, this),
@@ -58256,13 +58368,13 @@ function CustomDataEditor(param) {
                     return setNewKey(target.value);
                 }
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/CustomDataEditor.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\CustomDataEditor.tsx",
                 lineNumber: 44,
                 columnNumber: 5
             }, this)
         ]
     }, void 0, true, {
-        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/CustomDataEditor.tsx",
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\CustomDataEditor.tsx",
         lineNumber: 33,
         columnNumber: 10
     }, this);
@@ -58370,7 +58482,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Bold'),
                 children: "format_bold"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 68,
                 columnNumber: 7
             }, this),
@@ -58383,7 +58495,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Italic'),
                 children: "format_italic"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 76,
                 columnNumber: 7
             }, this),
@@ -58396,7 +58508,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Strikethrough'),
                 children: "strikethrough_s"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 84,
                 columnNumber: 7
             }, this),
@@ -58409,7 +58521,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Code'),
                 children: "code"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 92,
                 columnNumber: 7
             }, this),
@@ -58421,7 +58533,7 @@ function MenuBar(param) {
                 title: "Clear Formatting",
                 children: "format_clear"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 100,
                 columnNumber: 7
             }, this),
@@ -58435,7 +58547,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Heading 1'),
                 children: "format_h1"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 107,
                 columnNumber: 7
             }, this),
@@ -58449,7 +58561,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Heading 2'),
                 children: "format_h2"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 114,
                 columnNumber: 7
             }, this),
@@ -58463,7 +58575,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Heading 3'),
                 children: "format_h3"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 121,
                 columnNumber: 7
             }, this),
@@ -58477,7 +58589,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Heading 4'),
                 children: "format_h4"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 128,
                 columnNumber: 7
             }, this),
@@ -58491,7 +58603,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Heading 5'),
                 children: "format_h5"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 135,
                 columnNumber: 7
             }, this),
@@ -58505,7 +58617,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Heading 6'),
                 children: "format_h6"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 142,
                 columnNumber: 7
             }, this),
@@ -58515,7 +58627,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Link'),
                 children: "link"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 149,
                 columnNumber: 7
             }, this),
@@ -58528,7 +58640,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Remove Link'),
                 children: "link_off"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 156,
                 columnNumber: 7
             }, this),
@@ -58540,7 +58652,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Bullet List'),
                 children: "format_list_bulleted"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 164,
                 columnNumber: 7
             }, this),
@@ -58552,7 +58664,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Numbered List'),
                 children: "format_list_numbered"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 171,
                 columnNumber: 7
             }, this),
@@ -58564,7 +58676,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Code Block'),
                 children: "code_blocks"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 178,
                 columnNumber: 7
             }, this),
@@ -58576,7 +58688,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Aside'),
                 children: "view_sidebar"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 185,
                 columnNumber: 7
             }, this),
@@ -58588,7 +58700,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Blockquote'),
                 children: "format_quote"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 192,
                 columnNumber: 7
             }, this),
@@ -58600,7 +58712,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Horizontal Rule'),
                 children: "horizontal_rule"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 199,
                 columnNumber: 7
             }, this),
@@ -58613,7 +58725,7 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Undo'),
                 children: "undo"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 206,
                 columnNumber: 7
             }, this),
@@ -58626,13 +58738,13 @@ function MenuBar(param) {
                 title: (0,_helpers__WEBPACK_IMPORTED_MODULE_3__.T)('Redo'),
                 children: "redo"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 214,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
-        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
         lineNumber: 67,
         columnNumber: 5
     }, this);
@@ -58646,20 +58758,20 @@ function EditorFrame(param) {
                 editor: editor,
                 getLink: getLink
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 228,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_tiptap_react__WEBPACK_IMPORTED_MODULE_2__.EditorContent, {
                 editor: editor
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
                 lineNumber: 229,
                 columnNumber: 5
             }, this)
         ]
     }, void 0, true, {
-        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/EditorFrame.tsx",
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\EditorFrame.tsx",
         lineNumber: 227,
         columnNumber: 10
     }, this);
@@ -58858,7 +58970,7 @@ function Gallery(param) {
     var universe = param.universe, item = param.item, images = param.images, onRemoveImage = param.onRemoveImage, onUploadImage = param.onUploadImage, onChangeLabel = param.onChangeLabel;
     var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false), 2), uploadModal = _useState[0], setUploadModal = _useState[1];
     var modalAnchor = document.querySelector('#modal-anchor');
-    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         children: [
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
                 className: "item-gallery d-flex gap-4 flex-wrap",
@@ -58875,7 +58987,7 @@ function Gallery(param) {
                                     src: "/api/universes/".concat(universe, "/items/").concat(item, "/gallery/images/").concat(img.id),
                                     alt: img.label
                                 }, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                                     lineNumber: 24,
                                     columnNumber: 13
                                 }, _this),
@@ -58889,7 +59001,7 @@ function Gallery(param) {
                                             },
                                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Remove Image')
                                         }, void 0, false, {
-                                            fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                                             lineNumber: 26,
                                             columnNumber: 15
                                         }, _this),
@@ -58901,7 +59013,7 @@ function Gallery(param) {
                                                 return onChangeLabel(img.id, target.value);
                                             }
                                         }, void 0, false, {
-                                            fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                                             lineNumber: 27,
                                             columnNumber: 15
                                         }, _this),
@@ -58910,30 +59022,30 @@ function Gallery(param) {
                                             href: "/api/universes/".concat(universe, "/items/").concat(item, "/gallery/images/").concat(img.id, "?download=1"),
                                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Download')
                                         }, void 0, false, {
-                                            fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                                             lineNumber: 28,
                                             columnNumber: 15
                                         }, _this)
                                     ]
                                 }, void 0, true, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                                     lineNumber: 25,
                                     columnNumber: 13
                                 }, _this)
                             ]
                         }, void 0, true, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                             lineNumber: 23,
                             columnNumber: 11
                         }, _this)
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                         lineNumber: 22,
                         columnNumber: 9
                     }, _this);
                 })
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                 lineNumber: 20,
                 columnNumber: 5
             }, this),
@@ -58944,7 +59056,7 @@ function Gallery(param) {
                 },
                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Upload Image')
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                 lineNumber: 34,
                 columnNumber: 5
             }, this),
@@ -58964,7 +59076,7 @@ function Gallery(param) {
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h2", {
                                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Upload Image')
                             }, void 0, false, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                                 lineNumber: 40,
                                 columnNumber: 15
                             }, this),
@@ -58973,7 +59085,7 @@ function Gallery(param) {
                                 accept: "image/*",
                                 required: true
                             }, void 0, false, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                                 lineNumber: 41,
                                 columnNumber: 15
                             }, this),
@@ -59020,32 +59132,28 @@ function Gallery(param) {
                                 },
                                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Upload')
                             }, void 0, false, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                                 lineNumber: 42,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                         lineNumber: 39,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
-                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                     lineNumber: 38,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\Gallery.tsx",
                 lineNumber: 37,
                 columnNumber: 9
             }, this), modalAnchor)
         ]
-    }, void 0, true, {
-        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/Gallery.tsx",
-        lineNumber: 19,
-        columnNumber: 10
-    }, this);
+    }, void 0, true);
 }
 
 
@@ -59201,7 +59309,7 @@ function LineageEditor(param) {
         }
         onUpdate(newState);
     };
-    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         children: [
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
                 className: "item-parents",
@@ -59209,7 +59317,7 @@ function LineageEditor(param) {
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h4", {
                         children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Parents')
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                         lineNumber: 70,
                         columnNumber: 7
                     }, this),
@@ -59222,27 +59330,27 @@ function LineageEditor(param) {
                                     },
                                     children: parent.parent_title
                                 }, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                                     lineNumber: 73,
                                     columnNumber: 11
                                 }, _this),
                                 parent.parent_label && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                     children: parent.parent_label
                                 }, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                                     lineNumber: 74,
                                     columnNumber: 35
                                 }, _this)
                             ]
                         }, "parent_".concat(i), true, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                             lineNumber: 72,
                             columnNumber: 9
                         }, _this);
                     })
                 ]
             }, void 0, true, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                 lineNumber: 69,
                 columnNumber: 5
             }, this),
@@ -59252,7 +59360,7 @@ function LineageEditor(param) {
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h4", {
                         children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Children')
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                         lineNumber: 79,
                         columnNumber: 7
                     }, this),
@@ -59265,27 +59373,27 @@ function LineageEditor(param) {
                                     },
                                     children: child.child_title
                                 }, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                                     lineNumber: 82,
                                     columnNumber: 11
                                 }, _this),
                                 child.child_label && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                     children: child.child_label
                                 }, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                                     lineNumber: 83,
                                     columnNumber: 33
                                 }, _this)
                             ]
                         }, "child_".concat(i), true, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                             lineNumber: 81,
                             columnNumber: 9
                         }, _this);
                     })
                 ]
             }, void 0, true, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                 lineNumber: 78,
                 columnNumber: 5
             }, this),
@@ -59295,7 +59403,7 @@ function LineageEditor(param) {
                         onClick: addParent,
                         children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Add New Parent')
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                         lineNumber: 88,
                         columnNumber: 7
                     }, this),
@@ -59303,7 +59411,7 @@ function LineageEditor(param) {
                         options: itemMap,
                         onSelect: setNewParent
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                         lineNumber: 89,
                         columnNumber: 7
                     }, this),
@@ -59315,7 +59423,7 @@ function LineageEditor(param) {
                         },
                         placeholder: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('%s\'s Title', item.title)
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                         lineNumber: 90,
                         columnNumber: 7
                     }, this),
@@ -59327,13 +59435,13 @@ function LineageEditor(param) {
                         },
                         placeholder: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Parent Title')
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                         lineNumber: 95,
                         columnNumber: 7
                     }, this)
                 ]
             }, void 0, true, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                 lineNumber: 87,
                 columnNumber: 5
             }, this),
@@ -59343,7 +59451,7 @@ function LineageEditor(param) {
                         onClick: addChild,
                         children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Add New Child')
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                         lineNumber: 102,
                         columnNumber: 7
                     }, this),
@@ -59351,7 +59459,7 @@ function LineageEditor(param) {
                         options: itemMap,
                         onSelect: setNewChild
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                         lineNumber: 103,
                         columnNumber: 7
                     }, this),
@@ -59363,7 +59471,7 @@ function LineageEditor(param) {
                         },
                         placeholder: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('%s\'s Title', item.title)
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                         lineNumber: 104,
                         columnNumber: 7
                     }, this),
@@ -59375,22 +59483,18 @@ function LineageEditor(param) {
                         },
                         placeholder: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Child Title')
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                         lineNumber: 109,
                         columnNumber: 7
                     }, this)
                 ]
             }, void 0, true, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\LineageEditor.tsx",
                 lineNumber: 101,
                 columnNumber: 5
             }, this)
         ]
-    }, void 0, true, {
-        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/LineageEditor.tsx",
-        lineNumber: 68,
-        columnNumber: 10
-    }, this);
+    }, void 0, true);
 }
 
 
@@ -59459,20 +59563,23 @@ function _unsupported_iterable_to_array(o, minLen) {
 
 function SearchableSelect(param) {
     var _this = this;
-    var options = param.options, onSelect = param.onSelect, groups = param.groups;
+    var id = param.id, options = param.options, onSelect = param.onSelect, groups = param.groups;
     var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(''), 2), searchText = _useState[0], setSearchText = _useState[1];
     var _useState1 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), selectedKey = _useState1[0], setSelectedKey = _useState1[1];
     var _useState2 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false), 2), dropdownVisible = _useState2[0], setDropdownVisible = _useState2[1];
     groups = groups !== null && groups !== void 0 ? groups : {};
     (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
-        if (selectedKey) onSelect(selectedKey);
+        if (selectedKey !== null) onSelect(selectedKey);
     }, [
         selectedKey
     ]);
-    var ungroupedOptions = Object.keys(options).filter(function(key) {
+    var filteredOptions = Object.keys(options).filter(function(option) {
+        return !searchText || !options[option] || options[option].toLowerCase().includes(searchText.toLowerCase());
+    });
+    var ungroupedOptions = filteredOptions.filter(function(key) {
         return !(key in groups);
     });
-    var groupedOptions = Object.keys(options).filter(function(key) {
+    var groupedOptions = filteredOptions.filter(function(key) {
         return key in groups;
     });
     var optionGroups = {};
@@ -59503,15 +59610,17 @@ function SearchableSelect(param) {
             onClick: function() {
                 setSearchText(options[key]);
                 setSelectedKey(key);
+                setDropdownVisible(false);
             },
             children: options[key]
         }, key, false, {
-            fileName: "/home/admin/webserver/dev/archivium/editor/src/components/SearchableSelect.tsx",
-            lineNumber: 29,
+            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\SearchableSelect.tsx",
+            lineNumber: 32,
             columnNumber: 12
         }, _this);
     };
     return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+        id: id,
         className: "searchable-select",
         children: [
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -59529,8 +59638,8 @@ function SearchableSelect(param) {
                     }, 100);
                 }
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/SearchableSelect.tsx",
-                lineNumber: 36,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\SearchableSelect.tsx",
+                lineNumber: 40,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -59550,13 +59659,13 @@ function SearchableSelect(param) {
                                     children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("b", {
                                         children: group
                                     }, void 0, false, {
-                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/SearchableSelect.tsx",
-                                        lineNumber: 47,
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\SearchableSelect.tsx",
+                                        lineNumber: 51,
                                         columnNumber: 13
                                     }, _this)
                                 }, group, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/SearchableSelect.tsx",
-                                    lineNumber: 46,
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\SearchableSelect.tsx",
+                                    lineNumber: 50,
                                     columnNumber: 11
                                 }, _this),
                                 optionGroups[group].map(function(key) {
@@ -59567,14 +59676,14 @@ function SearchableSelect(param) {
                     })
                 ]
             }, void 0, true, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/SearchableSelect.tsx",
-                lineNumber: 42,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\SearchableSelect.tsx",
+                lineNumber: 46,
                 columnNumber: 5
             }, this)
         ]
     }, void 0, true, {
-        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/SearchableSelect.tsx",
-        lineNumber: 35,
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\SearchableSelect.tsx",
+        lineNumber: 39,
         columnNumber: 10
     }, this);
 }
@@ -59649,6 +59758,7 @@ function TabsBar(param) {
             var _param = _sliced_to_array(param, 2), tab = _param[0], name = _param[1];
             return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("li", {
                 className: "navbarBtn badge-anchor".concat(tab === selectedTab ? ' selected' : ''),
+                "data-tab": tab,
                 onClick: function() {
                     return onSelectTab(tab);
                 },
@@ -59657,8 +59767,8 @@ function TabsBar(param) {
                         className: "navbarBtnLink navbarText ma-0",
                         children: name
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TabsBar.tsx",
-                        lineNumber: 13,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TabsBar.tsx",
+                        lineNumber: 18,
                         columnNumber: 11
                     }, _this),
                     tab === selectedTab && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -59669,19 +59779,19 @@ function TabsBar(param) {
                         },
                         children: "delete"
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TabsBar.tsx",
-                        lineNumber: 14,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TabsBar.tsx",
+                        lineNumber: 19,
                         columnNumber: 35
                     }, _this)
                 ]
             }, tab, true, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TabsBar.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TabsBar.tsx",
                 lineNumber: 12,
                 columnNumber: 9
             }, _this);
         })
     }, void 0, false, {
-        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TabsBar.tsx",
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TabsBar.tsx",
         lineNumber: 10,
         columnNumber: 5
     }, this);
@@ -59896,7 +60006,7 @@ function TimePicker(param) {
                                 ": "
                             ]
                         }, void 0, true, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimePicker.tsx",
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimePicker.tsx",
                             lineNumber: 105,
                             columnNumber: 9
                         }, _this),
@@ -59909,13 +60019,13 @@ function TimePicker(param) {
                                 setTime(newTime);
                             }
                         }, void 0, false, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimePicker.tsx",
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimePicker.tsx",
                             lineNumber: 106,
                             columnNumber: 9
                         }, _this)
                     ]
                 }, key, true, {
-                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimePicker.tsx",
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimePicker.tsx",
                     lineNumber: 104,
                     columnNumber: 7
                 }, _this);
@@ -59927,7 +60037,7 @@ function TimePicker(param) {
                 },
                 children: "Select"
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimePicker.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimePicker.tsx",
                 lineNumber: 113,
                 columnNumber: 5
             }, this)
@@ -60120,7 +60230,7 @@ function TimelineEditor(param) {
     };
     var handleImportEvent = function() {
         var newEvents = _to_consumable_array(item.events);
-        if (!(importItem && importEvent)) return;
+        if (!(importItem && importEvent !== null)) return;
         var event = eventItemMap[importItem].find(function(param) {
             var _param = _sliced_to_array(param, 4), event_title = _param[3];
             return event_title === importEvent;
@@ -60150,6 +60260,7 @@ function TimelineEditor(param) {
                         return e.stopPropagation();
                     },
                     children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        id: "time-picker-modal",
                         className: "sheet d-flex flex-col gap-1",
                         children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_TimePicker__WEBPACK_IMPORTED_MODULE_4__["default"], {
                             abstime: abstime,
@@ -60162,22 +60273,22 @@ function TimelineEditor(param) {
                                 }
                             }
                         }, void 0, false, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
                             lineNumber: 91,
                             columnNumber: 17
                         }, _this)
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
                         lineNumber: 90,
                         columnNumber: 15
                     }, _this)
                 }, void 0, false, {
-                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
                     lineNumber: 89,
                     columnNumber: 13
                 }, _this)
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
                 lineNumber: 88,
                 columnNumber: 11
             }, _this), modalAnchor)
@@ -60185,16 +60296,17 @@ function TimelineEditor(param) {
     };
     var importItemOptions = {};
     for(var id in eventItemMap){
+        if (Number(id) === item.id) continue;
         var _eventItemMap_id_ = _sliced_to_array(eventItemMap[id][0], 2), title = _eventItemMap_id_[1];
         importItemOptions[id] = title;
     }
-    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         children: [
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h4", {
                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Events')
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                lineNumber: 115,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                lineNumber: 116,
                 columnNumber: 5
             }, this),
             sortedEvents.map(function(event, i) {
@@ -60208,8 +60320,8 @@ function TimelineEditor(param) {
                                 event.abstime
                             ]
                         }, void 0, true, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                            lineNumber: 120,
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                            lineNumber: 121,
                             columnNumber: 11
                         }, _this) : /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
                             children: [
@@ -60220,8 +60332,8 @@ function TimelineEditor(param) {
                                         return handleEventTitleChange(i, e.target.value);
                                     }
                                 }, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                                    lineNumber: 125,
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                    lineNumber: 126,
                                     columnNumber: 13
                                 }, _this),
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -60233,8 +60345,8 @@ function TimelineEditor(param) {
                                         return handleEventTimeChange(i, Number(e.target.value));
                                     }
                                 }, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                                    lineNumber: 130,
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                    lineNumber: 131,
                                     columnNumber: 13
                                 }, _this),
                                 /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -60244,8 +60356,8 @@ function TimelineEditor(param) {
                                     },
                                     children: "\uD83D\uDCC5"
                                 }, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                                    lineNumber: 137,
+                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                    lineNumber: 138,
                                     columnNumber: 13
                                 }, _this),
                                 createTimePickerModal(i, event.abstime)
@@ -60258,27 +60370,27 @@ function TimelineEditor(param) {
                             },
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Remove')
                         }, void 0, false, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                            lineNumber: 142,
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                            lineNumber: 143,
                             columnNumber: 9
                         }, _this)
                     ]
                 }, i, true, {
-                    fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                    lineNumber: 118,
+                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                    lineNumber: 119,
                     columnNumber: 7
                 }, _this);
             }),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                lineNumber: 151,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                lineNumber: 152,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h4", {
                 children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Add Events')
             }, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                lineNumber: 153,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                lineNumber: 154,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -60292,8 +60404,8 @@ function TimelineEditor(param) {
                                     ": "
                                 ]
                             }, void 0, true, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                                lineNumber: 156,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                lineNumber: 157,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -60304,14 +60416,14 @@ function TimelineEditor(param) {
                                     return setNewEventTitle(target.value);
                                 }
                             }, void 0, false, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                                lineNumber: 157,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                lineNumber: 158,
                                 columnNumber: 9
                             }, this)
                         ]
                     }, void 0, true, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                        lineNumber: 155,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                        lineNumber: 156,
                         columnNumber: 7
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -60322,8 +60434,8 @@ function TimelineEditor(param) {
                                     ": "
                                 ]
                             }, void 0, true, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                                lineNumber: 161,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                lineNumber: 162,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
@@ -60335,8 +60447,8 @@ function TimelineEditor(param) {
                                 },
                                 type: "number"
                             }, void 0, false, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                                lineNumber: 162,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                lineNumber: 163,
                                 columnNumber: 9
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -60346,15 +60458,15 @@ function TimelineEditor(param) {
                                 },
                                 children: "\uD83D\uDCC5"
                             }, void 0, false, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                                lineNumber: 168,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                lineNumber: 169,
                                 columnNumber: 9
                             }, this),
                             createTimePickerModal(-1, 0)
                         ]
                     }, void 0, true, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                        lineNumber: 160,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                        lineNumber: 161,
                         columnNumber: 7
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
@@ -60362,19 +60474,19 @@ function TimelineEditor(param) {
                         onClick: createNewEvent,
                         children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Create New Event')
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                        lineNumber: 172,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                        lineNumber: 173,
                         columnNumber: 7
                     }, this)
                 ]
             }, void 0, true, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                lineNumber: 154,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                lineNumber: 155,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                lineNumber: 180,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                lineNumber: 181,
                 columnNumber: 5
             }, this),
             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -60386,8 +60498,8 @@ function TimelineEditor(param) {
                         },
                         children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Import Event')
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                        lineNumber: 183,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                        lineNumber: 184,
                         columnNumber: 7
                     }, this),
                     importEventModal && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_3__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -60401,68 +60513,67 @@ function TimelineEditor(param) {
                                 return e.stopPropagation();
                             },
                             children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                                id: "import-event",
                                 className: "sheet d-flex flex-col gap-1",
                                 children: [
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_SearchableSelect__WEBPACK_IMPORTED_MODULE_5__["default"], {
+                                        id: "import-event-item",
                                         options: importItemOptions,
                                         onSelect: function(id) {
                                             return setImportItem(Number(id));
                                         }
                                     }, void 0, false, {
-                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                                        lineNumber: 189,
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                        lineNumber: 190,
                                         columnNumber: 17
                                     }, this),
-                                    importItem && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_SearchableSelect__WEBPACK_IMPORTED_MODULE_5__["default"], {
+                                    importItem !== null && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_SearchableSelect__WEBPACK_IMPORTED_MODULE_5__["default"], {
+                                        id: "import-event-event",
                                         options: eventItemMap[importItem].reduce(function(acc, param) {
                                             var _param = _sliced_to_array(param, 4), eventTitle = _param[3];
-                                            return _object_spread_props(_object_spread({}, acc), _define_property({}, eventTitle, eventTitle));
+                                            return _object_spread_props(_object_spread({}, acc), _define_property({}, eventTitle, eventTitle || (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Default')));
                                         }, {}),
                                         onSelect: function(eventTitle) {
                                             return setImportEvent(eventTitle);
                                         }
                                     }, void 0, false, {
-                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                                        lineNumber: 190,
-                                        columnNumber: 32
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                        lineNumber: 191,
+                                        columnNumber: 41
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
                                         type: "button",
                                         onClick: handleImportEvent,
                                         children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Import')
                                     }, void 0, false, {
-                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                                        lineNumber: 191,
+                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                        lineNumber: 196,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
-                                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                                lineNumber: 188,
+                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                                lineNumber: 189,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
-                            fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                            lineNumber: 187,
+                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                            lineNumber: 188,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
-                        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                        lineNumber: 186,
+                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                        lineNumber: 187,
                         columnNumber: 11
                     }, this), modalAnchor)
                 ]
             }, void 0, true, {
-                fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-                lineNumber: 182,
+                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\components\\TimelineEditor.tsx",
+                lineNumber: 183,
                 columnNumber: 5
             }, this)
         ]
-    }, void 0, true, {
-        fileName: "/home/admin/webserver/dev/archivium/editor/src/components/TimelineEditor.tsx",
-        lineNumber: 114,
-        columnNumber: 10
-    }, this);
+    }, void 0, true);
 }
 
 
@@ -61293,12 +61404,12 @@ var root = document.querySelector('#root');
 var dataset = root.dataset;
 (0,react_dom_client__WEBPACK_IMPORTED_MODULE_2__.createRoot)(root).render(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react__WEBPACK_IMPORTED_MODULE_1__.StrictMode, {
     children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_App_tsx__WEBPACK_IMPORTED_MODULE_3__["default"], _object_spread({}, dataset), void 0, false, {
-        fileName: "/home/admin/webserver/dev/archivium/editor/src/main.tsx",
+        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\main.tsx",
         lineNumber: 10,
         columnNumber: 5
     }, undefined)
 }, void 0, false, {
-    fileName: "/home/admin/webserver/dev/archivium/editor/src/main.tsx",
+    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\main.tsx",
     lineNumber: 9,
     columnNumber: 3
 }, undefined));

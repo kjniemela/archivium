@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { T } from '../helpers';
 import { createPortal } from 'react-dom';
 import TimePicker from './TimePicker';
-import type { EventItem, Item } from '../App';
+import type { EventItem } from '../App';
 import SearchableSelect from './SearchableSelect';
-import { type ItemEvent } from '../../../src/api/models/item';
+import { type Item, type ItemEvent } from '../../../src/api/models/item';
 
 type TimelineProps = {
   item: Item,
@@ -63,7 +63,7 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
   const handleImportEvent = () => {
     const newEvents = [ ...item.events ];
 
-    if (!(importItem && importEvent)) return;
+    if (!(importItem && importEvent !== null)) return;
 
     const event = eventItemMap[importItem].find(([,,, event_title]) => event_title === importEvent);
     if (!event) return;
@@ -87,7 +87,7 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
         createPortal(
           <div className='modal' onClick={() => setTimePickerModal(null)}>
             <div className='modal-content' onClick={(e) => e.stopPropagation()}>
-              <div className='sheet d-flex flex-col gap-1'>
+              <div id='time-picker-modal' className='sheet d-flex flex-col gap-1'>
                 <TimePicker abstime={abstime} onSelect={(time) => {
                   setTimePickerModal(null);
                   if (index === -1) {
@@ -107,11 +107,12 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
 
   const importItemOptions: { [id: number]: string } = {};
   for (const id in eventItemMap) {
+    if (Number(id) === item.id) continue;
     const [, title] = eventItemMap[id][0];
     importItemOptions[id] = title;
   }
 
-  return <div>
+  return <>
     <h4>{T('Events')}</h4>
     
     {sortedEvents.map((event: ItemEvent, i: number) => (
@@ -185,9 +186,13 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
         createPortal(
           <div className='modal' onClick={() => setImportEventModal(false)}>
             <div className='modal-content' onClick={(e) => e.stopPropagation()}>
-              <div className='sheet d-flex flex-col gap-1'>
-                <SearchableSelect options={importItemOptions} onSelect={(id) => setImportItem(Number(id))} />
-                {importItem && <SearchableSelect options={eventItemMap[importItem].reduce((acc, [,,, eventTitle]) => ({ ...acc, [eventTitle]: eventTitle }), {})} onSelect={(eventTitle) => setImportEvent(eventTitle)} />}
+              <div id='import-event' className='sheet d-flex flex-col gap-1'>
+                <SearchableSelect id='import-event-item' options={importItemOptions} onSelect={(id) => setImportItem(Number(id))} />
+                {importItem !== null && <SearchableSelect
+                  id='import-event-event'
+                  options={eventItemMap[importItem].reduce((acc, [,,, eventTitle]) => ({ ...acc, [eventTitle]: eventTitle || T('Default') }), {})}
+                  onSelect={(eventTitle) => setImportEvent(eventTitle)}
+                />}
                 <button type='button' onClick={handleImportEvent}>{T('Import')}</button>
               </div>
             </div>
@@ -196,5 +201,5 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
         )
       )}
     </div>
-  </div>;
+  </>;
 }

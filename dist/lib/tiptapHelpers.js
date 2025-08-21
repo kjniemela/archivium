@@ -2,6 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.jsonToIndexed = jsonToIndexed;
 exports.indexedToJson = indexedToJson;
+function cleanupMark(mark) {
+    const newMark = { ...mark };
+    if (newMark.type === 'link') {
+        newMark.attrs = {
+            href: newMark.attrs.href,
+            class: newMark.attrs.class,
+        };
+    }
+    return newMark;
+}
 function jsonToIndexed(doc) {
     let textBuffer = '';
     let pos = 0;
@@ -14,7 +24,7 @@ function jsonToIndexed(doc) {
                 type: 'text',
                 start,
                 end: pos,
-                marks: node.marks ?? [],
+                marks: (node.marks || []).map(cleanupMark),
                 attrs: node.attrs ?? {},
             };
         }
@@ -26,7 +36,7 @@ function jsonToIndexed(doc) {
         }
         return {
             type: node.type,
-            marks: node.marks || [],
+            marks: (node.marks || []).map(cleanupMark),
             attrs: node.attrs ?? {},
             content,
         };

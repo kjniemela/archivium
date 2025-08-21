@@ -20,6 +20,17 @@ export interface IndexedDocument {
   structure: OffsetTextNode[];
 }
 
+function cleanupMark(mark) {
+  const newMark = { ...mark };
+  if (newMark.type === 'link') {
+    newMark.attrs = {
+      href: newMark.attrs.href,
+      class: newMark.attrs.class,
+    };
+  }
+  return newMark;
+}
+
 export function jsonToIndexed(doc: any): IndexedDocument {
   let textBuffer = '';
   let pos = 0;
@@ -33,7 +44,7 @@ export function jsonToIndexed(doc: any): IndexedDocument {
         type: 'text',
         start,
         end: pos,
-        marks: node.marks ?? [],
+        marks: (node.marks || []).map(cleanupMark),
         attrs: node.attrs ?? {},
       };
     }
@@ -48,7 +59,7 @@ export function jsonToIndexed(doc: any): IndexedDocument {
 
     return {
       type: node.type,
-      marks: node.marks || [],
+      marks: (node.marks || []).map(cleanupMark),
       attrs: node.attrs ?? {},
       content,
     };

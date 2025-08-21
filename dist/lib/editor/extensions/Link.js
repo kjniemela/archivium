@@ -5,11 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const extension_link_1 = __importDefault(require("@tiptap/extension-link"));
 const core_1 = require("@tiptap/core");
+const MD_LINK_RE = /\[([^\]]+)\]\(([^)\s]+)\)$/;
 const Link = extension_link_1.default.configure({
     autolink: true,
     HTMLAttributes: {
-        rel: false,
-        target: false,
+        rel: '',
+        target: '',
         class: 'link link-animated',
     },
 }).extend({
@@ -31,6 +32,23 @@ const Link = extension_link_1.default.configure({
                 class: exists ? '' : 'link-broken',
             }),
             0,
+        ];
+    },
+    addInputRules() {
+        const type = this.type;
+        return [
+            new core_1.InputRule({
+                find: MD_LINK_RE,
+                handler({ state, range, match }) {
+                    const [, label, target] = match;
+                    if (!label || !target)
+                        return null;
+                    const tr = state.tr;
+                    tr.insertText(label, range.from, range.to);
+                    tr.addMark(range.from, range.from + label.length, type.create({ href: target }));
+                    tr.removeStoredMark(type);
+                }
+            }),
         ];
     },
 });

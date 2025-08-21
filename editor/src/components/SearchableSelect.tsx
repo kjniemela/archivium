@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 
 type SearchableSelectProps = {
+  id?: string,
   options: { [shortname: string]: string },
   onSelect: (selectedValue: string) => void,
   groups?: { [shortname: string]: string },
 };
 
-export default function SearchableSelect({ options, onSelect, groups }: SearchableSelectProps) {
+export default function SearchableSelect({ id, options, onSelect, groups }: SearchableSelectProps) {
   const [searchText, setSearchText] = useState<string>('');
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
@@ -14,11 +15,13 @@ export default function SearchableSelect({ options, onSelect, groups }: Searchab
   groups = groups ?? {};
 
   useEffect(() => {
-    if (selectedKey) onSelect(selectedKey);
+    if (selectedKey !== null) onSelect(selectedKey);
   }, [selectedKey]);
 
-  const ungroupedOptions = Object.keys(options).filter(key => !(key in groups));
-  const groupedOptions = Object.keys(options).filter(key => (key in groups));
+  const filteredOptions = Object.keys(options).filter(option => (!searchText || !options[option] || options[option].toLowerCase().includes(searchText.toLowerCase())));
+
+  const ungroupedOptions = filteredOptions.filter(key => !(key in groups));
+  const groupedOptions = filteredOptions.filter(key => (key in groups));
   const optionGroups: { [key: string]: string[] } = {};
   for (const key of groupedOptions) {
     if (!(groups[key] in optionGroups)) optionGroups[groups[key]] = [];
@@ -29,10 +32,11 @@ export default function SearchableSelect({ options, onSelect, groups }: Searchab
     return <div key={key} className='option' onClick={() => {
       setSearchText(options[key]);
       setSelectedKey(key);
+      setDropdownVisible(false);
     }}>{options[key]}</div>;
   };
   
-  return <div className='searchable-select'>
+  return <div id={id} className='searchable-select'>
     <input
       value={searchText}
       onChange={({ target }) => setSearchText(target.value)}

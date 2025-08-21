@@ -1,5 +1,5 @@
 import TiptapLink, { LinkOptions } from '@tiptap/extension-link';
-import { mergeAttributes } from '@tiptap/core';
+import { InputRule, mergeAttributes, textInputRule } from '@tiptap/core';
 import { LinkingContext } from '..';
 
 export interface ResolveResult {
@@ -14,11 +14,13 @@ interface ExtendedLinkOptions extends LinkOptions {
   context?: LinkingContext;
 }
 
+const MD_LINK_RE = /\[([^\]]+)\]\(([^)\s]+)\)$/;
+
 const Link = TiptapLink.configure({
   autolink: true,
   HTMLAttributes: {
-    rel: false,
-    target: false,
+    rel: '',
+    target: '',
     class: 'link link-animated',
   },
 }).extend<ExtendedLinkOptions>({
@@ -44,6 +46,24 @@ const Link = TiptapLink.configure({
       }),
       0,
     ];
+  },
+
+  addInputRules() {
+    const type = this.type;
+    return [
+      new InputRule({
+        find: MD_LINK_RE,
+        handler({ state, range, match }) {
+          const [, label, target] = match;
+          if (!label || !target) return null;
+
+          const tr = state.tr;
+          tr.insertText(label, range.from, range.to);
+          tr.addMark(range.from, range.from + label.length, type.create({ href: target }));
+          tr.removeStoredMark(type);
+        }
+      }),
+    ]
   },
 });
 

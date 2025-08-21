@@ -145,6 +145,7 @@ export default function App({ itemShort, universeShort, displayUniverse, addrPre
         console.log('NO CHANGE');
         setSaveText('Saved');
         setNeedsSaving(false);
+        if (callback) callback();
         return;
       }
 
@@ -189,7 +190,7 @@ export default function App({ itemShort, universeShort, displayUniverse, addrPre
         if (!(src_id in newEventItemMap)) {
           newEventItemMap[src_id] = [];
         }
-        newEventItemMap[src_id].push([src_shortname as string, src_title as string, Number(src_id), event_title as string, Number(abstime)]);
+        newEventItemMap[src_id].push([src_shortname as string, src_title as string, Number(src_id), event_title ?? '', Number(abstime)]);
       }
       setEventItemMap(newEventItemMap);
     });
@@ -495,7 +496,11 @@ export default function App({ itemShort, universeShort, displayUniverse, addrPre
             </ul>
           </div>
 
-          {currentTab && tabs[currentTab]}
+          {currentTab && (
+            <div data-tab={currentTab}>
+              {tabs[currentTab]}
+            </div>
+          )}
         </div>}
       </div>
     </>

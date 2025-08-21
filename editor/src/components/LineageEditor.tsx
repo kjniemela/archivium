@@ -65,7 +65,7 @@ export default function LineageEditor({ item, onUpdate, itemMap }: LineageEditor
     onUpdate(newState);
   };
 
-  return <div>
+  return <>
     <div className='item-parents'>
       <h4>{T('Parents')}</h4>
       {item.parents.map((parent, i) => (
@@ -112,5 +112,5 @@ export default function LineageEditor({ item, onUpdate, itemMap }: LineageEditor
         placeholder={T('Child Title')}
       />
     </div>
-  </div>;
+  </>;
 }

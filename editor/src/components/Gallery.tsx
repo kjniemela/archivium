@@ -16,7 +16,7 @@ export default function Gallery({ universe, item, images, onRemoveImage, onUploa
   const [uploadModal, setUploadModal] = useState<boolean>(false);
   const modalAnchor = document.querySelector('#modal-anchor') as HTMLElement;
 
-  return <div>
+  return <>
     <div className='item-gallery d-flex gap-4 flex-wrap'>
       {images.map((img, i) => (
         <div>
@@ -60,5 +60,5 @@ export default function Gallery({ universe, item, images, onRemoveImage, onUploa
         modalAnchor
       )
     )}
-  </div>;
+  </>;
 }
