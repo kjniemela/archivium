@@ -134,43 +134,6 @@ exports.default = {
             noteBaseRoute: `/api/universes/${universe.shortname}/items/${item.shortname}/notes`,
         });
     },
-    async editLegacy(req, res) {
-        const fetchedItem = await api_1.default.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortname, req.params.itemShortname, utils_1.perms.WRITE);
-        const item = { ...fetchedItem, ...(req.body ?? {}), shortname: fetchedItem.shortname, newShort: req.body?.shortname ?? fetchedItem.shortname };
-        const itemList = await api_1.default.item.getByUniverseId(req.session.user, item.universe_id, utils_1.perms.READ, { type: 'character' });
-        const universe = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
-        item.obj_data = JSON.parse(item.obj_data);
-        if (item.parents.length > 0 || item.children.length > 0) {
-            item.obj_data.lineage = { ...item.obj_data.lineage };
-            item.obj_data.lineage.parents = item.parents.reduce((obj, val) => ({ ...obj, [val.parent_shortname]: [val.parent_label, val.child_label] }), {});
-            item.obj_data.lineage.children = item.children.reduce((obj, val) => ({ ...obj, [val.child_shortname]: [val.child_label, val.parent_label] }), {});
-        }
-        if (item.events.length > 0) {
-            item.obj_data.timeline = { ...item.obj_data.timeline };
-            item.obj_data.timeline.events = item.events
-                .map(({ event_title, abstime, src_shortname, src_title, src_id }) => ({
-                title: event_title,
-                time: abstime,
-                imported: src_shortname !== item.shortname,
-                src: src_title,
-                srcId: src_id,
-            }));
-        }
-        if (item.gallery.length > 0) {
-            item.obj_data.gallery = { ...item.obj_data.gallery };
-            item.obj_data.gallery.imgs = item.gallery
-                .map(({ id, name, label }) => ({
-                id,
-                url: `/api/universes/${item.universe_short}/items/${item.shortname}/gallery/images/${id}`,
-                name,
-                label,
-            }))
-                .sort((a, b) => a.id > b.id ? 1 : -1);
-        }
-        const itemMap = {};
-        itemList.forEach(item => itemMap[item.shortname] = item.title);
-        res.prepareRender('editItem', { item, itemMap, universe, error: res.error });
-    },
     async edit(req, res) {
         res.prepareRender('editor', { itemShort: req.params.itemShortname, universeShort: req.params.universeShortname });
     },

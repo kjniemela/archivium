@@ -96,7 +96,6 @@ const templates = {
     editChapter: compile('templates/edit/chapter.pug'),
     deleteChapter: compile('templates/delete/chapter.pug'),
     item: compile('templates/view/item.pug'),
-    editItem: compile('templates/edit/item.pug'),
     deleteItem: compile('templates/delete/item.pug'),
     itemList: compile('templates/list/items.pug'),
     createItem: compile('templates/create/item.pug'),

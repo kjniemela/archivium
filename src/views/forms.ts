@@ -103,23 +103,6 @@ export default {
     }
   },
 
-  async editItem() {
-    throw new RequestError('This endpoint is deprecared.', { code: HttpStatusCode.Gone });
-    // try {
-    //   const id = await api.item.save(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);
-    //   const item = await api.item.getOne(req.session.user, { 'item.id': id }, perms.READ, true);
-    //   res.redirect(`${universeLink(req, req.params.universeShortname)}/items/${item.shortname}`);
-    // } catch (err) {
-    //   console.error(err);
-    //   if (err instanceof ModelError) {
-    //     res.error = err.message;
-    //     await pages.item.edit(req, res);
-    //     return;
-    //   }
-    //   throw err;
-    // }
-  },
-
   async commentOnItem(req, res) {
     await api.discussion.postCommentToItem(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);
     res.redirect(`${universeLink(req, req.params.universeShortname)}/items/${req.params.itemShortname}?tab=comments#post-comment`);

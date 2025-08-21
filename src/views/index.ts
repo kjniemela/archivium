@@ -198,7 +198,6 @@ export default function(app: Express) {
     get('/universes/:universeShortname/items/create', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.item.create);
     get('/universes/:universeShortname/items/:itemShortname', sites.NORMAL, [], pages.item.view);
     get('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.item.edit);
-    get('/universes/:universeShortname/items/:itemShortname/edit-legacy', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.item.editLegacy);
     get('/universes/:universeShortname/items/:itemShortname/delete', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.item.delete);
 
     /* Display Mode Pages */
@@ -223,7 +222,7 @@ export default function(app: Express) {
     post('/universes/:universeShortname/permissions', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.editUniversePerms);
     post('/universes/:universeShortname/upgrade', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.sponsorUniverse);
     post('/universes/:universeShortname/items/create', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.createItem);
-    post('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.editItem);
+    post('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, [Auth.verifySessionOrRedirect], () => { throw new RequestError('This endpoint is deprecared.', { code: HttpStatusCode.Gone }) });
     post('/universes/:universeShortname/items/:itemShortname/comment', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.commentOnItem);
   
     post('/edit', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.editUniverse, (sub) => ({ universeShortname: sub })));
@@ -232,7 +231,7 @@ export default function(app: Express) {
     post('/permissions', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.editUniversePerms, (sub) => ({ universeShortname: sub })));
     post('/upgrade', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.sponsorUniverse, (sub) => ({ universeShortname: sub })));
     post('/items/create', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.createItem, (sub) => ({ universeShortname: sub })));
-    post('/items/:itemShortname/edit', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.editItem, (sub) => ({ universeShortname: sub })));
+    post('/items/:itemShortname/edit', sites.DISPLAY, [Auth.verifySessionOrRedirect], () => { throw new RequestError('This endpoint is deprecared.', { code: HttpStatusCode.Gone }) });
     post('/items/:itemShortname/comment', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.commentOnItem, (sub) => ({ universeShortname: sub })));
   });
 
