@@ -754,7 +754,8 @@ button:disabled {
   border: 0.125rem solid silver;
   border-radius: 0.5rem;
   padding: 0.75rem;
-  margin: 0 0.75rem;
+  margin: 0.75rem;
+  overflow-x: auto;
 }
 
 h4, h5 {
