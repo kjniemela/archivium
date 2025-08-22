@@ -362,33 +362,33 @@ export function parseMarkdown(text) {
         }
         heading.attrs.id = id;
         heading.addSrc(line);
-        if (!toc) continue;
-        if (maxTocDepth && headingLvl > maxTocDepth) continue;
-        const [lastListNode, lastHeadingLvl] = curTocList;
-        if (headingLvl > lastHeadingLvl) {
-          const lastListItem = lastListNode ? (lastListNode.lastChild() ?? lastListNode.addChild(new MarkdownNode('li'))) : null;
-          const newListNode = (lastListItem ?? toc).addChild(new MarkdownNode('ol'));
-          curTocList = [newListNode, headingLvl];
-        } else if (headingLvl < lastHeadingLvl) {
-          let newListNode = lastListNode as MarkdownNode;
-          for (let i = 0; i < lastHeadingLvl - headingLvl; i++) {
-            if (newListNode.parent?.parent?.type === 'ol') newListNode = newListNode.parent.parent;
-            else break;
-          }
-          curTocList = [newListNode, headingLvl];
-        }
-        const [curListNode] = curTocList as [MarkdownNode, number]; // We know a node has been set
-        curListNode.addChild(new MarkdownNode('li'));
-        const tocLink = new MarkdownNode('a', heading.innerText(), { href: `#${id}` });
-        curListNode.lastChild()?.addChild(tocLink);
+        // if (!toc) continue;
+        // if (maxTocDepth && headingLvl > maxTocDepth) continue;
+        // const [lastListNode, lastHeadingLvl] = curTocList;
+        // if (headingLvl > lastHeadingLvl) {
+        //   const lastListItem = lastListNode ? (lastListNode.lastChild() ?? lastListNode.addChild(new MarkdownNode('li'))) : null;
+        //   const newListNode = (lastListItem ?? toc).addChild(new MarkdownNode('ol'));
+        //   curTocList = [newListNode, headingLvl];
+        // } else if (headingLvl < lastHeadingLvl) {
+        //   let newListNode = lastListNode as MarkdownNode;
+        //   for (let i = 0; i < lastHeadingLvl - headingLvl; i++) {
+        //     if (newListNode.parent?.parent?.type === 'ol') newListNode = newListNode.parent.parent;
+        //     else break;
+        //   }
+        //   curTocList = [newListNode, headingLvl];
+        // }
+        // const [curListNode] = curTocList as [MarkdownNode, number]; // We know a node has been set
+        // curListNode.addChild(new MarkdownNode('li'));
+        // const tocLink = new MarkdownNode('a', heading.innerText(), { href: `#${id}` });
+        // curListNode.lastChild()?.addChild(tocLink);
       }
     } else if (trimmedLine[0] === '@') {
       const lineEnd = trimmedLine.length - (trimmedLine[trimmedLine.length - 1] === '@' ? 1 : 0)
       const [cmd, ...args] = splitIgnoringQuotes(trimmedLine.substring(1, lineEnd));
       if (cmd === 'toc') {
         toc = root.addChild(new MarkdownNode('div', '', { id: 'toc' }));
-        toc.addChild(new MarkdownNode('h3', 'Table of Contents'));
-        if (args.length >= 1) maxTocDepth = args[0];
+        // toc.addChild(new MarkdownNode('h3', 'Table of Contents'));
+        // if (args.length >= 1) maxTocDepth = args[0];
         toc.addSrc(`@${cmd}`);
       } else if (cmd === 'aside') {
         asideStart = root.children.length;

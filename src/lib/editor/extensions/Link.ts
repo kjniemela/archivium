@@ -1,17 +1,17 @@
 import TiptapLink, { LinkOptions } from '@tiptap/extension-link';
 import { InputRule, mergeAttributes, textInputRule } from '@tiptap/core';
-import { LinkingContext } from '..';
+import { TiptapContext } from '..';
 
 export interface ResolveResult {
   href: string;
   exists?: boolean;
 }
 
-export type ShorthandResolver = (shorthand: string, context: LinkingContext | undefined) => ResolveResult;
+export type ShorthandResolver = (shorthand: string, context: TiptapContext | undefined) => ResolveResult;
 
 interface ExtendedLinkOptions extends LinkOptions {
   shorthandResolver: ShorthandResolver;
-  context?: LinkingContext;
+  context?: TiptapContext;
 }
 
 const MD_LINK_RE = /\[([^\]]+)\]\(([^)\s]+)\)$/;

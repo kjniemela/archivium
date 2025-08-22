@@ -10,6 +10,8 @@ const starter_kit_1 = __importDefault(require("@tiptap/starter-kit"));
 const Aside_1 = __importDefault(require("./extensions/Aside"));
 const Image_1 = __importDefault(require("./extensions/Image"));
 const Link_1 = __importDefault(require("./extensions/Link"));
+const ToC_1 = __importDefault(require("./extensions/ToC"));
+const Heading_1 = __importDefault(require("./extensions/Heading"));
 function extractLinkData(href) {
     const data = {};
     let [first, second] = href.substring(1).split('/');
@@ -48,8 +50,10 @@ function shorthandResolver(href, ctx) {
 const editorExtensions = (editMode, context) => ([
     starter_kit_1.default.configure({
         link: false,
+        heading: false,
     }),
     Aside_1.default,
+    Heading_1.default,
     Image_1.default,
     Link_1.default.configure({
         enableClickSelection: editMode,
@@ -57,5 +61,6 @@ const editorExtensions = (editMode, context) => ([
         shorthandResolver,
         context,
     }),
+    ToC_1.default.configure({ context }),
 ]);
 exports.editorExtensions = editorExtensions;

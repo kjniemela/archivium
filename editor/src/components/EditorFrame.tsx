@@ -24,6 +24,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         canCode: ctx.editor.can().chain().toggleCode().run() ?? false,
         canClearMarks: ctx.editor.can().chain().unsetAllMarks().run() ?? false,
         isParagraph: ctx.editor.isActive('paragraph') ?? false,
+        isToc: ctx.editor.isActive('toc') ?? false,
         isHeading1: ctx.editor.isActive('heading', { level: 1 }) ?? false,
         isHeading2: ctx.editor.isActive('heading', { level: 2 }) ?? false,
         isHeading3: ctx.editor.isActive('heading', { level: 3 }) ?? false,
@@ -128,6 +129,13 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         title='Clear Formatting'
       >
         format_clear
+      </button>
+      <button
+        onClick={() => editor.chain().focus().insertToC().run()}
+        className={`material-symbols-outlined ${editorState.isToc ? 'is-active' : ''}`}
+        title={T('Table of Contents')}
+      >
+        toc
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}

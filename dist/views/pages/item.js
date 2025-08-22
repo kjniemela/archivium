@@ -73,7 +73,8 @@ exports.default = {
         if ('body' in item.obj_data && typeof item.obj_data.body !== 'string') {
             try {
                 const links = [];
-                const jsonBody = (0, tiptapHelpers_1.indexedToJson)(item.obj_data.body, (href) => links.push((0, editor_1.extractLinkData)(href)));
+                const headings = [];
+                const jsonBody = (0, tiptapHelpers_1.indexedToJson)(item.obj_data.body, (href) => links.push((0, editor_1.extractLinkData)(href)), (title, level) => headings.push({ title, level }));
                 const itemsPerUniverse = {};
                 /* Because Tiptap rendering cannot be async, we extract the links we'll need to check ahead of time. */
                 await Promise.all(links.map(async (link) => {
@@ -91,6 +92,7 @@ exports.default = {
                     currentUniverse: universe.shortname,
                     universeLink: (universeShort) => (0, templates_1.universeLink)(req, universeShort),
                     itemExists: (universe, item) => (universe in itemsPerUniverse) && itemsPerUniverse[universe][item],
+                    headings,
                 };
                 const htmlBody = (0, html_string_1.renderToHTMLString)({ extensions: (0, editor_1.editorExtensions)(false, renderContext), content: jsonBody });
                 const sanitizedHtml = (0, sanitize_html_1.default)(htmlBody, {
@@ -98,6 +100,7 @@ exports.default = {
                     allowedAttributes: {
                         ...sanitize_html_1.default.defaults.allowedAttributes,
                         img: ['src', 'alt', 'title', 'width', 'height'],
+                        h1: ['id'], h2: ['id'], h3: ['id'], h4: ['id'], h5: ['id'], h6: ['id'],
                     },
                     disallowedTagsMode: 'escape',
                     allowedClasses: {

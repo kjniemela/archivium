@@ -11,7 +11,7 @@ import { ForbiddenError, NotFoundError } from '../../errors';
 import { IndexedDocument, indexedToJson } from '../../lib/tiptapHelpers';
 import logger from '../../logger';
 import { universeLink } from '../../templates';
-import { editorExtensions, extractLinkData, LinkData, LinkingContext } from '../../lib/editor';
+import { editorExtensions, extractLinkData, LinkData, TiptapContext } from '../../lib/editor';
 import StarterKit from '@tiptap/starter-kit';
 
 export default {
@@ -79,7 +79,12 @@ export default {
     if ('body' in item.obj_data && typeof item.obj_data.body !== 'string') {
       try {
         const links: LinkData[] = [];
-        const jsonBody = indexedToJson(item.obj_data.body as IndexedDocument, (href) => links.push(extractLinkData(href)));
+        const headings: { title: string, level: number }[] = [];
+        const jsonBody = indexedToJson(
+          item.obj_data.body as IndexedDocument,
+          (href) => links.push(extractLinkData(href)),
+          (title, level) => headings.push({ title, level }),
+        );
         const itemsPerUniverse = {};
         /* Because Tiptap rendering cannot be async, we extract the links we'll need to check ahead of time. */
         await Promise.all(links.map(async (link) => {
@@ -93,10 +98,11 @@ export default {
             }
           }
         }));
-        const renderContext: LinkingContext = {
+        const renderContext: TiptapContext = {
           currentUniverse: universe.shortname,
           universeLink: (universeShort) => universeLink(req, universeShort),
           itemExists: (universe, item) => (universe in itemsPerUniverse) && itemsPerUniverse[universe][item],
+          headings,
         };
         const htmlBody = renderToHTMLString({ extensions: editorExtensions(false, renderContext), content: jsonBody });
         const sanitizedHtml = sanitizeHtml(htmlBody, {
@@ -104,12 +110,13 @@ export default {
           allowedAttributes: {
             ...sanitizeHtml.defaults.allowedAttributes,
             img: ['src', 'alt', 'title', 'width', 'height'],
+            h1: ['id'], h2: ['id'], h3: ['id'], h4: ['id'], h5: ['id'], h6: ['id'],
           },
           disallowedTagsMode: 'escape',
           allowedClasses: {
             '*': false,
           },
-      });
+        });
         item.obj_data.body = {
           type: 'html',
           content: sanitizedHtml,

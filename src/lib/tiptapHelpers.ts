@@ -69,7 +69,11 @@ export function jsonToIndexed(doc: any): IndexedDocument {
   return { text: textBuffer, structure };
 }
 
-export function indexedToJson(indexed: IndexedDocument, linkHandler?: (href: string) => void): any {
+function _getTextContent(node: CombinedNode) {
+  return `${node.text ?? ''}${(node.content ?? []).map(_getTextContent).join('')}`;
+}
+
+export function indexedToJson(indexed: IndexedDocument, linkHandler?: (href: string) => void, headingHandler?: (text: string, level: number) => void): any {
   const { text, structure } = indexed;
 
   function walk(node: OffsetTextNode): any {
@@ -93,6 +97,11 @@ export function indexedToJson(indexed: IndexedDocument, linkHandler?: (href: str
     if (node.attrs && Object.keys(node.attrs).length > 0) combinedNode.attrs = node.attrs;
     if (node.content && node.content.length > 0) {
       combinedNode.content = node.content.map(walk);
+    }
+
+    if (node.type === 'heading' && headingHandler) {
+      const text = _getTextContent(combinedNode);
+      if (text) headingHandler(text, combinedNode.attrs?.level ?? 1);
     }
 
     return combinedNode;

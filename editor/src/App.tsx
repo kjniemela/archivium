@@ -2,7 +2,7 @@ import { useState, useEffect, type ReactElement } from 'react';
 import { BulkExistsFetcher, capitalize, deepCompare, renderMarkdown, T } from './helpers';
 import EditorFrame from './components/EditorFrame';
 import { indexedToJson, jsonToIndexed, type IndexedDocument } from '../../src/lib/tiptapHelpers';
-import { editorExtensions, extractLinkData, type LinkData, type LinkingContext } from '../../src/lib/editor';
+import { editorExtensions, extractLinkData, type LinkData, type TiptapContext } from '../../src/lib/editor';
 import { createPortal } from 'react-dom';
 import TabsBar from './components/TabsBar';
 import { useEditor } from '@tiptap/react';
@@ -105,7 +105,7 @@ export default function App({ itemShort, universeShort, displayUniverse, addrPre
   const [lineageItemMap, setLineageItemMap] = useState<Record<number, string>>();
   const [previousData, setPreviousData] = useState<(Item & { obj_data: ObjData }) | null>(null);
 
-  const context: LinkingContext = {
+  const context: TiptapContext = {
     currentUniverse: universeShort,
     universeLink(universe) {
       if (displayUniverse) {
@@ -118,6 +118,7 @@ export default function App({ itemShort, universeShort, displayUniverse, addrPre
     itemExists(universe, item): boolean {
       return (itemExistsCache[universe] ?? {})[item] ?? false;
     },
+    headings: [],
   };
   
   const editor = useEditor({
@@ -212,7 +213,7 @@ export default function App({ itemShort, universeShort, displayUniverse, addrPre
           setInitContent(text);
         });
       } else if (objData.body) {
-        const links: LinkData[] = [];
+        const links: LinkData[] = []; 
         const json = indexedToJson(objData.body, (href) => links.push(extractLinkData(href)));
         const bulkFetcher = new BulkExistsFetcher();
         const fetchPromises = links.map(async (link) => {

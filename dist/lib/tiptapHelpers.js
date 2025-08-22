@@ -44,7 +44,10 @@ function jsonToIndexed(doc) {
     const structure = (doc.content || []).map(walk);
     return { text: textBuffer, structure };
 }
-function indexedToJson(indexed, linkHandler) {
+function _getTextContent(node) {
+    return `${node.text ?? ''}${(node.content ?? []).map(_getTextContent).join('')}`;
+}
+function indexedToJson(indexed, linkHandler, headingHandler) {
     const { text, structure } = indexed;
     function walk(node) {
         if (node.type === 'text') {
@@ -70,6 +73,11 @@ function indexedToJson(indexed, linkHandler) {
             combinedNode.attrs = node.attrs;
         if (node.content && node.content.length > 0) {
             combinedNode.content = node.content.map(walk);
+        }
+        if (node.type === 'heading' && headingHandler) {
+            const text = _getTextContent(combinedNode);
+            if (text)
+                headingHandler(text, combinedNode.attrs?.level ?? 1);
         }
         return combinedNode;
     }
