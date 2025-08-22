@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.splitIgnoringQuotes = splitIgnoringQuotes;
 exports.parseMarkdown = parseMarkdown;
 exports.extractLinks = extractLinks;
 class MarkdownNode {

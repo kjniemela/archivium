@@ -324,7 +324,7 @@ function parseInline(line: Line) {
   return nodes;
 }
 
-function splitIgnoringQuotes(str) {
+export function splitIgnoringQuotes(str) {
   const regex = /(?:[^\s"']+|"[^"]*"|'[^']*')+/g;
   const matches = str.match(regex);
   return matches ? matches.map(match => match.replace(/^["']|["']$/g, '')) : [];

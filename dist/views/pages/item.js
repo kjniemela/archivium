@@ -97,7 +97,7 @@ exports.default = {
                     allowedTags: sanitize_html_1.default.defaults.allowedTags.concat(['img']),
                     allowedAttributes: {
                         ...sanitize_html_1.default.defaults.allowedAttributes,
-                        img: ['src', 'alt', 'title'],
+                        img: ['src', 'alt', 'title', 'width', 'height'],
                     },
                     disallowedTagsMode: 'escape',
                     allowedClasses: {

@@ -11,6 +11,8 @@ import TimelineEditor from './components/TimelineEditor';
 import type { Item } from '../../src/api/models/item';
 import LineageEditor from './components/LineageEditor';
 import CustomDataEditor from './components/CustomDataEditor';
+import type { SetImageOptions } from '@tiptap/extension-image';
+import { splitIgnoringQuotes } from '../../src/markdown';
 
 type Categories = {
   [key: string]: [string, string],
@@ -330,24 +332,40 @@ export default function App({ itemShort, universeShort, displayUniverse, addrPre
   const tabs: Record<string, ReactElement | null> = {
     ...customTabs,
     body: (
-      <EditorFrame editor={editor} getLink={async (previousUrl) => {
+      <EditorFrame editor={editor} getLink={async (previousUrl, type) => {
         const url = window.prompt('URL', previousUrl);
         if (url?.startsWith('@')) {
-          const link = extractLinkData(url);
-          if (link.item) {
-            const universe = link.universe ?? universeShort;
-            if (!(universeShort in itemExistsCache)) {
-              itemExistsCache[universe] = {};
+          if (type === 'link') {
+            const link = extractLinkData(url);
+            if (link.item) {
+              const universe = link.universe ?? universeShort;
+              if (!(universeShort in itemExistsCache)) {
+                itemExistsCache[universe] = {};
+              }
+              if (!(link.item in itemExistsCache[universe])) {
+                const existsFetcher = new BulkExistsFetcher();
+                const fetchPromise = existsFetcher.exists(universe, link.item);
+                existsFetcher.fetchAll();
+                itemExistsCache[universe][link.item] = await fetchPromise;
+              }
             }
-            if (!(link.item in itemExistsCache[universe])) {
-              const existsFetcher = new BulkExistsFetcher();
-              const fetchPromise = existsFetcher.exists(universe, link.item);
-              existsFetcher.fetchAll();
-              itemExistsCache[universe][link.item] = await fetchPromise;
+          } else if (type === 'image') {
+            const [cmd, index, alt, height, width] = splitIgnoringQuotes(url.substring(1));
+            if (cmd === 'img') {
+              const image = item.gallery[Number(index)];
+              if (image) {
+                const attrs: Partial<SetImageOptions> = {
+                  alt: alt ?? image.name,
+                  title: alt ?? image.label,
+                };
+                if (height) attrs.height = Number(height);
+                if (width) attrs.width = Number(width);
+                return [`/api/universes/${item.universe_short}/items/${item.shortname}/gallery/images/${image.id}`, attrs];
+              }
             }
           }
         }
-        return url;
+        return [url];
       }} />
     ),
     gallery: (

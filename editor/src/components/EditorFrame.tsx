@@ -1,10 +1,11 @@
 import { useCallback } from 'react';
 import { EditorContent, Editor, useEditorState } from '@tiptap/react';
 import { T } from '../helpers';
+import type { SetImageOptions } from '@tiptap/extension-image';
 
 type RichEditorProps = {
   editor: Editor;
-  getLink: (previousUrl: string) => Promise<string | null>;
+  getLink: (previousUrl: string, type: 'link' | 'image') => Promise<[string | null, { [attr: string]: any }?]>;
 };
 
 function MenuBar({ editor, getLink }: RichEditorProps) {
@@ -32,6 +33,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         isLink: ctx.editor.isActive('link') ?? false,
         isBulletList: ctx.editor.isActive('bulletList') ?? false,
         isOrderedList: ctx.editor.isActive('orderedList') ?? false,
+        isImage: ctx.editor.isActive('image') ?? false,
         isCodeBlock: ctx.editor.isActive('codeBlock') ?? false,
         isAside: ctx.editor.isActive('aside') ?? false,
         isBlockquote: ctx.editor.isActive('blockquote') ?? false,
@@ -44,7 +46,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
   const setLink = useCallback(() => {
     const previousUrl = editor.getAttributes('link').href;
 
-    getLink(previousUrl).then((url) => {
+    getLink(previousUrl, 'link').then(([url]) => {
       if (url === null) {
         return;
       }
@@ -57,6 +59,29 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
 
       try {
         editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+      } catch (e: any) {
+        alert(e.message);
+      }
+    });
+  }, [editor]);
+
+  const setImage = useCallback(() => {
+    const previousSrc = editor.getAttributes('image').src;
+
+    getLink(previousSrc, 'image').then(([src, attrs]) => {
+      if (src === null) {
+        return;
+      }
+
+      try {
+        const imgAttrs: SetImageOptions = { src };
+        if (attrs) {
+          if (attrs.alt) imgAttrs.alt = attrs.alt;
+          if (attrs.title) imgAttrs.title = attrs.title;
+          if (attrs.width) imgAttrs.width = attrs.width;
+          if (attrs.height) imgAttrs.height = attrs.height;
+        }
+        editor.chain().focus().setImage(imgAttrs).run();
       } catch (e: any) {
         alert(e.message);
       }
@@ -174,6 +199,13 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         title={T('Numbered List')}
       >
         format_list_numbered
+      </button>
+      <button
+        onClick={setImage}
+        className={`material-symbols-outlined ${editorState.isImage ? 'is-active' : ''}`}
+        title={T('Insert Image')}
+      >
+        image
       </button>
       <button
         onClick={() => editor.chain().focus().toggleCodeBlock().run()}
