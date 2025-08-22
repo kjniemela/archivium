@@ -434,7 +434,10 @@ export default function App({ itemShort, universeShort, displayUniverse, addrPre
         )
       )}
       {/* Editor Page */}
-      <h2>{item ? T('Edit %s', item.title) : T('Edit')}</h2>
+      <div className='d-flex justify-between align-baseline'>
+        <h2>{item ? T('Edit %s', item.title) : T('Edit')}</h2>
+        <a className='link link-animated color-error' href={`${context.universeLink(universeShort)}/items/${itemShort}`}>{T('Discard Changes')}</a>
+      </div>
       <div id='edit' className='form-row-group'>
         <div className='inputGroup'>
           <label htmlFor='title'>{T('Title')}</label>
