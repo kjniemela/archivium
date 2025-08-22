@@ -747,7 +747,15 @@ button:disabled {
 }
 .markdown blockquote>p:not(:last-child) {
   margin-bottom: 1rem;
-} 
+}
+
+.markdown pre {
+  background-color: #f3f3f3;
+  border: 0.125rem solid silver;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin: 0 0.75rem;
+}
 
 h4, h5 {
   margin-bottom: 0.25rem;
