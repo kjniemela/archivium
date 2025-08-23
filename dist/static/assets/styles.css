@@ -19,6 +19,9 @@ h1, h2, h3, h4, h5, h6, .lora {
 ul, ol {
   padding-inline-start: 2.5rem;
 }
+:is(ul, ol) :is(ul, ol) {
+    padding-inline-start: 1.5rem;
+}
 
 body {
   -webkit-overflow-scrolling : touch !important;
@@ -104,7 +107,7 @@ footer {
 
 @media only screen and (max-device-width: 480px) {
   html {
-    font-size: 80%;
+    font-size: 75%;
   }
 
   .page {
@@ -725,6 +728,10 @@ button:disabled {
   display: flex;
 }
 
+.markdown aside :is(h1, h2, h3, h4, h5, h6) {
+  padding-left: 0.25rem;
+}
+
 .markdown ul {
   margin-top: 0;
 }
@@ -739,6 +746,11 @@ button:disabled {
   border-left: 0.5rem solid silver;
   border-radius: 0.25rem;
   padding: 0.75rem;
+}
+
+.markdown aside blockquote {
+  margin-left: 0.75rem;
+  margin-right: 0.75rem;
 }
 
 .markdown blockquote>p {
