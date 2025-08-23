@@ -4,6 +4,8 @@ import { API } from '..';
 import { User } from './user';
 import { PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { ForbiddenError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
+import { IndexedDocument, indexedToJson } from '../../lib/tiptapHelpers';
+import { extractLinkData, LinkData } from '../../lib/editor';
 
 export type ItemOptions = BaseOptions & {
   type?: string,
@@ -681,35 +683,31 @@ export class ItemAPI {
 
   async handleLinks(item: Item, objData: any, conn?: PoolConnection): Promise<void> {
     if (objData.body) {
-      if (typeof objData.body === 'string') {
-        const bodyText = objData.body;
-        const links = await extractLinks(item.universe_short, bodyText, { item: { ...item, obj_data: objData } });
-        const oldLinks = await this._getLinks(item);
-        const existingLinks = {};
-        const newLinks = {};
+      const links: ({ href: string } & LinkData)[] = [];
+      indexedToJson(objData.body as IndexedDocument, (href) => links.push({ href, ...extractLinkData(href) }));
+      const oldLinks = await this._getLinks(item);
+      const existingLinks = {};
+      const newLinks = {};
+      for (const { href } of oldLinks) {
+        existingLinks[href] = true;
+      }
+      const doUpdates = async (conn: PoolConnection) => {
+        for (const { universe, item: itemShort, href } of links) {
+          newLinks[href] = true;
+          if (!existingLinks[href]) {
+            await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [ item.id, universe ?? item.universe_short, itemShort, href ]);
+          }
+        }
         for (const { href } of oldLinks) {
-          existingLinks[href] = true;
-        }
-        const doUpdates = async (conn: PoolConnection) => {
-          for (const [universeShort, itemShort, href] of links) {
-            newLinks[href] = true;
-            if (!existingLinks[href]) {
-              await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [ item.id, universeShort, itemShort, href ]);
-            }
+          if (!newLinks[href]) {
+            await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [ item.id, href ]);
           }
-          for (const { href } of oldLinks) {
-            if (!newLinks[href]) {
-              await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [ item.id, href ]);
-            }
-          }
-        };
-        if (conn) {
-          await doUpdates(conn);
-        } else {
-          await withTransaction(doUpdates);
         }
+      };
+      if (conn) {
+        await doUpdates(conn);
       } else {
-        // console.log(objData.body.structure);
+        await withTransaction(doUpdates);
       }
     }
   }

@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemAPI = void 0;
 const utils_1 = require("../utils");
-const markdown_1 = require("../../markdown");
 const errors_1 = require("../../errors");
+const tiptapHelpers_1 = require("../../lib/tiptapHelpers");
+const editor_1 = require("../../lib/editor");
 function getQuery(selects = [], permsCond, whereConds, options = {}) {
     const query = new utils_1.QueryBuilder()
         .select('item.id')
@@ -554,37 +555,32 @@ class ItemAPI {
     }
     async handleLinks(item, objData, conn) {
         if (objData.body) {
-            if (typeof objData.body === 'string') {
-                const bodyText = objData.body;
-                const links = await (0, markdown_1.extractLinks)(item.universe_short, bodyText, { item: { ...item, obj_data: objData } });
-                const oldLinks = await this._getLinks(item);
-                const existingLinks = {};
-                const newLinks = {};
+            const links = [];
+            (0, tiptapHelpers_1.indexedToJson)(objData.body, (href) => links.push({ href, ...(0, editor_1.extractLinkData)(href) }));
+            const oldLinks = await this._getLinks(item);
+            const existingLinks = {};
+            const newLinks = {};
+            for (const { href } of oldLinks) {
+                existingLinks[href] = true;
+            }
+            const doUpdates = async (conn) => {
+                for (const { universe, item: itemShort, href } of links) {
+                    newLinks[href] = true;
+                    if (!existingLinks[href]) {
+                        await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [item.id, universe ?? item.universe_short, itemShort, href]);
+                    }
+                }
                 for (const { href } of oldLinks) {
-                    existingLinks[href] = true;
-                }
-                const doUpdates = async (conn) => {
-                    for (const [universeShort, itemShort, href] of links) {
-                        newLinks[href] = true;
-                        if (!existingLinks[href]) {
-                            await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [item.id, universeShort, itemShort, href]);
-                        }
+                    if (!newLinks[href]) {
+                        await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [item.id, href]);
                     }
-                    for (const { href } of oldLinks) {
-                        if (!newLinks[href]) {
-                            await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [item.id, href]);
-                        }
-                    }
-                };
-                if (conn) {
-                    await doUpdates(conn);
                 }
-                else {
-                    await (0, utils_1.withTransaction)(doUpdates);
-                }
+            };
+            if (conn) {
+                await doUpdates(conn);
             }
             else {
-                // console.log(objData.body.structure);
+                await (0, utils_1.withTransaction)(doUpdates);
             }
         }
     }
