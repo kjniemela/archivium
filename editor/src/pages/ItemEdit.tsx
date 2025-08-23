@@ -451,9 +451,7 @@ export default function ItemEdit({ itemShort, universeShort, universeLink, navig
 
         <div className='inputGroup'>
           <small style={{ gridColumn: '2 / 4' }}>
-            <i>{T('NOTE: changes to the shortname will not auto-save.')}</i>
-            <br />
-            <i>{T('Other users currently editing this item will be unable to save their work. Change with caution.')}</i>
+            <i>{T('NOTE: other users currently editing this item will be unable to save their work. Change with caution.')}</i>
           </small>
         </div>
 

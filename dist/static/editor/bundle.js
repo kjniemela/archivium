@@ -61385,28 +61385,14 @@ function ItemEdit(param) {
                             style: {
                                 gridColumn: '2 / 4'
                             },
-                            children: [
-                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
-                                    children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('NOTE: changes to the shortname will not auto-save.')
-                                }, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                    lineNumber: 454,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                    lineNumber: 455,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
-                                    children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Other users currently editing this item will be unable to save their work. Change with caution.')
-                                }, void 0, false, {
-                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                    lineNumber: 456,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
+                            children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
+                                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('NOTE: other users currently editing this item will be unable to save their work. Change with caution.')
+                            }, void 0, false, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 454,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
                             fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
                             lineNumber: 453,
                             columnNumber: 11
@@ -61427,7 +61413,7 @@ function ItemEdit(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                lineNumber: 461,
+                                lineNumber: 459,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
@@ -61450,7 +61436,7 @@ function ItemEdit(param) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                        lineNumber: 463,
+                                        lineNumber: 461,
                                         columnNumber: 13
                                     }, this),
                                     categories && item && Object.keys(categories).map(function(type) {
@@ -61459,20 +61445,20 @@ function ItemEdit(param) {
                                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)(categories[type][0])
                                         }, type, false, {
                                             fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                            lineNumber: 465,
+                                            lineNumber: 463,
                                             columnNumber: 15
                                         }, _this1);
                                     })
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                lineNumber: 462,
+                                lineNumber: 460,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                        lineNumber: 460,
+                        lineNumber: 458,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -61486,7 +61472,7 @@ function ItemEdit(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                lineNumber: 473,
+                                lineNumber: 471,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("textarea", {
@@ -61501,13 +61487,13 @@ function ItemEdit(param) {
                                 }
                             }, void 0, false, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                lineNumber: 474,
+                                lineNumber: 472,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                        lineNumber: 472,
+                        lineNumber: 470,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -61521,7 +61507,7 @@ function ItemEdit(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                lineNumber: 478,
+                                lineNumber: 476,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
@@ -61540,26 +61526,26 @@ function ItemEdit(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                        lineNumber: 480,
+                                        lineNumber: 478,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                         className: "slider"
                                     }, void 0, false, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                        lineNumber: 483,
+                                        lineNumber: 481,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                lineNumber: 479,
+                                lineNumber: 477,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                        lineNumber: 477,
+                        lineNumber: 475,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -61573,7 +61559,7 @@ function ItemEdit(param) {
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                lineNumber: 488,
+                                lineNumber: 486,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
@@ -61592,26 +61578,26 @@ function ItemEdit(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                        lineNumber: 490,
+                                        lineNumber: 488,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
                                         className: "slider"
                                     }, void 0, false, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                        lineNumber: 493,
+                                        lineNumber: 491,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                lineNumber: 489,
+                                lineNumber: 487,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                        lineNumber: 487,
+                        lineNumber: 485,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -61624,12 +61610,12 @@ function ItemEdit(param) {
                             children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
                         }, void 0, false, {
                             fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                            lineNumber: 498,
+                            lineNumber: 496,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                        lineNumber: 497,
+                        lineNumber: 495,
                         columnNumber: 9
                     }, this),
                     errorMessage && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -61642,19 +61628,19 @@ function ItemEdit(param) {
                             children: errorMessage
                         }, void 0, false, {
                             fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                            lineNumber: 502,
+                            lineNumber: 500,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                        lineNumber: 501,
+                        lineNumber: 499,
                         columnNumber: 26
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("hr", {
                         className: "w-100 mb-0"
                     }, void 0, false, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                        lineNumber: 505,
+                        lineNumber: 503,
                         columnNumber: 9
                     }, this),
                     objData && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -61673,7 +61659,7 @@ function ItemEdit(param) {
                                         }
                                     }, void 0, false, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                        lineNumber: 509,
+                                        lineNumber: 507,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("ul", {
@@ -61688,23 +61674,23 @@ function ItemEdit(param) {
                                                 children: "add"
                                             }, void 0, false, {
                                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                                lineNumber: 512,
+                                                lineNumber: 510,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                            lineNumber: 511,
+                                            lineNumber: 509,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                        lineNumber: 510,
+                                        lineNumber: 508,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                lineNumber: 508,
+                                lineNumber: 506,
                                 columnNumber: 11
                             }, this),
                             currentTab && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
@@ -61712,13 +61698,13 @@ function ItemEdit(param) {
                                 children: tabs[currentTab]
                             }, void 0, false, {
                                 fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                                lineNumber: 518,
+                                lineNumber: 516,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
-                        lineNumber: 507,
+                        lineNumber: 505,
                         columnNumber: 21
                     }, this)
                 ]
