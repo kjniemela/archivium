@@ -8,7 +8,7 @@ import { defaultUniverseData, defaultItemData } from './defaults.js';
 import { User } from '../../api/models/user';
 import { Universe } from '../../api/models/universe';
 import { Chapter, Story } from '../../api/models/story';
-import { Item } from '../../api/models/item';
+import { BasicItem, Item } from '../../api/models/item';
 import { Thread } from '../../api/models/discussion';
 import { Note } from '../../api/models/note';
 
@@ -52,7 +52,10 @@ async function setUniversePerms(owner: User, universe: Universe, user: User, per
 
 async function createItem(owner: User, universe: Universe, title: string, shortname: string, item_type: string, obj_data: any, tags: string[] = ['testing'], parent_id: number | null = null): Promise<Item> {
   const data = await api.item.post(owner, { title, shortname, item_type, parent_id, obj_data: {} }, universe.shortname);
-  await api.item.save(owner, universe.shortname, shortname, { title, tags, obj_data }, true);
+  const _item = await api.item.getOne(owner, { 'item.id' : data.insertId });
+  const _tables = obj_data._tables ? obj_data._tables(_item) : {};
+  delete obj_data._tables;
+  await api.item.save(owner, universe.shortname, shortname, { title, tags, obj_data, ..._tables });
   const item = await api.item.getOne(owner, { 'item.id' : data.insertId });
   return item;
 }
@@ -71,7 +74,7 @@ async function postComment(poster: User, thread: Thread, comment: string): Promi
   await api.discussion.postCommentToThread(poster, thread.id, { body: comment });
 }
 
-async function createNote(owner: User, title: string, body: string, is_public: boolean, tags: string[], items: Item[] = [], boards: any[] = []): Promise<Note> {
+async function createNote(owner: User, title: string, body: string, is_public: boolean, tags: string[], items: BasicItem[] = [], boards: any[] = []): Promise<Note> {
   const uuid = await api.note.post(owner, { title, body, is_public, tags });
   const note = await api.note.getOne(owner, uuid);
   for (const item of items) {

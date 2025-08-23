@@ -238,7 +238,7 @@ function default_1(app) {
         post('/universes/:universeShortname/permissions', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], forms_1.default.editUniversePerms);
         post('/universes/:universeShortname/upgrade', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], forms_1.default.sponsorUniverse);
         post('/universes/:universeShortname/items/create', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], forms_1.default.createItem);
-        post('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], forms_1.default.editItem);
+        post('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], () => { throw new errors_1.RequestError('This endpoint is deprecared.', { code: axios_1.HttpStatusCode.Gone }); });
         post('/universes/:universeShortname/items/:itemShortname/comment', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], forms_1.default.commentOnItem);
         post('/edit', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(forms_1.default.editUniverse, (sub) => ({ universeShortname: sub })));
         post('/discuss/create', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(forms_1.default.createUniverseThread, (sub) => ({ universeShortname: sub })));
@@ -246,7 +246,7 @@ function default_1(app) {
         post('/permissions', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(forms_1.default.editUniversePerms, (sub) => ({ universeShortname: sub })));
         post('/upgrade', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(forms_1.default.sponsorUniverse, (sub) => ({ universeShortname: sub })));
         post('/items/create', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(forms_1.default.createItem, (sub) => ({ universeShortname: sub })));
-        post('/items/:itemShortname/edit', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(forms_1.default.editItem, (sub) => ({ universeShortname: sub })));
+        post('/items/:itemShortname/edit', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], () => { throw new errors_1.RequestError('This endpoint is deprecared.', { code: axios_1.HttpStatusCode.Gone }); });
         post('/items/:itemShortname/comment', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(forms_1.default.commentOnItem, (sub) => ({ universeShortname: sub })));
     });
     // Redirect (for notification links)

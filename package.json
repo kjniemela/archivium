@@ -9,14 +9,17 @@
     "build": "npx tsc",
     "clean": "npx tsc --build --clean",
     "build:dev": "npx tsc --build --clean && npx tsc --watch",
-    "dev": "nodemon -e '.js,.pug' --watch dist --delay 1000ms dist/index.js",
-    "devl": "nodemon --ext \".js,.pug\" --legacy-watch dist/index.js",
+    "dev": "nodemon -e '.js,.pug' --watch dist --ignore dist/static/editor --delay 1000ms dist/index.js",
+    "devl": "nodemon --ext \".js,.pug\" --legacy-watch --ignore dist/static/editor --delay 1000ms dist/index.js",
     "db:backup": "node dist/db/backup.js",
     "db:export": "node dist/db/export.js",
     "db:import": "node dist/db/import.js",
     "db:clean": "node dist/db/updateSchema.js",
     "db:reset": "node dist/db/generate",
-    "db:upgrade": "node dist/db/upgrade"
+    "db:upgrade": "node dist/db/upgrade",
+    "editor:dev": "cd editor && cross-env NODE_ENV=development webpack watch",
+    "editor:build": "cd editor && cross-env NODE_ENV=production webpack",
+    "editor:lint": "eslint editor/"
   },
   "repository": {
     "type": "git",
@@ -30,6 +33,10 @@
   },
   "homepage": "https://archivium.net",
   "dependencies": {
+    "@tiptap/extension-image": "^3.0.9",
+    "@tiptap/react": "^3.0.9",
+    "@tiptap/starter-kit": "^3.0.9",
+    "@tiptap/static-renderer": "^3.1.0",
     "axios": "^1.10.0",
     "dotenv": "^16.4.7",
     "express": "^4.18.0",
@@ -42,6 +49,9 @@
     "mysql2": "^3.11.3",
     "node-cron": "^3.0.3",
     "pug": "^3.0.2",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "sanitize-html": "^2.17.0",
     "serve-favicon": "^2.5.0",
     "typescript": "^5.8.3",
     "web-push": "^3.6.7",
@@ -49,13 +59,30 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.25.0",
+    "@swc/core": "^1.12.1",
     "@types/express": "^5.0.3",
     "@types/lodash": "^4.17.18",
     "@types/md5": "^2.3.5",
     "@types/multer": "^1.4.13",
     "@types/node-cron": "^3.0.11",
     "@types/pug": "^2.0.10",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.6",
+    "@types/sanitize-html": "^2.16.0",
+    "cross-env": "^7.0.3",
     "cypress": "^13.15.2",
-    "nodemon": "^2.0.15"
+    "eslint": "^9.25.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "html-webpack-plugin": "^5.6.3",
+    "nodemon": "^2.0.15",
+    "swc-loader": "^0.2.6",
+    "ts-loader": "^9.5.2",
+    "typescript-eslint": "^8.30.1",
+    "webpack": "^5.99.9",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
   }
 }

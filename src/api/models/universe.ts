@@ -1,18 +1,10 @@
-import { executeQuery, parseData, perms, withTransaction, tiers, tierAllowance, BaseOptions, handleNotFoundAsNull, Tier } from '../utils';
+import { executeQuery, parseData, perms, withTransaction, tiers, tierAllowance, BaseOptions, Tier } from '../utils';
 import logger from '../../logger';
 import { API } from '..';
 import { PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { User } from './user';
 import { ForbiddenError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
-
-export type ItemEvent = {
-  id: any;
-  event_title: string,
-  abstime: number,
-  src_shortname: string,
-  src_title: string,
-  src_id: number,
-};
+import { ItemEvent } from './item';
 
 export type UniverseAccessRequest = {
   universe_id: number,

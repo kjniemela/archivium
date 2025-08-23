@@ -1,9 +1,8 @@
-import { QueryBuilder, Cond, executeQuery, parseData, perms, withTransaction, BaseOptions } from '../utils';
-// const { extractLinks } = require('../../../static/scripts/markdown/parse');
+import { QueryBuilder, Cond, executeQuery, parseData, perms, withTransaction, BaseOptions, handleAsNull } from '../utils';
+import { extractLinks } from '../../markdown';
 import { API } from '..';
 import { User } from './user';
-import { ResultSetHeader } from 'mysql2/promise';
-import { ItemEvent } from './universe';
+import { PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { ForbiddenError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
 
 export type ItemOptions = BaseOptions & {
@@ -26,12 +25,36 @@ export type ItemImage = {
   label: string,
   data?: Buffer,
 };
-export type Item = {
-  events?: any;
-  gallery?: any;
-  parents?: any;
-  children?: any,
-  notifs_enabled: boolean;
+
+export type ItemEvent = {
+  event_title: string,
+  abstime: number,
+  src_shortname: string,
+  src_title: string,
+  src_id: number,
+};
+
+export type GalleryImage = {
+  id: number,
+  name: string,
+  label: string,
+};
+
+export type Child = {
+  child_shortname: string,
+  child_title: string,
+  child_label: string,
+  parent_label: string,
+};
+
+export type Parent = {
+  parent_shortname: string,
+  parent_title: string,
+  child_label: string,
+  parent_label: string,
+};
+
+export type BasicItem = {
   id: number,
   title: string,
   shortname: string,
@@ -42,16 +65,17 @@ export type Item = {
   author: string,
   universe: string,
   universe_short: string,
-  tags?: string[],
-  obj_data?: Object | string,
-  author_id?: number,
-  description?: string,
-  is_published?: boolean,
-  parent_id?: number,
-  images?: ItemImage[],
-  comment_count?: number,
-  first_activity?: Date,
-  last_activity?: Date,
+  notifs_enabled: boolean;
+  author_id: number | null,
+  tags: string[],
+  obj_data: Object | string, // TODO we should try to never stringify this if possible
+};
+
+export type Item = BasicItem & {
+  events: ItemEvent[];
+  gallery: GalleryImage[];
+  parents: Parent[];
+  children: Child[],
 };
 
 function getQuery(selects: [string, string?, (string | string[])?][] = [], permsCond?: Cond, whereConds?: Cond, options: ItemOptions = {}) {
@@ -140,22 +164,22 @@ class ItemImageAPI {
     return await executeQuery<ResultSetHeader>(queryString, [item.id, originalname.substring(0, 64), mimetype, buffer, '']);
   }
 
-  async putLabel(user: User | undefined, imageId: number, label: string): Promise<ResultSetHeader> {
+  async putLabel(user: User | undefined, imageId: number, label: string, conn?: PoolConnection): Promise<ResultSetHeader> {
     if (!user) throw new UnauthorizedError();
     const images = await this.getMany({ id: imageId }, false) as ItemImage[];
     const image = images && images[0];
     if (!image) throw new NotFoundError();
     await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
-    return await executeQuery<ResultSetHeader>(`UPDATE itemimage SET label = ? WHERE id = ?;`, [label, imageId]);
+    return await executeQuery<ResultSetHeader>(`UPDATE itemimage SET label = ? WHERE id = ?;`, [label, imageId], conn);
   }
 
-  async del(user: User | undefined, imageId: number): Promise<void> {
+  async del(user: User | undefined, imageId: number, conn?: PoolConnection): Promise<void> {
     if (!user) throw new UnauthorizedError();
     const images = await this.getMany({ id: imageId }, false) as ItemImage[];
     const image = images && images[0];
     if (!image) throw new NotFoundError();
     await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
-    await executeQuery(`DELETE FROM itemimage WHERE id = ?;`, [imageId]);
+    await executeQuery(`DELETE FROM itemimage WHERE id = ?;`, [imageId], conn);
   }
 }
 
@@ -168,8 +192,7 @@ export class ItemAPI {
     this.api = api;
   }
 
-  async getOne(user: User | undefined, conditions: any = {}, permissionsRequired = perms.READ, basicOnly = false, options: ItemOptions = {}): Promise<Item> {
-
+  async getOneBasic(user: User | undefined, conditions: any={}, permissionsRequired=perms.READ, options: ItemOptions = {}): Promise<BasicItem> {
     const parsedConditions = parseData(conditions);
 
     const data = await this.getMany(user, parsedConditions, permissionsRequired, { ...options, limit: 1 });
@@ -179,72 +202,82 @@ export class ItemAPI {
       else throw new UnauthorizedError();
     }
 
-    if (!basicOnly) {
-      const events = await executeQuery(`
-        SELECT DISTINCT
-          itemevent.event_title, itemevent.abstime,
-          item.shortname AS src_shortname, item.title AS src_title, item.id AS src_id
-        FROM itemevent
-        LEFT JOIN timelineitem ON timelineitem.event_id = itemevent.id
-        INNER JOIN item ON itemevent.item_id = item.id
-        WHERE itemevent.item_id = ? OR timelineitem.timeline_id = ?
-        ORDER BY itemevent.abstime DESC
-      `, [item.id, item.id]);
-      item.events = events;
+    return item;
+  }
 
-      const gallery = await executeQuery(`
-        SELECT
-          itemimage.id, itemimage.name, itemimage.label
-        FROM itemimage
-        WHERE itemimage.item_id = ?
-      `, [item.id]);
-      item.gallery = gallery;
+  async getOne(user: User | undefined, conditions: any = {}, permissionsRequired = perms.READ, options: ItemOptions = {}): Promise<Item> {
+    const item: Item = {
+      ...await this.getOneBasic(user, conditions, permissionsRequired, options),
+      events: [],
+      gallery: [],
+      parents: [],
+      children: [],
+    };
 
-      const children = await executeQuery(`
-        SELECT
-          item.shortname AS child_shortname, item.title AS child_title,
-          lineage.child_title AS child_label, lineage.parent_title AS parent_label
-        FROM lineage
-        INNER JOIN item ON item.id = lineage.child_id
-        WHERE lineage.parent_id = ?
-      `, [item.id]);
-      item.children = children;
+    const events = await executeQuery(`
+      SELECT DISTINCT
+        itemevent.event_title, itemevent.abstime,
+        item.shortname AS src_shortname, item.title AS src_title, item.id AS src_id
+      FROM itemevent
+      LEFT JOIN timelineitem ON timelineitem.event_id = itemevent.id
+      INNER JOIN item ON itemevent.item_id = item.id
+      WHERE itemevent.item_id = ? OR timelineitem.timeline_id = ?
+      ORDER BY itemevent.abstime DESC
+    `, [item.id, item.id]);
+    item.events = events as ItemEvent[];
 
-      const parents = await executeQuery(`
-        SELECT
-          item.shortname AS parent_shortname, item.title AS parent_title,
-          lineage.child_title AS child_label, lineage.parent_title AS parent_label
-        FROM lineage
-        INNER JOIN item ON item.id = lineage.parent_id
-        WHERE lineage.child_id = ?
-      `, [item.id]);
-      item.parents = parents;
+    const gallery = await executeQuery(`
+      SELECT
+        itemimage.id, itemimage.name, itemimage.label
+      FROM itemimage
+      WHERE itemimage.item_id = ?
+    `, [item.id]) as GalleryImage[];
+    item.gallery = gallery;
 
-      if (item.obj_data) {
-        const objData = JSON.parse(item.obj_data as string);
-        if (objData.body) {
-          const links = await executeQuery(`
-            SELECT to_universe_short, to_item_short, href
-            FROM itemlink
-            WHERE from_item = ?
-          `, [item.id]);
-          const replacements = {};
-          const attachments = {};
-          for (const { to_universe_short, to_item_short, href } of links) {
-            const replacement = to_universe_short === item.universe_short ? `${to_item_short}` : `${to_universe_short}/${to_item_short}`;
-            replacements[href] = replacement;
-            const match = href.match(/[?#]/);
-            const attachment = match ? `${match[0]}${href.slice(match.index + 1)}` : '';
-            attachments[href] = attachment;
-          }
-          objData.body = objData.body.replace(/(?<!\\)(\[[^\]]*?\])\(([^)]+)\)/g, (match, brackets, parens) => {
-            if (parens in replacements) {
-              return `${brackets}(@${replacements[parens]}${attachments[parens]})`;
-            }
-            return match;
-          });
-          item.obj_data = JSON.stringify(objData);
+    const children = await executeQuery(`
+      SELECT
+        item.shortname AS child_shortname, item.title AS child_title,
+        lineage.child_title AS child_label, lineage.parent_title AS parent_label
+      FROM lineage
+      INNER JOIN item ON item.id = lineage.child_id
+      WHERE lineage.parent_id = ?
+    `, [item.id]);
+    item.children = children as Child[];
+
+    const parents = await executeQuery(`
+      SELECT
+        item.shortname AS parent_shortname, item.title AS parent_title,
+        lineage.child_title AS child_label, lineage.parent_title AS parent_label
+      FROM lineage
+      INNER JOIN item ON item.id = lineage.parent_id
+      WHERE lineage.child_id = ?
+    `, [item.id]);
+    item.parents = parents as Parent[];
+
+    if (item.obj_data) {
+      const objData = JSON.parse(item.obj_data as string);
+      if (typeof objData.body === 'string') {
+        const links = await executeQuery(`
+          SELECT to_universe_short, to_item_short, href
+          FROM itemlink
+          WHERE from_item = ?
+        `, [item.id]);
+        const replacements = {};
+        const attachments = {};
+        for (const { to_universe_short, to_item_short, href } of links) {
+          const replacement = to_universe_short === item.universe_short ? `${to_item_short}` : `${to_universe_short}/${to_item_short}`;
+          replacements[href] = replacement;
+          const match = href.match(/[?#]/);
+          const attachment = match ? `${match[0]}${href.slice(match.index + 1)}` : '';
+          attachments[href] = attachment;
         }
+        objData.body = objData.body.replace(/(?<!\\)(\[[^\]]*?\])\(([^)]+)\)/g, (match, brackets, parens) => {
+          if (parens in replacements) {
+            return `${brackets}(@${replacements[parens]}${attachments[parens]})`;
+          }
+          return match;
+        });
+        item.obj_data = JSON.stringify(objData);
       }
 
       if (user) {
@@ -416,14 +449,15 @@ export class ItemAPI {
     itemShortname: string,
     permissionsRequired = perms.READ,
     basicOnly = false
-  ): Promise<Item> {
+  ): Promise<Item | BasicItem> {
 
     const conditions = {
       'universe.shortname': universeShortname,
       'item.shortname': itemShortname,
     };
 
-    return await this.getOne(user, conditions, permissionsRequired, basicOnly, { includeData: true });
+    if (basicOnly) return await this.getOneBasic(user, conditions, permissionsRequired, { includeData: true });
+    else return await this.getOne(user, conditions, permissionsRequired, { includeData: true });
   }
 
   /**
@@ -513,129 +547,124 @@ export class ItemAPI {
     }
   }
 
-  async save(user: User | undefined, universeShortname: string, itemShortname: string, body, jsonMode = false): Promise<number> {
-    // Handle tags
-    if (!jsonMode) body.tags = body.tags?.split(' ') ?? [];
+  async save(user: User | undefined, universeShortname: string, itemShortname: string, body: Partial<Item>): Promise<number> {
+    let item!: Item;
+    await withTransaction(async (conn) => {
+      // Actually save item
+      const changes = {
+        title: body.title,
+        shortname: body.shortname,
+        item_type: body.item_type,
+        obj_data: JSON.stringify(body.obj_data),
+        tags: body.tags ?? [],
+      };
+      const itemId = await this.put(user, universeShortname, itemShortname, changes, conn);
 
-    // Handle obj_data
-    if (!('obj_data' in body)) {
-      throw new ValidationError('Missing required fields');
-    }
-    if (!jsonMode) body.obj_data = JSON.parse(decodeURIComponent(body.obj_data));
-    let lineage;
-    if ('lineage' in body.obj_data) {
-      lineage = body.obj_data.lineage;
-      body.obj_data.lineage = { title: lineage.title };
-    }
-    let timeline;
-    if ('timeline' in body.obj_data) {
-      timeline = body.obj_data.timeline;
-      body.obj_data.timeline = { title: timeline.title };
-    }
-    let gallery;
-    if ('gallery' in body.obj_data) {
-      gallery = body.obj_data.gallery;
-      body.obj_data.gallery = { title: gallery.title };
-    }
+      item = await this.getOne(user, { 'item.id': itemId }, perms.WRITE);
 
-    body.obj_data = JSON.stringify(body.obj_data);
-
-    // Actually save item
-    const itemId = await this.put(user, universeShortname, itemShortname, body);
-
-    const item = await this.getOne(user, { 'item.id': itemId }, perms.WRITE);
-
-    // Handle lineage data
-    if (lineage) {
-      const [existingParents, existingChildren] = [{}, {}];
-      for (const { parent_shortname } of item.parents) existingParents[parent_shortname] = true;
-      for (const { child_shortname } of item.children) existingChildren[child_shortname] = true;
-      const [newParents, newChildren] = [{}, {}];
-      for (const shortname in lineage.parents ?? {}) {
-        const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, shortname, perms.WRITE);
-        newParents[shortname] = true;
-        if (!(shortname in existingParents)) {
-          await this.putLineage(parent.id, item.id, ...lineage.parents[shortname] as [string, string]);
-        }
-      }
-      for (const shortname in lineage.children ?? {}) {
-        const child = await this.getByUniverseAndItemShortnames(user, universeShortname, shortname, perms.WRITE);
-        newChildren[shortname] = true;
-        if (!(shortname in existingChildren)) {
-          await this.putLineage(item.id, child.id, ...lineage.children[shortname].reverse() as [string, string]);
-        }
-      }
-      for (const { parent_shortname } of item.parents) {
-        if (!newParents[parent_shortname]) {
-          const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, parent_shortname, perms.WRITE);
-          await this.delLineage(parent.id, item.id);
-        }
-      }
-      for (const { child_shortname } of item.children) {
-        if (!newChildren[child_shortname]) {
-          const child = await this.getByUniverseAndItemShortnames(user, universeShortname, child_shortname, perms.WRITE);
-          await this.delLineage(item.id, child.id);
-        }
-      }
-    }
-
-    // Handle timeline data
-    if (timeline) {
-      const myEvents = timeline.events?.filter(event => !event.imported);
-      const myImports = timeline.events?.filter(event => event.imported);
-      if (myEvents) {
-        const events = await this.fetchEvents(item.id);
-        const existingEvents = events.reduce((acc, event) => ({ ...acc, [event.event_title ?? null]: event }), {});
-        const newEvents = myEvents.filter(event => !existingEvents[event.title]);
-        const updatedEvents = myEvents.filter(event => existingEvents[event.title] && (
-          existingEvents[event.title].event_title !== event.title
-          || existingEvents[event.title].abstime !== event.time
-        )).map(({ title, time }) => ({ event_title: title, abstime: time, id: existingEvents[title].id }));
-        const newEventMap = myEvents.reduce((acc, event) => ({ ...acc, [event.title ?? null]: true }), {});
-        const deletedEvents = events.filter(event => !newEventMap[event.event_title]).map(event => event.id);
-        await this.insertEvents(item.id, newEvents);
-        for (const event of updatedEvents) {
-          await this.updateEvent(event.id, event);
-        }
-        await this.deleteEvents(deletedEvents);
-      }
-
-      if (myImports) {
-        const imports = await this.fetchImports(item.id);
-        const existingImports = imports.reduce((acc, ti) => ({ ...acc, [ti.event_id]: ti }), {});
-        const newImports: number[] = [];
-        const importsMap = {};
-        for (const { srcId: itemId, title: eventTitle } of myImports) {
-          const event = (await this.fetchEvents(itemId, { title: eventTitle }))[0];
-          if (!event) continue;
-          if (!(event.id in existingImports)) {
-            newImports.push(event.id);
+      // Handle lineage data
+      if (body.parents || body.children) {
+        const existingParents: { [key: string]: Parent } = {};
+        const existingChildren: { [key: string]: Child } = {};
+        for (const parent of item.parents) existingParents[parent.parent_shortname] = parent;
+        for (const child of item.children) existingChildren[child.child_shortname] = child;
+        const [newParents, newChildren] = [{}, {}];
+        for (const { parent_shortname, parent_label, child_label } of body.parents ?? []) {
+          const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, parent_shortname, perms.WRITE).catch(handleAsNull([NotFoundError, ForbiddenError]));
+          if (!parent) continue;
+          newParents[parent_shortname] = true;
+          if (
+            !(parent_shortname in existingParents)
+            || existingParents[parent_shortname].parent_label !== parent_label
+            || existingParents[parent_shortname].child_label !== child_label
+          ) {
+            await this.putLineage(parent.id, item.id, parent_label ?? null, child_label ?? null, conn);
           }
-          importsMap[event.id] = true;
         }
-        const deletedImports = imports.filter(ti => !importsMap[ti.event_id]).map(ti => ti.event_id);
-        await this.importEvents(item.id, newImports);
-        await this.deleteImports(item.id, deletedImports);
+        for (const { child_shortname, parent_label, child_label } of body.children ?? []) {
+          const child = await this.getByUniverseAndItemShortnames(user, universeShortname, child_shortname, perms.WRITE).catch(handleAsNull([NotFoundError, ForbiddenError]));
+          if (!child) continue;
+          newChildren[child_shortname] = true;
+          if (
+            !(child_shortname in existingChildren)
+            || existingChildren[child_shortname].parent_label !== parent_label
+            || existingChildren[child_shortname].child_label !== child_label
+          ) {
+            await this.putLineage(item.id, child.id, parent_label ?? null, child_label ?? null, conn);
+          }
+        }
+        for (const { parent_shortname } of item.parents) {
+          if (!newParents[parent_shortname]) {
+            const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, parent_shortname, perms.WRITE);
+            await this.delLineage(parent.id, item.id, conn);
+          }
+        }
+        for (const { child_shortname } of item.children) {
+          if (!newChildren[child_shortname]) {
+            const child = await this.getByUniverseAndItemShortnames(user, universeShortname, child_shortname, perms.WRITE);
+            await this.delLineage(item.id, child.id, conn);
+          }
+        }
       }
-    }
 
-    if (gallery) {
-      const existingImages = await this.image.getManyByItemShort(user, universeShortname, item.shortname);
-      const oldImages = {};
-      const newImages = {};
-      for (const img of existingImages ?? []) {
-        oldImages[img.id] = img;
-      }
-      for (const img of gallery?.imgs ?? []) {
-        newImages[img.id] = img;
-        if (oldImages[img.id] && img.label !== oldImages[img.id].label) {
-          await this.image.putLabel(user, img.id, img.label);
+      // Handle timeline data
+      if (body.events) {
+        const myEvents = body.events?.filter(event => event.src_id === item.id);
+        const myImports = body.events?.filter(event => event.src_id !== item.id);
+        if (myEvents) {
+          const events = await this.fetchEvents(item.id);
+          const existingEvents = events.reduce((acc, event) => ({ ...acc, [event.event_title ?? null]: event }), {});
+          const newEvents = myEvents.filter(event => !existingEvents[event.event_title]);
+          const updatedEvents = myEvents.filter(event => existingEvents[event.event_title] && (
+            existingEvents[event.event_title].event_title !== event.event_title
+            || existingEvents[event.event_title].abstime !== event.abstime
+          )).map(({ event_title, abstime }) => ({ event_title, abstime, id: existingEvents[event_title].id }));
+          const newEventMap = myEvents.reduce((acc, event) => ({ ...acc, [event.event_title ?? null]: true }), {});
+          const deletedEvents = events.filter(event => !newEventMap[event.event_title]).map(event => event.id);
+          await this.insertEvents(item.id, newEvents, conn);
+          for (const event of updatedEvents) {
+            await this.updateEvent(event.id, event, conn);
+          }
+          await this.deleteEvents(deletedEvents, conn);
+        }
+
+        if (myImports) {
+          const imports = await this.fetchImports(item.id);
+          const existingImports = imports.reduce((acc, ti) => ({ ...acc, [ti.event_id]: ti }), {});
+          const newImports: number[] = [];
+          const importsMap = {};
+          for (const { src_id: itemId, event_title: eventTitle } of myImports) {
+            const event = (await this.fetchEvents(itemId, { title: eventTitle }))[0];
+            if (!event) continue;
+            if (!(event.id in existingImports)) {
+              newImports.push(event.id);
+            }
+            importsMap[event.id] = true;
+          }
+          const deletedImports = imports.filter(ti => !importsMap[ti.event_id]).map(ti => ti.event_id);
+          await this.importEvents(item.id, newImports, conn);
+          await this.deleteImports(item.id, deletedImports, conn);
         }
       }
-      for (const img of existingImages ?? []) {
-        if (!newImages[img.id]) await this.image.del(user, img.id);
+
+      if (body.gallery) {
+        const existingImages = await this.image.getManyByItemShort(user, universeShortname, item.shortname);
+        const oldImages = {};
+        const newImages = {};
+        for (const img of existingImages ?? []) {
+          oldImages[img.id] = img;
+        }
+        for (const img of body.gallery ?? []) {
+          newImages[img.id] = img;
+          if (img.label && oldImages[img.id] && img.label !== oldImages[img.id].label) {
+            await this.image.putLabel(user, img.id, img.label, conn);
+          }
+        }
+        for (const img of existingImages ?? []) {
+          if (!newImages[img.id]) await this.image.del(user, img.id, conn);
+        }
       }
-    }
+    });
 
     return item.id;
   }
@@ -650,74 +679,82 @@ export class ItemAPI {
     return await this._getLinks(item);
   }
 
-  async handleLinks(item: Item, objData: any): Promise<void> {
+  async handleLinks(item: Item, objData: any, conn?: PoolConnection): Promise<void> {
     if (objData.body) {
-      const bodyText = objData.body;
-      // TODO disable this for now
-      // const links = await extractLinks(item.universe_short, bodyText, { item: { ...item, obj_data: objData } });
-      // const oldLinks = await _getLinks(item);
-      // const existingLinks = {};
-      // const newLinks = {};
-      // for (const { href } of oldLinks) {
-      //   existingLinks[href] = true;
-      // }
-      // await withTransaction(async (conn) => {
-      //   for (const [universeShort, itemShort, href] of links) {
-      //     newLinks[href] = true;
-      //     if (!existingLinks[href]) {
-      //       await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [ item.id, universeShort, itemShort, href ]);
-      //     }
-      //   }
-      //   for (const { href } of oldLinks) {
-      //     if (!newLinks[href]) {
-      //       await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [ item.id, href ]);
-      //     }
-      //   }
-      // });
+      if (typeof objData.body === 'string') {
+        const bodyText = objData.body;
+        const links = await extractLinks(item.universe_short, bodyText, { item: { ...item, obj_data: objData } });
+        const oldLinks = await this._getLinks(item);
+        const existingLinks = {};
+        const newLinks = {};
+        for (const { href } of oldLinks) {
+          existingLinks[href] = true;
+        }
+        const doUpdates = async (conn: PoolConnection) => {
+          for (const [universeShort, itemShort, href] of links) {
+            newLinks[href] = true;
+            if (!existingLinks[href]) {
+              await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [ item.id, universeShort, itemShort, href ]);
+            }
+          }
+          for (const { href } of oldLinks) {
+            if (!newLinks[href]) {
+              await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [ item.id, href ]);
+            }
+          }
+        };
+        if (conn) {
+          await doUpdates(conn);
+        } else {
+          await withTransaction(doUpdates);
+        }
+      } else {
+        // console.log(objData.body.structure);
+      }
     }
   }
 
-  async fetchEvents(itemId: number, options: EventOptions = {}): Promise<ItemEvent[]> {
+  async fetchEvents(itemId: number, options: EventOptions = {}): Promise<(ItemEvent & { id: number })[]> {
     let queryString = `SELECT * FROM itemevent WHERE item_id = ?`;
     const values: (string | number)[] = [itemId];
     if (options.title) {
       queryString += ` AND event_title = ?`;
       values.push(options.title);
     }
-    return await executeQuery(queryString, values) as ItemEvent[];
+    return await executeQuery(queryString, values) as (ItemEvent & { id: number })[];
   }
-  async insertEvents(itemId: number, events: { title: string, time: number }[]): Promise<void> {
+  async insertEvents(itemId: number, events: { event_title: string, abstime: number }[], conn?: PoolConnection): Promise<void> {
     if (!events.length) return;
     const queryString = 'INSERT INTO itemevent (item_id, event_title, abstime) VALUES ' + events.map(() => '(?, ?, ?)').join(',');
-    const values = events.reduce((acc, event) => ([...acc, itemId, event.title, event.time]), []);
-    await executeQuery(queryString, values);
+    const values = events.reduce((acc, event) => ([...acc, itemId, event.event_title, event.abstime]), []);
+    await executeQuery(queryString, values, conn);
   }
-  async updateEvent(eventId: number, changes: { event_title: string, abstime: number }): Promise<void> {
+  async updateEvent(eventId: number, changes: { event_title: string, abstime: number }, conn?: PoolConnection): Promise<void> {
     const { event_title, abstime } = changes;
     const queryString = 'UPDATE itemevent SET event_title = ?, abstime = ? WHERE id = ?';
-    await executeQuery(queryString, [event_title, abstime, eventId]);
+    await executeQuery(queryString, [event_title, abstime, eventId], conn);
   }
-  async deleteEvents(eventIds: number[]): Promise<void> {
+  async deleteEvents(eventIds: number[], conn?: PoolConnection): Promise<void> {
     if (!eventIds.length) return;
     // Un-import deleted events
     await this.deleteImports(null, eventIds);
     const [whereClause, values] = eventIds.reduce((cond, id) => cond.or('id = ?', id), new Cond()).export();
     const queryString = `DELETE FROM itemevent WHERE ${whereClause};`;
-    await executeQuery(queryString, values.filter(val => val !== undefined));
+    await executeQuery(queryString, values.filter(val => val !== undefined), conn);
   }
-  async importEvents(itemId: number, eventIds: number[]): Promise<void> {
+  async importEvents(itemId: number, eventIds: number[], conn?: PoolConnection): Promise<void> {
     if (!eventIds.length) return;
     const queryString = 'INSERT INTO timelineitem (timeline_id, event_id) VALUES ' + eventIds.map(() => '(?, ?)').join(',');
     const values = eventIds.reduce((acc, eventId) => ([...acc, itemId, eventId]), []);
-    await executeQuery(queryString, values);
+    await executeQuery(queryString, values, conn);
   }
-  async deleteImports(itemId: number | null, eventIds: number[]): Promise<void> {
+  async deleteImports(itemId: number | null, eventIds: number[], conn?: PoolConnection): Promise<void> {
     if (!eventIds.length) return;
     let cond = eventIds.reduce((cond, id) => cond.or('event_id = ?', id), new Cond());
     if (itemId !== null) cond = cond.and('timeline_id = ?', itemId);
     const [whereClause, values] = cond.export();
     const queryString = `DELETE FROM timelineitem WHERE ${whereClause};`;
-    await executeQuery(queryString, values.filter(val => val !== undefined));
+    await executeQuery(queryString, values.filter(val => val !== undefined), conn);
   }
   async fetchImports(itemId: number): Promise<{ event_id: number, timeline_id: number }[]> {
     const queryString = `SELECT * FROM timelineitem WHERE timeline_id = ?`;
@@ -729,7 +766,8 @@ export class ItemAPI {
     user: User | undefined,
     universeShortname: string,
     itemShortname: string,
-    changes: { title: string, shortname: string, item_type: string, obj_data: string, tags: string[] }
+    changes: { title?: string, shortname?: string, item_type?: string, obj_data?: string, tags?: string[] },
+    conn?: PoolConnection
   ): Promise<number> {
     if (!user) throw new UnauthorizedError();
     const { title, shortname, item_type, obj_data, tags } = changes;
@@ -738,13 +776,13 @@ export class ItemAPI {
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE);
 
     const objData = JSON.parse(obj_data);
-    await this.handleLinks(item, objData);
+    await this.handleLinks(item as Item, objData, conn);
 
     if (tags) {
       const trimmedTags = tags.map(tag => tag[0] === '#' ? tag.substring(1) : tag);
 
       // If tags list is provided, we can just as well handle it here
-      await this.putTags(user, universeShortname, itemShortname, trimmedTags);
+      await this.putTags(user, universeShortname, itemShortname, trimmedTags, conn);
       const tagLookup = {};
       item.tags?.forEach(tag => {
         tagLookup[tag] = true;
@@ -752,7 +790,7 @@ export class ItemAPI {
       trimmedTags.forEach(tag => {
         delete tagLookup[tag];
       });
-      await this.delTags(user, universeShortname, itemShortname, Object.keys(tagLookup));
+      await this.delTags(user, universeShortname, itemShortname, Object.keys(tagLookup), conn);
     }
 
     if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
@@ -761,7 +799,7 @@ export class ItemAPI {
       if (shortnameError) throw new ValidationError(shortnameError);
     }
 
-    await withTransaction(async (conn) => {
+    const doUpdate = async (conn: PoolConnection) => {
       if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
         await conn.execute('UPDATE itemlink SET to_item_short = ? WHERE to_item_short = ?', [shortname, item.shortname]);
       }
@@ -777,10 +815,17 @@ export class ItemAPI {
           last_updated_by = ?
         WHERE id = ?;
       `;
+
       await conn.execute(queryString, [title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), new Date(), user.id, item.id]);
 
       this.api.universe.putUpdatedAtWithTransaction(conn, item.universe_id, new Date());
-    });
+    };
+
+    if (conn) {
+      await doUpdate(conn);
+    } else {
+      await withTransaction(doUpdate);
+    }
 
     return item.id;
   }
@@ -795,10 +840,10 @@ export class ItemAPI {
       ...changes,
     };
 
-    await this.handleLinks(item, item.obj_data);
-
     let data!: ResultSetHeader;
     await withTransaction(async (conn) => {
+      await this.handleLinks(item as Item, item.obj_data, conn);
+
       const queryString = `UPDATE item SET obj_data = ?, updated_at = ?, last_updated_by = ? WHERE id = ?;`;
       [data] = await conn.execute<ResultSetHeader>(queryString, [JSON.stringify(item.obj_data), new Date(), user.id, item.id]);
       
@@ -826,9 +871,12 @@ export class ItemAPI {
    * @param {*} itemShortname 
    * @returns 
    */
-  async putLineage(parent_id: number, child_id: number, parent_title: string, child_title: string): Promise<ResultSetHeader> {
-    const queryString = `INSERT INTO lineage (parent_id, child_id, parent_title, child_title) VALUES (?, ?, ?, ?);`;
-    const data = await executeQuery<ResultSetHeader>(queryString, [parent_id, child_id, parent_title, child_title]);
+  async putLineage(parent_id: number, child_id: number, parent_title: string, child_title: string, conn?: PoolConnection): Promise<ResultSetHeader> {
+    const queryString = `
+      INSERT INTO lineage (parent_id, child_id, parent_title, child_title) VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE parent_title = ?, child_title = ?
+    `;
+    const data = await executeQuery<ResultSetHeader>(queryString, [parent_id, child_id, parent_title, child_title, parent_title, child_title], conn);
     return data;
   }
 
@@ -838,13 +886,13 @@ export class ItemAPI {
    * @param {*} itemShortname 
    * @returns 
    */
-  async delLineage(parent_id: number, child_id: number): Promise<ResultSetHeader> {
+  async delLineage(parent_id: number, child_id: number, conn?: PoolConnection): Promise<ResultSetHeader> {
     const queryString = `DELETE FROM lineage WHERE parent_id = ? AND child_id = ?;`;
-    const data = await executeQuery<ResultSetHeader>(queryString, [parent_id, child_id]);
+    const data = await executeQuery<ResultSetHeader>(queryString, [parent_id, child_id], conn);
     return data;
   }
 
-  async putTags(user: User | undefined, universeShortname: string, itemShortname: string, tags: string[]): Promise<ResultSetHeader | void> {
+  async putTags(user: User | undefined, universeShortname: string, itemShortname: string, tags: string[], conn?: PoolConnection): Promise<ResultSetHeader | void> {
     if (tags.length === 0) return; // Nothing to do
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE, true);
     const tagLookup = {};
@@ -856,17 +904,17 @@ export class ItemAPI {
     const valueArray = filteredTags.reduce((arr, tag) => [...arr, item.id, tag], []);
     if (!valueString) return;
     const queryString = `INSERT INTO tag (item_id, tag) VALUES ${valueString};`;
-    const data = await executeQuery<ResultSetHeader>(queryString, valueArray);
+    const data = await executeQuery<ResultSetHeader>(queryString, valueArray, conn);
     return data;
   }
 
-  async delTags(user: User | undefined, universeShortname: string, itemShortname: string, tags: string[]): Promise<ResultSetHeader | void> {
+  async delTags(user: User | undefined, universeShortname: string, itemShortname: string, tags: string[], conn?: PoolConnection): Promise<ResultSetHeader | void> {
     if (tags.length === 0) return; // Nothing to do
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE, true);
     const whereString = tags.map(() => `tag = ?`).join(' OR ');
     if (!whereString) return;
     const queryString = `DELETE FROM tag WHERE item_id = ? AND (${whereString});`;
-    const data = await executeQuery<ResultSetHeader>(queryString, [item.id, ...tags]);
+    const data = await executeQuery<ResultSetHeader>(queryString, [item.id, ...tags], conn);
     return data;
   }
 

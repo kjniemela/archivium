@@ -7,12 +7,11 @@ exports.Cond = exports.QueryBuilder = exports.parseData = exports.RollbackError 
 exports.executeQuery = executeQuery;
 exports.withTransaction = withTransaction;
 exports.getPfpUrl = getPfpUrl;
-exports.handleNotFoundAsNull = handleNotFoundAsNull;
+exports.handleAsNull = handleAsNull;
 exports.handleErrorWithData = handleErrorWithData;
 const db_1 = __importDefault(require("../db"));
 const md5_1 = __importDefault(require("md5"));
 const logger_1 = __importDefault(require("../logger"));
-const errors_1 = require("../errors");
 var perms;
 (function (perms) {
     perms[perms["NONE"] = 0] = "NONE";
@@ -44,8 +43,8 @@ exports.tierAllowance = {
     [plans.PREMIUM_BETA]: { total: 20, [exports.tiers.PREMIUM]: 5 },
     [plans.SUPER]: { total: 999, [exports.tiers.PREMIUM]: 99 },
 };
-async function executeQuery(query, values = []) {
-    const [results] = await db_1.default.execute(query, values);
+async function executeQuery(query, values = [], conn) {
+    const [results] = await (conn ?? db_1.default).execute(query, values);
     return results;
 }
 class RollbackError extends Error {
@@ -256,11 +255,23 @@ class MultiCond extends Cond {
 function getPfpUrl(user) {
     return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${(0, md5_1.default)(user.email)}.jpg`;
 }
-function handleNotFoundAsNull(error) {
-    if (error instanceof errors_1.NotFoundError) {
-        return null;
+function handleAsNull(type) {
+    if (type instanceof Array) {
+        return (error) => {
+            if (type.some(t => error instanceof t)) {
+                return null;
+            }
+            throw error;
+        };
     }
-    throw error;
+    else {
+        return (error) => {
+            if (error instanceof type) {
+                return null;
+            }
+            throw error;
+        };
+    }
 }
 function handleErrorWithData(error) {
     if (error.data) {

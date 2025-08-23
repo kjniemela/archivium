@@ -1,8 +1,6 @@
 import { Express, Handler, Request, Response } from 'express';
-import { ADDR_PREFIX, DEV_MODE } from '../config';
+import { ADDR_PREFIX } from '../config';
 import Auth from '../middleware/auth';
-import api from '../api';
-import md5 from 'md5';
 import { render, universeLink } from '../templates';
 import { tiers } from '../api/utils';
 import logger from '../logger';
@@ -224,7 +222,7 @@ export default function(app: Express) {
     post('/universes/:universeShortname/permissions', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.editUniversePerms);
     post('/universes/:universeShortname/upgrade', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.sponsorUniverse);
     post('/universes/:universeShortname/items/create', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.createItem);
-    post('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.editItem);
+    post('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, [Auth.verifySessionOrRedirect], () => { throw new RequestError('This endpoint is deprecared.', { code: HttpStatusCode.Gone }) });
     post('/universes/:universeShortname/items/:itemShortname/comment', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.commentOnItem);
   
     post('/edit', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.editUniverse, (sub) => ({ universeShortname: sub })));
@@ -233,7 +231,7 @@ export default function(app: Express) {
     post('/permissions', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.editUniversePerms, (sub) => ({ universeShortname: sub })));
     post('/upgrade', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.sponsorUniverse, (sub) => ({ universeShortname: sub })));
     post('/items/create', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.createItem, (sub) => ({ universeShortname: sub })));
-    post('/items/:itemShortname/edit', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.editItem, (sub) => ({ universeShortname: sub })));
+    post('/items/:itemShortname/edit', sites.DISPLAY, [Auth.verifySessionOrRedirect], () => { throw new RequestError('This endpoint is deprecared.', { code: HttpStatusCode.Gone }) });
     post('/items/:itemShortname/comment', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.commentOnItem, (sub) => ({ universeShortname: sub })));
   });
 

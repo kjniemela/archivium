@@ -7,7 +7,8 @@ import { perms, Tier } from '../api/utils';
 import logger from '../logger';
 import pages from './pages';
 import { ResultSetHeader } from "mysql2";
-import { ModelError, RateLimitError } from "../errors";
+import { ModelError, RateLimitError, RequestError } from "../errors";
+import { HttpStatusCode } from "axios";
 
 export default {
   async notificationSettings(req, res) {
@@ -96,22 +97,6 @@ export default {
       if (err instanceof ModelError) {
         const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
         res.prepareRender('createItem', { error: err.message, ...req.body, universe });
-        return;
-      }
-      throw err;
-    }
-  },
-
-  async editItem(req, res) {
-    try {
-      const id = await api.item.save(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);
-      const item = await api.item.getOne(req.session.user, { 'item.id': id }, perms.READ, true);
-      res.redirect(`${universeLink(req, req.params.universeShortname)}/items/${item.shortname}`);
-    } catch (err) {
-      console.error(err);
-      if (err instanceof ModelError) {
-        res.error = err.message;
-        await pages.item.edit(req, res);
         return;
       }
       throw err;

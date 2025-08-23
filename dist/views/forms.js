@@ -101,22 +101,6 @@ exports.default = {
             throw err;
         }
     },
-    async editItem(req, res) {
-        try {
-            const id = await api_1.default.item.save(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);
-            const item = await api_1.default.item.getOne(req.session.user, { 'item.id': id }, utils_1.perms.READ, true);
-            res.redirect(`${(0, templates_1.universeLink)(req, req.params.universeShortname)}/items/${item.shortname}`);
-        }
-        catch (err) {
-            console.error(err);
-            if (err instanceof errors_1.ModelError) {
-                res.error = err.message;
-                await pages_1.default.item.edit(req, res);
-                return;
-            }
-            throw err;
-        }
-    },
     async commentOnItem(req, res) {
         await api_1.default.discussion.postCommentToItem(req.session.user, req.params.universeShortname, req.params.itemShortname, req.body);
         res.redirect(`${(0, templates_1.universeLink)(req, req.params.universeShortname)}/items/${req.params.itemShortname}?tab=comments#post-comment`);

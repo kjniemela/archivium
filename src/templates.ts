@@ -1,12 +1,12 @@
 import pug from 'pug';
 import { Request } from 'express';
-import { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN } from '../config';
-import { perms, getPfpUrl, tiers, plans, tierAllowance } from '../api/utils';
-import { locale, lang, sprintf, T } from '../locale';
-import api from '../api';
+import { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN } from './config';
+import { perms, getPfpUrl, tiers, plans, tierAllowance } from './api/utils';
+import { locale, lang, sprintf, T } from './locale';
+import api from './api';
 import path from 'path';
-import themes from '../themes';
-import logger from '../logger';
+import themes from './themes';
+import logger from './logger';
 
 export function universeLink(req: Request, uniShort) {
   const displayUniverse = req.headers['x-subdomain'];
@@ -59,7 +59,7 @@ function contextData(req) {
 }
 
 const pugOptions = {
-  basedir: path.join(__dirname, '..'),
+  basedir: __dirname,
 };
 
 function compile(file) {
@@ -98,7 +98,6 @@ const templates = {
   deleteChapter: compile('templates/delete/chapter.pug'),
 
   item: compile('templates/view/item.pug'),
-  editItem: compile('templates/edit/item.pug'),
   deleteItem: compile('templates/delete/item.pug'),
   itemList: compile('templates/list/items.pug'),
   createItem: compile('templates/create/item.pug'),
@@ -117,6 +116,8 @@ const templates = {
   notifications: compile('templates/view/notifications.pug'),
   forgotPassword: compile('templates/edit/forgotPassword.pug'),
   resetPassword: compile('templates/edit/resetPassword.pug'),
+
+  editor: compile('templates/editor.pug'),
 };
 
 export function render(req: Request, template, context = {}) {

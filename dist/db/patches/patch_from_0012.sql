@@ -7,11 +7,9 @@ ADD COLUMN is_public BOOLEAN;
 ALTER TABLE noteboard
 ADD COLUMN is_public BOOLEAN;
 
-SET SQL_SAFE_UPDATES = 0;
 UPDATE universe SET is_public = public;
 UPDATE note SET is_public = public;
 UPDATE noteboard SET is_public = public;
-SET SQL_SAFE_UPDATES = 1;
 
 ALTER TABLE universe
 DROP COLUMN public;

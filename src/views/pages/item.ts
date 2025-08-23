@@ -1,3 +1,5 @@
+import { renderToHTMLString } from '@tiptap/static-renderer/pm/html-string';
+import sanitizeHtml from 'sanitize-html';
 import { RouteHandler } from '..';
 import api from '../../api';
 import { Comment } from '../../api/models/discussion';
@@ -6,7 +8,11 @@ import { Note } from '../../api/models/note';
 import { User } from '../../api/models/user';
 import { getPfpUrl, perms } from '../../api/utils';
 import { ForbiddenError, NotFoundError } from '../../errors';
+import { IndexedDocument, indexedToJson } from '../../lib/tiptapHelpers';
+import logger from '../../logger';
 import { universeLink } from '../../templates';
+import { editorExtensions, extractLinkData, LinkData, TiptapContext } from '../../lib/editor';
+import StarterKit from '@tiptap/starter-kit';
 
 export default {
   async list(req, res) {
@@ -45,9 +51,9 @@ export default {
   async view(req, res) {
     const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
 
-    let item: Item & { [key: string]: any };
+    let item: Item & { [key: string]: any }; // TODO this is ugly
     try {
-      item = await api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortname, req.params.itemShortname);
+      item = await api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortname, req.params.itemShortname) as Item;
     } catch (err) {
       if (err instanceof ForbiddenError) {
         if (req.session.user && universe.author_permissions[req.session.user.id] >= perms.READ) {
@@ -63,11 +69,62 @@ export default {
       throw err;
     }
 
-    item.obj_data = JSON.parse(item.obj_data as string);
+    item.obj_data = JSON.parse(item.obj_data as string) as Record<string, any>;
     item.itemTypeName = ((universe.obj_data['cats'] ?? {})[item.item_type] ?? ['Missing Category'])[0];
     item.itemTypeColor = ((universe.obj_data['cats'] ?? {})[item.item_type] ?? [,,'#f3f3f3'])[2];
-    if (item.gallery.length > 0) {
+    if (item.gallery && item.gallery.length > 0) {
       item.gallery = item.gallery.sort((a, b) => a.id > b.id ? 1 : -1);
+    }
+
+    if ('body' in item.obj_data && typeof item.obj_data.body !== 'string') {
+      try {
+        const links: LinkData[] = [];
+        const headings: { title: string, level: number }[] = [];
+        const jsonBody = indexedToJson(
+          item.obj_data.body as IndexedDocument,
+          (href) => links.push(extractLinkData(href)),
+          (title, level) => headings.push({ title, level }),
+        );
+        const itemsPerUniverse = {};
+        /* Because Tiptap rendering cannot be async, we extract the links we'll need to check ahead of time. */
+        await Promise.all(links.map(async (link) => {
+          if (link.item) {
+            const universeShort = link.universe ?? universe.shortname;
+            if (!(universeShort in itemsPerUniverse)) {
+              itemsPerUniverse[universeShort] = {};
+            }
+            if (!(link.item in itemsPerUniverse[universeShort])) {
+              itemsPerUniverse[universeShort][link.item] = await api.item.exists(req.session.user, universeShort, link.item);
+            }
+          }
+        }));
+        const renderContext: TiptapContext = {
+          currentUniverse: universe.shortname,
+          universeLink: (universeShort) => universeLink(req, universeShort),
+          itemExists: (universe, item) => (universe in itemsPerUniverse) && itemsPerUniverse[universe][item],
+          headings,
+        };
+        const htmlBody = renderToHTMLString({ extensions: editorExtensions(false, renderContext), content: jsonBody });
+        const sanitizedHtml = sanitizeHtml(htmlBody, {
+          allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+          allowedAttributes: {
+            ...sanitizeHtml.defaults.allowedAttributes,
+            img: ['src', 'alt', 'title', 'width', 'height'],
+            h1: ['id'], h2: ['id'], h3: ['id'], h4: ['id'], h5: ['id'], h6: ['id'],
+          },
+          disallowedTagsMode: 'escape',
+          allowedClasses: {
+            '*': false,
+          },
+        });
+        item.obj_data.body = {
+          type: 'html',
+          content: sanitizedHtml,
+        };
+      } catch (err) {
+        logger.error('Failed to parse item body:', err);
+        item.obj_data.body = '';
+      }
     }
 
     const [comments, commentUsers] = await api.discussion.getCommentsByItem(item.id, true) as [Comment[], User[]];
@@ -94,41 +151,12 @@ export default {
   },
 
   async edit(req, res) {
-    const fetchedItem = await api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortname, req.params.itemShortname, perms.WRITE);
-    const item = {...fetchedItem, ...(req.body ?? {}), shortname: fetchedItem.shortname, newShort: req.body?.shortname ?? fetchedItem.shortname};
-    const itemList = await api.item.getByUniverseId(req.session.user, item.universe_id, perms.READ, { type: 'character' });
     const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
-    item.obj_data = JSON.parse(item.obj_data);
-    if (item.parents.length > 0 || item.children.length > 0) {
-      item.obj_data.lineage = { ...item.obj_data.lineage };
-      item.obj_data.lineage.parents = item.parents.reduce((obj, val) => ({ ...obj, [val.parent_shortname]: [val.parent_label, val.child_label] }), {});
-      item.obj_data.lineage.children = item.children.reduce((obj, val) => ({ ...obj, [val.child_shortname]: [val.child_label, val.parent_label] }), {});
-    }
-    if (item.events.length > 0) {
-      item.obj_data.timeline = { ...item.obj_data.timeline };
-      item.obj_data.timeline.events = item.events
-        .map(({ event_title, abstime, src_shortname, src_title, src_id }) => ({
-          title: event_title,
-          time: abstime,
-          imported: src_shortname !== item.shortname,
-          src: src_title,
-          srcId: src_id,
-        }));
-    }
-    if (item.gallery.length > 0) {
-      item.obj_data.gallery = { ...item.obj_data.gallery };
-      item.obj_data.gallery.imgs = item.gallery
-        .map(({ id, name, label }) => ({
-          id,
-          url: `/api/universes/${item.universe_short}/items/${item.shortname}/gallery/images/${id}`,
-          name,
-          label,
-        }))
-        .sort((a, b) => a.id > b.id ? 1 : -1);
-    }
-    const itemMap = {};
-    itemList.forEach(item => itemMap[item.shortname] = item.title);
-    res.prepareRender('editItem', { item, itemMap, universe, error: res.error });
+    res.prepareRender('editor', {
+      universe,
+      itemShort: req.params.itemShortname,
+      universeShort: req.params.universeShortname,
+    });
   },
 
   async delete(req, res) {
