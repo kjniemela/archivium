@@ -13,6 +13,7 @@ import LineageEditor from '../components/LineageEditor';
 import CustomDataEditor from '../components/CustomDataEditor';
 import type { SetImageOptions } from '@tiptap/extension-image';
 import { splitIgnoringQuotes } from '../../../src/markdown';
+import type { NavProps } from '../App';
 
 type Categories = {
   [key: string]: [string, string],
@@ -35,6 +36,7 @@ export type ItemEditProps = {
   itemShort: string,
   universeShort: string,
   universeLink: (universe: string) => string,
+  navigate: (props: NavProps) => void,
 };
 
 async function fetchData(url: string, setter: (value: any) => Promise<void> | void): Promise<any> {
@@ -89,7 +91,7 @@ function computeTabs(objData: ObjData): Record<string, string> {
 
 const itemExistsCache: { [universe: string]: { [item: string]: boolean } } = {};
 
-export default function ItemEdit({ itemShort, universeShort, universeLink }: ItemEditProps) {
+export default function ItemEdit({ itemShort, universeShort, universeLink, navigate }: ItemEditProps) {
   const [initContent, setInitContent] = useState<any | null>(null);
   const [categories, setCategories] = useState<Categories | null>(null);
   const [item, setItem] = useState<Item | null>(null);
@@ -162,6 +164,9 @@ export default function ItemEdit({ itemShort, universeShort, universeLink }: Ite
         setPreviousData(data);
         setNeedsSaving(false);
         if (callback) callback();
+        if (data.shortname !== itemShort) {
+          navigate({ itemShort: data.shortname });
+        }
       } catch (err) {
         console.error('Failed to save!');
         console.error(err);
@@ -409,7 +414,7 @@ export default function ItemEdit({ itemShort, universeShort, universeLink }: Ite
       )}
       {previewBtnAnchor && createPortal(
         <a className='navbarBtnLink navbarText' onClick={() => save(0, () => {
-          location.href = `${context.universeLink(universeShort)}/items/${itemShort}`;
+          location.href = `${context.universeLink(universeShort)}/items/${item.shortname}`;
         })}>{T('Preview')}</a>,
         previewBtnAnchor,
       )}
