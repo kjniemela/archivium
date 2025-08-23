@@ -55719,6 +55719,19 @@ function _array_like_to_array(arr, len) {
 function _array_with_holes(arr) {
     if (Array.isArray(arr)) return arr;
 }
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
 function _iterable_to_array_limit(arr, i) {
     var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
     if (_i == null) return;
@@ -55745,6 +55758,45 @@ function _iterable_to_array_limit(arr, i) {
 }
 function _non_iterable_rest() {
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            _define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
+function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+        var symbols = Object.getOwnPropertySymbols(object);
+        if (enumerableOnly) {
+            symbols = symbols.filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+            });
+        }
+        keys.push.apply(keys, symbols);
+    }
+    return keys;
+}
+function _object_spread_props(target, source) {
+    source = source != null ? source : {};
+    if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+        ownKeys(Object(source)).forEach(function(key) {
+            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+    }
+    return target;
 }
 function _sliced_to_array(arr, i) {
     return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
@@ -55812,12 +55864,14 @@ var editorExtensions = function(editMode, context) {
         _extensions_Aside__WEBPACK_IMPORTED_MODULE_1__["default"],
         _extensions_Heading__WEBPACK_IMPORTED_MODULE_5__["default"],
         _extensions_Image__WEBPACK_IMPORTED_MODULE_2__["default"],
-        _extensions_Link__WEBPACK_IMPORTED_MODULE_3__["default"].configure({
+        _extensions_Link__WEBPACK_IMPORTED_MODULE_3__["default"].configure(_object_spread_props(_object_spread({
             enableClickSelection: editMode,
-            openOnClick: !editMode,
-            shorthandResolver: shorthandResolver,
+            openOnClick: !editMode
+        }, editMode ? {} : {
+            shorthandResolver: shorthandResolver
+        }), {
             context: context
-        }),
+        })),
         _extensions_ToC__WEBPACK_IMPORTED_MODULE_4__["default"].configure({
             context: context
         })

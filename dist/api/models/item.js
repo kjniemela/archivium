@@ -191,7 +191,7 @@ class ItemAPI {
                     return match;
                 });
             }
-            else {
+            else if (objData.body) {
                 const linkMap = {};
                 for (const { to_universe_short, to_item_short, href } of links) {
                     linkMap[href] = [to_universe_short, to_item_short];
@@ -580,7 +580,7 @@ class ItemAPI {
     async handleLinks(item, objData, conn) {
         if (objData.body) {
             const links = [];
-            (0, tiptapHelpers_1.indexedToJson)(objData.body, (href) => links.push({ href, ...(0, editor_1.extractLinkData)(href) }));
+            (0, tiptapHelpers_1.indexedToJson)(objData.body, (href) => href.startsWith('@') && links.push({ href, ...(0, editor_1.extractLinkData)(href) }));
             const oldLinks = await this._getLinks(item);
             const existingLinks = {};
             const newLinks = {};

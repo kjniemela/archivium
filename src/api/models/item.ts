@@ -279,7 +279,7 @@ export class ItemAPI {
           }
           return match;
         });
-      } else {
+      } else if (objData.body) {
         const linkMap = {};
         for (const { to_universe_short, to_item_short, href } of links) {
           linkMap[href] = [to_universe_short, to_item_short];
@@ -706,7 +706,7 @@ export class ItemAPI {
   async handleLinks(item: Item, objData: any, conn?: PoolConnection): Promise<void> {
     if (objData.body) {
       const links: ({ href: string } & LinkData)[] = [];
-      indexedToJson(objData.body as IndexedDocument, (href) => links.push({ href, ...extractLinkData(href) }));
+      indexedToJson(objData.body as IndexedDocument, (href) => href.startsWith('@') && links.push({ href, ...extractLinkData(href) }));
       const oldLinks = await this._getLinks(item);
       const existingLinks = {};
       const newLinks = {};
