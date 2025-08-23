@@ -20,7 +20,7 @@ ul, ol {
   padding-inline-start: 2.5rem;
 }
 
-html, body {
+body {
   -webkit-overflow-scrolling : touch !important;
   overflow: auto !important;
   height: 100% !important;
