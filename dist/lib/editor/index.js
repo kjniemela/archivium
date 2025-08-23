@@ -60,7 +60,7 @@ const editorExtensions = (editMode, context) => ([
     Link_1.default.configure({
         enableClickSelection: editMode,
         openOnClick: !editMode,
-        shorthandResolver,
+        ...(editMode ? {} : { shorthandResolver }),
         context,
     }),
     ToC_1.default.configure({ context }),

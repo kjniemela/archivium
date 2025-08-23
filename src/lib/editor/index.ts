@@ -73,7 +73,7 @@ export const editorExtensions = (editMode: boolean, context: TiptapContext) => (
   Link.configure({
     enableClickSelection: editMode,
     openOnClick: !editMode,
-    shorthandResolver,
+    ...(editMode ? {} : { shorthandResolver }),
     context,
   }),
   ToC.configure({ context }),
