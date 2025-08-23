@@ -56,6 +56,13 @@ export type Parent = {
   parent_label: string,
 };
 
+export type ItemLink = {
+  id: number,
+  title: string,
+  shortname: string,
+  universe_short: string,
+};
+
 export type BasicItem = {
   id: number,
   title: string,
@@ -78,6 +85,7 @@ export type Item = BasicItem & {
   gallery: GalleryImage[];
   parents: Parent[];
   children: Child[],
+  links: ItemLink[],
 };
 
 function getQuery(selects: [string, string?, (string | string[])?][] = [], permsCond?: Cond, whereConds?: Cond, options: ItemOptions = {}) {
@@ -214,6 +222,7 @@ export class ItemAPI {
       gallery: [],
       parents: [],
       children: [],
+      links: [],
     };
 
     const events = await executeQuery(`
@@ -255,6 +264,15 @@ export class ItemAPI {
       WHERE lineage.child_id = ?
     `, [item.id]);
     item.parents = parents as Parent[];
+
+    const links = await executeQuery(`
+      SELECT item.id, item.shortname, item.title, universe.shortname AS universe_short
+      FROM itemlink
+      INNER JOIN item ON item.id = itemlink.from_item
+      INNER JOIN universe ON item.universe_id = universe.id
+      WHERE itemlink.to_universe_short = ? AND itemlink.to_item_short = ?
+    `, [item.universe_short, item.shortname]);
+    item.links = links as ItemLink[];
 
     if (item.obj_data) {
       const objData = JSON.parse(item.obj_data as string);

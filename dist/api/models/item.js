@@ -130,6 +130,7 @@ class ItemAPI {
             gallery: [],
             parents: [],
             children: [],
+            links: [],
         };
         const events = await (0, utils_1.executeQuery)(`
       SELECT DISTINCT
@@ -167,6 +168,14 @@ class ItemAPI {
       WHERE lineage.child_id = ?
     `, [item.id]);
         item.parents = parents;
+        const links = await (0, utils_1.executeQuery)(`
+      SELECT item.id, item.shortname, item.title, universe.shortname AS universe_short
+      FROM itemlink
+      INNER JOIN item ON item.id = itemlink.from_item
+      INNER JOIN universe ON item.universe_id = universe.id
+      WHERE itemlink.to_universe_short = ? AND itemlink.to_item_short = ?
+    `, [item.universe_short, item.shortname]);
+        item.links = links;
         if (item.obj_data) {
             const objData = JSON.parse(item.obj_data);
             const links = await (0, utils_1.executeQuery)(`
