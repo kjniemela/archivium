@@ -138,7 +138,12 @@ exports.default = {
         });
     },
     async edit(req, res) {
-        res.prepareRender('editor', { itemShort: req.params.itemShortname, universeShort: req.params.universeShortname });
+        const universe = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
+        res.prepareRender('editor', {
+            universe,
+            itemShort: req.params.itemShortname,
+            universeShort: req.params.universeShortname,
+        });
     },
     async delete(req, res) {
         try {
