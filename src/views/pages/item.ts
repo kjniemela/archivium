@@ -150,15 +150,6 @@ export default {
     });
   },
 
-  async edit(req, res) {
-    const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
-    res.prepareRender('editor', {
-      universe,
-      itemShort: req.params.itemShortname,
-      universeShort: req.params.universeShortname,
-    });
-  },
-
   async delete(req, res) {
     try {
       const item = await api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortname, req.params.itemShortname, perms.OWNER);
