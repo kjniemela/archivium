@@ -88,7 +88,7 @@ block content
           });
         })();
       if universe.author_permissions[contextUser.id] >= perms.WRITE
-        a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/items/${item.shortname}/edit`)
+        a.link.link-animated.d-flex.align-center(href=`${ADDR_PREFIX}/editor/universes/${universe.shortname}/items/${item.shortname}`)
           span.material-symbols-outlined edit
           |  #{T('Edit')}
       if universe.author_permissions[contextUser.id] >= perms.OWNER
