@@ -57026,1508 +57026,33 @@ function extractLinks(universeShortname, body, ctx) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ App),
-/* harmony export */   setNeedsSaving: () => (/* binding */ setNeedsSaving)
+/* harmony export */   "default": () => (/* binding */ App)
 /* harmony export */ });
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "../node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./helpers */ "./src/helpers.tsx");
-/* harmony import */ var _components_EditorFrame__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/EditorFrame */ "./src/components/EditorFrame.tsx");
-/* harmony import */ var _src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../src/lib/tiptapHelpers */ "../src/lib/tiptapHelpers.ts");
-/* harmony import */ var _src_lib_editor__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../src/lib/editor */ "../src/lib/editor/index.ts");
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-dom */ "../node_modules/react-dom/index.js");
-/* harmony import */ var _components_TabsBar__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/TabsBar */ "./src/components/TabsBar.tsx");
-/* harmony import */ var _tiptap_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @tiptap/react */ "../node_modules/@tiptap/react/dist/index.js");
-/* harmony import */ var _components_Gallery__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/Gallery */ "./src/components/Gallery.tsx");
-/* harmony import */ var _components_TimelineEditor__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./components/TimelineEditor */ "./src/components/TimelineEditor.tsx");
-/* harmony import */ var _components_LineageEditor__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./components/LineageEditor */ "./src/components/LineageEditor.tsx");
-/* harmony import */ var _components_CustomDataEditor__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./components/CustomDataEditor */ "./src/components/CustomDataEditor.tsx");
-/* harmony import */ var _src_markdown__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../src/markdown */ "../src/markdown.ts");
-function _array_like_to_array(arr, len) {
-    if (len == null || len > arr.length) len = arr.length;
-    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
-    return arr2;
-}
-function _array_with_holes(arr) {
-    if (Array.isArray(arr)) return arr;
-}
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
-    try {
-        var info = gen[key](arg);
-        var value = info.value;
-    } catch (error) {
-        reject(error);
-        return;
-    }
-    if (info.done) {
-        resolve(value);
-    } else {
-        Promise.resolve(value).then(_next, _throw);
-    }
-}
-function _async_to_generator(fn) {
-    return function() {
-        var self = this, args = arguments;
-        return new Promise(function(resolve, reject) {
-            var gen = fn.apply(self, args);
-            function _next(value) {
-                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
-            }
-            function _throw(err) {
-                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
-            }
-            _next(undefined);
-        });
-    };
-}
-function _define_property(obj, key, value) {
-    if (key in obj) {
-        Object.defineProperty(obj, key, {
-            value: value,
-            enumerable: true,
-            configurable: true,
-            writable: true
-        });
-    } else {
-        obj[key] = value;
-    }
-    return obj;
-}
-function _instanceof(left, right) {
-    if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) {
-        return !!right[Symbol.hasInstance](left);
-    } else {
-        return left instanceof right;
-    }
-}
-function _iterable_to_array_limit(arr, i) {
-    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
-    if (_i == null) return;
-    var _arr = [];
-    var _n = true;
-    var _d = false;
-    var _s, _e;
-    try {
-        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
-            _arr.push(_s.value);
-            if (i && _arr.length === i) break;
-        }
-    } catch (err) {
-        _d = true;
-        _e = err;
-    } finally{
-        try {
-            if (!_n && _i["return"] != null) _i["return"]();
-        } finally{
-            if (_d) throw _e;
-        }
-    }
-    return _arr;
-}
-function _non_iterable_rest() {
-    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-function _object_spread(target) {
-    for(var i = 1; i < arguments.length; i++){
-        var source = arguments[i] != null ? arguments[i] : {};
-        var ownKeys = Object.keys(source);
-        if (typeof Object.getOwnPropertySymbols === "function") {
-            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
-                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-            }));
-        }
-        ownKeys.forEach(function(key) {
-            _define_property(target, key, source[key]);
-        });
-    }
-    return target;
-}
-function ownKeys(object, enumerableOnly) {
-    var keys = Object.keys(object);
-    if (Object.getOwnPropertySymbols) {
-        var symbols = Object.getOwnPropertySymbols(object);
-        if (enumerableOnly) {
-            symbols = symbols.filter(function(sym) {
-                return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-            });
-        }
-        keys.push.apply(keys, symbols);
-    }
-    return keys;
-}
-function _object_spread_props(target, source) {
-    source = source != null ? source : {};
-    if (Object.getOwnPropertyDescriptors) {
-        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-    } else {
-        ownKeys(Object(source)).forEach(function(key) {
-            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-        });
-    }
-    return target;
-}
-function _sliced_to_array(arr, i) {
-    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
-}
-function _unsupported_iterable_to_array(o, minLen) {
-    if (!o) return;
-    if (typeof o === "string") return _array_like_to_array(o, minLen);
-    var n = Object.prototype.toString.call(o).slice(8, -1);
-    if (n === "Object" && o.constructor) n = o.constructor.name;
-    if (n === "Map" || n === "Set") return Array.from(n);
-    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
-}
-function _ts_generator(thisArg, body) {
-    var f, y, t, _ = {
-        label: 0,
-        sent: function() {
-            if (t[0] & 1) throw t[1];
-            return t[1];
-        },
-        trys: [],
-        ops: []
-    }, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
-    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() {
-        return this;
-    }), g;
-    function verb(n) {
-        return function(v) {
-            return step([
-                n,
-                v
-            ]);
-        };
-    }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while(g && (g = 0, op[0] && (_ = 0)), _)try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [
-                op[0] & 2,
-                t.value
-            ];
-            switch(op[0]){
-                case 0:
-                case 1:
-                    t = op;
-                    break;
-                case 4:
-                    _.label++;
-                    return {
-                        value: op[1],
-                        done: false
-                    };
-                case 5:
-                    _.label++;
-                    y = op[1];
-                    op = [
-                        0
-                    ];
-                    continue;
-                case 7:
-                    op = _.ops.pop();
-                    _.trys.pop();
-                    continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
-                        _ = 0;
-                        continue;
-                    }
-                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
-                        _.label = op[1];
-                        break;
-                    }
-                    if (op[0] === 6 && _.label < t[1]) {
-                        _.label = t[1];
-                        t = op;
-                        break;
-                    }
-                    if (t && _.label < t[2]) {
-                        _.label = t[2];
-                        _.ops.push(op);
-                        break;
-                    }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop();
-                    continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) {
-            op = [
-                6,
-                e
-            ];
-            y = 0;
-        } finally{
-            f = t = 0;
-        }
-        if (op[0] & 5) throw op[1];
-        return {
-            value: op[0] ? op[1] : void 0,
-            done: true
-        };
-    }
-}
+/* harmony import */ var _pages_ItemEdit__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./pages/ItemEdit */ "./src/pages/ItemEdit.tsx");
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-var BUILTIN_TABS = [
-    'lineage',
-    'location',
-    'timeline',
-    'gallery'
-];
-function fetchData(url, setter) {
-    return _async_to_generator(function() {
-        var res, data, err;
-        return _ts_generator(this, function(_state) {
-            switch(_state.label){
-                case 0:
-                    _state.trys.push([
-                        0,
-                        4,
-                        ,
-                        5
-                    ]);
-                    return [
-                        4,
-                        fetch(url, {
-                            method: 'GET',
-                            credentials: 'include',
-                            headers: {
-                                'Accept': 'application/json'
-                            }
-                        })
-                    ];
-                case 1:
-                    res = _state.sent();
-                    if (!res.ok) throw new Error('Failed to fetch');
-                    return [
-                        4,
-                        res.json()
-                    ];
-                case 2:
-                    data = _state.sent();
-                    return [
-                        4,
-                        setter(data)
-                    ];
-                case 3:
-                    _state.sent();
-                    return [
-                        3,
-                        5
-                    ];
-                case 4:
-                    err = _state.sent();
-                    console.error(err);
-                    return [
-                        3,
-                        5
-                    ];
-                case 5:
-                    return [
-                        2
-                    ];
-            }
-        });
-    })();
-}
-var updateTimeoutId = null;
-function debouncedOnUpdate(editor, onChange) {
-    if (updateTimeoutId) {
-        clearTimeout(updateTimeoutId);
-    }
-    updateTimeoutId = setTimeout(function() {
-        var json = editor.getJSON();
-        var indexed = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__.jsonToIndexed)(json);
-        onChange(indexed);
-    }, 500);
-}
-var needsSaving = false;
-function setNeedsSaving(value) {
-    needsSaving = value;
-}
-window.onbeforeunload = function(event) {
-    if (needsSaving) {
-        event.preventDefault();
-        event.returnValue = true;
-    }
-};
-var saveTimeout = null;
-function computeTabs(objData) {
-    return _object_spread({}, objData.body ? {
-        body: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Main Text')
-    } : {}, (objData.tabs ? Object.keys(objData.tabs) : []).reduce(function(acc, tab) {
-        return _object_spread_props(_object_spread({}, acc), _define_property({}, tab, tab));
-    }, {}), BUILTIN_TABS.filter(function(tab) {
-        return objData[tab] !== undefined;
-    }).reduce(function(acc, tab) {
-        return _object_spread_props(_object_spread({}, acc), _define_property({}, tab, objData[tab].title));
-    }, {}));
-}
-var itemExistsCache = {};
 function App(param) {
-    var _this, _loop = function(tab) {
-        customTabs[tab] = /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_CustomDataEditor__WEBPACK_IMPORTED_MODULE_12__["default"], {
-            data: objData.tabs[tab],
-            onUpdate: function(newData) {
-                var newState = _object_spread({}, objData);
-                if (!newState.tabs) newState.tabs = {};
-                newState.tabs[tab] = newData;
-                setObjData(newState);
-            }
-        }, void 0, false, {
-            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-            lineNumber: 325,
-            columnNumber: 23
-        }, _this);
-    };
-    var _this1 = this;
     var itemShort = param.itemShort, universeShort = param.universeShort, displayUniverse = param.displayUniverse, addrPrefix = param.addrPrefix, domain = param.domain;
-    var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), initContent = _useState[0], setInitContent = _useState[1];
-    var _useState1 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), categories = _useState1[0], setCategories = _useState1[1];
-    var _useState2 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), item = _useState2[0], setItem = _useState2[1];
-    var _useState3 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), objData = _useState3[0], setObjData = _useState3[1];
-    var _useState4 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), errorMessage = _useState4[0], setErrorMessage = _useState4[1];
-    var _useState5 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)('Save Changes'), 2), saveText = _useState5[0], setSaveText = _useState5[1];
-    var _useState6 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), currentModal = _useState6[0], setCurrentModal = _useState6[1];
-    var _useState7 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), currentTab = _useState7[0], setCurrentTab = _useState7[1];
-    var _useState8 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({}), 2), tabNames = _useState8[0], setTabNames = _useState8[1];
-    var _useState9 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(), 2), eventItemMap = _useState9[0], setEventItemMap = _useState9[1];
-    var _useState10 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(), 2), lineageItemMap = _useState10[0], setLineageItemMap = _useState10[1];
-    var _useState11 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), previousData = _useState11[0], setPreviousData = _useState11[1];
-    var context = {
-        currentUniverse: universeShort,
-        universeLink: function universeLink(universe) {
-            if (displayUniverse) {
-                if (displayUniverse === universe) return addrPrefix;
-                else return "https://".concat(domain).concat(addrPrefix, "/universes/").concat(universe);
-            } else {
-                return "".concat(addrPrefix, "/universes/").concat(universe);
-            }
-        },
-        itemExists: function itemExists(universe, item) {
-            var _itemExistsCache_universe, _item;
-            return (_item = ((_itemExistsCache_universe = itemExistsCache[universe]) !== null && _itemExistsCache_universe !== void 0 ? _itemExistsCache_universe : {})[item]) !== null && _item !== void 0 ? _item : false;
-        },
-        headings: []
-    };
-    var editor = (0,_tiptap_react__WEBPACK_IMPORTED_MODULE_8__.useEditor)({
-        extensions: (0,_src_lib_editor__WEBPACK_IMPORTED_MODULE_5__.editorExtensions)(true, context),
-        onUpdate: function(param) {
-            var editor = param.editor;
-            if (!objData) return;
-            setNeedsSaving(true);
-            setSaveText('Save Changes');
-            debouncedOnUpdate(editor, function(content) {
-                return setObjData(_object_spread_props(_object_spread({}, objData), {
-                    body: content
-                }));
-            });
+    function universeLink(universe) {
+        if (displayUniverse) {
+            if (displayUniverse === universe) return addrPrefix;
+            else return "https://".concat(domain).concat(addrPrefix, "/universes/").concat(universe);
+        } else {
+            return "".concat(addrPrefix, "/universes/").concat(universe);
         }
-    });
-    function save(delay, callback) {
-        return _async_to_generator(function() {
-            return _ts_generator(this, function(_state) {
-                if (saveTimeout) {
-                    clearTimeout(saveTimeout);
-                }
-                saveTimeout = setTimeout(function() {
-                    return _async_to_generator(function() {
-                        var data, response, _$err, err;
-                        return _ts_generator(this, function(_state) {
-                            switch(_state.label){
-                                case 0:
-                                    if (!item || !objData) return [
-                                        2
-                                    ];
-                                    setSaveText('Saving...');
-                                    console.log('SAVING...');
-                                    data = _object_spread_props(_object_spread({}, structuredClone(item)), {
-                                        obj_data: _object_spread({}, structuredClone(objData))
-                                    });
-                                    if ((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.deepCompare)(data, previousData)) {
-                                        console.log('NO CHANGE');
-                                        setSaveText('Saved');
-                                        setNeedsSaving(false);
-                                        if (callback) callback();
-                                        return [
-                                            2
-                                        ];
-                                    }
-                                    _state.label = 1;
-                                case 1:
-                                    _state.trys.push([
-                                        1,
-                                        4,
-                                        ,
-                                        5
-                                    ]);
-                                    setErrorMessage(null);
-                                    return [
-                                        4,
-                                        fetch("/api/universes/".concat(universeShort, "/items/").concat(itemShort), {
-                                            method: 'PUT',
-                                            headers: {
-                                                'Content-Type': 'application/json'
-                                            },
-                                            body: JSON.stringify(data)
-                                        })
-                                    ];
-                                case 2:
-                                    response = _state.sent();
-                                    return [
-                                        4,
-                                        response.json()
-                                    ];
-                                case 3:
-                                    _$err = _state.sent();
-                                    if (!response.ok) {
-                                        setErrorMessage(_$err);
-                                        throw _$err;
-                                    }
-                                    console.log('SAVED.');
-                                    setSaveText('Saved');
-                                    setPreviousData(data);
-                                    setNeedsSaving(false);
-                                    if (callback) callback();
-                                    return [
-                                        3,
-                                        5
-                                    ];
-                                case 4:
-                                    err = _state.sent();
-                                    console.error('Failed to save!');
-                                    console.error(err);
-                                    setSaveText('Error');
-                                    setPreviousData(null);
-                                    if (_instanceof(err, TypeError)) {
-                                        setErrorMessage('Network error. Make sure you are connected to the internet and try again.');
-                                    }
-                                    return [
-                                        3,
-                                        5
-                                    ];
-                                case 5:
-                                    return [
-                                        2
-                                    ];
-                            }
-                        });
-                    })();
-                }, delay);
-                return [
-                    2
-                ];
-            });
-        })();
     }
-    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
-        var categoryPromise = fetchData("/api/universes/".concat(universeShort), function(data) {
-            setCategories(data.obj_data.cats);
-        });
-        var eventItemPromise = fetchData("/api/universes/".concat(universeShort, "/events"), function(events) {
-            var newEventItemMap = {};
-            var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
-            try {
-                for(var _iterator = events[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true){
-                    var _step_value = _step.value, src_id = _step_value.src_id, src_title = _step_value.src_title, src_shortname = _step_value.src_shortname, event_title = _step_value.event_title, abstime = _step_value.abstime;
-                    if (!(src_id in newEventItemMap)) {
-                        newEventItemMap[src_id] = [];
-                    }
-                    newEventItemMap[src_id].push([
-                        src_shortname,
-                        src_title,
-                        Number(src_id),
-                        event_title !== null && event_title !== void 0 ? event_title : '',
-                        Number(abstime)
-                    ]);
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally{
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return != null) {
-                        _iterator.return();
-                    }
-                } finally{
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
-            setEventItemMap(newEventItemMap);
-        });
-        var lineageItemPromise = fetchData("/api/universes/".concat(universeShort, "/items?type=character"), function(items) {
-            var newLineageItemMap = {};
-            var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
-            try {
-                for(var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true){
-                    var _step_value = _step.value, shortname = _step_value.shortname, title = _step_value.title;
-                    if (shortname === itemShort) continue;
-                    newLineageItemMap[shortname] = title;
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally{
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return != null) {
-                        _iterator.return();
-                    }
-                } finally{
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
-            setLineageItemMap(newLineageItemMap);
-        });
-        fetchData("/api/universes/".concat(universeShort, "/items/").concat(itemShort), function(data) {
-            return _async_to_generator(function() {
-                var objData, links, json, bulkFetcher, fetchPromises;
-                return _ts_generator(this, function(_state) {
-                    switch(_state.label){
-                        case 0:
-                            return [
-                                4,
-                                Promise.all([
-                                    categoryPromise,
-                                    eventItemPromise,
-                                    lineageItemPromise
-                                ])
-                            ];
-                        case 1:
-                            _state.sent();
-                            objData = JSON.parse(data.obj_data);
-                            if (!(typeof objData.body === 'string')) return [
-                                3,
-                                3
-                            ];
-                            return [
-                                4,
-                                (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.renderMarkdown)(universeShort, objData.body, {
-                                    item: _object_spread_props(_object_spread({}, data), {
-                                        obj_data: objData
-                                    })
-                                }).then(function(text) {
-                                    setInitContent(text);
-                                })
-                            ];
-                        case 2:
-                            _state.sent();
-                            return [
-                                3,
-                                5
-                            ];
-                        case 3:
-                            if (!objData.body) return [
-                                3,
-                                5
-                            ];
-                            links = [];
-                            json = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__.indexedToJson)(objData.body, function(href) {
-                                return links.push((0,_src_lib_editor__WEBPACK_IMPORTED_MODULE_5__.extractLinkData)(href));
-                            });
-                            bulkFetcher = new _helpers__WEBPACK_IMPORTED_MODULE_2__.BulkExistsFetcher();
-                            fetchPromises = links.map(function(link) {
-                                return _async_to_generator(function() {
-                                    var _link_universe, universe, _, _1;
-                                    return _ts_generator(this, function(_state) {
-                                        switch(_state.label){
-                                            case 0:
-                                                if (!link.item) return [
-                                                    3,
-                                                    2
-                                                ];
-                                                universe = (_link_universe = link.universe) !== null && _link_universe !== void 0 ? _link_universe : universeShort;
-                                                if (!(universeShort in itemExistsCache)) {
-                                                    itemExistsCache[universe] = {};
-                                                }
-                                                if (!!(link.item in itemExistsCache[universe])) return [
-                                                    3,
-                                                    2
-                                                ];
-                                                _ = itemExistsCache[universe];
-                                                _1 = link.item;
-                                                return [
-                                                    4,
-                                                    bulkFetcher.exists(universe, link.item)
-                                                ];
-                                            case 1:
-                                                _[_1] = _state.sent();
-                                                _state.label = 2;
-                                            case 2:
-                                                return [
-                                                    2
-                                                ];
-                                        }
-                                    });
-                                })();
-                            });
-                            bulkFetcher.fetchAll();
-                            return [
-                                4,
-                                Promise.all(fetchPromises)
-                            ];
-                        case 4:
-                            _state.sent();
-                            setInitContent(json);
-                            _state.label = 5;
-                        case 5:
-                            delete data.obj_data;
-                            setObjData(objData);
-                            setTabNames(computeTabs(objData));
-                            setItem(data);
-                            return [
-                                2
-                            ];
-                    }
-                });
-            })();
-        });
-    }, [
-        itemShort,
-        universeShort
-    ]);
-    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
-        if (editor && initContent) {
-            editor.commands.setContent(initContent);
-        }
-    }, [
-        editor,
-        initContent
-    ]);
-    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
-        if (item && objData) {
-            setNeedsSaving(true);
-            setSaveText('Save Changes');
-            save(5000);
-        }
-    }, [
-        item,
-        objData
-    ]);
-    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
-        if (!(currentTab && tabNames[currentTab])) {
-            if (Object.keys(tabNames).length > 0) setCurrentTab(Object.keys(tabNames)[0]);
-            else setCurrentTab(null);
-        }
-    }, [
-        tabNames
-    ]);
-    var modalAnchor = document.querySelector('#modal-anchor');
-    var saveBtnAnchor = document.querySelector('#save-btn');
-    var previewBtnAnchor = document.querySelector('#preview-btn');
-    var _useState12 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(undefined), 2), newTabType = _useState12[0], setNewTabType = _useState12[1];
-    var _useState13 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(''), 2), newTabName = _useState13[0], setNewTabName = _useState13[1];
-    function addTabByType() {
-        if (!objData || newTabType === undefined) return;
-        var newObjData = _object_spread({}, objData);
-        if (BUILTIN_TABS.includes(newTabType)) {
-            newObjData[newTabType] = {
-                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(newTabType))
-            };
-        } else if (newTabType === 'body') {
-            newObjData.body = {
-                text: '',
-                structure: []
-            };
-        } else if (newTabType === 'custom') {
-            if (!newTabName) return;
-            if (!newObjData.tabs) newObjData.tabs = {};
-            newObjData.tabs[newTabName] = {};
-        }
-        setObjData(newObjData);
-        setTabNames(computeTabs(newObjData));
-        setCurrentModal(null);
-    }
-    function removeTab(tab) {
-        if (!objData) return;
-        var newObjData = _object_spread({}, objData);
-        if (BUILTIN_TABS.includes(tab)) {
-            delete newObjData[tab];
-        } else if (tab === 'body') {
-            delete newObjData.body;
-        } else if (newObjData.tabs) {
-            if (!newObjData.tabs[tab]) return;
-            delete newObjData.tabs[tab];
-        }
-        setObjData(newObjData);
-        setTabNames(computeTabs(newObjData));
-    }
-    /* Loading Screen */ if (!item || !objData) {
-        return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-            className: "d-flex justify-center align-center",
-            children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                className: "loader",
-                style: {
-                    marginTop: 'max(0px, calc(50vh - 50px - var(--page-margin-top)))'
-                }
-            }, void 0, false, {
-                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 302,
-                columnNumber: 7
-            }, this)
-        }, void 0, false, {
-            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-            lineNumber: 301,
-            columnNumber: 12
-        }, this);
-    }
-    var modals = {
-        newTab: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-            className: "sheet d-flex flex-col gap-1",
-            style: {
-                minWidth: '20rem'
-            },
-            children: [
-                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
-                    onChange: function(param) {
-                        var target = param.target;
-                        return setNewTabType(target.value);
-                    },
-                    children: [
-                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
-                            hidden: true,
-                            disabled: true,
-                            selected: true,
-                            value: undefined,
-                            children: [
-                                (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Tab Type'),
-                                "..."
-                            ]
-                        }, void 0, true, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 310,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
-                            value: "body",
-                            disabled: 'body' in objData,
-                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Main Text')
-                        }, void 0, false, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 311,
-                            columnNumber: 11
-                        }, this),
-                        BUILTIN_TABS.map(function(type) {
-                            return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
-                                value: type,
-                                disabled: type in tabNames,
-                                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(type))
-                            }, type, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 313,
-                                columnNumber: 13
-                            }, _this1);
-                        }),
-                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
-                            value: "custom",
-                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Custom Data')
-                        }, void 0, false, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 315,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                    lineNumber: 309,
-                    columnNumber: 9
-                }, this),
-                newTabType === 'custom' && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
-                    type: "text",
-                    placeholder: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Tab Name'),
-                    value: newTabName,
-                    onChange: function(param) {
-                        var target = param.target;
-                        return setNewTabName(target.value);
-                    }
-                }, void 0, false, {
-                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                    lineNumber: 317,
-                    columnNumber: 37
-                }, this),
-                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
-                    type: "button",
-                    onClick: function() {
-                        return addTabByType();
-                    },
-                    children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('New Tab')
-                }, void 0, false, {
-                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                    lineNumber: 318,
-                    columnNumber: 9
-                }, this)
-            ]
-        }, void 0, true, {
-            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-            lineNumber: 308,
-            columnNumber: 7
-        }, this)
-    };
-    var customTabs = {};
-    for(var tab in objData.tabs)_this = this, _loop(tab);
-    var tabs = _object_spread_props(_object_spread({}, customTabs), {
-        body: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_EditorFrame__WEBPACK_IMPORTED_MODULE_3__["default"], {
-            editor: editor,
-            getLink: function(previousUrl, type) {
-                return _async_to_generator(function() {
-                    var url, link, _link_universe, universe, existsFetcher, fetchPromise, _, _1, _splitIgnoringQuotes, cmd, index, alt, height, width, image, attrs;
-                    return _ts_generator(this, function(_state) {
-                        switch(_state.label){
-                            case 0:
-                                url = window.prompt('URL', previousUrl);
-                                if (!(url === null || url === void 0 ? void 0 : url.startsWith('@'))) return [
-                                    3,
-                                    4
-                                ];
-                                if (!(type === 'link')) return [
-                                    3,
-                                    3
-                                ];
-                                link = (0,_src_lib_editor__WEBPACK_IMPORTED_MODULE_5__.extractLinkData)(url);
-                                if (!link.item) return [
-                                    3,
-                                    2
-                                ];
-                                universe = (_link_universe = link.universe) !== null && _link_universe !== void 0 ? _link_universe : universeShort;
-                                if (!(universeShort in itemExistsCache)) {
-                                    itemExistsCache[universe] = {};
-                                }
-                                if (!!(link.item in itemExistsCache[universe])) return [
-                                    3,
-                                    2
-                                ];
-                                existsFetcher = new _helpers__WEBPACK_IMPORTED_MODULE_2__.BulkExistsFetcher();
-                                fetchPromise = existsFetcher.exists(universe, link.item);
-                                existsFetcher.fetchAll();
-                                _ = itemExistsCache[universe];
-                                _1 = link.item;
-                                return [
-                                    4,
-                                    fetchPromise
-                                ];
-                            case 1:
-                                _[_1] = _state.sent();
-                                _state.label = 2;
-                            case 2:
-                                return [
-                                    3,
-                                    4
-                                ];
-                            case 3:
-                                if (type === 'image') {
-                                    _splitIgnoringQuotes = _sliced_to_array((0,_src_markdown__WEBPACK_IMPORTED_MODULE_13__.splitIgnoringQuotes)(url.substring(1)), 5), cmd = _splitIgnoringQuotes[0], index = _splitIgnoringQuotes[1], alt = _splitIgnoringQuotes[2], height = _splitIgnoringQuotes[3], width = _splitIgnoringQuotes[4];
-                                    if (cmd === 'img') {
-                                        image = item.gallery[Number(index)];
-                                        if (image) {
-                                            attrs = {
-                                                alt: alt !== null && alt !== void 0 ? alt : image.name,
-                                                title: alt !== null && alt !== void 0 ? alt : image.label
-                                            };
-                                            if (height) attrs.height = Number(height);
-                                            if (width) attrs.width = Number(width);
-                                            return [
-                                                2,
-                                                [
-                                                    "/api/universes/".concat(item.universe_short, "/items/").concat(item.shortname, "/gallery/images/").concat(image.id),
-                                                    attrs
-                                                ]
-                                            ];
-                                        }
-                                    }
-                                }
-                                _state.label = 4;
-                            case 4:
-                                return [
-                                    2,
-                                    [
-                                        url
-                                    ]
-                                ];
-                        }
-                    });
-                })();
-            }
-        }, void 0, false, {
-            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-            lineNumber: 336,
-            columnNumber: 7
-        }, this),
-        gallery: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_Gallery__WEBPACK_IMPORTED_MODULE_9__["default"], {
-            universe: universeShort,
-            item: itemShort,
-            images: item.gallery,
-            onRemoveImage: function(id) {
-                var newState = _object_spread({}, item);
-                for(var i = 0; i < newState.gallery.length; i++){
-                    var img = newState.gallery[i];
-                    if (img.id === id) {
-                        newState.gallery.splice(i, 1);
-                        break;
-                    }
-                }
-                setItem(newState);
-            },
-            onUploadImage: function(img) {
-                var newState = _object_spread({}, item);
-                newState.gallery.push(img);
-                setItem(newState);
-            },
-            onChangeLabel: function(id, label) {
-                var newState = _object_spread({}, item);
-                for(var i = 0; i < newState.gallery.length; i++){
-                    var img = newState.gallery[i];
-                    if (img.id === id) {
-                        img.label = label;
-                        break;
-                    }
-                }
-                setItem(newState);
-            }
-        }, void 0, false, {
-            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-            lineNumber: 373,
-            columnNumber: 7
-        }, this),
-        timeline: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_TimelineEditor__WEBPACK_IMPORTED_MODULE_10__["default"], {
-            item: item,
-            onEventsUpdate: function(newEvents) {
-                var newState = _object_spread({}, item);
-                console.log(newEvents);
-                newState.events = newEvents;
-                setItem(newState);
-            },
-            eventItemMap: eventItemMap !== null && eventItemMap !== void 0 ? eventItemMap : {}
-        }, void 0, false, {
-            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-            lineNumber: 400,
-            columnNumber: 7
-        }, this),
-        lineage: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_LineageEditor__WEBPACK_IMPORTED_MODULE_11__["default"], {
-            item: item,
-            onUpdate: function(newItem) {
-                return setItem(newItem);
-            },
-            itemMap: lineageItemMap !== null && lineageItemMap !== void 0 ? lineageItemMap : {}
-        }, void 0, false, {
-            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-            lineNumber: 408,
-            columnNumber: 7
-        }, this)
-    });
-    var _item_title, _item_shortname, _item_tags, _objData_comments, _objData_notes;
     return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        children: [
-            saveBtnAnchor && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("a", {
-                className: "navbarBtnLink navbarText",
-                onClick: function() {
-                    return save(0);
-                },
-                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
-            }, void 0, false, {
-                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 416,
-                columnNumber: 9
-            }, this), saveBtnAnchor),
-            previewBtnAnchor && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("a", {
-                className: "navbarBtnLink navbarText",
-                onClick: function() {
-                    return save(0, function() {
-                        location.href = "".concat(context.universeLink(universeShort), "/items/").concat(itemShort);
-                    });
-                },
-                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Preview')
-            }, void 0, false, {
-                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 420,
-                columnNumber: 9
-            }, this), previewBtnAnchor),
-            modalAnchor && currentModal && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                className: "modal",
-                onClick: function() {
-                    return setCurrentModal(null);
-                },
-                children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                    className: "modal-content",
-                    onClick: function(e) {
-                        return e.stopPropagation();
-                    },
-                    children: modals[currentModal]
-                }, void 0, false, {
-                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                    lineNumber: 429,
-                    columnNumber: 13
-                }, this)
-            }, void 0, false, {
-                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 428,
-                columnNumber: 11
-            }, this), modalAnchor),
-            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                className: "d-flex justify-between align-baseline",
-                children: [
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h2", {
-                        children: item ? (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Edit %s', item.title) : (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Edit')
-                    }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 438,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("a", {
-                        className: "link link-animated color-error",
-                        href: "".concat(context.universeLink(universeShort), "/items/").concat(itemShort),
-                        children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Discard Changes')
-                    }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 439,
-                        columnNumber: 9
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 437,
-                columnNumber: 7
-            }, this),
-            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                id: "edit",
-                className: "form-row-group",
-                children: [
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                htmlFor: "title",
-                                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Title')
-                            }, void 0, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 443,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
-                                id: "title",
-                                type: "text",
-                                name: "title",
-                                value: (_item_title = item === null || item === void 0 ? void 0 : item.title) !== null && _item_title !== void 0 ? _item_title : '',
-                                onChange: function(param) {
-                                    var target = param.target;
-                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
-                                        title: target.value
-                                    }));
-                                }
-                            }, void 0, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 444,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 442,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                htmlFor: "shortname",
-                                children: [
-                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Shortname'),
-                                    ":"
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 450,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
-                                id: "shortname",
-                                type: "text",
-                                name: "shortname",
-                                value: (_item_shortname = item === null || item === void 0 ? void 0 : item.shortname) !== null && _item_shortname !== void 0 ? _item_shortname : '',
-                                onChange: function(param) {
-                                    var target = param.target;
-                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
-                                        shortname: target.value
-                                    }));
-                                }
-                            }, void 0, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 451,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 449,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("small", {
-                            style: {
-                                gridColumn: '2 / 4'
-                            },
-                            children: [
-                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
-                                    children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('NOTE: changes to the shortname will not auto-save.')
-                                }, void 0, false, {
-                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                    lineNumber: 458,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
-                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                    lineNumber: 459,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
-                                    children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Other users currently editing this item will be unable to save their work. Change with caution.')
-                                }, void 0, false, {
-                                    fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                    lineNumber: 460,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 457,
-                            columnNumber: 11
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 456,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                htmlFor: "item_type",
-                                children: [
-                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Type'),
-                                    ":"
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 465,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
-                                id: "item_type",
-                                name: "item_type",
-                                defaultValue: item === null || item === void 0 ? void 0 : item.item_type,
-                                onChange: function(param) {
-                                    var target = param.target;
-                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
-                                        item_type: target.value
-                                    }));
-                                },
-                                children: [
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
-                                        hidden: true,
-                                        disabled: true,
-                                        children: [
-                                            (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Select one'),
-                                            "..."
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 467,
-                                        columnNumber: 13
-                                    }, this),
-                                    categories && item && Object.keys(categories).map(function(type) {
-                                        return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
-                                            value: type,
-                                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)(categories[type][0])
-                                        }, type, false, {
-                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                            lineNumber: 469,
-                                            columnNumber: 15
-                                        }, _this1);
-                                    })
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 466,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 464,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                htmlFor: "tags",
-                                children: [
-                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Tags'),
-                                    ":"
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 477,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("textarea", {
-                                id: "tags",
-                                name: "tags",
-                                value: ((_item_tags = item === null || item === void 0 ? void 0 : item.tags) !== null && _item_tags !== void 0 ? _item_tags : []).join(' '),
-                                onChange: function(param) {
-                                    var target = param.target;
-                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
-                                        tags: target.value.split(' ')
-                                    }));
-                                }
-                            }, void 0, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 478,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 476,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                htmlFor: "comments",
-                                children: [
-                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Enable comments'),
-                                    ":"
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 482,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                className: "switch",
-                                children: [
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
-                                        id: "comments",
-                                        name: "comments",
-                                        type: "checkbox",
-                                        checked: (_objData_comments = objData === null || objData === void 0 ? void 0 : objData.comments) !== null && _objData_comments !== void 0 ? _objData_comments : false,
-                                        onChange: function(param) {
-                                            var target = param.target;
-                                            return objData && setObjData(_object_spread_props(_object_spread({}, objData), {
-                                                comments: target.checked
-                                            }));
-                                        }
-                                    }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 484,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
-                                        className: "slider"
-                                    }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 487,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 483,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 481,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "inputGroup",
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                htmlFor: "notes",
-                                children: [
-                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Enable notes'),
-                                    ":"
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 492,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
-                                className: "switch",
-                                children: [
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
-                                        id: "notes",
-                                        name: "notes",
-                                        type: "checkbox",
-                                        checked: (_objData_notes = objData === null || objData === void 0 ? void 0 : objData.notes) !== null && _objData_notes !== void 0 ? _objData_notes : false,
-                                        onChange: function(param) {
-                                            var target = param.target;
-                                            return objData && setObjData(_object_spread_props(_object_spread({}, objData), {
-                                                notes: target.checked
-                                            }));
-                                        }
-                                    }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 494,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
-                                        className: "slider"
-                                    }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 497,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 493,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 491,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        className: "mt-2",
-                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
-                            id: "save-changes",
-                            onClick: function() {
-                                return save(0);
-                            },
-                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
-                        }, void 0, false, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 502,
-                            columnNumber: 11
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 501,
-                        columnNumber: 9
-                    }, this),
-                    errorMessage && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
-                            id: "item-error",
-                            className: "color-error",
-                            style: {
-                                fontSize: 'small'
-                            },
-                            children: errorMessage
-                        }, void 0, false, {
-                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                            lineNumber: 506,
-                            columnNumber: 11
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 505,
-                        columnNumber: 26
-                    }, this),
-                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("hr", {
-                        className: "w-100 mb-0"
-                    }, void 0, false, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 509,
-                        columnNumber: 9
-                    }, this),
-                    objData && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                        children: [
-                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                                className: "d-flex align-start mb-2",
-                                children: [
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_TabsBar__WEBPACK_IMPORTED_MODULE_7__["default"], {
-                                        tabs: tabNames,
-                                        selectedTab: currentTab,
-                                        onSelectTab: function(tab) {
-                                            return setCurrentTab(tab);
-                                        },
-                                        onRemoveTab: function(tab) {
-                                            return removeTab(tab);
-                                        }
-                                    }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 513,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("ul", {
-                                        className: "navbarBtns",
-                                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("li", {
-                                            className: "navbarBtn",
-                                            children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h3", {
-                                                className: "navbarBtnLink navbarText ma-0 material-symbols-outlined heavy",
-                                                onClick: function() {
-                                                    return setCurrentModal('newTab');
-                                                },
-                                                children: "add"
-                                            }, void 0, false, {
-                                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                                lineNumber: 516,
-                                                columnNumber: 17
-                                            }, this)
-                                        }, void 0, false, {
-                                            fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                            lineNumber: 515,
-                                            columnNumber: 15
-                                        }, this)
-                                    }, void 0, false, {
-                                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                        lineNumber: 514,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 512,
-                                columnNumber: 11
-                            }, this),
-                            currentTab && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
-                                "data-tab": currentTab,
-                                children: tabs[currentTab]
-                            }, void 0, false, {
-                                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                                lineNumber: 522,
-                                columnNumber: 13
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                        lineNumber: 511,
-                        columnNumber: 21
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "C:\\Users\\Johannes\\Documents\\GitHub\\archivium\\editor\\src\\App.tsx",
-                lineNumber: 441,
-                columnNumber: 7
-            }, this)
-        ]
-    }, void 0, true);
+        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_pages_ItemEdit__WEBPACK_IMPORTED_MODULE_1__["default"], {
+            universeShort: universeShort,
+            itemShort: itemShort,
+            universeLink: universeLink
+        }, void 0, false, {
+            fileName: "/home/admin/webserver/dev/archivium/editor/src/App.tsx",
+            lineNumber: 24,
+            columnNumber: 7
+        }, this)
+    }, void 0, false);
 }
 
 
@@ -61710,6 +60235,1514 @@ function renderMdPreview(universeShortname, body, ctx, frmt) {
             }
         });
     })();
+}
+
+
+/***/ }),
+
+/***/ "./src/pages/ItemEdit.tsx":
+/*!********************************!*\
+  !*** ./src/pages/ItemEdit.tsx ***!
+  \********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ ItemEdit),
+/* harmony export */   setNeedsSaving: () => (/* binding */ setNeedsSaving)
+/* harmony export */ });
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ "../node_modules/react/jsx-dev-runtime.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "../node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../helpers */ "./src/helpers.tsx");
+/* harmony import */ var _components_EditorFrame__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/EditorFrame */ "./src/components/EditorFrame.tsx");
+/* harmony import */ var _src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../src/lib/tiptapHelpers */ "../src/lib/tiptapHelpers.ts");
+/* harmony import */ var _src_lib_editor__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../src/lib/editor */ "../src/lib/editor/index.ts");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-dom */ "../node_modules/react-dom/index.js");
+/* harmony import */ var _components_TabsBar__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../components/TabsBar */ "./src/components/TabsBar.tsx");
+/* harmony import */ var _tiptap_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @tiptap/react */ "../node_modules/@tiptap/react/dist/index.js");
+/* harmony import */ var _components_Gallery__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../components/Gallery */ "./src/components/Gallery.tsx");
+/* harmony import */ var _components_TimelineEditor__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../components/TimelineEditor */ "./src/components/TimelineEditor.tsx");
+/* harmony import */ var _components_LineageEditor__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../components/LineageEditor */ "./src/components/LineageEditor.tsx");
+/* harmony import */ var _components_CustomDataEditor__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../components/CustomDataEditor */ "./src/components/CustomDataEditor.tsx");
+/* harmony import */ var _src_markdown__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../../src/markdown */ "../src/markdown.ts");
+function _array_like_to_array(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
+    return arr2;
+}
+function _array_with_holes(arr) {
+    if (Array.isArray(arr)) return arr;
+}
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+        var info = gen[key](arg);
+        var value = info.value;
+    } catch (error) {
+        reject(error);
+        return;
+    }
+    if (info.done) {
+        resolve(value);
+    } else {
+        Promise.resolve(value).then(_next, _throw);
+    }
+}
+function _async_to_generator(fn) {
+    return function() {
+        var self = this, args = arguments;
+        return new Promise(function(resolve, reject) {
+            var gen = fn.apply(self, args);
+            function _next(value) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+            }
+            function _throw(err) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+            }
+            _next(undefined);
+        });
+    };
+}
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function _instanceof(left, right) {
+    if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) {
+        return !!right[Symbol.hasInstance](left);
+    } else {
+        return left instanceof right;
+    }
+}
+function _iterable_to_array_limit(arr, i) {
+    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+    if (_i == null) return;
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _s, _e;
+    try {
+        for(_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true){
+            _arr.push(_s.value);
+            if (i && _arr.length === i) break;
+        }
+    } catch (err) {
+        _d = true;
+        _e = err;
+    } finally{
+        try {
+            if (!_n && _i["return"] != null) _i["return"]();
+        } finally{
+            if (_d) throw _e;
+        }
+    }
+    return _arr;
+}
+function _non_iterable_rest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            _define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
+function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+        var symbols = Object.getOwnPropertySymbols(object);
+        if (enumerableOnly) {
+            symbols = symbols.filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+            });
+        }
+        keys.push.apply(keys, symbols);
+    }
+    return keys;
+}
+function _object_spread_props(target, source) {
+    source = source != null ? source : {};
+    if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+        ownKeys(Object(source)).forEach(function(key) {
+            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+    }
+    return target;
+}
+function _sliced_to_array(arr, i) {
+    return _array_with_holes(arr) || _iterable_to_array_limit(arr, i) || _unsupported_iterable_to_array(arr, i) || _non_iterable_rest();
+}
+function _unsupported_iterable_to_array(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _array_like_to_array(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
+}
+function _ts_generator(thisArg, body) {
+    var f, y, t, _ = {
+        label: 0,
+        sent: function() {
+            if (t[0] & 1) throw t[1];
+            return t[1];
+        },
+        trys: [],
+        ops: []
+    }, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+        return this;
+    }), g;
+    function verb(n) {
+        return function(v) {
+            return step([
+                n,
+                v
+            ]);
+        };
+    }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while(g && (g = 0, op[0] && (_ = 0)), _)try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [
+                op[0] & 2,
+                t.value
+            ];
+            switch(op[0]){
+                case 0:
+                case 1:
+                    t = op;
+                    break;
+                case 4:
+                    _.label++;
+                    return {
+                        value: op[1],
+                        done: false
+                    };
+                case 5:
+                    _.label++;
+                    y = op[1];
+                    op = [
+                        0
+                    ];
+                    continue;
+                case 7:
+                    op = _.ops.pop();
+                    _.trys.pop();
+                    continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                        _ = 0;
+                        continue;
+                    }
+                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                        _.label = op[1];
+                        break;
+                    }
+                    if (op[0] === 6 && _.label < t[1]) {
+                        _.label = t[1];
+                        t = op;
+                        break;
+                    }
+                    if (t && _.label < t[2]) {
+                        _.label = t[2];
+                        _.ops.push(op);
+                        break;
+                    }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop();
+                    continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) {
+            op = [
+                6,
+                e
+            ];
+            y = 0;
+        } finally{
+            f = t = 0;
+        }
+        if (op[0] & 5) throw op[1];
+        return {
+            value: op[0] ? op[1] : void 0,
+            done: true
+        };
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var BUILTIN_TABS = [
+    'lineage',
+    'location',
+    'timeline',
+    'gallery'
+];
+function fetchData(url, setter) {
+    return _async_to_generator(function() {
+        var res, data, err;
+        return _ts_generator(this, function(_state) {
+            switch(_state.label){
+                case 0:
+                    _state.trys.push([
+                        0,
+                        4,
+                        ,
+                        5
+                    ]);
+                    return [
+                        4,
+                        fetch(url, {
+                            method: 'GET',
+                            credentials: 'include',
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        })
+                    ];
+                case 1:
+                    res = _state.sent();
+                    if (!res.ok) throw new Error('Failed to fetch');
+                    return [
+                        4,
+                        res.json()
+                    ];
+                case 2:
+                    data = _state.sent();
+                    return [
+                        4,
+                        setter(data)
+                    ];
+                case 3:
+                    _state.sent();
+                    return [
+                        3,
+                        5
+                    ];
+                case 4:
+                    err = _state.sent();
+                    console.error(err);
+                    return [
+                        3,
+                        5
+                    ];
+                case 5:
+                    return [
+                        2
+                    ];
+            }
+        });
+    })();
+}
+var updateTimeoutId = null;
+function debouncedOnUpdate(editor, onChange) {
+    if (updateTimeoutId) {
+        clearTimeout(updateTimeoutId);
+    }
+    updateTimeoutId = setTimeout(function() {
+        var json = editor.getJSON();
+        var indexed = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__.jsonToIndexed)(json);
+        onChange(indexed);
+    }, 500);
+}
+var needsSaving = false;
+function setNeedsSaving(value) {
+    needsSaving = value;
+}
+window.onbeforeunload = function(event) {
+    if (needsSaving) {
+        event.preventDefault();
+        event.returnValue = true;
+    }
+};
+var saveTimeout = null;
+function computeTabs(objData) {
+    return _object_spread({}, objData.body ? {
+        body: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Main Text')
+    } : {}, (objData.tabs ? Object.keys(objData.tabs) : []).reduce(function(acc, tab) {
+        return _object_spread_props(_object_spread({}, acc), _define_property({}, tab, tab));
+    }, {}), BUILTIN_TABS.filter(function(tab) {
+        return objData[tab] !== undefined;
+    }).reduce(function(acc, tab) {
+        return _object_spread_props(_object_spread({}, acc), _define_property({}, tab, objData[tab].title));
+    }, {}));
+}
+var itemExistsCache = {};
+function ItemEdit(param) {
+    var _this, _loop = function(tab) {
+        customTabs[tab] = /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_CustomDataEditor__WEBPACK_IMPORTED_MODULE_12__["default"], {
+            data: objData.tabs[tab],
+            onUpdate: function(newData) {
+                var newState = _object_spread({}, objData);
+                if (!newState.tabs) newState.tabs = {};
+                newState.tabs[tab] = newData;
+                setObjData(newState);
+            }
+        }, void 0, false, {
+            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+            lineNumber: 316,
+            columnNumber: 23
+        }, _this);
+    };
+    var _this1 = this;
+    var itemShort = param.itemShort, universeShort = param.universeShort, universeLink = param.universeLink;
+    var _useState = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), initContent = _useState[0], setInitContent = _useState[1];
+    var _useState1 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), categories = _useState1[0], setCategories = _useState1[1];
+    var _useState2 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), item = _useState2[0], setItem = _useState2[1];
+    var _useState3 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), objData = _useState3[0], setObjData = _useState3[1];
+    var _useState4 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), errorMessage = _useState4[0], setErrorMessage = _useState4[1];
+    var _useState5 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)('Save Changes'), 2), saveText = _useState5[0], setSaveText = _useState5[1];
+    var _useState6 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), currentModal = _useState6[0], setCurrentModal = _useState6[1];
+    var _useState7 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), currentTab = _useState7[0], setCurrentTab = _useState7[1];
+    var _useState8 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({}), 2), tabNames = _useState8[0], setTabNames = _useState8[1];
+    var _useState9 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(), 2), eventItemMap = _useState9[0], setEventItemMap = _useState9[1];
+    var _useState10 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(), 2), lineageItemMap = _useState10[0], setLineageItemMap = _useState10[1];
+    var _useState11 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), 2), previousData = _useState11[0], setPreviousData = _useState11[1];
+    var context = {
+        currentUniverse: universeShort,
+        universeLink: universeLink,
+        itemExists: function itemExists(universe, item) {
+            var _itemExistsCache_universe, _item;
+            return (_item = ((_itemExistsCache_universe = itemExistsCache[universe]) !== null && _itemExistsCache_universe !== void 0 ? _itemExistsCache_universe : {})[item]) !== null && _item !== void 0 ? _item : false;
+        },
+        headings: []
+    };
+    var editor = (0,_tiptap_react__WEBPACK_IMPORTED_MODULE_8__.useEditor)({
+        extensions: (0,_src_lib_editor__WEBPACK_IMPORTED_MODULE_5__.editorExtensions)(true, context),
+        onUpdate: function(param) {
+            var editor = param.editor;
+            if (!objData) return;
+            setNeedsSaving(true);
+            setSaveText('Save Changes');
+            debouncedOnUpdate(editor, function(content) {
+                return setObjData(_object_spread_props(_object_spread({}, objData), {
+                    body: content
+                }));
+            });
+        }
+    });
+    function save(delay, callback) {
+        return _async_to_generator(function() {
+            return _ts_generator(this, function(_state) {
+                if (saveTimeout) {
+                    clearTimeout(saveTimeout);
+                }
+                saveTimeout = setTimeout(function() {
+                    return _async_to_generator(function() {
+                        var data, response, _$err, err;
+                        return _ts_generator(this, function(_state) {
+                            switch(_state.label){
+                                case 0:
+                                    if (!item || !objData) return [
+                                        2
+                                    ];
+                                    setSaveText('Saving...');
+                                    console.log('SAVING...');
+                                    data = _object_spread_props(_object_spread({}, structuredClone(item)), {
+                                        obj_data: _object_spread({}, structuredClone(objData))
+                                    });
+                                    if ((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.deepCompare)(data, previousData)) {
+                                        console.log('NO CHANGE');
+                                        setSaveText('Saved');
+                                        setNeedsSaving(false);
+                                        if (callback) callback();
+                                        return [
+                                            2
+                                        ];
+                                    }
+                                    _state.label = 1;
+                                case 1:
+                                    _state.trys.push([
+                                        1,
+                                        4,
+                                        ,
+                                        5
+                                    ]);
+                                    setErrorMessage(null);
+                                    return [
+                                        4,
+                                        fetch("/api/universes/".concat(universeShort, "/items/").concat(itemShort), {
+                                            method: 'PUT',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify(data)
+                                        })
+                                    ];
+                                case 2:
+                                    response = _state.sent();
+                                    return [
+                                        4,
+                                        response.json()
+                                    ];
+                                case 3:
+                                    _$err = _state.sent();
+                                    if (!response.ok) {
+                                        setErrorMessage(_$err);
+                                        throw _$err;
+                                    }
+                                    console.log('SAVED.');
+                                    setSaveText('Saved');
+                                    setPreviousData(data);
+                                    setNeedsSaving(false);
+                                    if (callback) callback();
+                                    return [
+                                        3,
+                                        5
+                                    ];
+                                case 4:
+                                    err = _state.sent();
+                                    console.error('Failed to save!');
+                                    console.error(err);
+                                    setSaveText('Error');
+                                    setPreviousData(null);
+                                    if (_instanceof(err, TypeError)) {
+                                        setErrorMessage('Network error. Make sure you are connected to the internet and try again.');
+                                    }
+                                    return [
+                                        3,
+                                        5
+                                    ];
+                                case 5:
+                                    return [
+                                        2
+                                    ];
+                            }
+                        });
+                    })();
+                }, delay);
+                return [
+                    2
+                ];
+            });
+        })();
+    }
+    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
+        var categoryPromise = fetchData("/api/universes/".concat(universeShort), function(data) {
+            setCategories(data.obj_data.cats);
+        });
+        var eventItemPromise = fetchData("/api/universes/".concat(universeShort, "/events"), function(events) {
+            var newEventItemMap = {};
+            var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
+            try {
+                for(var _iterator = events[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true){
+                    var _step_value = _step.value, src_id = _step_value.src_id, src_title = _step_value.src_title, src_shortname = _step_value.src_shortname, event_title = _step_value.event_title, abstime = _step_value.abstime;
+                    if (!(src_id in newEventItemMap)) {
+                        newEventItemMap[src_id] = [];
+                    }
+                    newEventItemMap[src_id].push([
+                        src_shortname,
+                        src_title,
+                        Number(src_id),
+                        event_title !== null && event_title !== void 0 ? event_title : '',
+                        Number(abstime)
+                    ]);
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally{
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return != null) {
+                        _iterator.return();
+                    }
+                } finally{
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+            setEventItemMap(newEventItemMap);
+        });
+        var lineageItemPromise = fetchData("/api/universes/".concat(universeShort, "/items?type=character"), function(items) {
+            var newLineageItemMap = {};
+            var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
+            try {
+                for(var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true){
+                    var _step_value = _step.value, shortname = _step_value.shortname, title = _step_value.title;
+                    if (shortname === itemShort) continue;
+                    newLineageItemMap[shortname] = title;
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally{
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return != null) {
+                        _iterator.return();
+                    }
+                } finally{
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+            setLineageItemMap(newLineageItemMap);
+        });
+        fetchData("/api/universes/".concat(universeShort, "/items/").concat(itemShort), function(data) {
+            return _async_to_generator(function() {
+                var objData, links, json, bulkFetcher, fetchPromises;
+                return _ts_generator(this, function(_state) {
+                    switch(_state.label){
+                        case 0:
+                            return [
+                                4,
+                                Promise.all([
+                                    categoryPromise,
+                                    eventItemPromise,
+                                    lineageItemPromise
+                                ])
+                            ];
+                        case 1:
+                            _state.sent();
+                            objData = JSON.parse(data.obj_data);
+                            if (!(typeof objData.body === 'string')) return [
+                                3,
+                                3
+                            ];
+                            return [
+                                4,
+                                (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.renderMarkdown)(universeShort, objData.body, {
+                                    item: _object_spread_props(_object_spread({}, data), {
+                                        obj_data: objData
+                                    })
+                                }).then(function(text) {
+                                    setInitContent(text);
+                                })
+                            ];
+                        case 2:
+                            _state.sent();
+                            return [
+                                3,
+                                5
+                            ];
+                        case 3:
+                            if (!objData.body) return [
+                                3,
+                                5
+                            ];
+                            links = [];
+                            json = (0,_src_lib_tiptapHelpers__WEBPACK_IMPORTED_MODULE_4__.indexedToJson)(objData.body, function(href) {
+                                return links.push((0,_src_lib_editor__WEBPACK_IMPORTED_MODULE_5__.extractLinkData)(href));
+                            });
+                            bulkFetcher = new _helpers__WEBPACK_IMPORTED_MODULE_2__.BulkExistsFetcher();
+                            fetchPromises = links.map(function(link) {
+                                return _async_to_generator(function() {
+                                    var _link_universe, universe, _, _1;
+                                    return _ts_generator(this, function(_state) {
+                                        switch(_state.label){
+                                            case 0:
+                                                if (!link.item) return [
+                                                    3,
+                                                    2
+                                                ];
+                                                universe = (_link_universe = link.universe) !== null && _link_universe !== void 0 ? _link_universe : universeShort;
+                                                if (!(universeShort in itemExistsCache)) {
+                                                    itemExistsCache[universe] = {};
+                                                }
+                                                if (!!(link.item in itemExistsCache[universe])) return [
+                                                    3,
+                                                    2
+                                                ];
+                                                _ = itemExistsCache[universe];
+                                                _1 = link.item;
+                                                return [
+                                                    4,
+                                                    bulkFetcher.exists(universe, link.item)
+                                                ];
+                                            case 1:
+                                                _[_1] = _state.sent();
+                                                _state.label = 2;
+                                            case 2:
+                                                return [
+                                                    2
+                                                ];
+                                        }
+                                    });
+                                })();
+                            });
+                            bulkFetcher.fetchAll();
+                            return [
+                                4,
+                                Promise.all(fetchPromises)
+                            ];
+                        case 4:
+                            _state.sent();
+                            setInitContent(json);
+                            _state.label = 5;
+                        case 5:
+                            delete data.obj_data;
+                            setObjData(objData);
+                            setTabNames(computeTabs(objData));
+                            setItem(data);
+                            return [
+                                2
+                            ];
+                    }
+                });
+            })();
+        });
+    }, [
+        itemShort,
+        universeShort
+    ]);
+    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
+        if (editor && initContent) {
+            editor.commands.setContent(initContent);
+        }
+    }, [
+        editor,
+        initContent
+    ]);
+    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
+        if (item && objData) {
+            setNeedsSaving(true);
+            setSaveText('Save Changes');
+            save(5000);
+        }
+    }, [
+        item,
+        objData
+    ]);
+    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function() {
+        if (!(currentTab && tabNames[currentTab])) {
+            if (Object.keys(tabNames).length > 0) setCurrentTab(Object.keys(tabNames)[0]);
+            else setCurrentTab(null);
+        }
+    }, [
+        tabNames
+    ]);
+    var modalAnchor = document.querySelector('#modal-anchor');
+    var saveBtnAnchor = document.querySelector('#save-btn');
+    var previewBtnAnchor = document.querySelector('#preview-btn');
+    var _useState12 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(undefined), 2), newTabType = _useState12[0], setNewTabType = _useState12[1];
+    var _useState13 = _sliced_to_array((0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(''), 2), newTabName = _useState13[0], setNewTabName = _useState13[1];
+    function addTabByType() {
+        if (!objData || newTabType === undefined) return;
+        var newObjData = _object_spread({}, objData);
+        if (BUILTIN_TABS.includes(newTabType)) {
+            newObjData[newTabType] = {
+                title: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(newTabType))
+            };
+        } else if (newTabType === 'body') {
+            newObjData.body = {
+                text: '',
+                structure: []
+            };
+        } else if (newTabType === 'custom') {
+            if (!newTabName) return;
+            if (!newObjData.tabs) newObjData.tabs = {};
+            newObjData.tabs[newTabName] = {};
+        }
+        setObjData(newObjData);
+        setTabNames(computeTabs(newObjData));
+        setCurrentModal(null);
+    }
+    function removeTab(tab) {
+        if (!objData) return;
+        var newObjData = _object_spread({}, objData);
+        if (BUILTIN_TABS.includes(tab)) {
+            delete newObjData[tab];
+        } else if (tab === 'body') {
+            delete newObjData.body;
+        } else if (newObjData.tabs) {
+            if (!newObjData.tabs[tab]) return;
+            delete newObjData.tabs[tab];
+        }
+        setObjData(newObjData);
+        setTabNames(computeTabs(newObjData));
+    }
+    /* Loading Screen */ if (!item || !objData) {
+        return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+            className: "d-flex justify-center align-center",
+            children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                className: "loader",
+                style: {
+                    marginTop: 'max(0px, calc(50vh - 50px - var(--page-margin-top)))'
+                }
+            }, void 0, false, {
+                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                lineNumber: 293,
+                columnNumber: 7
+            }, this)
+        }, void 0, false, {
+            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+            lineNumber: 292,
+            columnNumber: 12
+        }, this);
+    }
+    var modals = {
+        newTab: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+            className: "sheet d-flex flex-col gap-1",
+            style: {
+                minWidth: '20rem'
+            },
+            children: [
+                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
+                    onChange: function(param) {
+                        var target = param.target;
+                        return setNewTabType(target.value);
+                    },
+                    children: [
+                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                            hidden: true,
+                            disabled: true,
+                            selected: true,
+                            value: undefined,
+                            children: [
+                                (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Tab Type'),
+                                "..."
+                            ]
+                        }, void 0, true, {
+                            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                            lineNumber: 301,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                            value: "body",
+                            disabled: 'body' in objData,
+                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Main Text')
+                        }, void 0, false, {
+                            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                            lineNumber: 302,
+                            columnNumber: 11
+                        }, this),
+                        BUILTIN_TABS.map(function(type) {
+                            return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                                value: type,
+                                disabled: type in tabNames,
+                                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)((0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(type))
+                            }, type, false, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 304,
+                                columnNumber: 13
+                            }, _this1);
+                        }),
+                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                            value: "custom",
+                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Custom Data')
+                        }, void 0, false, {
+                            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                            lineNumber: 306,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                    lineNumber: 300,
+                    columnNumber: 9
+                }, this),
+                newTabType === 'custom' && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                    type: "text",
+                    placeholder: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Tab Name'),
+                    value: newTabName,
+                    onChange: function(param) {
+                        var target = param.target;
+                        return setNewTabName(target.value);
+                    }
+                }, void 0, false, {
+                    fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                    lineNumber: 308,
+                    columnNumber: 37
+                }, this),
+                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                    type: "button",
+                    onClick: function() {
+                        return addTabByType();
+                    },
+                    children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('New Tab')
+                }, void 0, false, {
+                    fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                    lineNumber: 309,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+            lineNumber: 299,
+            columnNumber: 7
+        }, this)
+    };
+    var customTabs = {};
+    for(var tab in objData.tabs)_this = this, _loop(tab);
+    var tabs = _object_spread_props(_object_spread({}, customTabs), {
+        body: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_EditorFrame__WEBPACK_IMPORTED_MODULE_3__["default"], {
+            editor: editor,
+            getLink: function(previousUrl, type) {
+                return _async_to_generator(function() {
+                    var url, link, _link_universe, universe, existsFetcher, fetchPromise, _, _1, _splitIgnoringQuotes, cmd, index, alt, height, width, image, attrs;
+                    return _ts_generator(this, function(_state) {
+                        switch(_state.label){
+                            case 0:
+                                url = window.prompt('URL', previousUrl);
+                                if (!(url === null || url === void 0 ? void 0 : url.startsWith('@'))) return [
+                                    3,
+                                    4
+                                ];
+                                if (!(type === 'link')) return [
+                                    3,
+                                    3
+                                ];
+                                link = (0,_src_lib_editor__WEBPACK_IMPORTED_MODULE_5__.extractLinkData)(url);
+                                if (!link.item) return [
+                                    3,
+                                    2
+                                ];
+                                universe = (_link_universe = link.universe) !== null && _link_universe !== void 0 ? _link_universe : universeShort;
+                                if (!(universeShort in itemExistsCache)) {
+                                    itemExistsCache[universe] = {};
+                                }
+                                if (!!(link.item in itemExistsCache[universe])) return [
+                                    3,
+                                    2
+                                ];
+                                existsFetcher = new _helpers__WEBPACK_IMPORTED_MODULE_2__.BulkExistsFetcher();
+                                fetchPromise = existsFetcher.exists(universe, link.item);
+                                existsFetcher.fetchAll();
+                                _ = itemExistsCache[universe];
+                                _1 = link.item;
+                                return [
+                                    4,
+                                    fetchPromise
+                                ];
+                            case 1:
+                                _[_1] = _state.sent();
+                                _state.label = 2;
+                            case 2:
+                                return [
+                                    3,
+                                    4
+                                ];
+                            case 3:
+                                if (type === 'image') {
+                                    _splitIgnoringQuotes = _sliced_to_array((0,_src_markdown__WEBPACK_IMPORTED_MODULE_13__.splitIgnoringQuotes)(url.substring(1)), 5), cmd = _splitIgnoringQuotes[0], index = _splitIgnoringQuotes[1], alt = _splitIgnoringQuotes[2], height = _splitIgnoringQuotes[3], width = _splitIgnoringQuotes[4];
+                                    if (cmd === 'img') {
+                                        image = item.gallery[Number(index)];
+                                        if (image) {
+                                            attrs = {
+                                                alt: alt !== null && alt !== void 0 ? alt : image.name,
+                                                title: alt !== null && alt !== void 0 ? alt : image.label
+                                            };
+                                            if (height) attrs.height = Number(height);
+                                            if (width) attrs.width = Number(width);
+                                            return [
+                                                2,
+                                                [
+                                                    "/api/universes/".concat(item.universe_short, "/items/").concat(item.shortname, "/gallery/images/").concat(image.id),
+                                                    attrs
+                                                ]
+                                            ];
+                                        }
+                                    }
+                                }
+                                _state.label = 4;
+                            case 4:
+                                return [
+                                    2,
+                                    [
+                                        url
+                                    ]
+                                ];
+                        }
+                    });
+                })();
+            }
+        }, void 0, false, {
+            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+            lineNumber: 327,
+            columnNumber: 7
+        }, this),
+        gallery: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_Gallery__WEBPACK_IMPORTED_MODULE_9__["default"], {
+            universe: universeShort,
+            item: itemShort,
+            images: item.gallery,
+            onRemoveImage: function(id) {
+                var newState = _object_spread({}, item);
+                for(var i = 0; i < newState.gallery.length; i++){
+                    var img = newState.gallery[i];
+                    if (img.id === id) {
+                        newState.gallery.splice(i, 1);
+                        break;
+                    }
+                }
+                setItem(newState);
+            },
+            onUploadImage: function(img) {
+                var newState = _object_spread({}, item);
+                newState.gallery.push(img);
+                setItem(newState);
+            },
+            onChangeLabel: function(id, label) {
+                var newState = _object_spread({}, item);
+                for(var i = 0; i < newState.gallery.length; i++){
+                    var img = newState.gallery[i];
+                    if (img.id === id) {
+                        img.label = label;
+                        break;
+                    }
+                }
+                setItem(newState);
+            }
+        }, void 0, false, {
+            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+            lineNumber: 364,
+            columnNumber: 7
+        }, this),
+        timeline: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_TimelineEditor__WEBPACK_IMPORTED_MODULE_10__["default"], {
+            item: item,
+            onEventsUpdate: function(newEvents) {
+                var newState = _object_spread({}, item);
+                console.log(newEvents);
+                newState.events = newEvents;
+                setItem(newState);
+            },
+            eventItemMap: eventItemMap !== null && eventItemMap !== void 0 ? eventItemMap : {}
+        }, void 0, false, {
+            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+            lineNumber: 391,
+            columnNumber: 7
+        }, this),
+        lineage: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_LineageEditor__WEBPACK_IMPORTED_MODULE_11__["default"], {
+            item: item,
+            onUpdate: function(newItem) {
+                return setItem(newItem);
+            },
+            itemMap: lineageItemMap !== null && lineageItemMap !== void 0 ? lineageItemMap : {}
+        }, void 0, false, {
+            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+            lineNumber: 399,
+            columnNumber: 7
+        }, this)
+    });
+    var _item_title, _item_shortname, _item_tags, _objData_comments, _objData_notes;
+    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+        children: [
+            saveBtnAnchor && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("a", {
+                className: "navbarBtnLink navbarText",
+                onClick: function() {
+                    return save(0);
+                },
+                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
+            }, void 0, false, {
+                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                lineNumber: 407,
+                columnNumber: 9
+            }, this), saveBtnAnchor),
+            previewBtnAnchor && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("a", {
+                className: "navbarBtnLink navbarText",
+                onClick: function() {
+                    return save(0, function() {
+                        location.href = "".concat(context.universeLink(universeShort), "/items/").concat(itemShort);
+                    });
+                },
+                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Preview')
+            }, void 0, false, {
+                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                lineNumber: 411,
+                columnNumber: 9
+            }, this), previewBtnAnchor),
+            modalAnchor && currentModal && /*#__PURE__*/ (0,react_dom__WEBPACK_IMPORTED_MODULE_6__.createPortal)(/*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                className: "modal",
+                onClick: function() {
+                    return setCurrentModal(null);
+                },
+                children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                    className: "modal-content",
+                    onClick: function(e) {
+                        return e.stopPropagation();
+                    },
+                    children: modals[currentModal]
+                }, void 0, false, {
+                    fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                    lineNumber: 420,
+                    columnNumber: 13
+                }, this)
+            }, void 0, false, {
+                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                lineNumber: 419,
+                columnNumber: 11
+            }, this), modalAnchor),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                className: "d-flex justify-between align-baseline",
+                children: [
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h2", {
+                        children: item ? (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Edit %s', item.title) : (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Edit')
+                    }, void 0, false, {
+                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                        lineNumber: 429,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("a", {
+                        className: "link link-animated color-error",
+                        href: "".concat(context.universeLink(universeShort), "/items/").concat(itemShort),
+                        children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Discard Changes')
+                    }, void 0, false, {
+                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                        lineNumber: 430,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                lineNumber: 428,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                id: "edit",
+                className: "form-row-group",
+                children: [
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "title",
+                                children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Title')
+                            }, void 0, false, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 434,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                id: "title",
+                                type: "text",
+                                name: "title",
+                                value: (_item_title = item === null || item === void 0 ? void 0 : item.title) !== null && _item_title !== void 0 ? _item_title : '',
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
+                                        title: target.value
+                                    }));
+                                }
+                            }, void 0, false, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 435,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                        lineNumber: 433,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "shortname",
+                                children: [
+                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Shortname'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 441,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                id: "shortname",
+                                type: "text",
+                                name: "shortname",
+                                value: (_item_shortname = item === null || item === void 0 ? void 0 : item.shortname) !== null && _item_shortname !== void 0 ? _item_shortname : '',
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
+                                        shortname: target.value
+                                    }));
+                                }
+                            }, void 0, false, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 442,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                        lineNumber: 440,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("small", {
+                            style: {
+                                gridColumn: '2 / 4'
+                            },
+                            children: [
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
+                                    children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('NOTE: changes to the shortname will not auto-save.')
+                                }, void 0, false, {
+                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                    lineNumber: 449,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("br", {}, void 0, false, {
+                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                    lineNumber: 450,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("i", {
+                                    children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Other users currently editing this item will be unable to save their work. Change with caution.')
+                                }, void 0, false, {
+                                    fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                    lineNumber: 451,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                            lineNumber: 448,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                        lineNumber: 447,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "item_type",
+                                children: [
+                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Type'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 456,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("select", {
+                                id: "item_type",
+                                name: "item_type",
+                                defaultValue: item === null || item === void 0 ? void 0 : item.item_type,
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
+                                        item_type: target.value
+                                    }));
+                                },
+                                children: [
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                                        hidden: true,
+                                        disabled: true,
+                                        children: [
+                                            (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Select one'),
+                                            "..."
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                        lineNumber: 458,
+                                        columnNumber: 13
+                                    }, this),
+                                    categories && item && Object.keys(categories).map(function(type) {
+                                        return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("option", {
+                                            value: type,
+                                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.capitalize)(categories[type][0])
+                                        }, type, false, {
+                                            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                            lineNumber: 460,
+                                            columnNumber: 15
+                                        }, _this1);
+                                    })
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 457,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                        lineNumber: 455,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "tags",
+                                children: [
+                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Tags'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 468,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("textarea", {
+                                id: "tags",
+                                name: "tags",
+                                value: ((_item_tags = item === null || item === void 0 ? void 0 : item.tags) !== null && _item_tags !== void 0 ? _item_tags : []).join(' '),
+                                onChange: function(param) {
+                                    var target = param.target;
+                                    return item && setItem(_object_spread_props(_object_spread({}, item), {
+                                        tags: target.value.split(' ')
+                                    }));
+                                }
+                            }, void 0, false, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 469,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                        lineNumber: 467,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "comments",
+                                children: [
+                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Enable comments'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 473,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                className: "switch",
+                                children: [
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                        id: "comments",
+                                        name: "comments",
+                                        type: "checkbox",
+                                        checked: (_objData_comments = objData === null || objData === void 0 ? void 0 : objData.comments) !== null && _objData_comments !== void 0 ? _objData_comments : false,
+                                        onChange: function(param) {
+                                            var target = param.target;
+                                            return objData && setObjData(_object_spread_props(_object_spread({}, objData), {
+                                                comments: target.checked
+                                            }));
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                        lineNumber: 475,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
+                                        className: "slider"
+                                    }, void 0, false, {
+                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                        lineNumber: 478,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 474,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                        lineNumber: 472,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "inputGroup",
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                htmlFor: "notes",
+                                children: [
+                                    (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)('Enable notes'),
+                                    ":"
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 483,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("label", {
+                                className: "switch",
+                                children: [
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("input", {
+                                        id: "notes",
+                                        name: "notes",
+                                        type: "checkbox",
+                                        checked: (_objData_notes = objData === null || objData === void 0 ? void 0 : objData.notes) !== null && _objData_notes !== void 0 ? _objData_notes : false,
+                                        onChange: function(param) {
+                                            var target = param.target;
+                                            return objData && setObjData(_object_spread_props(_object_spread({}, objData), {
+                                                notes: target.checked
+                                            }));
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                        lineNumber: 485,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
+                                        className: "slider"
+                                    }, void 0, false, {
+                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                        lineNumber: 488,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 484,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                        lineNumber: 482,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        className: "mt-2",
+                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("button", {
+                            id: "save-changes",
+                            onClick: function() {
+                                return save(0);
+                            },
+                            children: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.T)(saveText)
+                        }, void 0, false, {
+                            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                            lineNumber: 493,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                        lineNumber: 492,
+                        columnNumber: 9
+                    }, this),
+                    errorMessage && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("span", {
+                            id: "item-error",
+                            className: "color-error",
+                            style: {
+                                fontSize: 'small'
+                            },
+                            children: errorMessage
+                        }, void 0, false, {
+                            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                            lineNumber: 497,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                        lineNumber: 496,
+                        columnNumber: 26
+                    }, this),
+                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("hr", {
+                        className: "w-100 mb-0"
+                    }, void 0, false, {
+                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                        lineNumber: 500,
+                        columnNumber: 9
+                    }, this),
+                    objData && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                        children: [
+                            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                                className: "d-flex align-start mb-2",
+                                children: [
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_TabsBar__WEBPACK_IMPORTED_MODULE_7__["default"], {
+                                        tabs: tabNames,
+                                        selectedTab: currentTab,
+                                        onSelectTab: function(tab) {
+                                            return setCurrentTab(tab);
+                                        },
+                                        onRemoveTab: function(tab) {
+                                            return removeTab(tab);
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                        lineNumber: 504,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("ul", {
+                                        className: "navbarBtns",
+                                        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("li", {
+                                            className: "navbarBtn",
+                                            children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h3", {
+                                                className: "navbarBtnLink navbarText ma-0 material-symbols-outlined heavy",
+                                                onClick: function() {
+                                                    return setCurrentModal('newTab');
+                                                },
+                                                children: "add"
+                                            }, void 0, false, {
+                                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                                lineNumber: 507,
+                                                columnNumber: 17
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                            lineNumber: 506,
+                                            columnNumber: 15
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                        lineNumber: 505,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 503,
+                                columnNumber: 11
+                            }, this),
+                            currentTab && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("div", {
+                                "data-tab": currentTab,
+                                children: tabs[currentTab]
+                            }, void 0, false, {
+                                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                                lineNumber: 513,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                        lineNumber: 502,
+                        columnNumber: 21
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ItemEdit.tsx",
+                lineNumber: 432,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true);
 }
 
 
