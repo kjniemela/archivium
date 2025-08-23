@@ -100,4 +100,14 @@ exports.default = {
             res.prepareRender('search', { items: [], universes: [], notes: [], search: '' });
         }
     },
+    /* React Editor */
+    async editor(req, res) {
+        const params = req.params[0]?.split('/') ?? [];
+        const data = {};
+        if (params[0] === 'universes' && params[1]) {
+            const [, universeShort] = params;
+            data.universe = await api_1.default.universe.getOne(req.session.user, { shortname: universeShort });
+        }
+        res.prepareRender('editor', data);
+    }
 };

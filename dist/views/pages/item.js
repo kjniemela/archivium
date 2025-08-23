@@ -137,14 +137,6 @@ exports.default = {
             noteBaseRoute: `/api/universes/${universe.shortname}/items/${item.shortname}/notes`,
         });
     },
-    async edit(req, res) {
-        const universe = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
-        res.prepareRender('editor', {
-            universe,
-            itemShort: req.params.itemShortname,
-            universeShort: req.params.universeShortname,
-        });
-    },
     async delete(req, res) {
         try {
             const item = await api_1.default.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortname, req.params.itemShortname, utils_1.perms.OWNER);
