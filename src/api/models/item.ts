@@ -722,7 +722,7 @@ export class ItemAPI {
   }
 
   async handleLinks(item: Item, objData: any, conn?: PoolConnection): Promise<void> {
-    if (objData.body) {
+    if (objData.body && typeof objData.body !== 'string') {
       const links: ({ href: string } & LinkData)[] = [];
       indexedToJson(objData.body as IndexedDocument, (href) => href.startsWith('@') && links.push({ href, ...extractLinkData(href) }));
       const oldLinks = await this._getLinks(item);
