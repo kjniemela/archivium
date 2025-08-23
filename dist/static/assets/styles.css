@@ -1445,6 +1445,26 @@ input:checked + .slider:before {
   padding-right: 0.5rem;
 }
 
+.pb-0 {
+  padding-bottom: 0;
+}
+.pb-1 {
+  padding-bottom: 0.25rem;
+}
+.pb-2 {
+  padding-bottom: 0.5rem;
+}
+
+.pt-0 {
+  padding-top: 0;
+}
+.pt-1 {
+  padding-top: 0.25rem;
+}
+.pt-2 {
+  padding-top: 0.5rem;
+}
+
 .w-50 {
   width: 50%;
 }
