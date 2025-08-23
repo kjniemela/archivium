@@ -73,6 +73,28 @@ function _getTextContent(node: CombinedNode) {
   return `${node.text ?? ''}${(node.content ?? []).map(_getTextContent).join('')}`;
 }
 
+/**
+ * Mutates the provided IndexedDocument.
+ */
+export function updateLinks(indexed: IndexedDocument, getNewLink: (href: string) => string): void {
+  const { structure } = indexed;
+
+  function walk(node: OffsetTextNode): void {
+    if (node.type === 'text') {
+      for (const mark of node.marks ?? []) {
+        if (mark.attrs && mark.attrs.href && mark.attrs.href.startsWith('@')) {
+          mark.attrs.href = getNewLink(mark.attrs.href);
+        }
+      }
+    }
+    if (node.content && node.content.length > 0) {
+      node.content.forEach(walk);
+    }
+  }
+
+  structure.forEach(walk)
+}
+
 export function indexedToJson(indexed: IndexedDocument, linkHandler?: (href: string) => void, headingHandler?: (text: string, level: number) => void): any {
   const { text, structure } = indexed;
 

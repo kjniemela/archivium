@@ -4,7 +4,7 @@ import { API } from '..';
 import { User } from './user';
 import { PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { ForbiddenError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
-import { IndexedDocument, indexedToJson } from '../../lib/tiptapHelpers';
+import { IndexedDocument, indexedToJson, updateLinks } from '../../lib/tiptapHelpers';
 import { extractLinkData, LinkData } from '../../lib/editor';
 
 export type ItemOptions = BaseOptions & {
@@ -258,12 +258,12 @@ export class ItemAPI {
 
     if (item.obj_data) {
       const objData = JSON.parse(item.obj_data as string);
+      const links = await executeQuery(`
+        SELECT to_universe_short, to_item_short, href
+        FROM itemlink
+        WHERE from_item = ?
+      `, [item.id]);
       if (typeof objData.body === 'string') {
-        const links = await executeQuery(`
-          SELECT to_universe_short, to_item_short, href
-          FROM itemlink
-          WHERE from_item = ?
-        `, [item.id]);
         const replacements = {};
         const attachments = {};
         for (const { to_universe_short, to_item_short, href } of links) {
@@ -279,15 +279,37 @@ export class ItemAPI {
           }
           return match;
         });
-        item.obj_data = JSON.stringify(objData);
-      }
+      } else {
+        const linkMap = {};
+        for (const { to_universe_short, to_item_short, href } of links) {
+          linkMap[href] = [to_universe_short, to_item_short];
+        }
+        updateLinks(objData.body, (href) => {
+          if (href in linkMap) {
+            const linkData = extractLinkData(href);
+            if (linkData.item) {
+              const [toUniverse, toItem] = linkMap[href];
+              if (toUniverse === item.universe_short) {
+                return href.replace(linkData.item, toItem);
+              } else if (linkData.universe) {
+                return href.replace(linkData.universe, toUniverse).replace(linkData.item, toItem);
+              } else {
+                return `@${toUniverse}/${toItem}${linkData.query ? `?${linkData.query}` : ''}${linkData.hash ? `#${linkData.hash}` : ''}`;
+              }
+            }
+          }
 
-      if (user) {
-        const notifs = await executeQuery(`
-          SELECT 1 FROM itemnotification WHERE item_id = ? AND user_id = ? AND is_enabled
-        `, [item.id, user.id]);
-        item.notifs_enabled = notifs.length === 1;
+          return href;
+        });
       }
+      item.obj_data = JSON.stringify(objData);
+    }
+
+    if (user) {
+      const notifs = await executeQuery(`
+        SELECT 1 FROM itemnotification WHERE item_id = ? AND user_id = ? AND is_enabled
+      `, [item.id, user.id]);
+      item.notifs_enabled = notifs.length === 1;
     }
 
     return item;

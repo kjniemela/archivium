@@ -55836,7 +55836,8 @@ var editorExtensions = function(editMode, context) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   indexedToJson: () => (/* binding */ indexedToJson),
-/* harmony export */   jsonToIndexed: () => (/* binding */ jsonToIndexed)
+/* harmony export */   jsonToIndexed: () => (/* binding */ jsonToIndexed),
+/* harmony export */   updateLinks: () => (/* binding */ updateLinks)
 /* harmony export */ });
 function _define_property(obj, key, value) {
     if (key in obj) {
@@ -55916,6 +55917,42 @@ function jsonToIndexed(doc) {
 function _getTextContent(node) {
     var _node_text, _node_content;
     return "".concat((_node_text = node.text) !== null && _node_text !== void 0 ? _node_text : '').concat(((_node_content = node.content) !== null && _node_content !== void 0 ? _node_content : []).map(_getTextContent).join(''));
+}
+/**
+ * Mutates the provided IndexedDocument.
+ */ function updateLinks(indexed, getNewLink) {
+    var structure = indexed.structure;
+    function walk(node) {
+        if (node.type === 'text') {
+            var _node_marks;
+            var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
+            try {
+                for(var _iterator = ((_node_marks = node.marks) !== null && _node_marks !== void 0 ? _node_marks : [])[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true){
+                    var mark = _step.value;
+                    if (mark.attrs && mark.attrs.href && mark.attrs.href.startsWith('@')) {
+                        mark.attrs.href = getNewLink(mark.attrs.href);
+                    }
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally{
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return != null) {
+                        _iterator.return();
+                    }
+                } finally{
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+        }
+        if (node.content && node.content.length > 0) {
+            node.content.forEach(walk);
+        }
+    }
+    structure.forEach(walk);
 }
 function indexedToJson(indexed, linkHandler, headingHandler) {
     var text = indexed.text, structure = indexed.structure;

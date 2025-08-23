@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.jsonToIndexed = jsonToIndexed;
+exports.updateLinks = updateLinks;
 exports.indexedToJson = indexedToJson;
 function cleanupMark(mark) {
     const newMark = { ...mark };
@@ -46,6 +47,25 @@ function jsonToIndexed(doc) {
 }
 function _getTextContent(node) {
     return `${node.text ?? ''}${(node.content ?? []).map(_getTextContent).join('')}`;
+}
+/**
+ * Mutates the provided IndexedDocument.
+ */
+function updateLinks(indexed, getNewLink) {
+    const { structure } = indexed;
+    function walk(node) {
+        if (node.type === 'text') {
+            for (const mark of node.marks ?? []) {
+                if (mark.attrs && mark.attrs.href && mark.attrs.href.startsWith('@')) {
+                    mark.attrs.href = getNewLink(mark.attrs.href);
+                }
+            }
+        }
+        if (node.content && node.content.length > 0) {
+            node.content.forEach(walk);
+        }
+    }
+    structure.forEach(walk);
 }
 function indexedToJson(indexed, linkHandler, headingHandler) {
     const { text, structure } = indexed;
