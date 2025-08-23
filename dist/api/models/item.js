@@ -587,7 +587,7 @@ class ItemAPI {
         return await this._getLinks(item);
     }
     async handleLinks(item, objData, conn) {
-        if (objData.body) {
+        if (objData.body && typeof objData.body !== 'string') {
             const links = [];
             (0, tiptapHelpers_1.indexedToJson)(objData.body, (href) => href.startsWith('@') && links.push({ href, ...(0, editor_1.extractLinkData)(href) }));
             const oldLinks = await this._getLinks(item);
