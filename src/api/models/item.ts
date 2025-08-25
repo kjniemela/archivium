@@ -1,5 +1,5 @@
 import { QueryBuilder, Cond, executeQuery, parseData, perms, withTransaction, BaseOptions, handleAsNull } from '../utils';
-import { extractLinks } from '../../markdown';
+import { extractLinks } from '../../lib/markdown';
 import { API } from '..';
 import { User } from './user';
 import { PoolConnection, ResultSetHeader } from 'mysql2/promise';
