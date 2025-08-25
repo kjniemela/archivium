@@ -1,5 +1,3 @@
-import { renderToHTMLString } from '@tiptap/static-renderer/pm/html-string';
-import sanitizeHtml from 'sanitize-html';
 import { RouteHandler } from '..';
 import api from '../../api';
 import { Comment } from '../../api/models/discussion';
@@ -8,11 +6,8 @@ import { Note } from '../../api/models/note';
 import { User } from '../../api/models/user';
 import { getPfpUrl, perms } from '../../api/utils';
 import { ForbiddenError, NotFoundError } from '../../errors';
-import { IndexedDocument, indexedToJson } from '../../lib/tiptapHelpers';
-import logger from '../../logger';
+import { RenderedBody, tryRenderContent } from '../../lib/renderContent';
 import { universeLink } from '../../templates';
-import { editorExtensions, extractLinkData, LinkData, TiptapContext } from '../../lib/editor';
-import StarterKit from '@tiptap/starter-kit';
 
 export default {
   async list(req, res) {
@@ -76,56 +71,9 @@ export default {
       item.gallery = item.gallery.sort((a, b) => a.id > b.id ? 1 : -1);
     }
 
+    let renderedBody: RenderedBody = { type: 'text', content: '' };
     if ('body' in item.obj_data) {
-      try {
-        const links: LinkData[] = [];
-        const headings: { title: string, level: number }[] = [];
-        const jsonBody = indexedToJson(
-          item.obj_data.body as IndexedDocument,
-          (href) => links.push(extractLinkData(href)),
-          (title, level) => headings.push({ title, level }),
-        );
-        const itemsPerUniverse = {};
-        /* Because Tiptap rendering cannot be async, we extract the links we'll need to check ahead of time. */
-        await Promise.all(links.map(async (link) => {
-          if (link.item) {
-            const universeShort = link.universe ?? universe.shortname;
-            if (!(universeShort in itemsPerUniverse)) {
-              itemsPerUniverse[universeShort] = {};
-            }
-            if (!(link.item in itemsPerUniverse[universeShort])) {
-              itemsPerUniverse[universeShort][link.item] = await api.item.exists(req.session.user, universeShort, link.item);
-            }
-          }
-        }));
-        const renderContext: TiptapContext = {
-          currentUniverse: universe.shortname,
-          universeLink: (universeShort) => universeLink(req, universeShort),
-          itemExists: (universe, item) => (universe in itemsPerUniverse) && itemsPerUniverse[universe][item],
-          headings,
-        };
-        const htmlBody = renderToHTMLString({ extensions: editorExtensions(false, renderContext), content: jsonBody });
-        const sanitizedHtml = sanitizeHtml(htmlBody, {
-          allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-          allowedAttributes: {
-            ...sanitizeHtml.defaults.allowedAttributes,
-            img: ['src', 'alt', 'title', 'width', 'height'],
-            h1: ['id'], h2: ['id'], h3: ['id'], h4: ['id'], h5: ['id'], h6: ['id'],
-          },
-          disallowedTagsMode: 'escape',
-          allowedClasses: {
-            '*': false,
-          },
-        });
-        item.obj_data.body = {
-          type: 'html',
-          content: sanitizedHtml,
-        };
-      } catch (err) {
-        logger.error('Failed to parse item body:');
-        logger.error(err);
-        item.obj_data.body = '';
-      }
+      renderedBody = await tryRenderContent(req, item.obj_data.body, universe.shortname);
     }
 
     const [comments, commentUsers] = await api.discussion.getCommentsByItem(item.id, true) as [Comment[], User[]];
@@ -145,7 +93,7 @@ export default {
     }
 
     res.prepareRender('item', {
-      item, universe, tab: req.query.tab, comments, commenters, notes, noteAuthors,
+      item, universe, tab: req.query.tab, comments, commenters, notes, noteAuthors, renderedBody,
       commentAction: `${universeLink(req, universe.shortname)}/items/${item.shortname}/comment`,
       noteBaseRoute: `/api/universes/${universe.shortname}/items/${item.shortname}/notes`,
     });
