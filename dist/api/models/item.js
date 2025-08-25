@@ -2,6 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemAPI = void 0;
 const utils_1 = require("../utils");
+<<<<<<< HEAD
+=======
+const markdown_1 = require("../../lib/markdown");
+>>>>>>> 8676f00 (add chapter editor)
 const errors_1 = require("../../errors");
 const tiptapHelpers_1 = require("../../lib/tiptapHelpers");
 const editor_1 = require("../../lib/editor");
