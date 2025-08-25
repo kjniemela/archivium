@@ -1,5 +1,3 @@
-import { parseMarkdown, type MarkdownData, type NodeAttributes } from "../../src/lib/markdown";
-
 // TODO this is duplicated from helpers.pug
 export const capitalize = (str: string) => str[0].toUpperCase() + str.substr(1,str.length-1);
 export const formatDate = (date: Date, intervalOnly=false, short=false) => {

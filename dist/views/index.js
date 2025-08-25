@@ -188,7 +188,6 @@ function default_1(app) {
     get('/stories/:shortname/delete', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.story.delete);
     get('/stories/:shortname/create', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.story.createChapter);
     get('/stories/:shortname/:index', sites.ALL, [], pages_1.default.story.viewChapter);
-    get('/stories/:shortname/:index/edit', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.story.editChapter);
     get('/stories/:shortname/:index/delete', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.story.deleteChapter);
     get('/items', sites.NORMAL, [], pages_1.default.item.list);
     renderContext((req, res) => {
@@ -261,7 +260,6 @@ function default_1(app) {
     post('/notes/edit', sites.ALL, [auth_1.default.verifySessionOrRedirect], forms_1.default.editNote);
     post('/stories/create', sites.ALL, [auth_1.default.verifySessionOrRedirect], forms_1.default.createStory);
     post('/stories/:shortname/edit', sites.ALL, [auth_1.default.verifySessionOrRedirect], forms_1.default.editStory);
-    post('/stories/:shortname/:index/edit', sites.ALL, [auth_1.default.verifySessionOrRedirect], forms_1.default.editChapter);
     post('/stories/:shortname/:index/comment', sites.ALL, [auth_1.default.verifySessionOrRedirect], forms_1.default.commentOnChapter);
     post('/universes/create', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], forms_1.default.createUniverse);
 }

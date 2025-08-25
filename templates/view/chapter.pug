@@ -36,7 +36,7 @@ block content
       |  - #{T('Last updated %s', formatDate(new Date(story.updated_at)))}
   #action-bar.d-flex.justify-center.align-center.gap-2.mb-1
       if contextUser && contextUser.id === story.author_id
-        a.link.link-animated.d-flex.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}/edit`)
+        a.link.link-animated.d-flex.align-center(href=`${ADDR_PREFIX}/editor/stories/${story.shortname}/${chapter.chapter_number}`)
           span.material-symbols-outlined edit
           |  #{T('Edit')}
         a.link.link-animated.d-flex.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}/delete`)

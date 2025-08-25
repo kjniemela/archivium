@@ -167,7 +167,6 @@ export default function(app: Express) {
   get('/stories/:shortname/delete', sites.ALL, [Auth.verifySessionOrRedirect], pages.story.delete);
   get('/stories/:shortname/create', sites.ALL, [Auth.verifySessionOrRedirect], pages.story.createChapter);
   get('/stories/:shortname/:index', sites.ALL, [], pages.story.viewChapter);
-  get('/stories/:shortname/:index/edit', sites.ALL, [Auth.verifySessionOrRedirect], pages.story.editChapter);
   get('/stories/:shortname/:index/delete', sites.ALL, [Auth.verifySessionOrRedirect], pages.story.deleteChapter);
   
   get('/items', sites.NORMAL, [], pages.item.list);
@@ -249,7 +248,6 @@ export default function(app: Express) {
   post('/notes/edit', sites.ALL, [Auth.verifySessionOrRedirect], forms.editNote);
   post('/stories/create', sites.ALL, [Auth.verifySessionOrRedirect], forms.createStory);
   post('/stories/:shortname/edit', sites.ALL, [Auth.verifySessionOrRedirect], forms.editStory);
-  post('/stories/:shortname/:index/edit', sites.ALL, [Auth.verifySessionOrRedirect], forms.editChapter);
   post('/stories/:shortname/:index/comment', sites.ALL, [Auth.verifySessionOrRedirect], forms.commentOnChapter);
   post('/universes/create', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.createUniverse);
 }

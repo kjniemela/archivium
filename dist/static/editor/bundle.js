@@ -70379,6 +70379,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   postFormData: () => (/* binding */ postFormData),
 /* harmony export */   sprintf: () => (/* binding */ sprintf)
 /* harmony export */ });
+// TODO this is duplicated from helpers.pug
 function _array_like_to_array(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
     for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
@@ -70563,7 +70564,6 @@ function _ts_generator(thisArg, body) {
         };
     }
 }
-// TODO this is duplicated from helpers.pug
 var capitalize = function(str) {
     return str[0].toUpperCase() + str.substr(1, str.length - 1);
 };
@@ -71350,7 +71350,8 @@ function ChapterEdit(param) {
                         className: "mt-2",
                         children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_SaveBtn__WEBPACK_IMPORTED_MODULE_7__["default"], {
                             data: chapter,
-                            saveUrl: "/api/stories/".concat(story.shortname, "/").concat(chapter.chapter_number)
+                            saveUrl: "/api/stories/".concat(story.shortname, "/").concat(chapter.chapter_number),
+                            previewUrl: "/stories/".concat(story.shortname, "/").concat(chapter.chapter_number)
                         }, void 0, false, {
                             fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ChapterEdit.tsx",
                             lineNumber: 117,
@@ -71365,7 +71366,7 @@ function ChapterEdit(param) {
                         className: "w-100 mb-0"
                     }, void 0, false, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ChapterEdit.tsx",
-                        lineNumber: 123,
+                        lineNumber: 124,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_components_EditorFrame__WEBPACK_IMPORTED_MODULE_6__["default"], {
@@ -71423,7 +71424,7 @@ function ChapterEdit(param) {
                         }
                     }, void 0, false, {
                         fileName: "/home/admin/webserver/dev/archivium/editor/src/pages/ChapterEdit.tsx",
-                        lineNumber: 125,
+                        lineNumber: 126,
                         columnNumber: 9
                     }, this)
                 ]

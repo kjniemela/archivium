@@ -47,7 +47,7 @@ exports.default = {
         const story = await api_1.default.story.getOne(req.session.user, { 'story.shortname': req.params.shortname });
         const title = `${(0, locale_1.T)('Untitled Chapter')} ${story.chapter_count + 1}`;
         const [, index] = await api_1.default.story.postChapter(req.session.user, story.shortname, { title });
-        return res.redirect(`${config_1.ADDR_PREFIX}/stories/${story.shortname}/${index}/edit`);
+        return res.redirect(`${config_1.ADDR_PREFIX}/editor/stories/${story.shortname}/${index}`);
     },
     async viewChapter(req, res) {
         const story = await api_1.default.story.getOne(req.session.user, { 'story.shortname': req.params.shortname });
@@ -75,11 +75,5 @@ exports.default = {
             }
             throw err;
         }
-    },
-    async editChapter(req, res) {
-        const story = await api_1.default.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }, utils_1.perms.WRITE);
-        const fetchedChapter = await api_1.default.story.getChapter(req.session.user, req.params.shortname, Number(req.params.index), utils_1.perms.WRITE);
-        const chapter = { ...fetchedChapter, ...(req.body ?? {}) };
-        res.prepareRender('editChapter', { story, chapter, error: res.error });
     },
 };
