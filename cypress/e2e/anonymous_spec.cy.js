@@ -32,7 +32,7 @@ describe('Anonymous user spec', () => {
       '/contacts',
       '/universes/create',
       '/universes/public-test-universe/items/create',
-      '/universes/public-test-universe/items/test-parent/edit',
+      '/editor/universes/public-test-universe/items/test-parent',
       '/universes/chatroom/discuss/create'
     ];
     for (const page of pages) {
