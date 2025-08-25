@@ -33,7 +33,7 @@ describe('Item spec', () => {
       cy.get('h1').contains('Test Event').should('exist');
       cy.url().should('include', '/universes/public-test-universe/items/test-event');
 
-      cy.visit('/universes/public-test-universe/items/test-character/edit');
+      cy.visit('/editor/universes/public-test-universe/items/test-character');
       cy.get('.tiptap-editor .tiptap').type('{ctrl}a{backspace}');
       cy.get('.tiptap-editor .tiptap').type(oldContent);
       cy.wait(600);
@@ -71,7 +71,7 @@ describe('Item spec', () => {
   });
 
   it('adds an event to an item, then imports it to the timeline', () => {
-    cy.visit('/universes/public-test-universe/items/test-event/edit');
+    cy.visit('/editor/universes/public-test-universe/items/test-event');
 
     cy.get('.tabs-buttons').contains('Timeline').click();
     cy.get('#new_event_title').type('Cypress Event');
@@ -82,7 +82,7 @@ describe('Item spec', () => {
     cy.wait(600);
     cy.get('#save-btn').click();
 
-    cy.visit('/universes/public-test-universe/items/test-timeline/edit');
+    cy.visit('/editor/universes/public-test-universe/items/test-timeline');
 
     cy.get('.tabs-buttons').contains('Timeline').click();
     cy.get('[data-tab="timeline"] button').contains('Import Event').click();
@@ -100,7 +100,7 @@ describe('Item spec', () => {
   });
 
   it('deletes the event and sees that it is removed from the timeline that imported it as well', () => {
-    cy.visit('/universes/public-test-universe/items/test-event/edit');
+    cy.visit('/editor/universes/public-test-universe/items/test-event');
 
     cy.get('.tabs-buttons').contains('Timeline').click();
     cy.get('input').filter((k, el) => el.value === 'Cypress Event').siblings('button').contains('Remove').click();
