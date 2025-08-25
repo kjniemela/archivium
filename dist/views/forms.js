@@ -190,24 +190,6 @@ exports.default = {
             throw err;
         }
     },
-    async editChapter(req, res) {
-        req.body = {
-            ...req.body,
-            is_published: req.body.is_published === 'on',
-        };
-        try {
-            const index = await api_1.default.story.putChapter(req.session.user, req.params.shortname, Number(req.params.index), req.body);
-            res.redirect(`${config_1.ADDR_PREFIX}/stories/${req.params.shortname}/${index}`);
-        }
-        catch (err) {
-            if (err instanceof errors_1.ModelError) {
-                res.error = err.message;
-                await pages_1.default.story.editChapter(req, res);
-                return;
-            }
-            throw err;
-        }
-    },
     async commentOnChapter(req, res) {
         await api_1.default.discussion.postCommentToChapter(req.session.user, req.params.shortname, Number(req.params.index), req.body);
         res.redirect(`${config_1.ADDR_PREFIX}/stories/${req.params.shortname}/${req.params.index}#post-comment`);

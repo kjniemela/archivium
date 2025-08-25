@@ -117,6 +117,7 @@ export default function ChapterEdit({ universeLink }: ItemEditProps) {
           <SaveBtn<Chapter>
             data={chapter}
             saveUrl={`/api/stories/${story.shortname}/${chapter.chapter_number}`}
+            previewUrl={`/stories/${story.shortname}/${chapter.chapter_number}`}
           />
         </div>
 
