@@ -148,7 +148,7 @@ export class StoryAPI {
     const data = await executeQuery<ResultSetHeader>(`
         INSERT INTO storychapter (title, summary, chapter_number, body, story_id, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?)
-      `, [title, summary ?? null, story.chapter_count + 1, '', story.id, new Date(), new Date()]);
+      `, [title, summary ?? null, story.chapter_count + 1, null, story.id, new Date(), new Date()]);
     return [data, story.chapter_count + 1];
   }
 

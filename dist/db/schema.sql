@@ -196,7 +196,7 @@ CREATE TABLE storychapter (
   title VARCHAR(128) NOT NULL,
   summary VARCHAR(2048),
   chapter_number INT NOT NULL,
-  body TEXT NOT NULL,
+  body JSON,
   story_id INT NOT NULL,
   is_published BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL,

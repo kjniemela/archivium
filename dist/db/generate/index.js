@@ -38,7 +38,7 @@ async function createStory(owner, title, shortname, summary, is_public, universe
 async function createChapter(owner, story, title, summary, body = '', isPublished = false) {
     const [, index] = await api_1.default.story.postChapter(owner, story.shortname, { title, summary });
     const chapter = await api_1.default.story.getChapter(owner, story.shortname, index);
-    await api_1.default.story.putChapter(owner, story.shortname, chapter.chapter_number, { is_published: isPublished, body });
+    await api_1.default.story.putChapter(owner, story.shortname, chapter.chapter_number, { is_published: isPublished, body: (0, defaults_js_1.unformattedTiptapDocument)(body) });
     return chapter;
 }
 async function setUniversePerms(owner, universe, user, permsLvl) {

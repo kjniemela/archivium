@@ -4,7 +4,7 @@ import { loadSchema, askQuestion } from '../import';
 import api from '../../api';
 import { perms } from '../../api/utils';
 import db from '..';
-import { defaultUniverseData, defaultItemData } from './defaults.js';
+import { defaultUniverseData, defaultItemData, unformattedTiptapDocument } from './defaults.js';
 import { User } from '../../api/models/user';
 import { Universe } from '../../api/models/universe';
 import { Chapter, Story } from '../../api/models/story';
@@ -42,7 +42,7 @@ async function createStory(owner: User, title: string, shortname: string, summar
 async function createChapter(owner: User, story: Story, title: string, summary: string, body: string = '', isPublished: boolean = false): Promise<Chapter> {
   const [, index] = await api.story.postChapter(owner, story.shortname, { title, summary });
   const chapter = await api.story.getChapter(owner, story.shortname, index);
-  await api.story.putChapter(owner, story.shortname, chapter.chapter_number, { is_published: isPublished, body });
+  await api.story.putChapter(owner, story.shortname, chapter.chapter_number, { is_published: isPublished, body: unformattedTiptapDocument(body) });
   return chapter;
 }
 
