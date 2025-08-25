@@ -70,7 +70,7 @@ exports.default = {
         if (item.gallery && item.gallery.length > 0) {
             item.gallery = item.gallery.sort((a, b) => a.id > b.id ? 1 : -1);
         }
-        if ('body' in item.obj_data && typeof item.obj_data.body !== 'string') {
+        if ('body' in item.obj_data) {
             try {
                 const links = [];
                 const headings = [];
@@ -113,7 +113,8 @@ exports.default = {
                 };
             }
             catch (err) {
-                logger_1.default.error('Failed to parse item body:', err);
+                logger_1.default.error('Failed to parse item body:');
+                logger_1.default.error(err);
                 item.obj_data.body = '';
             }
         }

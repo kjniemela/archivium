@@ -76,7 +76,7 @@ export default {
       item.gallery = item.gallery.sort((a, b) => a.id > b.id ? 1 : -1);
     }
 
-    if ('body' in item.obj_data && typeof item.obj_data.body !== 'string') {
+    if ('body' in item.obj_data) {
       try {
         const links: LinkData[] = [];
         const headings: { title: string, level: number }[] = [];
@@ -122,7 +122,8 @@ export default {
           content: sanitizedHtml,
         };
       } catch (err) {
-        logger.error('Failed to parse item body:', err);
+        logger.error('Failed to parse item body:');
+        logger.error(err);
         item.obj_data.body = '';
       }
     }
