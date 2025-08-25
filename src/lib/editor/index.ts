@@ -62,7 +62,7 @@ export function shorthandResolver(href: string, ctx: TiptapContext | undefined):
   return { href };
 }
 
-export const editorExtensions = (editMode: boolean, context: TiptapContext) => ([
+export const editorExtensions = (editMode: boolean, context?: TiptapContext) => ([
   StarterKit.configure({
     link: false,
     heading: false,

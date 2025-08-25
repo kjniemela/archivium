@@ -14,7 +14,6 @@ const Image = TiptapImage.extend({
       {
         tag: 'div.img-container img',
         getAttrs: (element) => {
-          if (!(element instanceof HTMLImageElement)) return {};
           return {
             src: element.getAttribute('src'),
             alt: element.getAttribute('alt'),
