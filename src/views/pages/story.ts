@@ -1,5 +1,3 @@
-import { renderToHTMLString } from '@tiptap/static-renderer/pm/html-string';
-import sanitizeHtml from 'sanitize-html';
 import { RouteHandler } from '..';
 import api from '../../api';
 import { Comment } from '../../api/models/discussion';
@@ -7,11 +5,8 @@ import { User } from '../../api/models/user';
 import { getPfpUrl, perms } from '../../api/utils';
 import { ADDR_PREFIX } from '../../config';
 import { NotFoundError } from '../../errors';
-import { editorExtensions, extractLinkData, LinkData, TiptapContext } from '../../lib/editor';
-import { IndexedDocument, indexedToJson } from '../../lib/tiptapHelpers';
+import { RenderedBody, tryRenderContent } from '../../lib/renderContent';
 import { T } from '../../locale';
-import logger from '../../logger';
-import { universeLink } from '../../templates';
 
 export default {
   async list(req, res) {
@@ -76,56 +71,7 @@ export default {
       commenters[user.id] = user;
     }
 
-    let renderedBody: { type: string, content: any };
-    try {
-      const links: LinkData[] = [];
-      const headings: { title: string, level: number }[] = [];
-      const jsonBody = indexedToJson(
-        chapter.body as IndexedDocument,
-        (href) => links.push(extractLinkData(href)),
-        (title, level) => headings.push({ title, level }),
-      );
-      const itemsPerUniverse = {};
-      /* Because Tiptap rendering cannot be async, we extract the links we'll need to check ahead of time. */
-      await Promise.all(links.map(async (link) => {
-        if (link.item) {
-          const universeShort = link.universe ?? story.universe_short;
-          if (!(universeShort in itemsPerUniverse)) {
-            itemsPerUniverse[universeShort] = {};
-          }
-          if (!(link.item in itemsPerUniverse[universeShort])) {
-            itemsPerUniverse[universeShort][link.item] = await api.item.exists(req.session.user, universeShort, link.item);
-          }
-        }
-      }));
-      const renderContext: TiptapContext = {
-        currentUniverse: story.universe_short,
-        universeLink: (universeShort) => universeLink(req, universeShort),
-        itemExists: (universe, item) => (universe in itemsPerUniverse) && itemsPerUniverse[universe][item],
-        headings,
-      };
-      const htmlBody = renderToHTMLString({ extensions: editorExtensions(false, renderContext), content: jsonBody });
-      const sanitizedHtml = sanitizeHtml(htmlBody, {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-        allowedAttributes: {
-          ...sanitizeHtml.defaults.allowedAttributes,
-          img: ['src', 'alt', 'title', 'width', 'height'],
-          h1: ['id'], h2: ['id'], h3: ['id'], h4: ['id'], h5: ['id'], h6: ['id'],
-        },
-        disallowedTagsMode: 'escape',
-        allowedClasses: {
-          '*': false,
-        },
-      });
-      renderedBody = {
-        type: 'html',
-        content: sanitizedHtml,
-      };
-    } catch (err) {
-      logger.error('Failed to parse chapter body:');
-      logger.error(err);
-      renderedBody = { type: 'text', content: chapter.body };
-    }
+    let renderedBody: RenderedBody = await tryRenderContent(req, chapter.body, story.universe_short);
 
     res.prepareRender('chapter', {
       story, chapter, comments, commenters, renderedBody,

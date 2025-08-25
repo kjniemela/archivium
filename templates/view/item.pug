@@ -230,31 +230,20 @@ block content
 
     if 'body' in item.obj_data
       .sheet.hidden(data-tab='body')
-        if item.obj_data.body instanceof Object
-          if item.obj_data.body.type === 'html'
-            .markdown !{item.obj_data.body.content}
-          else
-            .markdown #{item.obj_data.body.content}
+        if renderedBody.type === 'html'
+          .markdown !{renderedBody.content}
         else
-          #markdown-body
+          .markdown #{renderedBody.content}
 
   script.
     (() => {
-      const body = document.getElementById('markdown-body');
-      if (body) {
-        (async () => {
-          if (typeof item.obj_data.body === 'string') {
-            await loadMarkdown(body, '#{universe.shortname}', item.obj_data.body, { item })
-          }
-        })().then(async () => {
-          await tabLoadPromise;
-          const hash = location.hash.substr(1);
-          if (hash) {
-            const el = document.getElementById(hash);
-            el.scrollIntoView();
-          }
-        });
-      }
+      tabLoadPromise.then(() => {
+        const hash = location.hash.substr(1);
+        if (hash) {
+          const el = document.getElementById(hash);
+          el.scrollIntoView();
+        }
+      });
 
       document.querySelectorAll('.mdVal').forEach((el) => {
         loadMarkdown(el, '#{universe.shortname}', el.dataset.val, null, (tag) => {
