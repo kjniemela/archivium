@@ -29,7 +29,7 @@ export type Chapter = {
   title: string,
   summary: string,
   chapter_number: number,
-  body: string | IndexedDocument,
+  body: IndexedDocument,
   story_id: number,
   is_published: boolean,
   created_at: Date,

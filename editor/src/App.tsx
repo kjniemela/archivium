@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router';
+import ChapterEdit from './pages/ChapterEdit';
 import ItemEdit from './pages/ItemEdit';
 
 export type AppProps = {
@@ -21,10 +22,15 @@ export default function App({ displayUniverse, addrPrefix, domain }: AppProps) {
     <Routes>
       <Route path='editor'>
         <Route path='universes'>
-          <Route path=':universe'>
+          <Route path=':universeShort'>
             <Route path='items'>
-              <Route path=':item' element={<ItemEdit universeLink={universeLink} />} />
+              <Route path=':itemShort' element={<ItemEdit universeLink={universeLink} />} />
             </Route>
+          </Route>
+        </Route>
+        <Route path='stories'>
+          <Route path=':storyShort'>
+            <Route path=':chapterIndex' element={<ChapterEdit universeLink={universeLink} />} />
           </Route>
         </Route>
       </Route>

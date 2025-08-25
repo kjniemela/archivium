@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemAPI = void 0;
 const utils_1 = require("../utils");
-const markdown_1 = require("../../markdown");
+const markdown_1 = require("../../lib/markdown");
 const errors_1 = require("../../errors");
 function getQuery(selects = [], permsCond, whereConds, options = {}) {
     const query = new utils_1.QueryBuilder()
