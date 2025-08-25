@@ -1,19 +1,20 @@
-import { useState, useEffect, type ReactElement } from 'react';
-import { BulkExistsFetcher, capitalize, deepCompare, renderMarkdown, T } from '../helpers';
-import EditorFrame from '../components/EditorFrame';
-import { indexedToJson, jsonToIndexed, type IndexedDocument } from '../../../src/lib/tiptapHelpers';
-import { editorExtensions, extractLinkData, type LinkData, type TiptapContext } from '../../../src/lib/editor';
-import { createPortal } from 'react-dom';
-import TabsBar from '../components/TabsBar';
-import { useEditor } from '@tiptap/react';
-import Gallery from '../components/Gallery';
-import TimelineEditor from '../components/TimelineEditor';
-import type { Item } from '../../../src/api/models/item';
-import LineageEditor from '../components/LineageEditor';
-import CustomDataEditor from '../components/CustomDataEditor';
 import type { SetImageOptions } from '@tiptap/extension-image';
-import { splitIgnoringQuotes } from '../../../src/markdown';
+import { useEditor } from '@tiptap/react';
+import { useEffect, useState, type ReactElement } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useParams } from 'react-router';
+import type { Item } from '../../../src/api/models/item';
+import { editorExtensions, extractLinkData, type LinkData, type TiptapContext } from '../../../src/lib/editor';
+import { splitIgnoringQuotes } from '../../../src/lib/markdown';
+import { indexedToJson, jsonToIndexed, type IndexedDocument } from '../../../src/lib/tiptapHelpers';
+import CustomDataEditor from '../components/CustomDataEditor';
+import EditorFrame from '../components/EditorFrame';
+import Gallery from '../components/Gallery';
+import LineageEditor from '../components/LineageEditor';
+import SaveBtn from '../components/SaveBtn';
+import TabsBar from '../components/TabsBar';
+import TimelineEditor from '../components/TimelineEditor';
+import { BulkExistsFetcher, capitalize, fetchData, T } from '../helpers';
 
 type Categories = {
   [key: string]: [string, string],
@@ -36,48 +37,6 @@ export type ItemEditProps = {
   universeLink: (universe: string) => string,
 };
 
-async function fetchData(url: string, setter: (value: any) => Promise<void> | void): Promise<any> {
-  try {
-    const res = await fetch(url, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
-    if (!res.ok) throw new Error('Failed to fetch');
-    const data = await res.json();
-    await setter(data);
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-let updateTimeoutId: NodeJS.Timeout | null = null;
-function debouncedOnUpdate(editor: any, onChange: (content: IndexedDocument) => void) {
-  if (updateTimeoutId) {
-    clearTimeout(updateTimeoutId);
-  }
-
-  updateTimeoutId = setTimeout(() => {
-    const json = editor.getJSON();
-    const indexed = jsonToIndexed(json);
-    onChange(indexed);
-  }, 500);
-}
-
-let needsSaving = false;
-export function setNeedsSaving(value: boolean) {
-  needsSaving = value;
-}
-window.onbeforeunload = (event) => {
-  if (needsSaving) {
-    event.preventDefault();
-    event.returnValue = true;
-  }
-};
-let saveTimeout: NodeJS.Timeout | null = null;
-
 function computeTabs(objData: ObjData): Record<string, string> {
   return {
     ...(objData.body ? { body: T('Main Text') } : {}),
@@ -90,21 +49,19 @@ const itemExistsCache: { [universe: string]: { [item: string]: boolean } } = {};
 
 export default function ItemEdit({ universeLink }: ItemEditProps) {
   const navigate = useNavigate();
-  const params = useParams();
-  const [universeShort, itemShort] = [params.universe as string, params.item as string];
+  const { universeShort, itemShort } = useParams();
+
+  if (!universeShort || !itemShort) return;
 
   const [initContent, setInitContent] = useState<any | null>(null);
   const [categories, setCategories] = useState<Categories | null>(null);
   const [item, setItem] = useState<Item | null>(null);
   const [objData, setObjData] = useState<ObjData | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [saveText, setSaveText] = useState<string>('Save Changes');
   const [currentModal, setCurrentModal] = useState<ModalType | null>(null);
   const [currentTab, setCurrentTab] = useState<string | null>(null);
   const [tabNames, setTabNames] = useState<Record<string, string>>({});
   const [eventItemMap, setEventItemMap] = useState<Record<number, EventItem[]>>();
   const [lineageItemMap, setLineageItemMap] = useState<Record<number, string>>();
-  const [previousData, setPreviousData] = useState<(Item & { obj_data: ObjData }) | null>(null);
 
   const context: TiptapContext = {
     currentUniverse: universeShort,
@@ -119,66 +76,11 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
     extensions: editorExtensions(true, context),
     onUpdate: ({ editor }) => {
       if (!objData) return;
-      setNeedsSaving(true);
-      setSaveText('Save Changes');
-      debouncedOnUpdate(editor, (content) => setObjData({ ...objData, body: content }));
+      const json = editor.getJSON();
+      const indexed = jsonToIndexed(json);
+      setObjData({ ...objData, body: indexed });
     },
   });
-  
-  async function save(delay: number, callback?: () => void) {
-    if (saveTimeout) {
-      clearTimeout(saveTimeout);
-    }
-    saveTimeout = setTimeout(async () => {
-      if (!item || !objData) return;
-      setSaveText('Saving...');
-      console.log('SAVING...');
-      const data = {
-        ...structuredClone(item),
-        obj_data: { ...structuredClone(objData) },
-      };
-
-      if (deepCompare(data, previousData)) {
-        console.log('NO CHANGE');
-        setSaveText('Saved');
-        setNeedsSaving(false);
-        if (callback) callback();
-        return;
-      }
-
-      try {
-        setErrorMessage(null);
-        const response = await fetch(`/api/universes/${universeShort}/items/${itemShort}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        });
-        const err = await response.json();
-        if (!response.ok) {
-          setErrorMessage(err);
-          throw err;
-        }
-        console.log('SAVED.');
-        setSaveText('Saved');
-        setPreviousData(data);
-        setNeedsSaving(false);
-        if (callback) callback();
-        if (data.shortname !== itemShort) {
-          navigate(`/editor/universes/${universeShort}/items/${data.shortname}`);
-        }
-      } catch (err) {
-        console.error('Failed to save!');
-        console.error(err);
-        setSaveText('Error');
-        setPreviousData(null);
-        if (err instanceof TypeError) {
-          setErrorMessage('Network error. Make sure you are connected to the internet and try again.');
-        }
-      }
-    }, delay);
-  }
 
   useEffect(() => {
     const categoryPromise = fetchData(`/api/universes/${universeShort}`, (data) => {
@@ -205,18 +107,14 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
     fetchData(`/api/universes/${universeShort}/items/${itemShort}`, async (data) => {
       await Promise.all([categoryPromise, eventItemPromise, lineageItemPromise]);
       const objData = JSON.parse(data.obj_data) as ObjData;
-      if (typeof objData.body === 'string') {
-        await renderMarkdown(universeShort, objData.body, { item: { ...data, obj_data: objData } }).then((text: string) => {
-          setInitContent(text);
-        });
-      } else if (objData.body) {
+      if (objData.body) {
         const links: LinkData[] = []; 
         const json = indexedToJson(objData.body, (href) => links.push(extractLinkData(href)));
         const bulkFetcher = new BulkExistsFetcher();
         const fetchPromises = links.map(async (link) => {
           if (link.item) {
             const universe = link.universe ?? universeShort;
-            if (!(universeShort in itemExistsCache)) {
+            if (!(universe in itemExistsCache)) {
               itemExistsCache[universe] = {};
             }
             if (!(link.item in itemExistsCache[universe])) {
@@ -242,14 +140,6 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
   }, [editor, initContent]);
 
   useEffect(() => {
-    if (item && objData) {
-      setNeedsSaving(true);
-      setSaveText('Save Changes');
-      save(5000);
-    }
-  }, [item, objData]);
-
-  useEffect(() => {
     if (!(currentTab && tabNames[currentTab])) {
       if (Object.keys(tabNames).length > 0) setCurrentTab(Object.keys(tabNames)[0]);
       else setCurrentTab(null);
@@ -257,8 +147,6 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
   }, [tabNames]);
 
   const modalAnchor = document.querySelector('#modal-anchor');
-  const saveBtnAnchor = document.querySelector('#save-btn');
-  const previewBtnAnchor = document.querySelector('#preview-btn');
 
   const [newTabType, setNewTabType] = useState<string | undefined>(undefined);
   const [newTabName, setNewTabName] = useState<string>('');
@@ -337,7 +225,7 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
             const link = extractLinkData(url);
             if (link.item) {
               const universe = link.universe ?? universeShort;
-              if (!(universeShort in itemExistsCache)) {
+              if (!(universe in itemExistsCache)) {
                 itemExistsCache[universe] = {};
               }
               if (!(link.item in itemExistsCache[universe])) {
@@ -408,17 +296,6 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
 
   return (
     <>
-      {/* Save Button */}
-      {saveBtnAnchor && createPortal(
-        <a className='navbarBtnLink navbarText' onClick={() => save(0)}>{T(saveText)}</a>,
-        saveBtnAnchor,
-      )}
-      {previewBtnAnchor && createPortal(
-        <a className='navbarBtnLink navbarText' onClick={() => save(0, () => {
-          location.href = `${context.universeLink(universeShort)}/items/${item.shortname}`;
-        })}>{T('Preview')}</a>,
-        previewBtnAnchor,
-      )}
       {/* Modals */}
       {modalAnchor && (
         currentModal && createPortal(
@@ -432,21 +309,21 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
       )}
       {/* Editor Page */}
       <div className='d-flex justify-between align-baseline'>
-        <h2>{item ? T('Edit %s', item.title) : T('Edit')}</h2>
+        <h2>{T('Edit %s', item.title)}</h2>
         <a className='link link-animated color-error' href={`${context.universeLink(universeShort)}/items/${itemShort}`}>{T('Discard Changes')}</a>
       </div>
       <div id='edit' className='form-row-group'>
         <div className='inputGroup'>
           <label htmlFor='title'>{T('Title')}</label>
-          <input id='title' type='text' name='title' value={item?.title ?? ''} onChange={({ target }) =>
-            item && setItem({ ...item, title: target.value })
+          <input id='title' type='text' name='title' value={item.title} onChange={({ target }) =>
+            setItem({ ...item, title: target.value })
           } />
         </div>
 
         <div className='inputGroup'>
           <label htmlFor='shortname'>{T('Shortname')}:</label>
-          <input id='shortname' type='text' name='shortname' value={item?.shortname ?? ''} onChange={({ target }) =>
-            item && setItem({ ...item, shortname: target.value })
+          <input id='shortname' type='text' name='shortname' value={item.shortname} onChange={({ target }) =>
+            setItem({ ...item, shortname: target.value })
           } />
         </div>
 
@@ -458,7 +335,7 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
 
         <div className='inputGroup'>
           <label htmlFor='item_type'>{T('Type')}:</label>
-          <select id='item_type' name='item_type' defaultValue={item?.item_type} onChange={({ target }) => item && setItem({ ...item, item_type: target.value })}>
+          <select id='item_type' name='item_type' defaultValue={item.item_type} onChange={({ target }) => item && setItem({ ...item, item_type: target.value })}>
             <option hidden disabled>{T('Select one')}...</option>
             {(categories && item) && Object.keys(categories).map(type => (
               <option key={type} value={type}>
@@ -470,14 +347,14 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
 
         <div className='inputGroup'>
           <label htmlFor='tags'>{T('Tags')}:</label>
-          <textarea id='tags' name='tags' value={(item?.tags ?? []).join(' ')} onChange={({ target }) => item && setItem({ ...item, tags: target.value.split(' ') })} />
+          <textarea id='tags' name='tags' value={item.tags.join(' ')} onChange={({ target }) => item && setItem({ ...item, tags: target.value.split(' ') })} />
         </div>
 
         <div className='inputGroup'>
           <label htmlFor='comments'>{T('Enable comments')}:</label>
           <label className='switch'>
             <input id='comments' name='comments' type='checkbox' checked={objData?.comments ?? false} onChange={({ target }) =>
-              objData && setObjData({ ...objData, comments: target.checked })
+              setObjData({ ...objData, comments: target.checked })
             } />
             <span className='slider'></span>
           </label>
@@ -487,19 +364,24 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
           <label htmlFor='notes'>{T('Enable notes')}:</label> 
           <label className='switch'>
             <input id='notes' name='notes' type='checkbox' checked={objData?.notes ?? false} onChange={({ target }) =>
-              objData && setObjData({ ...objData, notes: target.checked })
+              setObjData({ ...objData, notes: target.checked })
             } />
             <span className='slider'></span>
           </label>
         </div>
 
         <div className='mt-2'>
-          <button id='save-changes' onClick={() => save(0)}>{T(saveText)}</button>
+          <SaveBtn<Item>
+            data={{ ...item, obj_data: objData }}
+            saveUrl={`/api/universes/${universeShort}/items/${itemShort}`}
+            previewUrl={`${context.universeLink(universeShort)}/items/${item.shortname}`}
+            onSave={(data) => {
+              if (data.shortname !== itemShort) {
+                navigate(`/editor/universes/${universeShort}/items/${data.shortname}`);
+              }
+            }}
+          />
         </div>
-
-        {errorMessage && <div>
-          <span id='item-error' className='color-error' style={{ fontSize: 'small' }}>{errorMessage}</span>
-        </div>}
 
         <hr className='w-100 mb-0' />
 
