@@ -1,5 +1,4 @@
 extends ../layout.pug
-include ../mixins.pug
 include ../components/storyCard.pug
 
 block title
@@ -163,7 +162,7 @@ block content
           - const username = universe.authors[id];
           if universe.author_permissions[id] >= perms.WRITE
             .card.sheet.gap-4(data-goto=`${ADDR_PREFIX}/users/${username}` data-username=username)
-              img.userIcon(alt=username, src=authors[id].pfpUrl)
+              +userIcon(authors[id])
               .d-flex.flex-col.grow-1
                 h2.ma-0
                   a.link.link-animated(href=`${ADDR_PREFIX}/users/${username}`) #{username}
@@ -199,7 +198,7 @@ block content
         each username, id in universe.authors
           if universe.author_permissions[id] < perms.WRITE && universe.author_permissions[id] >= perms.READ
             .card.sheet.gap-4(data-goto=`${ADDR_PREFIX}/users/${username}` data-username=username)
-              img.userIcon(alt=username, src=authors[id].pfpUrl)
+              +userIcon(authors[id])
               .d-flex.flex-col.grow-1
                 h2.ma-0
                   a.link.link-animated(href=`${ADDR_PREFIX}/users/${username}`) #{username}

@@ -30,3 +30,14 @@ mixin highlight(string, keyword, italics)
           b #{segment}
       else
         | #{segment}
+
+mixin userIcon(user)
+  .d-flex
+    .badge-anchor.mb-auto
+      img.userIcon(alt=user.username, src=user.pfpUrl)
+      if user.plan == plans.BETA || user.plan == plans.PREMIUM_BETA
+        .badge.user-badge
+          b Beta Tester
+      if user.plan == plans.SUPER
+        .badge.user-badge
+          b Site Admin

@@ -142,8 +142,6 @@ class UserAPI {
     }
     async getByUniverseShortname(user, shortname) {
         const universe = await this.api.universe.getOne(user, { shortname });
-        if (!universe)
-            throw new errors_1.NotFoundError();
         const queryString = `
       SELECT 
         user.id,
@@ -151,14 +149,16 @@ class UserAPI {
         user.created_at,
         user.updated_at,
         user.email,
+        userplan.plan,
         COUNT(item.id) AS items_authored,
         (ui.user_id IS NOT NULL) as hasPfp
       FROM user
       INNER JOIN authoruniverse AS au ON au.user_id = user.id
       LEFT JOIN item ON item.universe_id = au.universe_id AND item.author_id = user.id
       LEFT JOIN userimage AS ui ON user.id = ui.user_id
+      LEFT JOIN userplan ON user.id = userplan.user_id
       WHERE au.universe_id = ?
-      GROUP BY user.id;
+      GROUP BY user.id, userplan.plan;
     `;
         const users = await (0, utils_1.executeQuery)(queryString, [universe.id]);
         return users;

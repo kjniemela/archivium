@@ -916,6 +916,19 @@ h4, h5 {
   top: -0.5rem;
 }
 
+.user-badge {
+  background-color: #707077cf;
+  font-size: 0.75rem;
+  padding: 0.125rem;
+  top: unset;
+  right: unset;
+  bottom: 0.125rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 header .badge {
   z-index: 4;
 }
@@ -1312,6 +1325,9 @@ input:checked + .slider:before {
   margin-right: 0.5rem;
 }
 
+.mb-auto {
+  margin-bottom: auto;
+}
 .mb-0 {
   margin-bottom: 0;
 }
