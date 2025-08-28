@@ -917,16 +917,23 @@ h4, h5 {
 }
 
 .user-badge {
-  background-color: #707077cf;
-  font-size: 0.75rem;
-  padding: 0.125rem;
-  top: unset;
-  right: unset;
-  bottom: 0.125rem;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    background-color: #707077cf;
+    font-size: 0.75rem;
+    padding: 0.125rem;
+    top: unset;
+    right: unset;
+    bottom: 0.125rem;
+    width: calc(100% + 0.875rem);
+    left: -0.4375rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.0625rem;
+}
+
+.user-badge .material-symbols-outlined {
+  font-size: 0.9375rem;
+  margin-left: -0.125rem;
 }
 
 header .badge {

@@ -37,7 +37,9 @@ mixin userIcon(user)
       img.userIcon(alt=user.username, src=user.pfpUrl)
       if user.plan == plans.BETA || user.plan == plans.PREMIUM_BETA
         .badge.user-badge
-          b Beta Tester
+          span.material-symbols-outlined experiment
+          b #{T('Beta Tester')}
       if user.plan == plans.SUPER
         .badge.user-badge
-          b Site Admin
+          span.material-symbols-outlined security
+          b #{T('Site Admin')}
