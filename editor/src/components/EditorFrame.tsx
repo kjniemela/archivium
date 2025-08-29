@@ -92,6 +92,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
   return (
     <div className='tiptap-navbar'>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editorState.canBold}
         className={`material-symbols-outlined ${editorState.isBold ? 'is-active' : ''}`}
@@ -100,6 +101,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         format_bold
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={!editorState.canItalic}
         className={`material-symbols-outlined ${editorState.isItalic ? 'is-active' : ''}`}
@@ -108,6 +110,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         format_italic
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleStrike().run()}
         disabled={!editorState.canStrike}
         className={`material-symbols-outlined ${editorState.isStrike ? 'is-active' : ''}`}
@@ -116,6 +119,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         strikethrough_s
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleCode().run()}
         disabled={!editorState.canCode}
         className={`material-symbols-outlined ${editorState.isCode ? 'is-active' : ''}`}
@@ -124,6 +128,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         code
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().unsetAllMarks().run()}
         className='material-symbols-outlined'
         title='Clear Formatting'
@@ -131,6 +136,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         format_clear
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().insertToC().run()}
         className={`material-symbols-outlined ${editorState.isToc ? 'is-active' : ''}`}
         title={T('Table of Contents')}
@@ -138,6 +144,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         toc
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         className={`material-symbols-outlined ${editorState.isHeading1 ? 'is-active' : ''}`}
         title={T('Heading 1')}
@@ -145,6 +152,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         format_h1
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         className={`material-symbols-outlined ${editorState.isHeading2 ? 'is-active' : ''}`}
         title={T('Heading 2')}
@@ -152,6 +160,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         format_h2
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         className={`material-symbols-outlined ${editorState.isHeading3 ? 'is-active' : ''}`}
         title={T('Heading 3')}
@@ -159,6 +168,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         format_h3
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
         className={`material-symbols-outlined ${editorState.isHeading4 ? 'is-active' : ''}`}
         title={T('Heading 4')}
@@ -166,6 +176,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         format_h4
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
         className={`material-symbols-outlined ${editorState.isHeading5 ? 'is-active' : ''}`}
         title={T('Heading 5')}
@@ -173,6 +184,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         format_h5
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
         className={`material-symbols-outlined ${editorState.isHeading6 ? 'is-active' : ''}`}
         title={T('Heading 6')}
@@ -180,6 +192,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         format_h6
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={setLink}
         className={`material-symbols-outlined ${editorState.isLink ? 'is-active' : ''}`}
         title={T('Link')}
@@ -187,6 +200,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         link
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().unsetLink().run()}
         disabled={!editorState.isLink}
         className={'material-symbols-outlined'}
@@ -195,6 +209,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         link_off
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={`material-symbols-outlined ${editorState.isBulletList ? 'is-active' : ''}`}
         title={T('Bullet List')}
@@ -202,6 +217,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         format_list_bulleted
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         className={`material-symbols-outlined ${editorState.isOrderedList ? 'is-active' : ''}`}
         title={T('Numbered List')}
@@ -209,6 +225,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         format_list_numbered
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={setImage}
         className={`material-symbols-outlined ${editorState.isImage ? 'is-active' : ''}`}
         title={T('Insert Image')}
@@ -216,6 +233,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         image
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         className={`material-symbols-outlined ${editorState.isCodeBlock ? 'is-active' : ''}`}
         title={T('Code Block')}
@@ -223,6 +241,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         code_blocks
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleAside().run()}
         className={`material-symbols-outlined ${editorState.isAside ? 'is-active' : ''}`}
         title={T('Aside')}
@@ -230,6 +249,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         view_sidebar
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         className={`material-symbols-outlined ${editorState.isBlockquote ? 'is-active' : ''}`}
         title={T('Blockquote')}
@@ -237,6 +257,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         format_quote
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().setHorizontalRule().run()}
         className='material-symbols-outlined'
         title={T('Horizontal Rule')}
@@ -244,6 +265,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         horizontal_rule
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().undo().run()} 
         disabled={!editorState.canUndo}
         className='material-symbols-outlined'
@@ -252,6 +274,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         undo
       </button>
       <button
+        onMouseDown={e => e.preventDefault()}
         onClick={() => editor.chain().focus().redo().run()}
         disabled={!editorState.canRedo}
         className='material-symbols-outlined'
