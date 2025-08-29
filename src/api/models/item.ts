@@ -63,7 +63,7 @@ export type ItemLink = {
   universe_short: string,
 };
 
-export type BasicItem = {
+export type BasicItem<T = string | Object> = {
   id: number,
   title: string,
   shortname: string,
@@ -77,10 +77,10 @@ export type BasicItem = {
   notifs_enabled: boolean;
   author_id: number | null,
   tags: string[],
-  obj_data: Object | string, // TODO we should try to never stringify this if possible
+  obj_data: T, // TODO we should try to never stringify this if possible
 };
 
-export type Item = BasicItem & {
+export type Item<T = string | Object> = BasicItem<T> & {
   events: ItemEvent[];
   gallery: GalleryImage[];
   parents: Parent[];
