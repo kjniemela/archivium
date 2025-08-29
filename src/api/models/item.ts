@@ -266,7 +266,7 @@ export class ItemAPI {
     item.parents = parents as Parent[];
 
     const links = await executeQuery(`
-      SELECT item.id, item.shortname, item.title, universe.shortname AS universe_short
+      SELECT DISTINCT item.id, item.shortname, item.title, universe.shortname AS universe_short
       FROM itemlink
       INNER JOIN item ON item.id = itemlink.from_item
       INNER JOIN universe ON item.universe_id = universe.id

@@ -169,7 +169,7 @@ class ItemAPI {
     `, [item.id]);
         item.parents = parents;
         const links = await (0, utils_1.executeQuery)(`
-      SELECT item.id, item.shortname, item.title, universe.shortname AS universe_short
+      SELECT DISTINCT item.id, item.shortname, item.title, universe.shortname AS universe_short
       FROM itemlink
       INNER JOIN item ON item.id = itemlink.from_item
       INNER JOIN universe ON item.universe_id = universe.id
