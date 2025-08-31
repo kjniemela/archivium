@@ -21,20 +21,23 @@ export type LinkData = {
 
 export function extractLinkData(href: string): LinkData {
   const data: LinkData = {};
-  let [first, second] = href.substring(1).split('/');
-  if (first) {
-    data.universe = first;
-    if (!second) {
-      second = first;
-      delete data.universe;
+
+  if (href.startsWith('@')) {
+    let [first, second] = href.substring(1).split('/');
+    if (first) {
+      data.universe = first;
+      if (!second) {
+        second = first;
+        delete data.universe;
+      }
+
+      const [itemQuery, hash] = second.split('#');
+      const [item, query] = itemQuery.split('?');
+
+      data.item = item;
+      data.hash = hash;
+      data.query = query;
     }
-
-    const [itemQuery, hash] = second.split('#');
-    const [item, query] = itemQuery.split('?');
-
-    data.item = item;
-    data.hash = hash;
-    data.query = query;
   }
 
   return data;
@@ -70,7 +73,7 @@ export const editorExtensions = (editMode: boolean, context: TiptapContext) => (
   Link.configure({
     enableClickSelection: editMode,
     openOnClick: !editMode,
-    shorthandResolver,
+    ...(editMode ? {} : { shorthandResolver }),
     context,
   }),
   ToC.configure({ context }),
