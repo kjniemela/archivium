@@ -3,6 +3,7 @@ import { API } from '..';
 import { User } from './user';
 import { ResultSetHeader } from 'mysql2/promise';
 import { NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
+import { IndexedDocument } from '../../lib/tiptapHelpers';
 
 export type Story = {
   id: number,
@@ -28,7 +29,7 @@ export type Chapter = {
   title: string,
   summary: string,
   chapter_number: number,
-  body: string,
+  body: IndexedDocument,
   story_id: number,
   is_published: boolean,
   created_at: Date,
@@ -147,7 +148,7 @@ export class StoryAPI {
     const data = await executeQuery<ResultSetHeader>(`
         INSERT INTO storychapter (title, summary, chapter_number, body, story_id, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?)
-      `, [title, summary ?? null, story.chapter_count + 1, '', story.id, new Date(), new Date()]);
+      `, [title, summary ?? null, story.chapter_count + 1, null, story.id, new Date(), new Date()]);
     return [data, story.chapter_count + 1];
   }
 
@@ -203,7 +204,7 @@ export class StoryAPI {
     return shortname ?? story.shortname;
   }
 
-  async putChapter(user: User | undefined, shortname: string, index: number, payload): Promise<number> {
+  async putChapter(user: User | undefined, shortname: string, index: number, payload: Partial<Chapter>): Promise<number> {
     if (!user) throw new UnauthorizedError();
     const { title, summary, body, is_published } = payload;
 

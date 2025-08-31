@@ -167,7 +167,6 @@ export default function(app: Express) {
   get('/stories/:shortname/delete', sites.ALL, [Auth.verifySessionOrRedirect], pages.story.delete);
   get('/stories/:shortname/create', sites.ALL, [Auth.verifySessionOrRedirect], pages.story.createChapter);
   get('/stories/:shortname/:index', sites.ALL, [], pages.story.viewChapter);
-  get('/stories/:shortname/:index/edit', sites.ALL, [Auth.verifySessionOrRedirect], pages.story.editChapter);
   get('/stories/:shortname/:index/delete', sites.ALL, [Auth.verifySessionOrRedirect], pages.story.deleteChapter);
   
   get('/items', sites.NORMAL, [], pages.item.list);
@@ -182,6 +181,9 @@ export default function(app: Express) {
       req.theme = themeName === 'custom' ? customTheme : baseTheme;
     }
   }, (get, post) => {
+    get('/editor', sites.ALL, [Auth.verifySessionOrRedirect], pages.misc.editor);
+    get('/editor/*', sites.ALL, [Auth.verifySessionOrRedirect], pages.misc.editor);
+
     /* Universe Pages */
     get('/universes', sites.NORMAL, [], pages.universe.list);
     get('/universes/create', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.universe.create);
@@ -197,7 +199,6 @@ export default function(app: Express) {
     /* Item Pages */
     get('/universes/:universeShortname/items/create', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.item.create);
     get('/universes/:universeShortname/items/:itemShortname', sites.NORMAL, [], pages.item.view);
-    get('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.item.edit);
     get('/universes/:universeShortname/items/:itemShortname/delete', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.item.delete);
 
     /* Display Mode Pages */
@@ -212,7 +213,6 @@ export default function(app: Express) {
     get('/items', sites.DISPLAY, [], subdomain(pages.universe.itemList, (sub) => ({ universeShortname: sub })));
     get('/items/create', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(pages.item.create, (sub) => ({ universeShortname: sub })));
     get('/items/:itemShortname', sites.DISPLAY, [], subdomain(pages.item.view, (sub) => ({ universeShortname: sub })));
-    get('/items/:itemShortname/edit', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(pages.item.edit, (sub) => ({ universeShortname: sub })));
     get('/items/:itemShortname/delete', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(pages.item.delete, (sub) => ({ universeShortname: sub })));
 
     /* Universe POST Handlers */
@@ -248,7 +248,6 @@ export default function(app: Express) {
   post('/notes/edit', sites.ALL, [Auth.verifySessionOrRedirect], forms.editNote);
   post('/stories/create', sites.ALL, [Auth.verifySessionOrRedirect], forms.createStory);
   post('/stories/:shortname/edit', sites.ALL, [Auth.verifySessionOrRedirect], forms.editStory);
-  post('/stories/:shortname/:index/edit', sites.ALL, [Auth.verifySessionOrRedirect], forms.editChapter);
   post('/stories/:shortname/:index/comment', sites.ALL, [Auth.verifySessionOrRedirect], forms.commentOnChapter);
   post('/universes/create', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.createUniverse);
 }

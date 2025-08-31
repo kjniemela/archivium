@@ -197,24 +197,6 @@ export default {
     }
   },
 
-  async editChapter(req, res) {
-    req.body = {
-      ...req.body,
-      is_published: req.body.is_published === 'on',
-    }
-    try {
-      const index = await api.story.putChapter(req.session.user, req.params.shortname, Number(req.params.index), req.body);
-      res.redirect(`${ADDR_PREFIX}/stories/${req.params.shortname}/${index}`);
-    } catch (err) {
-      if (err instanceof ModelError) {
-        res.error = err.message;
-        await pages.story.editChapter(req, res);
-        return;
-      }
-      throw err;
-    }
-  },
-
   async commentOnChapter(req, res) {
     await api.discussion.postCommentToChapter(req.session.user, req.params.shortname, Number(req.params.index), req.body);
     res.redirect(`${ADDR_PREFIX}/stories/${req.params.shortname}/${req.params.index}#post-comment`);

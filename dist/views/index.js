@@ -188,7 +188,6 @@ function default_1(app) {
     get('/stories/:shortname/delete', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.story.delete);
     get('/stories/:shortname/create', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.story.createChapter);
     get('/stories/:shortname/:index', sites.ALL, [], pages_1.default.story.viewChapter);
-    get('/stories/:shortname/:index/edit', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.story.editChapter);
     get('/stories/:shortname/:index/delete', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.story.deleteChapter);
     get('/items', sites.NORMAL, [], pages_1.default.item.list);
     renderContext((req, res) => {
@@ -202,6 +201,8 @@ function default_1(app) {
             req.theme = themeName === 'custom' ? customTheme : baseTheme;
         }
     }, (get, post) => {
+        get('/editor', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.misc.editor);
+        get('/editor/*', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.misc.editor);
         /* Universe Pages */
         get('/universes', sites.NORMAL, [], pages_1.default.universe.list);
         get('/universes/create', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.universe.create);
@@ -216,7 +217,6 @@ function default_1(app) {
         /* Item Pages */
         get('/universes/:universeShortname/items/create', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.item.create);
         get('/universes/:universeShortname/items/:itemShortname', sites.NORMAL, [], pages_1.default.item.view);
-        get('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.item.edit);
         get('/universes/:universeShortname/items/:itemShortname/delete', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.item.delete);
         /* Display Mode Pages */
         get('/', sites.DISPLAY, [], subdomain(pages_1.default.universe.view, (sub) => ({ universeShortname: sub })));
@@ -229,7 +229,6 @@ function default_1(app) {
         get('/items', sites.DISPLAY, [], subdomain(pages_1.default.universe.itemList, (sub) => ({ universeShortname: sub })));
         get('/items/create', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(pages_1.default.item.create, (sub) => ({ universeShortname: sub })));
         get('/items/:itemShortname', sites.DISPLAY, [], subdomain(pages_1.default.item.view, (sub) => ({ universeShortname: sub })));
-        get('/items/:itemShortname/edit', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(pages_1.default.item.edit, (sub) => ({ universeShortname: sub })));
         get('/items/:itemShortname/delete', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(pages_1.default.item.delete, (sub) => ({ universeShortname: sub })));
         /* Universe POST Handlers */
         post('/universes/:universeShortname/edit', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], forms_1.default.editUniverse);
@@ -261,7 +260,6 @@ function default_1(app) {
     post('/notes/edit', sites.ALL, [auth_1.default.verifySessionOrRedirect], forms_1.default.editNote);
     post('/stories/create', sites.ALL, [auth_1.default.verifySessionOrRedirect], forms_1.default.createStory);
     post('/stories/:shortname/edit', sites.ALL, [auth_1.default.verifySessionOrRedirect], forms_1.default.editStory);
-    post('/stories/:shortname/:index/edit', sites.ALL, [auth_1.default.verifySessionOrRedirect], forms_1.default.editChapter);
     post('/stories/:shortname/:index/comment', sites.ALL, [auth_1.default.verifySessionOrRedirect], forms_1.default.commentOnChapter);
     post('/universes/create', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], forms_1.default.createUniverse);
 }

@@ -3,11 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const config_1 = require("../../config");
 const api_1 = __importDefault(require("../../api"));
 const utils_1 = require("../../api/utils");
-const locale_1 = require("../../locale");
+const config_1 = require("../../config");
 const errors_1 = require("../../errors");
+const renderContent_1 = require("../../lib/renderContent");
+const locale_1 = require("../../locale");
 exports.default = {
     async list(req, res) {
         const search = req.getQueryParam('search');
@@ -47,7 +48,7 @@ exports.default = {
         const story = await api_1.default.story.getOne(req.session.user, { 'story.shortname': req.params.shortname });
         const title = `${(0, locale_1.T)('Untitled Chapter')} ${story.chapter_count + 1}`;
         const [, index] = await api_1.default.story.postChapter(req.session.user, story.shortname, { title });
-        return res.redirect(`${config_1.ADDR_PREFIX}/stories/${story.shortname}/${index}/edit`);
+        return res.redirect(`${config_1.ADDR_PREFIX}/editor/stories/${story.shortname}/${index}`);
     },
     async viewChapter(req, res) {
         const story = await api_1.default.story.getOne(req.session.user, { 'story.shortname': req.params.shortname });
@@ -59,8 +60,9 @@ exports.default = {
             delete user.email;
             commenters[user.id] = user;
         }
+        let renderedBody = await (0, renderContent_1.tryRenderContent)(req, chapter.body, story.universe_short);
         res.prepareRender('chapter', {
-            story, chapter, comments, commenters,
+            story, chapter, comments, commenters, renderedBody,
             commentAction: `${config_1.ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}/comment`,
         });
     },
@@ -75,11 +77,5 @@ exports.default = {
             }
             throw err;
         }
-    },
-    async editChapter(req, res) {
-        const story = await api_1.default.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }, utils_1.perms.WRITE);
-        const fetchedChapter = await api_1.default.story.getChapter(req.session.user, req.params.shortname, Number(req.params.index), utils_1.perms.WRITE);
-        const chapter = { ...fetchedChapter, ...(req.body ?? {}) };
-        res.prepareRender('editChapter', { story, chapter, error: res.error });
     },
 };

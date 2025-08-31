@@ -1,13 +1,12 @@
-import { ADDR_PREFIX } from '../../config';
-import api from '../../api';
-import { universeLink } from '../../templates';
-import { perms, getPfpUrl } from '../../api/utils';
-import logger from '../../logger';
-import { T } from '../../locale';
 import { RouteHandler } from '..';
-import { NotFoundError } from '../../errors';
+import api from '../../api';
 import { Comment } from '../../api/models/discussion';
 import { User } from '../../api/models/user';
+import { getPfpUrl, perms } from '../../api/utils';
+import { ADDR_PREFIX } from '../../config';
+import { NotFoundError } from '../../errors';
+import { RenderedBody, tryRenderContent } from '../../lib/renderContent';
+import { T } from '../../locale';
 
 export default {
   async list(req, res) {
@@ -58,7 +57,7 @@ export default {
 
     const title = `${T('Untitled Chapter')} ${story.chapter_count + 1}`;
     const [, index] = await api.story.postChapter(req.session.user, story.shortname, { title });
-    return res.redirect(`${ADDR_PREFIX}/stories/${story.shortname}/${index}/edit`);
+    return res.redirect(`${ADDR_PREFIX}/editor/stories/${story.shortname}/${index}`);
   },
   
   async viewChapter(req, res) {
@@ -71,8 +70,11 @@ export default {
       delete user.email;
       commenters[user.id] = user;
     }
+
+    let renderedBody: RenderedBody = await tryRenderContent(req, chapter.body, story.universe_short);
+
     res.prepareRender('chapter', {
-      story, chapter, comments, commenters,
+      story, chapter, comments, commenters, renderedBody,
       commentAction: `${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}/comment`,
     });
   },
@@ -87,12 +89,5 @@ export default {
       }
       throw err;
     }
-  },
-
-  async editChapter(req, res) {
-    const story = await api.story.getOne(req.session.user, { 'story.shortname': req.params.shortname }, perms.WRITE);
-    const fetchedChapter = await api.story.getChapter(req.session.user, req.params.shortname, Number(req.params.index), perms.WRITE);
-    const chapter = { ...fetchedChapter, ...(req.body ?? {}) };
-    res.prepareRender('editChapter', { story, chapter, error: res.error });
   },
 } satisfies Record<string, RouteHandler>;

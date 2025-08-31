@@ -18,8 +18,6 @@ const Image = extension_image_1.default.extend({
             {
                 tag: 'div.img-container img',
                 getAttrs: (element) => {
-                    if (!(element instanceof HTMLImageElement))
-                        return {};
                     return {
                         src: element.getAttribute('src'),
                         alt: element.getAttribute('alt'),

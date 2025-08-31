@@ -1,6 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultItemData = exports.defaultUniverseData = void 0;
+exports.unformattedTiptapDocument = unformattedTiptapDocument;
+function unformattedTiptapDocument(text) {
+    return {
+        text,
+        structure: [{
+                type: 'paragraph',
+                attrs: {},
+                marks: [],
+                content: [{ start: 0, end: text.length, type: 'text', attrs: {}, marks: [] }],
+            }],
+    };
+}
 exports.defaultUniverseData = {
     cats: {
         article: ['article', 'articles', '#deddca'],
@@ -16,7 +28,7 @@ exports.defaultUniverseData = {
 };
 exports.defaultItemData = {
     article: {
-        body: '# Markdown Test\n\n- **Bold**\n- *Italics*\n- _Italics 2_\n- __Underline__\n- ~~Strikethrough~~\n- [Link](@test-character)\n- Lists',
+        body: unformattedTiptapDocument('# Markdown Test\n\n- **Bold**\n- *Italics*\n- _Italics 2_\n- __Underline__\n- ~~Strikethrough~~\n- [Link](@test-character)\n- Lists'),
     },
     character(age = 0, parent = null, child = null) {
         return {
@@ -28,13 +40,13 @@ exports.defaultItemData = {
                 parents: parent ? [{ parent_shortname: parent.shortname, parent_title: parent.title }] : [],
                 children: child ? [{ child_shortname: child.shortname, child_title: child.title }] : [],
             }),
-            body: 'This is a test character.',
+            body: unformattedTiptapDocument('This is a test character.'),
             lineage: { title: 'Lineage' },
             timeline: { title: 'Timeline' },
         };
     },
     event: {
-        body: 'This is a test event.',
+        body: unformattedTiptapDocument('This is a test event.'),
         _tables: (self) => ({
             events: [
                 { event_title: null, abstime: Math.round(Math.random() * 31557600000), src_id: self.id, src_shortname: self.shortname, src_title: self.title },
