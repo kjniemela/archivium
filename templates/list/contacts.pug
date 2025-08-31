@@ -1,5 +1,4 @@
 extends ../layout.pug
-include ../mixins.pug
 
 block title
   title #{T('Contacts')} — #{T('Archivium')}
@@ -23,7 +22,7 @@ block content
   .card-list
     each user in contacts
       .card.sheet.gap-4.align-start(data-goto=`${ADDR_PREFIX}/users/${user.username}`)
-        img.userIcon(alt=user.username, src=user.pfpUrl)
+        +userIcon(user)
         .d-flex.flex-col.grow-1
           h2.ma-0
             a.link.link-animated(href=`${ADDR_PREFIX}/users/${user.username}`) #{user.username}
@@ -40,7 +39,7 @@ block content
   .card-list
     each user in pending
       .card.sheet.gap-4.align-start(data-goto=`${ADDR_PREFIX}/users/${user.username}`)
-        img.userIcon(alt=user.username, src=user.pfpUrl)
+        +userIcon(user)
         .d-flex.flex-col
           h2.ma-0
             a.link.link-animated(href=`${ADDR_PREFIX}/users/${user.username}`) #{user.username}

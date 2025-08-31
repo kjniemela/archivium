@@ -51,10 +51,11 @@ class ContactAPI {
         const queryString = `
       SELECT 
         user.id, user.username, user.email, user.created_at, user.updated_at, contact.accepted,
-        (contact.accepting_user = ?) AS is_request, (ui.user_id IS NOT NULL) as hasPfp
+        (contact.accepting_user = ?) AS is_request, (ui.user_id IS NOT NULL) as hasPfp, userplan.plan
       FROM contact
       INNER JOIN user
       LEFT JOIN userimage AS ui ON user.id = ui.user_id
+      LEFT JOIN userplan ON user.id = userplan.user_id
       WHERE 
         user.id <> ? 
         AND (

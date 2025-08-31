@@ -81,13 +81,14 @@ class DiscussionAPI {
         const comments = await (0, utils_1.executeQuery)(queryString1, [threadId]);
         if (inclCommenters) {
             const queryString2 = `
-          SELECT user.id, user.username, user.email, (ui.user_id IS NOT NULL) as hasPfp
+          SELECT user.id, user.username, user.email, (ui.user_id IS NOT NULL) as hasPfp, userplan.plan
           FROM user
           INNER JOIN comment ON user.id = comment.author_id
           INNER JOIN threadcomment AS tc ON tc.comment_id = comment.id
           LEFT JOIN userimage AS ui ON user.id = ui.user_id
+          LEFT JOIN userplan ON user.id = userplan.user_id
           WHERE tc.thread_id = ?
-          GROUP BY user.id`;
+          GROUP BY user.id, userplan.plan`;
             const users = await (0, utils_1.executeQuery)(queryString2, [threadId]);
             return [comments, users];
         }

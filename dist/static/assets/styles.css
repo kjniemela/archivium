@@ -916,6 +916,26 @@ h4, h5 {
   top: -0.5rem;
 }
 
+.user-badge {
+    background-color: #707077cf;
+    font-size: 0.75rem;
+    padding: 0.125rem;
+    top: unset;
+    right: unset;
+    bottom: 0.125rem;
+    width: calc(100% + 0.875rem);
+    left: -0.4375rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.0625rem;
+}
+
+.user-badge .material-symbols-outlined {
+  font-size: 0.9375rem;
+  margin-left: -0.125rem;
+}
+
 header .badge {
   z-index: 4;
 }
@@ -1312,6 +1332,9 @@ input:checked + .slider:before {
   margin-right: 0.5rem;
 }
 
+.mb-auto {
+  margin-bottom: auto;
+}
 .mb-0 {
   margin-bottom: 0;
 }
