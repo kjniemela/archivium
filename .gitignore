@@ -10,6 +10,4 @@ logs/
 cypress/screenshots/
 
 package-lock.json
-dist/static/editor/bundle.js
-dist/static/editor/bundle.js.map
-dist/static/editor/bundle.js.LICENSE.txt
+dist/static/editor
