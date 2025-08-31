@@ -4,6 +4,8 @@ import { API } from '..';
 import { User } from './user';
 import { PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { ForbiddenError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
+import { IndexedDocument, indexedToJson, updateLinks } from '../../lib/tiptapHelpers';
+import { extractLinkData, LinkData } from '../../lib/editor';
 
 export type ItemOptions = BaseOptions & {
   type?: string,
@@ -54,7 +56,14 @@ export type Parent = {
   parent_label: string,
 };
 
-export type BasicItem = {
+export type ItemLink = {
+  id: number,
+  title: string,
+  shortname: string,
+  universe_short: string,
+};
+
+export type BasicItem<T = string | Object> = {
   id: number,
   title: string,
   shortname: string,
@@ -68,14 +77,15 @@ export type BasicItem = {
   notifs_enabled: boolean;
   author_id: number | null,
   tags: string[],
-  obj_data: Object | string, // TODO we should try to never stringify this if possible
+  obj_data: T, // TODO we should try to never stringify this if possible
 };
 
-export type Item = BasicItem & {
+export type Item<T = string | Object> = BasicItem<T> & {
   events: ItemEvent[];
   gallery: GalleryImage[];
   parents: Parent[];
   children: Child[],
+  links: ItemLink[],
 };
 
 function getQuery(selects: [string, string?, (string | string[])?][] = [], permsCond?: Cond, whereConds?: Cond, options: ItemOptions = {}) {
@@ -212,6 +222,7 @@ export class ItemAPI {
       gallery: [],
       parents: [],
       children: [],
+      links: [],
     };
 
     const events = await executeQuery(`
@@ -254,14 +265,23 @@ export class ItemAPI {
     `, [item.id]);
     item.parents = parents as Parent[];
 
+    const links = await executeQuery(`
+      SELECT DISTINCT item.id, item.shortname, item.title, universe.shortname AS universe_short
+      FROM itemlink
+      INNER JOIN item ON item.id = itemlink.from_item
+      INNER JOIN universe ON item.universe_id = universe.id
+      WHERE itemlink.to_universe_short = ? AND itemlink.to_item_short = ?
+    `, [item.universe_short, item.shortname]);
+    item.links = links as ItemLink[];
+
     if (item.obj_data) {
       const objData = JSON.parse(item.obj_data as string);
+      const links = await executeQuery(`
+        SELECT to_universe_short, to_item_short, href
+        FROM itemlink
+        WHERE from_item = ?
+      `, [item.id]);
       if (typeof objData.body === 'string') {
-        const links = await executeQuery(`
-          SELECT to_universe_short, to_item_short, href
-          FROM itemlink
-          WHERE from_item = ?
-        `, [item.id]);
         const replacements = {};
         const attachments = {};
         for (const { to_universe_short, to_item_short, href } of links) {
@@ -277,15 +297,37 @@ export class ItemAPI {
           }
           return match;
         });
-        item.obj_data = JSON.stringify(objData);
-      }
+      } else if (objData.body) {
+        const linkMap = {};
+        for (const { to_universe_short, to_item_short, href } of links) {
+          linkMap[href] = [to_universe_short, to_item_short];
+        }
+        updateLinks(objData.body, (href) => {
+          if (href in linkMap) {
+            const linkData = extractLinkData(href);
+            if (linkData.item) {
+              const [toUniverse, toItem] = linkMap[href];
+              if (toUniverse === item.universe_short) {
+                return href.replace(linkData.item, toItem);
+              } else if (linkData.universe) {
+                return href.replace(linkData.universe, toUniverse).replace(linkData.item, toItem);
+              } else {
+                return `@${toUniverse}/${toItem}${linkData.query ? `?${linkData.query}` : ''}${linkData.hash ? `#${linkData.hash}` : ''}`;
+              }
+            }
+          }
 
-      if (user) {
-        const notifs = await executeQuery(`
-          SELECT 1 FROM itemnotification WHERE item_id = ? AND user_id = ? AND is_enabled
-        `, [item.id, user.id]);
-        item.notifs_enabled = notifs.length === 1;
+          return href;
+        });
       }
+      item.obj_data = JSON.stringify(objData);
+    }
+
+    if (user) {
+      const notifs = await executeQuery(`
+        SELECT 1 FROM itemnotification WHERE item_id = ? AND user_id = ? AND is_enabled
+      `, [item.id, user.id]);
+      item.notifs_enabled = notifs.length === 1;
     }
 
     return item;
@@ -680,36 +722,32 @@ export class ItemAPI {
   }
 
   async handleLinks(item: Item, objData: any, conn?: PoolConnection): Promise<void> {
-    if (objData.body) {
-      if (typeof objData.body === 'string') {
-        const bodyText = objData.body;
-        const links = await extractLinks(item.universe_short, bodyText, { item: { ...item, obj_data: objData } });
-        const oldLinks = await this._getLinks(item);
-        const existingLinks = {};
-        const newLinks = {};
+    if (objData.body && typeof objData.body !== 'string') {
+      const links: ({ href: string } & LinkData)[] = [];
+      indexedToJson(objData.body as IndexedDocument, (href) => href.startsWith('@') && links.push({ href, ...extractLinkData(href) }));
+      const oldLinks = await this._getLinks(item);
+      const existingLinks = {};
+      const newLinks = {};
+      for (const { href } of oldLinks) {
+        existingLinks[href] = true;
+      }
+      const doUpdates = async (conn: PoolConnection) => {
+        for (const { universe, item: itemShort, href } of links) {
+          newLinks[href] = true;
+          if (!existingLinks[href]) {
+            await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [ item.id, universe ?? item.universe_short, itemShort, href ]);
+          }
+        }
         for (const { href } of oldLinks) {
-          existingLinks[href] = true;
-        }
-        const doUpdates = async (conn: PoolConnection) => {
-          for (const [universeShort, itemShort, href] of links) {
-            newLinks[href] = true;
-            if (!existingLinks[href]) {
-              await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [ item.id, universeShort, itemShort, href ]);
-            }
+          if (!newLinks[href]) {
+            await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [ item.id, href ]);
           }
-          for (const { href } of oldLinks) {
-            if (!newLinks[href]) {
-              await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [ item.id, href ]);
-            }
-          }
-        };
-        if (conn) {
-          await doUpdates(conn);
-        } else {
-          await withTransaction(doUpdates);
         }
+      };
+      if (conn) {
+        await doUpdates(conn);
       } else {
-        // console.log(objData.body.structure);
+        await withTransaction(doUpdates);
       }
     }
   }

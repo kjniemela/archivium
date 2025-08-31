@@ -5,6 +5,11 @@ block title
 
 block append styles
   link(rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css")
+  style.
+    #links-display {
+      visibility: hidden;
+      transition: max-height 0.33s;
+    }
 
 block scripts
   script(src="https://unpkg.com/easymde/dist/easymde.min.js")
@@ -96,7 +101,30 @@ block content
         each tag in item.tags
           if tag
             a.link.link-animated(href=`${universeLink(universe.shortname)}/items?tag=${tag}`) ##{tag} 
-          
+  .center#links
+    small #{T('Linked to by %s items', item.links.length)} (
+      a.link.link-animated#show-links #{T('show')}
+      | ).
+    ul#links-display.d-flex.gap-2.justify-center.flex-wrap.ma-0.pa-0.pt-1.overflow-hidden
+      each link in item.links
+        li.navbarBtn
+          a.link.link-animated(href=`${universeLink(link.universe_short)}/items/${link.shortname}`) #{link.title}
+    script.
+      (() => {
+        const display = document.querySelector('#links-display');
+        const showBtn = document.querySelector('#show-links');
+        const height = display.getBoundingClientRect().height;
+        let isVisible = false;
+        display.style.maxHeight = 0;
+        display.style.visibility = 'visible';
+        showBtn.addEventListener('click', () => {
+          isVisible = !isVisible;
+          showBtn.textContent = isVisible ? T('hide') : T('show')
+          console.log(height)
+          display.style.maxHeight = isVisible ? `${height}px` : 0;
+          console.log(display.style.maxHeight)
+        });
+      })();
   hr
 
   //- Tab buttons

@@ -14,18 +14,20 @@ const ToC_1 = __importDefault(require("./extensions/ToC"));
 const Heading_1 = __importDefault(require("./extensions/Heading"));
 function extractLinkData(href) {
     const data = {};
-    let [first, second] = href.substring(1).split('/');
-    if (first) {
-        data.universe = first;
-        if (!second) {
-            second = first;
-            delete data.universe;
+    if (href.startsWith('@')) {
+        let [first, second] = href.substring(1).split('/');
+        if (first) {
+            data.universe = first;
+            if (!second) {
+                second = first;
+                delete data.universe;
+            }
+            const [itemQuery, hash] = second.split('#');
+            const [item, query] = itemQuery.split('?');
+            data.item = item;
+            data.hash = hash;
+            data.query = query;
         }
-        const [itemQuery, hash] = second.split('#');
-        const [item, query] = itemQuery.split('?');
-        data.item = item;
-        data.hash = hash;
-        data.query = query;
     }
     return data;
 }
@@ -58,7 +60,7 @@ const editorExtensions = (editMode, context) => ([
     Link_1.default.configure({
         enableClickSelection: editMode,
         openOnClick: !editMode,
-        shorthandResolver,
+        ...(editMode ? {} : { shorthandResolver }),
         context,
     }),
     ToC_1.default.configure({ context }),

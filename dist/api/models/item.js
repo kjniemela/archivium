@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemAPI = void 0;
 const utils_1 = require("../utils");
-const markdown_1 = require("../../markdown");
 const errors_1 = require("../../errors");
+const tiptapHelpers_1 = require("../../lib/tiptapHelpers");
+const editor_1 = require("../../lib/editor");
 function getQuery(selects = [], permsCond, whereConds, options = {}) {
     const query = new utils_1.QueryBuilder()
         .select('item.id')
@@ -129,6 +130,7 @@ class ItemAPI {
             gallery: [],
             parents: [],
             children: [],
+            links: [],
         };
         const events = await (0, utils_1.executeQuery)(`
       SELECT DISTINCT
@@ -166,14 +168,22 @@ class ItemAPI {
       WHERE lineage.child_id = ?
     `, [item.id]);
         item.parents = parents;
+        const links = await (0, utils_1.executeQuery)(`
+      SELECT DISTINCT item.id, item.shortname, item.title, universe.shortname AS universe_short
+      FROM itemlink
+      INNER JOIN item ON item.id = itemlink.from_item
+      INNER JOIN universe ON item.universe_id = universe.id
+      WHERE itemlink.to_universe_short = ? AND itemlink.to_item_short = ?
+    `, [item.universe_short, item.shortname]);
+        item.links = links;
         if (item.obj_data) {
             const objData = JSON.parse(item.obj_data);
+            const links = await (0, utils_1.executeQuery)(`
+        SELECT to_universe_short, to_item_short, href
+        FROM itemlink
+        WHERE from_item = ?
+      `, [item.id]);
             if (typeof objData.body === 'string') {
-                const links = await (0, utils_1.executeQuery)(`
-          SELECT to_universe_short, to_item_short, href
-          FROM itemlink
-          WHERE from_item = ?
-        `, [item.id]);
                 const replacements = {};
                 const attachments = {};
                 for (const { to_universe_short, to_item_short, href } of links) {
@@ -189,14 +199,38 @@ class ItemAPI {
                     }
                     return match;
                 });
-                item.obj_data = JSON.stringify(objData);
             }
-            if (user) {
-                const notifs = await (0, utils_1.executeQuery)(`
-          SELECT 1 FROM itemnotification WHERE item_id = ? AND user_id = ? AND is_enabled
-        `, [item.id, user.id]);
-                item.notifs_enabled = notifs.length === 1;
+            else if (objData.body) {
+                const linkMap = {};
+                for (const { to_universe_short, to_item_short, href } of links) {
+                    linkMap[href] = [to_universe_short, to_item_short];
+                }
+                (0, tiptapHelpers_1.updateLinks)(objData.body, (href) => {
+                    if (href in linkMap) {
+                        const linkData = (0, editor_1.extractLinkData)(href);
+                        if (linkData.item) {
+                            const [toUniverse, toItem] = linkMap[href];
+                            if (toUniverse === item.universe_short) {
+                                return href.replace(linkData.item, toItem);
+                            }
+                            else if (linkData.universe) {
+                                return href.replace(linkData.universe, toUniverse).replace(linkData.item, toItem);
+                            }
+                            else {
+                                return `@${toUniverse}/${toItem}${linkData.query ? `?${linkData.query}` : ''}${linkData.hash ? `#${linkData.hash}` : ''}`;
+                            }
+                        }
+                    }
+                    return href;
+                });
             }
+            item.obj_data = JSON.stringify(objData);
+        }
+        if (user) {
+            const notifs = await (0, utils_1.executeQuery)(`
+        SELECT 1 FROM itemnotification WHERE item_id = ? AND user_id = ? AND is_enabled
+      `, [item.id, user.id]);
+            item.notifs_enabled = notifs.length === 1;
         }
         return item;
     }
@@ -553,38 +587,33 @@ class ItemAPI {
         return await this._getLinks(item);
     }
     async handleLinks(item, objData, conn) {
-        if (objData.body) {
-            if (typeof objData.body === 'string') {
-                const bodyText = objData.body;
-                const links = await (0, markdown_1.extractLinks)(item.universe_short, bodyText, { item: { ...item, obj_data: objData } });
-                const oldLinks = await this._getLinks(item);
-                const existingLinks = {};
-                const newLinks = {};
+        if (objData.body && typeof objData.body !== 'string') {
+            const links = [];
+            (0, tiptapHelpers_1.indexedToJson)(objData.body, (href) => href.startsWith('@') && links.push({ href, ...(0, editor_1.extractLinkData)(href) }));
+            const oldLinks = await this._getLinks(item);
+            const existingLinks = {};
+            const newLinks = {};
+            for (const { href } of oldLinks) {
+                existingLinks[href] = true;
+            }
+            const doUpdates = async (conn) => {
+                for (const { universe, item: itemShort, href } of links) {
+                    newLinks[href] = true;
+                    if (!existingLinks[href]) {
+                        await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [item.id, universe ?? item.universe_short, itemShort, href]);
+                    }
+                }
                 for (const { href } of oldLinks) {
-                    existingLinks[href] = true;
-                }
-                const doUpdates = async (conn) => {
-                    for (const [universeShort, itemShort, href] of links) {
-                        newLinks[href] = true;
-                        if (!existingLinks[href]) {
-                            await conn.execute('INSERT INTO itemlink (from_item, to_universe_short, to_item_short, href) VALUES (?, ?, ?, ?)', [item.id, universeShort, itemShort, href]);
-                        }
+                    if (!newLinks[href]) {
+                        await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [item.id, href]);
                     }
-                    for (const { href } of oldLinks) {
-                        if (!newLinks[href]) {
-                            await conn.execute('DELETE FROM itemlink WHERE from_item = ? AND href = ?', [item.id, href]);
-                        }
-                    }
-                };
-                if (conn) {
-                    await doUpdates(conn);
                 }
-                else {
-                    await (0, utils_1.withTransaction)(doUpdates);
-                }
+            };
+            if (conn) {
+                await doUpdates(conn);
             }
             else {
-                // console.log(objData.body.structure);
+                await (0, utils_1.withTransaction)(doUpdates);
             }
         }
     }
