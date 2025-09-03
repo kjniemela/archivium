@@ -205,7 +205,7 @@ block content
       updateObjData({ publicBody: publicMDE.value() });
     });
     const publicBodyContainer = document.querySelector('#public-body');
-    publicBodyContainer.classList.toggle('hidden', #{universe.public});
+    publicBodyContainer.classList.toggle('hidden', #{universe.public ? 'true' : 'false'});
     const visibilitySelect = document.querySelector('#visibility');
     visibilitySelect.addEventListener('change', () => {
       publicBodyContainer.classList.toggle('hidden', visibilitySelect.value !== 'private');

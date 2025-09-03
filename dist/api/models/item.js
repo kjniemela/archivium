@@ -20,7 +20,7 @@ function getQuery(selects = [], permsCond, whereConds, options = {}) {
     for (const args of selects) {
         query.select(...args);
     }
-    query.select('tag.tags')
+    query.select('IFNULL(tag.tags, JSON_ARRAY()) AS tags')
         .from('item')
         .leftJoin('user', new utils_1.Cond('user.id = item.author_id'))
         .innerJoin('universe', new utils_1.Cond('universe.id = item.universe_id'))

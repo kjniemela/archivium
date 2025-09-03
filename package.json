@@ -9,8 +9,8 @@
     "build": "npx tsc",
     "clean": "npx tsc --build --clean",
     "build:dev": "npx tsc --build --clean && npx tsc --watch",
-    "dev": "nodemon -e '.js,.pug' --watch dist --ignore dist/static/editor --delay 1000ms dist/index.js",
-    "devl": "nodemon --ext \".js,.pug\" --legacy-watch --ignore dist/static/editor --delay 1000ms dist/index.js",
+    "dev": "nodemon -e '.js,.pug' --watch dist --ignore dist/static/editor --ignore cypress --delay 1000ms dist/index.js",
+    "devl": "nodemon --ext \".js,.pug\" --legacy-watch --ignore dist/static/editor --ignore cypress --delay 1000ms dist/index.js",
     "db:backup": "node dist/db/backup.js",
     "db:export": "node dist/db/export.js",
     "db:import": "node dist/db/import.js",
@@ -19,7 +19,8 @@
     "db:upgrade": "node dist/db/upgrade",
     "editor:dev": "cd editor && cross-env NODE_ENV=development webpack watch",
     "editor:build": "cd editor && cross-env NODE_ENV=production webpack",
-    "editor:lint": "eslint editor/"
+    "editor:lint": "eslint editor/",
+    "build:all": "npm run build && npm run editor:build"
   },
   "repository": {
     "type": "git",

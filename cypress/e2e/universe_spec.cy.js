@@ -94,7 +94,7 @@ describe('Universe spec', () => {
     cy.get('.tabs [data-tab=authors] .card').contains('testwriter').should('exist');
   });
 
-  it('creates new private universe', () => {
+  it('creates new private universe with a public page', () => {
     cy.visit('/universes');
     cy.get('a').contains('New Universe').click();
 
@@ -109,6 +109,9 @@ describe('Universe spec', () => {
     cy.get('button[type="submit"]').click();
 
     cy.get('h1').contains('Cypress Universe').should('exist');
+    cy.get('#action-bar').contains('Edit').click();
+    cy.get('#public-body .CodeMirror').type('This is the public page for the Cypress Universe.');
+    cy.get('#save-btn').click();
   });
 
   it('requests access to new universe as reader, admin approves', () => {
@@ -163,10 +166,14 @@ describe('Universe spec', () => {
     cy.get('.card-list .card h3').contains('Cypress Universe').should('not.exist');
   });
 
-  it('anonymous users cannot see the private universe', () => {
+  it('anonymous users cannot see the private universe, but can see the public page', () => {
     cy.logout();
     cy.visit('/universes');
     cy.get('.card-list .card h3').contains('Cypress Universe').should('not.exist');
+
+    cy.visit('/universes/cypress-universe');
+    cy.get('.page #md-body .markdown').should('have.text', 'This is the public page for the Cypress Universe.');
+
   });
 
   it('makes the universe public, the reader can see the universe again', () => {
