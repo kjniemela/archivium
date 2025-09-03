@@ -105,7 +105,7 @@ function getQuery(selects: [string, string?, (string | string[])?][] = [], perms
     query.select(...args);
   }
 
-  query.select('tag.tags')
+  query.select('IFNULL(tag.tags, JSON_ARRAY()) AS tags')
     .from('item')
     .leftJoin('user', new Cond('user.id = item.author_id'))
     .innerJoin('universe', new Cond('universe.id = item.universe_id'))
