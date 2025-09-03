@@ -11,6 +11,13 @@ CREATE TABLE schema_version (
 INSERT INTO schema_version (version, comment, time)
 VALUES (0, '', NULL);
 
+CREATE TABLE image (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(64) NOT NULL,
+  mimetype VARCHAR(32) NOT NULL,
+  data LONGBLOB NOT NULL
+);
+
 CREATE TABLE newsletter (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(128),
@@ -43,10 +50,9 @@ CREATE TABLE userplan (
 
 CREATE TABLE userimage (
   user_id INT NOT NULL,
-  name VARCHAR(64) NOT NULL,
-  mimetype VARCHAR(32) NOT NULL,
-  data LONGBLOB NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
+  image_id INT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE,
+  FOREIGN KEY (image_id) REFERENCES image (id) ON DELETE CASCADE
 );
 
 CREATE TABLE userverification (
@@ -255,13 +261,11 @@ CREATE TABLE itemnote (
 );
 
 CREATE TABLE itemimage (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  image_id INT NOT NULL,
   item_id INT NOT NULL,
-  name VARCHAR(64) NOT NULL,
   label VARCHAR(256) NOT NULL,
-  mimetype VARCHAR(32) NOT NULL,
-  data LONGBLOB NOT NULL,
-  FOREIGN KEY (item_id) REFERENCES item (id) ON DELETE CASCADE
+  FOREIGN KEY (item_id) REFERENCES item (id) ON DELETE CASCADE,
+  FOREIGN KEY (image_id) REFERENCES image (id) ON DELETE CASCADE
 );
 
 CREATE TABLE itemlink (
