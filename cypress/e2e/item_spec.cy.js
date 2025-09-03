@@ -126,6 +126,16 @@ describe('Item spec', () => {
     cy.get('button[type="submit"]').click();
   });
 
+  it('adds some tags to the new item, confirm they exist', () => {
+    cy.visit('/editor/universes/public-test-universe/items/cypress-character');
+
+    cy.get('#tags').type('testing cypress');
+    cy.get('#preview-btn').click();
+
+    cy.get('#tags>small').children().should('have.length', 2);
+    cy.get('#tags').contains('#cypress #testing');
+  });
+
   it('logs in as owner, deletes the new item', () => {
     cy.login('testowner');
 
