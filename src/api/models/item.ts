@@ -333,7 +333,7 @@ export class ItemAPI {
     return item;
   }
 
-  async getMany(user: User | undefined, conditions, permissionsRequired = perms.READ, options: ItemOptions = {}): Promise<Item[]> {
+  async getMany(user: User | undefined, conditions, permissionsRequired = perms.READ, options: ItemOptions = {}): Promise<BasicItem[]> {
     if (options.type) {
       if (!conditions) conditions = { strings: [], values: [] };
       conditions.strings.push('item.item_type = ?');
@@ -417,12 +417,12 @@ export class ItemAPI {
     if (options.search) {
       query.innerJoin(['tag', 'search_tag'], new Cond('search_tag.item_id = item.id'));
     }
-    const data = await query.execute() as Item[];
+    const data = await query.execute() as BasicItem[];
 
     return data;
   }
 
-  async getByAuthorUsername(user, username, permissionsRequired, options): Promise<Item[]> {
+  async getByAuthorUsername(user, username, permissionsRequired, options): Promise<BasicItem[]> {
 
     const conditions = {
       strings: [
@@ -436,7 +436,7 @@ export class ItemAPI {
     return items;
   }
 
-  async getByUniverseId(user, universeId, permissionsRequired, options): Promise<Item[]> {
+  async getByUniverseId(user, universeId, permissionsRequired, options): Promise<BasicItem[]> {
 
     const conditions = {
       strings: [
@@ -450,7 +450,7 @@ export class ItemAPI {
     return items;
   }
 
-  async getByUniverseAndItemIds(user, universeId, itemId, permissionsRequired = perms.READ): Promise<Item> {
+  async getByUniverseAndItemIds(user, universeId, itemId, permissionsRequired = perms.READ): Promise<BasicItem> {
 
     const conditions = {
       strings: [
@@ -471,7 +471,7 @@ export class ItemAPI {
     return item;
   }
 
-  async getByUniverseShortname(user: User | undefined, shortname: string, permissionsRequired = perms.READ, options?: ItemOptions): Promise<Item[]> {
+  async getByUniverseShortname(user: User | undefined, shortname: string, permissionsRequired = perms.READ, options?: ItemOptions): Promise<BasicItem[]> {
 
     const conditions = {
       strings: [
