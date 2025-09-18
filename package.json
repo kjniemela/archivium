@@ -57,6 +57,7 @@
     "@tiptap/suggestion": "^3.27.2",
     "@tiptap/y-tiptap": "^3.0.1",
     "axios": "^1.13.2",
+    "cors": "^2.8.5",
     "buffer-image-size": "^0.6.4",
     "compression": "^1.8.1",
     "dotenv": "^16.6.1",

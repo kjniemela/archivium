@@ -1,7 +1,8 @@
+import cors from 'cors';
 import { Express, Handler, Request, Response } from 'express';
 import { Multer } from 'multer';
 import api from '.';
-import { ADDR_PREFIX } from '../config';
+import { ADDR_PREFIX, DEV_MODE } from '../config';
 import embedder from '../embedding';
 import { NotFoundError } from '../errors';
 import { tryRenderContent } from '../lib/renderContent';
@@ -78,7 +79,23 @@ export default function (app: Express, upload: Multer) {
   app.use('/api', (req, res, next) => {
     res.set('Content-Type', 'application/json; charset=utf-8');
     next();
-  })
+  });
+
+  app.use('/api', cors({
+    origin: function (origin: string, callback: (error: Error | null, isAllowed?: boolean) => void) {
+      if (!origin) return callback(null, true);
+      if (origin.startsWith('http://localhost') && DEV_MODE) return callback(null, true);
+
+      const DOMAIN = 'archivium.net';
+      const regex = new RegExp(`^https?:\/\/([a-z0-9-]+\\.)*${DOMAIN.replace('.', '\\.')}$`, "i");
+      if (regex.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true
+  }));
 
   const apiRoutes = new APIRoute('/api', {}, [
     new APIRoute('/*'),
