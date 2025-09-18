@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import api from '../api';
-import { ADDR_PREFIX } from '../config';
+import { ADDR_PREFIX, DEV_MODE } from '../config';
 import logger from '../logger';
 import { ResultSetHeader } from 'mysql2/promise';
 import { Session } from '../api/models/session';
@@ -31,7 +31,7 @@ const createSession = async (req: Request, res: Response, next: NextFunction) =>
   res.cookie('archiviumuid', session.hash, {
     httpOnly: true,
     secure: true,
-    sameSite: 'lax',
+    sameSite: DEV_MODE ? 'none' : 'lax',
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
   });
   req.session = {
