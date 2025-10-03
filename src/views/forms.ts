@@ -112,7 +112,7 @@ export default {
     const { session, params, body } = req;
     const user = await api.user.getOne({ 'user.username': req.body.username });
     await api.universe.putPermissions(session.user, params.universeShortname, user, Number(body.permission_level));
-    res.redirect(`${universeLink(req, params.universeShortname)}/permissions`);
+    res.redirect(`${universeLink(req, params.universeShortname)}/admin?tab=permissions`);
   },
 
   async sponsorUniverse(req, res) {

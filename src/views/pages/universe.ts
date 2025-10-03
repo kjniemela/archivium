@@ -136,7 +136,7 @@ export default {
     });
   },
 
-  async editPerms(req, res) {
+  async admin(req, res) {
     const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.ADMIN);
     const users = await api.user.getMany();
     const contacts = await api.contact.getAll(req.session.user, false);
@@ -151,7 +151,7 @@ export default {
     for (const userID in universe.author_permissions) {
       if (universe.author_permissions[userID] === perms.OWNER) ownerCount++;
     }
-    res.prepareRender('editUniversePerms', { universe, users, requests, ownerCount });
+    res.prepareRender('universeAdmin', { universe, users, requests, ownerCount });
   },
 
   async upgrade(req, res) {

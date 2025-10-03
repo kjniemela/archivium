@@ -1,0 +1,68 @@
+extends ../layout.pug
+
+block title
+  title #{T('Settings')} — #{T('Archivium')}
+
+block scripts
+  script
+    include /static/scripts/tabs.js
+    include /static/scripts/fetchUtils.js
+  script.
+    const formatDate = !{formatDate};
+    const validateUsername = !{validateUsername};
+
+block content
+  .d-flex.justify-between.align-baseline
+    h2 #{universe.title} Admin Menu
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{T('Go back')}
+
+  ul#tabBtns.navbarBtns.gap-1.mb-2.scroll-x
+    li.navbarBtn(data-tab='permissions')
+      h3.navbarBtnLink.navbarText.ma-0(onclick=`showTab('permissions')`) #{T('Permissions')}
+    li.navbarBtn(data-tab='storage')
+      h3.navbarBtnLink.navbarText.ma-0(onclick=`showTab('storage')`) #{T('Storage')}
+
+  .tabs
+    .itemTab.hidden.flex-col(data-tab='permissions')
+      script.
+        window.addEventListener('load', () => {
+          document.querySelectorAll('form .permission_level').forEach((select) => {
+            select.onchange = () => {
+              select.form.submit();
+            }
+          });
+        });
+        
+      .d-flex.flex-col.align-start
+        .grid(style={ 'grid-template-columns': '1fr 1rem 1fr' })
+          each perm, authorId in universe.author_permissions
+            form.grid.grid-inherit.align-center(method='POST' action=`${universeLink(universe.shortname)}/permissions` style={ 'grid-column': '1 / 4' })
+              input(class='username' name='username' type='hidden' value=universe.authors[authorId])
+              b(style={ 'grid-column': '1 / 2' }) #{universe.authors[authorId]}
+              select(class='permission_level' name='permission_level' style={ 'grid-column': '3 / 4' } disabled=((perm === perms.OWNER && ownerCount === 1) || (perm > universe.author_permissions[contextUser.id])))
+                each permission_level in Object.keys(perms).filter((item) => !isNaN(Number(item)))
+                  option(value=permission_level selected=(permission_level == perm) disabled=(permission_level > universe.author_permissions[contextUser.id])) #{T(`perms_${permission_level}`)}
+          
+      br
+      hr
+      br
+
+      #requests.d-flex.flex-col.gap-2
+        each request in requests
+          .d-flex.nowrap.gap-1.align-center
+            span
+              a.link.link-animated(href=`${ADDR_PREFIX}/users/${request.username}`) #{request.username}
+              |  is requesting  
+              b #{T(`perms_${request.permission_level}`).toLowerCase()}
+              |  permissions.
+            button(
+              onclick=`putJSON(
+                '/api/universes/${universe.shortname}/perms', { username: '${request.username}', permission_level: ${request.permission_level} }
+              ).then(() => window.location.reload())`
+            ) #{T('Approve')}
+            button(
+              onclick=`deleteJSON(
+                '/api/universes/${universe.shortname}/request/${request.username}'
+              ).then(() => window.location.reload())`
+            ) #{T('Deny')}
+    .itemTab.hidden.flex-col(data-tab='storage')

@@ -73,9 +73,9 @@ block content
         a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/edit`)
           span.material-symbols-outlined edit
           |  #{T('Edit')}
-        a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/permissions`)
+        a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/admin`)
           span.material-symbols-outlined key_vertical
-          |  #{T('Set Permissions')}
+          |  #{T('Admin Menu')}
         if (contextUser.maxTier > universe.tier && couldUpgrade) || (universe.author_permissions[contextUser.id] >= perms.OWNER && universe.tier === tiers.FREE)
           a.link.link-animated.d-flex.align-center(href=`${universeLink(universe.shortname)}/upgrade`)
             span.material-symbols-outlined workspace_premium
