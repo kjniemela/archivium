@@ -152,7 +152,7 @@ class UniverseAPI {
         const rows = await (0, utils_1.executeQuery)(queryString, [shortname]);
         if (!rows)
             throw new errors_1.NotFoundError();
-        return Number(rows[0].size);
+        return Number(rows[0]?.size);
     }
     async post(user, body) {
         if (!user)

@@ -192,7 +192,7 @@ export class UniverseAPI {
 
     const rows = await executeQuery<ResultSetHeader>(queryString, [shortname])
     if (!rows) throw new NotFoundError();
-    return Number(rows[0].size);
+    return Number(rows[0]?.size);
   }
 
   async post(user: User | undefined, body): Promise<[ResultSetHeader, ResultSetHeader]> {

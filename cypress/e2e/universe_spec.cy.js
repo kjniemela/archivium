@@ -157,7 +157,7 @@ describe('Universe spec', () => {
     cy.visit('/universes/cypress-universe');
     cy.get('#action-bar').contains('Admin Menu').click();
 
-    cy.intercept('POST', '/universes/cypress-universe/admin?tab=permissions').as('setperms');
+    cy.intercept('POST', '/universes/cypress-universe/permissions').as('setperms');
     cy.get('form').contains('testreader').parent().find('select').select('0');
     cy.wait('@setperms');
 
