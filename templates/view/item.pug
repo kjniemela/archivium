@@ -273,6 +273,9 @@ block content
           content.classList.remove('itemKey');
           replaceContent('gallery-fullscreen-modal', content);
           showModal('gallery-fullscreen-modal');
+          setOnClose('gallery-fullscreen-modal', () => {
+            hideModal('gallery-fullscreen-modal');
+          });
         };
       });
     })();
