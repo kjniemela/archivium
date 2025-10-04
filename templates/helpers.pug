@@ -84,3 +84,10 @@
     if (short) return `${date.toDateString()} ${date.toLocaleTimeString()}`;
     else return `on ${date.toDateString()} at ${date.toLocaleTimeString()}`;
   };
+  const formatBytes = (bytes) => {
+    if (bytes > 1_000_000_000_000) return `${(bytes / 1_000_000_000_000).toFixed(1)}TB`;
+    else if (bytes > 1_000_000_000) return `${(bytes / 1_000_000_000).toFixed(1)}GB`;
+    else if (bytes > 1_000_000) return `${(bytes / 1_000_000).toFixed(1)}MB`;
+    else if (bytes > 1_000) return `${(bytes / 1_000).toFixed(1)}KB`;
+    else `${bytes}B`;
+  };

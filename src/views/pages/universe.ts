@@ -1,7 +1,7 @@
 import { ADDR_PREFIX } from '../../config';
 import api from '../../api';
 import { universeLink } from '../../templates';
-import { perms, getPfpUrl, tierAllowance } from '../../api/utils';
+import { perms, getPfpUrl, tierAllowance, tierLimits } from '../../api/utils';
 import logger from '../../logger';
 import { RouteHandler } from '..';
 import { ForbiddenError, NotFoundError, UnauthorizedError } from '../../errors';
@@ -45,7 +45,7 @@ export default {
       const sponsored = user ? await api.user.getSponsoredUniverses(user) : null;
       const couldUpgrade = sponsored ? (
         sponsored.length === 0 || sponsored
-          .filter(row => row.tier > universe.tier)
+          .filter(row => row.tier > (universe.tier ?? 0))
           // .some(row => row.universes.length < tierAllowance[user.plan][row.tier])
       ) : false;
       res.prepareRender('universe', { universe, authors: authorMap, threads, counts, totalItems, stories, couldUpgrade });
@@ -138,6 +138,7 @@ export default {
 
   async admin(req, res) {
     const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.ADMIN);
+
     const users = await api.user.getMany();
     const contacts = await api.contact.getAll(req.session.user, false);
     const requests = await api.universe.getAccessRequests(req.session.user, req.params.universeShortname);
@@ -151,7 +152,10 @@ export default {
     for (const userID in universe.author_permissions) {
       if (universe.author_permissions[userID] === perms.OWNER) ownerCount++;
     }
-    res.prepareRender('universeAdmin', { universe, users, requests, ownerCount });
+
+    const totalStoredImages = await api.universe.getTotalStoredByShortname(universe.shortname);
+
+    res.prepareRender('universeAdmin', { universe, users, requests, ownerCount, totalStoredImages, tierLimits: tierLimits[universe.tier ?? 0] });
   },
 
   async upgrade(req, res) {

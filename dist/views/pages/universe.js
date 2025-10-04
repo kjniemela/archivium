@@ -37,7 +37,7 @@ exports.default = {
             const stories = await api_1.default.story.getMany(user, { 'story.universe_id': universe.id });
             const sponsored = user ? await api_1.default.user.getSponsoredUniverses(user) : null;
             const couldUpgrade = sponsored ? (sponsored.length === 0 || sponsored
-                .filter(row => row.tier > universe.tier)
+                .filter(row => row.tier > (universe.tier ?? 0))
             // .some(row => row.universes.length < tierAllowance[user.plan][row.tier])
             ) : false;
             res.prepareRender('universe', { universe, authors: authorMap, threads, counts, totalItems, stories, couldUpgrade });
@@ -141,7 +141,8 @@ exports.default = {
             if (universe.author_permissions[userID] === utils_1.perms.OWNER)
                 ownerCount++;
         }
-        res.prepareRender('universeAdmin', { universe, users, requests, ownerCount });
+        const totalStoredImages = await api_1.default.universe.getTotalStoredByShortname(universe.shortname);
+        res.prepareRender('universeAdmin', { universe, users, requests, ownerCount, totalStoredImages, tierLimits: utils_1.tierLimits[universe.tier ?? 0] });
     },
     async upgrade(req, res) {
         const universe = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, utils_1.perms.ADMIN);

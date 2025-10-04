@@ -1,7 +1,19 @@
 extends ../layout.pug
 
 block title
-  title #{T('Settings')} — #{T('Archivium')}
+  title #{T('Admin Menu')} — #{T('Archivium')}
+
+block breadcrumbs
+  if displayUniverse
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{universe.title}
+  else
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    |  / 
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    |  / 
+    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+  |  / 
+  span #{T('Admin Menu')}
 
 block scripts
   script
@@ -42,7 +54,7 @@ block content
               select(class='permission_level' name='permission_level' style={ 'grid-column': '3 / 4' } disabled=((perm === perms.OWNER && ownerCount === 1) || (perm > universe.author_permissions[contextUser.id])))
                 each permission_level in Object.keys(perms).filter((item) => !isNaN(Number(item)))
                   option(value=permission_level selected=(permission_level == perm) disabled=(permission_level > universe.author_permissions[contextUser.id])) #{T(`perms_${permission_level}`)}
-          
+
       br
       hr
       br
@@ -65,4 +77,9 @@ block content
                 '/api/universes/${universe.shortname}/request/${request.username}'
               ).then(() => window.location.reload())`
             ) #{T('Deny')}
+
     .itemTab.hidden.flex-col(data-tab='storage')
+      .big-text
+        p
+          b #{T('Images Stored')}: 
+          | #{formatBytes(totalStoredImages)} / #{formatBytes(tierLimits.images)}
