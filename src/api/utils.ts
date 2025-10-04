@@ -42,6 +42,14 @@ export const tierAllowance: Record<plans, Record<PaidTier | 'total', number>> = 
   [plans.SUPER]: { total: 999, [tiers.PREMIUM]: 99  },
 };
 
+type TierLimit = {
+  images: number, // image upload limit in bytes
+};
+export const tierLimits: Record<Tier, TierLimit> = {
+  [tiers.FREE]: { images: 25_000_000 },
+  [tiers.PREMIUM]: { images: 5_000_000_000 },
+};
+
 export async function executeQuery<T extends QueryResult = RowDataPacket[]>(query: string, values: any[] = [], conn?: PoolConnection): Promise<T> {
   const [ results ] = await (conn ?? db).execute<T>(query, values);
   return results;

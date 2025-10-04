@@ -1,10 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemAPI = void 0;
-const utils_1 = require("../utils");
+const __1 = __importDefault(require(".."));
 const errors_1 = require("../../errors");
-const tiptapHelpers_1 = require("../../lib/tiptapHelpers");
 const editor_1 = require("../../lib/editor");
+const tiptapHelpers_1 = require("../../lib/tiptapHelpers");
+const utils_1 = require("../utils");
 function getQuery(selects = [], permsCond, whereConds, options = {}) {
     const query = new utils_1.QueryBuilder()
         .select('item.id')
@@ -60,8 +64,10 @@ class ItemImageAPI {
         const parsedOptions = (0, utils_1.parseData)(options);
         let queryString = `
       SELECT 
-        id, item_id, name, mimetype, label ${inclData ? ', data' : ''}
+        image.id, itemimage.item_id, image.name, image.mimetype,
+        itemimage.label ${inclData ? ', image.data' : ''}
       FROM itemimage
+      INNER JOIN image ON image.id = itemimage.image_id
     `;
         if (options)
             queryString += ` WHERE ${parsedOptions.strings.join(' AND ')}`;
@@ -78,10 +84,19 @@ class ItemImageAPI {
             throw new errors_1.ValidationError('Missing required fields');
         if (!user)
             throw new errors_1.UnauthorizedError();
+        const universe = await __1.default.universe.getOne(user, { shortname: universeShortname });
+        const totalStoredSize = await __1.default.universe.getTotalStoredByShortname(universe.shortname);
+        if (totalStoredSize + file.buffer.length > utils_1.tierLimits[universe.tier ?? 0].images) {
+            throw new errors_1.InsufficientStorageError();
+        }
         const { originalname, buffer, mimetype } = file;
         const item = await this.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE, true);
-        const queryString = `INSERT INTO itemimage (item_id, name, mimetype, data, label) VALUES (?, ?, ?, ?, ?);`;
-        return await (0, utils_1.executeQuery)(queryString, [item.id, originalname.substring(0, 64), mimetype, buffer, '']);
+        let data;
+        await (0, utils_1.withTransaction)(async (conn) => {
+            [data] = await conn.execute(`INSERT INTO image (name, mimetype, data) VALUES (?, ?, ?)`, [originalname.substring(0, 64), mimetype, buffer]);
+            await conn.execute(`INSERT INTO itemimage (item_id, image_id, label) VALUES (?, ?, ?)`, [item.id, data.insertId, '']);
+        });
+        return data;
     }
     async putLabel(user, imageId, label, conn) {
         if (!user)
@@ -91,7 +106,7 @@ class ItemImageAPI {
         if (!image)
             throw new errors_1.NotFoundError();
         await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
-        return await (0, utils_1.executeQuery)(`UPDATE itemimage SET label = ? WHERE id = ?;`, [label, imageId], conn);
+        return await (0, utils_1.executeQuery)(`UPDATE itemimage SET label = ? WHERE image_id = ?`, [label, imageId], conn);
     }
     async del(user, imageId, conn) {
         if (!user)
@@ -101,7 +116,7 @@ class ItemImageAPI {
         if (!image)
             throw new errors_1.NotFoundError();
         await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
-        await (0, utils_1.executeQuery)(`DELETE FROM itemimage WHERE id = ?;`, [imageId], conn);
+        await (0, utils_1.executeQuery)(`DELETE FROM image WHERE id = ?;`, [imageId], conn); // itemimage will be deleted by cascade
     }
 }
 class ItemAPI {
@@ -145,8 +160,9 @@ class ItemAPI {
         item.events = events;
         const gallery = await (0, utils_1.executeQuery)(`
       SELECT
-        itemimage.id, itemimage.name, itemimage.label
+        image.id, image.name, itemimage.label
       FROM itemimage
+      INNER JOIN image ON image.id = itemimage.image_id
       WHERE itemimage.item_id = ?
     `, [item.id]);
         item.gallery = gallery;

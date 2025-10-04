@@ -193,8 +193,8 @@ export default function(app: Express) {
     get('/universes/:universeShortname/discuss/create', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.universe.createDiscussionThread);
     get('/universes/:universeShortname/discuss/:threadId', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.universe.discussionThread);
     get('/universes/:universeShortname/items', sites.NORMAL, [], pages.universe.itemList);
-    get('/universes/:universeShortname/permissions', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.universe.editPerms);
     get('/universes/:universeShortname/upgrade', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.universe.upgrade);
+    get('/universes/:universeShortname/admin', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.universe.admin);
 
     /* Item Pages */
     get('/universes/:universeShortname/items/create', sites.NORMAL, [Auth.verifySessionOrRedirect], pages.item.create);
@@ -207,8 +207,8 @@ export default function(app: Express) {
     get('/edit', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(pages.universe.edit, (sub) => ({ universeShortname: sub })));
     get('/discuss/create', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(pages.universe.createDiscussionThread, (sub) => ({ universeShortname: sub })));
     get('/discuss/:threadId', sites.DISPLAY, [], subdomain(pages.universe.discussionThread, (sub) => ({ universeShortname: sub })));
-    get('/permissions', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(pages.universe.editPerms, (sub) => ({ universeShortname: sub })));
     get('/upgrade', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(pages.universe.upgrade, (sub) => ({ universeShortname: sub })));
+    get('/admin', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(pages.universe.admin, (sub) => ({ universeShortname: sub })));
     
     get('/items', sites.DISPLAY, [], subdomain(pages.universe.itemList, (sub) => ({ universeShortname: sub })));
     get('/items/create', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(pages.item.create, (sub) => ({ universeShortname: sub })));

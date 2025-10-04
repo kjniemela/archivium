@@ -24,8 +24,9 @@ async function main() {
         console.log(`Migrating... (${i}/${items.length})`);
         const gallery = await (0, utils_1.executeQuery)(`
       SELECT
-        itemimage.id, itemimage.name, itemimage.label
+        image.id, image.name, itemimage.label
       FROM itemimage
+      INNER JOIN image ON image.id = itemimage.image_id
       WHERE itemimage.item_id = ?
     `, [item.id]);
         const html = await (0, markdownRender_1.renderMarkdown)(item.universe_short, objData.body, { item: { ...item, obj_data: objData, gallery } });

@@ -79,9 +79,10 @@ export class UserImageAPI {
     if (!user) throw new NotFoundError();
     let queryString = `
       SELECT 
-        user_id, name, mimetype, data
-      FROM userimage
-      WHERE user_id = ?;
+        ui.user_id, image.name, image.mimetype, image.data
+      FROM userimage AS ui
+      INNER JOIN image ON image.id = ui.image_id
+      WHERE ui.user_id = ?;
     `;
     const image = (await executeQuery(queryString, [user.id]))[0] as UserImage | undefined;
     return image;
@@ -95,11 +96,23 @@ export class UserImageAPI {
     const { originalname, buffer, mimetype } = file;
     const user = await this.user.getOne({ 'user.username': username });
 
-    let data;
+    let data!: ResultSetHeader;
     await withTransaction(async (conn: PoolConnection) => {
-      await conn.execute('DELETE FROM userimage WHERE user_id = ?', [user.id]);
-      const queryString = `INSERT INTO userimage (user_id, name, mimetype, data) VALUES (?, ?, ?, ?);`;
-      [ data ] = await conn.execute(queryString, [ user.id, originalname.substring(0, 64), mimetype, buffer ]);
+      await conn.execute(`
+        DELETE image FROM image
+        INNER JOIN userimage AS ui ON ui.image_id = image.id
+        WHERE ui.user_id = ?
+      `, [user.id]);
+
+      [data] = await conn.execute<ResultSetHeader>(
+        `INSERT INTO image (name, mimetype, data) VALUES (?, ?, ?)`,
+        [originalname.substring(0, 64), mimetype, buffer],
+      );
+
+      await conn.execute<ResultSetHeader>(
+        `INSERT INTO userimage (user_id, image_id) VALUES (?, ?)`,
+        [user.id, data.insertId],
+      );
     });
     return data;
   }
@@ -108,7 +121,11 @@ export class UserImageAPI {
     if (!sessionUser) throw new UnauthorizedError();
     if (sessionUser.username !== username) throw new ForbiddenError();
     const user = await this.user.getOne({ 'user.username': username });
-    return await executeQuery<ResultSetHeader>(`DELETE FROM userimage WHERE user_id = ?;`, [user.id]);
+    return await executeQuery<ResultSetHeader>(`
+      DELETE image FROM image
+      INNER JOIN userimage AS ui ON ui.image_id = image.id
+      WHERE ui.user_id = ?
+    `, [user.id]);
   }
 }
 

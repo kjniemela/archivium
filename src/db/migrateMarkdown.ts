@@ -21,8 +21,9 @@ async function main() {
 
     const gallery = await executeQuery(`
       SELECT
-        itemimage.id, itemimage.name, itemimage.label
+        image.id, image.name, itemimage.label
       FROM itemimage
+      INNER JOIN image ON image.id = itemimage.image_id
       WHERE itemimage.item_id = ?
     `, [item.id]) as GalleryImage[];
 

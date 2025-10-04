@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NotFoundError = exports.ForbiddenError = exports.PremiumOnlyError = exports.UnauthorizedError = exports.ValidationError = exports.RateLimitError = exports.ModelError = exports.RequestError = void 0;
+exports.InsufficientStorageError = exports.NotFoundError = exports.ForbiddenError = exports.PremiumOnlyError = exports.UnauthorizedError = exports.ValidationError = exports.RateLimitError = exports.ModelError = exports.RequestError = void 0;
 const axios_1 = require("axios");
 class RequestError extends Error {
     code = axios_1.HttpStatusCode.InternalServerError;
@@ -54,3 +54,7 @@ class NotFoundError extends ModelError {
     code = axios_1.HttpStatusCode.NotFound;
 }
 exports.NotFoundError = NotFoundError;
+class InsufficientStorageError extends ModelError {
+    code = axios_1.HttpStatusCode.InsufficientStorage;
+}
+exports.InsufficientStorageError = InsufficientStorageError;

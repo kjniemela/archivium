@@ -81,9 +81,9 @@ const templates = {
   deleteUniverse: compile('templates/delete/universe.pug'),
   universeList: compile('templates/list/universes.pug'),
   createUniverse: compile('templates/create/universe.pug'),
-  editUniversePerms: compile('templates/edit/universePerms.pug'),
   upgradeUniverse: compile('templates/edit/universeUpgrade.pug'),
   privateUniverse: compile('templates/view/privateUniverse.pug'),
+  universeAdmin: compile('templates/edit/universeAdmin.pug'),
 
   universeThread: compile('templates/view/universeThread.pug'),
   createUniverseThread: compile('templates/create/universeThread.pug'),

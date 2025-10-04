@@ -212,8 +212,8 @@ function default_1(app) {
         get('/universes/:universeShortname/discuss/create', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.universe.createDiscussionThread);
         get('/universes/:universeShortname/discuss/:threadId', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.universe.discussionThread);
         get('/universes/:universeShortname/items', sites.NORMAL, [], pages_1.default.universe.itemList);
-        get('/universes/:universeShortname/permissions', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.universe.editPerms);
         get('/universes/:universeShortname/upgrade', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.universe.upgrade);
+        get('/universes/:universeShortname/admin', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.universe.admin);
         /* Item Pages */
         get('/universes/:universeShortname/items/create', sites.NORMAL, [auth_1.default.verifySessionOrRedirect], pages_1.default.item.create);
         get('/universes/:universeShortname/items/:itemShortname', sites.NORMAL, [], pages_1.default.item.view);
@@ -224,8 +224,8 @@ function default_1(app) {
         get('/edit', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(pages_1.default.universe.edit, (sub) => ({ universeShortname: sub })));
         get('/discuss/create', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(pages_1.default.universe.createDiscussionThread, (sub) => ({ universeShortname: sub })));
         get('/discuss/:threadId', sites.DISPLAY, [], subdomain(pages_1.default.universe.discussionThread, (sub) => ({ universeShortname: sub })));
-        get('/permissions', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(pages_1.default.universe.editPerms, (sub) => ({ universeShortname: sub })));
         get('/upgrade', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(pages_1.default.universe.upgrade, (sub) => ({ universeShortname: sub })));
+        get('/admin', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(pages_1.default.universe.admin, (sub) => ({ universeShortname: sub })));
         get('/items', sites.DISPLAY, [], subdomain(pages_1.default.universe.itemList, (sub) => ({ universeShortname: sub })));
         get('/items/create', sites.DISPLAY, [auth_1.default.verifySessionOrRedirect], subdomain(pages_1.default.item.create, (sub) => ({ universeShortname: sub })));
         get('/items/:itemShortname', sites.DISPLAY, [], subdomain(pages_1.default.item.view, (sub) => ({ universeShortname: sub })));

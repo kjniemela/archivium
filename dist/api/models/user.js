@@ -43,9 +43,10 @@ class UserImageAPI {
             throw new errors_1.NotFoundError();
         let queryString = `
       SELECT 
-        user_id, name, mimetype, data
-      FROM userimage
-      WHERE user_id = ?;
+        ui.user_id, image.name, image.mimetype, image.data
+      FROM userimage AS ui
+      INNER JOIN image ON image.id = ui.image_id
+      WHERE ui.user_id = ?;
     `;
         const image = (await (0, utils_1.executeQuery)(queryString, [user.id]))[0];
         return image;
@@ -61,9 +62,13 @@ class UserImageAPI {
         const user = await this.user.getOne({ 'user.username': username });
         let data;
         await (0, utils_1.withTransaction)(async (conn) => {
-            await conn.execute('DELETE FROM userimage WHERE user_id = ?', [user.id]);
-            const queryString = `INSERT INTO userimage (user_id, name, mimetype, data) VALUES (?, ?, ?, ?);`;
-            [data] = await conn.execute(queryString, [user.id, originalname.substring(0, 64), mimetype, buffer]);
+            await conn.execute(`
+        DELETE image FROM image
+        INNER JOIN userimage AS ui ON ui.image_id = image.id
+        WHERE ui.user_id = ?
+      `, [user.id]);
+            [data] = await conn.execute(`INSERT INTO image (name, mimetype, data) VALUES (?, ?, ?)`, [originalname.substring(0, 64), mimetype, buffer]);
+            await conn.execute(`INSERT INTO userimage (user_id, image_id) VALUES (?, ?)`, [user.id, data.insertId]);
         });
         return data;
     }
@@ -73,7 +78,11 @@ class UserImageAPI {
         if (sessionUser.username !== username)
             throw new errors_1.ForbiddenError();
         const user = await this.user.getOne({ 'user.username': username });
-        return await (0, utils_1.executeQuery)(`DELETE FROM userimage WHERE user_id = ?;`, [user.id]);
+        return await (0, utils_1.executeQuery)(`
+      DELETE image FROM image
+      INNER JOIN userimage AS ui ON ui.image_id = image.id
+      WHERE ui.user_id = ?
+    `, [user.id]);
     }
 }
 exports.UserImageAPI = UserImageAPI;

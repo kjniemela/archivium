@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Cond = exports.QueryBuilder = exports.parseData = exports.RollbackError = exports.tierAllowance = exports.tiers = exports.paidTiers = exports.plans = exports.perms = void 0;
+exports.Cond = exports.QueryBuilder = exports.parseData = exports.RollbackError = exports.tierLimits = exports.tierAllowance = exports.tiers = exports.paidTiers = exports.plans = exports.perms = void 0;
 exports.executeQuery = executeQuery;
 exports.withTransaction = withTransaction;
 exports.getPfpUrl = getPfpUrl;
@@ -42,6 +42,10 @@ exports.tierAllowance = {
     [plans.BETA]: { total: 5, [exports.tiers.PREMIUM]: 1 },
     [plans.PREMIUM_BETA]: { total: 20, [exports.tiers.PREMIUM]: 5 },
     [plans.SUPER]: { total: 999, [exports.tiers.PREMIUM]: 99 },
+};
+exports.tierLimits = {
+    [exports.tiers.FREE]: { images: 25_000_000 },
+    [exports.tiers.PREMIUM]: { images: 5_000_000_000 },
 };
 async function executeQuery(query, values = [], conn) {
     const [results] = await (conn ?? db_1.default).execute(query, values);

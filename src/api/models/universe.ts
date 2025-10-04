@@ -27,7 +27,7 @@ export type Universe = {
   author_permissions: { [id: number]: perms },
   owner: string,
   followers: { [id: number]: boolean },
-  tier: Tier,
+  tier: Tier | null,
   sponsoring_user: number,
 };
 
@@ -177,6 +177,22 @@ export class UniverseAPI {
     const body = JSON.parse(rows.obj_data)?.publicBody;
     if (!body) return;
     return body;
+  }
+
+  async getTotalStoredByShortname(shortname: string): Promise<number> {
+    const queryString = `
+      SELECT SUM(OCTET_LENGTH(image.data)) AS size
+      FROM universe
+      INNER JOIN item ON item.universe_id = universe.id
+      INNER JOIN itemimage ON itemimage.item_id = item.id
+      INNER JOIN image ON image.id = itemimage.image_id
+      WHERE universe.shortname = ?
+      GROUP BY universe.title
+    `;
+
+    const rows = await executeQuery<ResultSetHeader>(queryString, [shortname])
+    if (!rows) throw new NotFoundError();
+    return Number(rows[0]?.size);
   }
 
   async post(user: User | undefined, body): Promise<[ResultSetHeader, ResultSetHeader]> {
