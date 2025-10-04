@@ -4,6 +4,7 @@ import Image from './extensions/Image';
 import Link, { ResolveResult } from './extensions/Link';
 import ToC from './extensions/ToC';
 import Heading from './extensions/Heading';
+import IFrame from './extensions/IFrame';
 
 export interface TiptapContext {
   currentUniverse: string;
@@ -70,6 +71,7 @@ export const editorExtensions = (editMode: boolean, context?: TiptapContext) => 
   Aside,
   Heading,
   Image,
+  IFrame,
   Link.configure({
     enableClickSelection: editMode,
     openOnClick: !editMode,

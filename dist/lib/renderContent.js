@@ -37,10 +37,11 @@ async function tryRenderContent(req, content, universeShortname) {
         };
         const htmlBody = (0, html_string_1.renderToHTMLString)({ extensions: (0, editor_1.editorExtensions)(false, renderContext), content: jsonBody });
         const sanitizedHtml = (0, sanitize_html_1.default)(htmlBody, {
-            allowedTags: sanitize_html_1.default.defaults.allowedTags.concat(['img']),
+            allowedTags: sanitize_html_1.default.defaults.allowedTags.concat(['img', 'iframe']),
             allowedAttributes: {
                 ...sanitize_html_1.default.defaults.allowedAttributes,
                 img: ['src', 'alt', 'title', 'width', 'height'],
+                iframe: ['src'],
                 h1: ['id'], h2: ['id'], h3: ['id'], h4: ['id'], h5: ['id'], h6: ['id'],
             },
             disallowedTagsMode: 'escape',

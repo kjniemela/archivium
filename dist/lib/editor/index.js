@@ -12,6 +12,7 @@ const Image_1 = __importDefault(require("./extensions/Image"));
 const Link_1 = __importDefault(require("./extensions/Link"));
 const ToC_1 = __importDefault(require("./extensions/ToC"));
 const Heading_1 = __importDefault(require("./extensions/Heading"));
+const IFrame_1 = __importDefault(require("./extensions/IFrame"));
 function extractLinkData(href) {
     const data = {};
     if (href.startsWith('@')) {
@@ -57,6 +58,7 @@ const editorExtensions = (editMode, context) => ([
     Aside_1.default,
     Heading_1.default,
     Image_1.default,
+    IFrame_1.default,
     Link_1.default.configure({
         enableClickSelection: editMode,
         openOnClick: !editMode,
