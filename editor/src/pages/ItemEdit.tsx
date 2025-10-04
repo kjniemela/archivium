@@ -279,6 +279,11 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
           }
         }
         setItem(newState);
+      }} onReorderImages={(newImages) => {
+        setItem(prev => prev ? ({
+          ...prev,
+          gallery: newImages,
+        }) : prev);
       }} />
     ),
     timeline: (
