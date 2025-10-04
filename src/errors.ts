@@ -58,4 +58,6 @@ export class NotFoundError extends ModelError {
   readonly code: number = HttpStatusCode.NotFound;
 }
 
-
+export class InsufficientStorageError extends ModelError {
+  readonly code: number = HttpStatusCode.InsufficientStorage;
+}

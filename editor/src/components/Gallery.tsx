@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { postFormData, T } from '../helpers';
 import { createPortal } from 'react-dom';
 import type { GalleryImage } from '../../../src/api/models/item';
+import { HttpStatusCode } from 'axios';
 
 type GalleryProps = {
   universe: string,
@@ -14,6 +15,7 @@ type GalleryProps = {
 
 export default function Gallery({ universe, item, images, onRemoveImage, onUploadImage, onChangeLabel }: GalleryProps) {
   const [uploadModal, setUploadModal] = useState<boolean>(false);
+  const [uploadModalError, setUploadModalError] = useState<string>('');
   const modalAnchor = document.querySelector('#modal-anchor') as HTMLElement;
 
   return <>
@@ -39,12 +41,20 @@ export default function Gallery({ universe, item, images, onRemoveImage, onUploa
             <div className='sheet d-flex flex-col gap-1 align-center'>
               <h2>{T('Upload Image')}</h2>
               <input type='file' accept='image/*' required></input>
+              {uploadModalError && <div>
+                <span id='item-error' className='color-error' style={{ fontSize: 'small' }}>{uploadModalError}</span>
+              </div>}
               <button type='button' onClick={async ({ target }) => {
                 const imageInput = (target as HTMLElement).parentElement?.querySelector('input[type=file]') as HTMLInputElement;
                 if (!imageInput.files) return;
                 const image = imageInput.files[0];
                 const response = await postFormData(`/api/universes/${universe}/items/${item}/gallery/upload`, { image });
                 const data = await response.json();
+
+                if (response.status === HttpStatusCode.InsufficientStorage) {
+                  setUploadModalError('There is not enough available storage to upload this image!');
+                  return;
+                }
 
                 onUploadImage({
                   id: data.insertId,

@@ -1,11 +1,10 @@
-import { QueryBuilder, Cond, executeQuery, parseData, perms, withTransaction, BaseOptions, handleAsNull } from '../utils';
-import { extractLinks } from '../../lib/markdown';
-import { API } from '..';
-import { User } from './user';
 import { PoolConnection, ResultSetHeader } from 'mysql2/promise';
-import { ForbiddenError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
-import { IndexedDocument, indexedToJson, updateLinks } from '../../lib/tiptapHelpers';
+import api, { API } from '..';
+import { ForbiddenError, InsufficientStorageError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
 import { extractLinkData, LinkData } from '../../lib/editor';
+import { IndexedDocument, indexedToJson, updateLinks } from '../../lib/tiptapHelpers';
+import { BaseOptions, Cond, executeQuery, handleAsNull, parseData, perms, QueryBuilder, tierLimits, withTransaction } from '../utils';
+import { User } from './user';
 
 export type ItemOptions = BaseOptions & {
   type?: string,
@@ -168,6 +167,12 @@ class ItemImageAPI {
   async post(user: User | undefined, file: Express.Multer.File | undefined, universeShortname: string, itemShortname: string): Promise<ResultSetHeader> {
     if (!file) throw new ValidationError('Missing required fields');
     if (!user) throw new UnauthorizedError();
+
+    const universe = await api.universe.getOne(user, { shortname: universeShortname });
+    const totalStoredSize = await api.universe.getTotalStoredByShortname(universe.shortname);
+    if (totalStoredSize + file.buffer.length > tierLimits[universe.tier ?? 0].images) {
+      throw new InsufficientStorageError();
+    }
 
     const { originalname, buffer, mimetype } = file;
     const item = await this.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE, true);

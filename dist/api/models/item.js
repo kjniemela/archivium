@@ -1,10 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemAPI = void 0;
-const utils_1 = require("../utils");
+const __1 = __importDefault(require(".."));
 const errors_1 = require("../../errors");
-const tiptapHelpers_1 = require("../../lib/tiptapHelpers");
 const editor_1 = require("../../lib/editor");
+const tiptapHelpers_1 = require("../../lib/tiptapHelpers");
+const utils_1 = require("../utils");
 function getQuery(selects = [], permsCond, whereConds, options = {}) {
     const query = new utils_1.QueryBuilder()
         .select('item.id')
@@ -80,6 +84,11 @@ class ItemImageAPI {
             throw new errors_1.ValidationError('Missing required fields');
         if (!user)
             throw new errors_1.UnauthorizedError();
+        const universe = await __1.default.universe.getOne(user, { shortname: universeShortname });
+        const totalStoredSize = await __1.default.universe.getTotalStoredByShortname(universe.shortname);
+        if (totalStoredSize + file.buffer.length > utils_1.tierLimits[universe.tier ?? 0].images) {
+            throw new errors_1.InsufficientStorageError();
+        }
         const { originalname, buffer, mimetype } = file;
         const item = await this.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE, true);
         let data;
