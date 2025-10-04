@@ -57,7 +57,7 @@ describe('Universe spec', () => {
 
   it('removes and then restores an author of the public universe', () => {
     cy.visit('/universes/public-test-universe');
-    cy.get('#action-bar').contains('Set Permissions').click();
+    cy.get('#action-bar').contains('Admin Menu').click();
 
     cy.get('form').contains('testwriter').parent().find('select').select('0');
     cy.get('#breadcrumbs').contains('Public Test Universe').click();
@@ -65,7 +65,7 @@ describe('Universe spec', () => {
     cy.get('#tabBtns').contains('Authors').click();
     cy.get('.tabs [data-tab=authors] .card').contains('testwriter').should('not.exist');
 
-    cy.get('#action-bar').contains('Set Permissions').click();
+    cy.get('#action-bar').contains('Admin Menu').click();
 
     cy.get('form').contains('testwriter').parent().find('select').select('3');
     cy.get('#breadcrumbs').contains('Public Test Universe').click();
@@ -76,7 +76,7 @@ describe('Universe spec', () => {
 
   it('removes and restores an author of the private universe', () => {
     cy.visit('/universes/private-test-universe');
-    cy.get('#action-bar').contains('Set Permissions').click();
+    cy.get('#action-bar').contains('Admin Menu').click();
 
     cy.get('form').contains('testwriter').parent().find('select').select('0');
     cy.get('#breadcrumbs').contains('Private Test Universe').click();
@@ -85,7 +85,7 @@ describe('Universe spec', () => {
     cy.get('.tabs [data-tab=authors] .card').contains('testwriter').should('not.exist');
 
     cy.visit('/universes/private-test-universe');
-    cy.get('#action-bar').contains('Set Permissions').click();
+    cy.get('#action-bar').contains('Admin Menu').click();
 
     cy.get('form').contains('testwriter').parent().find('select').select('3');
     cy.get('#breadcrumbs').contains('Private Test Universe').click();
@@ -121,7 +121,7 @@ describe('Universe spec', () => {
 
     cy.login('testadmin');
     cy.visit('/universes/cypress-universe');
-    cy.get('#action-bar').contains('Set Permissions').click();
+    cy.get('#action-bar').contains('Admin Menu').click();
 
     cy.get('#requests').contains('testreader is requesting read permissions').parent().contains('Approve').click();
 
@@ -144,7 +144,7 @@ describe('Universe spec', () => {
 
     cy.login('testadmin');
     cy.visit('/universes/cypress-universe');
-    cy.get('#action-bar').contains('Set Permissions').click();
+    cy.get('#action-bar').contains('Admin Menu').click();
 
     cy.get('#requests').contains('testreader is requesting write permissions').parent().contains('Approve').click();
 
@@ -155,9 +155,9 @@ describe('Universe spec', () => {
 
   it('removes the reader\'s permissions, the reader can no longer see the universe', () => {
     cy.visit('/universes/cypress-universe');
-    cy.get('#action-bar').contains('Set Permissions').click();
+    cy.get('#action-bar').contains('Admin Menu').click();
 
-    cy.intercept('POST', '/universes/cypress-universe/permissions').as('setperms');
+    cy.intercept('POST', '/universes/cypress-universe/admin?tab=permissions').as('setperms');
     cy.get('form').contains('testreader').parent().find('select').select('0');
     cy.wait('@setperms');
 
