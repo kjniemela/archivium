@@ -5,7 +5,7 @@ import type { SetImageOptions } from '@tiptap/extension-image';
 
 type RichEditorProps = {
   editor: Editor;
-  getLink: (previousUrl: string, type: 'link' | 'image') => Promise<[string | null, { [attr: string]: any }?]>;
+  getLink: (previousUrl: string, type: 'link' | 'image' | 'videoembed') => Promise<[string | null, { [attr: string]: any }?]>;
 };
 
 function MenuBar({ editor, getLink }: RichEditorProps) {
@@ -35,6 +35,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         isBulletList: ctx.editor.isActive('bulletList') ?? false,
         isOrderedList: ctx.editor.isActive('orderedList') ?? false,
         isImage: ctx.editor.isActive('image') ?? false,
+        isVideoEmbed: ctx.editor.isActive('iframe') ?? false,
         isCodeBlock: ctx.editor.isActive('codeBlock') ?? false,
         isAside: ctx.editor.isActive('aside') ?? false,
         isBlockquote: ctx.editor.isActive('blockquote') ?? false,
@@ -83,6 +84,22 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
           if (attrs.height) imgAttrs.height = attrs.height;
         }
         editor.chain().focus().setImage(imgAttrs).run();
+      } catch (e: any) {
+        alert(e.message);
+      }
+    });
+  }, [editor]);
+
+  const setVideoEmbed = useCallback(() => {
+    const previousSrc = editor.getAttributes('iframe').src;
+
+    getLink(previousSrc, 'videoembed').then(([src, _]) => {
+      if (src === null) {
+        return;
+      }
+
+      try {
+        editor.chain().focus().setIframe({ src }).run();
       } catch (e: any) {
         alert(e.message);
       }
@@ -231,6 +248,14 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         title={T('Insert Image')}
       >
         image
+      </button>
+      <button
+        onMouseDown={e => e.preventDefault()}
+        onClick={setVideoEmbed}
+        className={`material-symbols-outlined ${editorState.isVideoEmbed ? 'is-active' : ''}`}
+        title={T('Embed Video')}
+      >
+        subscriptions
       </button>
       <button
         onMouseDown={e => e.preventDefault()}
