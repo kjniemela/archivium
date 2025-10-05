@@ -67,9 +67,6 @@ export default {
     item.obj_data = JSON.parse(item.obj_data as string) as Record<string, any>;
     item.itemTypeName = ((universe.obj_data['cats'] ?? {})[item.item_type] ?? ['Missing Category'])[0];
     item.itemTypeColor = ((universe.obj_data['cats'] ?? {})[item.item_type] ?? [,,'#f3f3f3'])[2];
-    // if (item.gallery && item.gallery.length > 0) {
-    //   item.gallery = item.gallery.sort((a, b) => a.id > b.id ? 1 : -1);
-    // }
 
     let renderedBody: RenderedBody = { type: 'text', content: '' };
     if ('body' in item.obj_data) {
