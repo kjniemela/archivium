@@ -287,7 +287,7 @@ export default function (app: Express, upload: Multer) {
         new APIRoute('/perms', {
           PUT: async (req) => {
             const user = await api.user.getOne({ 'user.username': req.body.username });
-            return await api.universe.putPermissions(req.session.user, req.params.universeShortName, user, req.body.permission_level);
+            return await api.universe.putPermissions(req.session.user, req.params.universeShortName, user, req.body.permissionLevel);
           },
         }),
         new APIRoute('/request', {

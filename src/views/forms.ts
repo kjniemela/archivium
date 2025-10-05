@@ -108,13 +108,6 @@ export default {
     res.redirect(`${universeLink(req, req.params.universeShortname)}/items/${req.params.itemShortname}?tab=comments#post-comment`);
   },
 
-  async editUniversePerms(req, res) {
-    const { session, params, body } = req;
-    const user = await api.user.getOne({ 'user.username': req.body.username });
-    await api.universe.putPermissions(session.user, params.universeShortname, user, Number(body.permission_level));
-    res.redirect(`${universeLink(req, params.universeShortname)}/admin?tab=permissions`);
-  },
-
   async sponsorUniverse(req, res) {
     const { session, params, body } = req;
     await api.universe.putUserSponsoring(session.user, params.universeShortname, Number(body.tier) as Tier);

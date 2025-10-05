@@ -279,7 +279,7 @@ function default_1(app, upload) {
                 new APIRoute('/perms', {
                     PUT: async (req) => {
                         const user = await _1.default.user.getOne({ 'user.username': req.body.username });
-                        return await _1.default.universe.putPermissions(req.session.user, req.params.universeShortName, user, req.body.permission_level);
+                        return await _1.default.universe.putPermissions(req.session.user, req.params.universeShortName, user, req.body.permissionLevel);
                     },
                 }),
                 new APIRoute('/request', {
