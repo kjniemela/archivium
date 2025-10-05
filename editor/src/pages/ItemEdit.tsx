@@ -265,9 +265,11 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
           }
         }
         setItem(newState);
-      }} onUploadImage={(img) => {
+      }} onUploadImages={(imgs) => {
         const newState = { ...item };
-        newState.gallery.push(img);
+        for (const img of imgs) {
+          newState.gallery.push(img);
+        }
         setItem(newState);
       }} onChangeLabel={(id, label) => {
         const newState = { ...item };

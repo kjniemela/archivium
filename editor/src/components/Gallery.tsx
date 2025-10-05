@@ -12,14 +12,15 @@ type GalleryProps = {
   item: string,
   images: GalleryImage[];
   onRemoveImage: (id: number) => void,
-  onUploadImage: (img: GalleryImage) => void,
+  onUploadImages: (imgs: GalleryImage[]) => void,
   onChangeLabel: (id: number, label: string) => void,
   onReorderImages: (newImages: GalleryImage[]) => void,
 };
 
-export default function Gallery({ universe, item, images, onRemoveImage, onUploadImage, onChangeLabel, onReorderImages }: GalleryProps) {
+export default function Gallery({ universe, item, images, onRemoveImage, onUploadImages, onChangeLabel, onReorderImages }: GalleryProps) {
   const [uploadModal, setUploadModal] = useState<boolean>(false);
   const [uploadModalError, setUploadModalError] = useState<string>('');
+  const [uploading, setUploading] = useState<boolean>(false);
   const modalAnchor = document.querySelector('#modal-anchor') as HTMLElement;
 
   const sensors = useSensors(
@@ -88,29 +89,40 @@ export default function Gallery({ universe, item, images, onRemoveImage, onUploa
           <div className='modal-content' onClick={(e) => e.stopPropagation()}>
             <div className='sheet d-flex flex-col gap-1 align-center'>
               <h2>{T('Upload Image')}</h2>
-              <input type='file' accept='image/*' required></input>
+              <input type='file' accept='image/*' required multiple></input>
               {uploadModalError && <div>
                 <span id='item-error' className='color-error' style={{ fontSize: 'small' }}>{uploadModalError}</span>
+              </div>}
+              {uploading && <div className='d-flex justify-center align-center'>
+                <div className='loader ma-2'></div>
               </div>}
               <button type='button' onClick={async ({ target }) => {
                 const imageInput = (target as HTMLElement).parentElement?.querySelector('input[type=file]') as HTMLInputElement;
                 if (!imageInput.files) return;
-                const image = imageInput.files[0];
-                const response = await postFormData(`/api/universes/${universe}/items/${item}/gallery/upload`, { image });
-                const data = await response.json();
 
-                if (response.status === HttpStatusCode.InsufficientStorage) {
-                  setUploadModalError('There is not enough available storage to upload this image!');
-                  return;
+                setUploading(true);
+
+                const uploadedImages = [];
+                for (const image of imageInput.files) {
+                  const response = await postFormData(`/api/universes/${universe}/items/${item}/gallery/upload`, { image });
+                  const data = await response.json();
+  
+                  if (response.status === HttpStatusCode.InsufficientStorage) {
+                    setUploadModalError('There is not enough available storage to upload this image!');
+                    setUploading(false);
+                    return;
+                  }
+                  
+                  uploadedImages.push({
+                    id: data.insertId,
+                    name: image.name,
+                    label: '',
+                  });
                 }
 
-                onUploadImage({
-                  id: data.insertId,
-                  name: image.name,
-                  label: '',
-                });
-
+                onUploadImages(uploadedImages);
                 setUploadModal(false);
+                setUploading(false);
               }}>{T('Upload')}</button>
             </div>
           </div>
