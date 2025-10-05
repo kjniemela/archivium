@@ -4,6 +4,7 @@ import md5 from 'md5';
 import logger from '../logger';
 import { PoolConnection, QueryResult, RowDataPacket } from 'mysql2/promise';
 import { ForbiddenError, NotFoundError, RequestError } from '../errors';
+import { User } from './models/user';
 
 export enum perms {
   NONE,
@@ -277,8 +278,8 @@ class MultiCond extends Cond {
   }
 }
 
-export function getPfpUrl(user) {
-  return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email)}.jpg`;
+export function getPfpUrl(user: User) {
+  return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email ?? '')}.jpg`;
 }
 
 export function handleAsNull(type: typeof RequestError | (typeof RequestError)[]) {

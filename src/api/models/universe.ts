@@ -402,7 +402,7 @@ export class UniverseAPI {
     return requests;
   }
 
-  async putAccessRequest(user: User | undefined, shortname: string, permissionLevel: perms): Promise<void> {
+  async putAccessRequest(user: User | undefined, shortname: string, permissionLevel: perms, isInvite: boolean): Promise<void> {
     if (!user) throw new UnauthorizedError();
 
     const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
@@ -415,8 +415,8 @@ export class UniverseAPI {
     }
 
     await executeQuery<ResultSetHeader>(
-      'INSERT INTO universeaccessrequest (universe_id, user_id, permission_level) VALUES (?, ?, ?)',
-      [universe.id, user.id, permissionLevel],
+      'INSERT INTO universeaccessrequest (universe_id, user_id, permission_level, is_invite) VALUES (?, ?, ?, ?)',
+      [universe.id, user.id, permissionLevel, isInvite],
     );
   }
 

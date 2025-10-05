@@ -330,7 +330,7 @@ class UniverseAPI {
         const requests = await (0, utils_1.executeQuery)('SELECT ua.*, user.username FROM universeaccessrequest ua INNER JOIN user ON user.id = ua.user_id WHERE ua.universe_id = ?', [universe.id]);
         return requests;
     }
-    async putAccessRequest(user, shortname, permissionLevel) {
+    async putAccessRequest(user, shortname, permissionLevel, isInvite) {
         if (!user)
             throw new errors_1.UnauthorizedError();
         const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
@@ -343,7 +343,7 @@ class UniverseAPI {
             else
                 await this.delAccessRequest(user, shortname, user);
         }
-        await (0, utils_1.executeQuery)('INSERT INTO universeaccessrequest (universe_id, user_id, permission_level) VALUES (?, ?, ?)', [universe.id, user.id, permissionLevel]);
+        await (0, utils_1.executeQuery)('INSERT INTO universeaccessrequest (universe_id, user_id, permission_level, is_invite) VALUES (?, ?, ?, ?)', [universe.id, user.id, permissionLevel, isInvite]);
     }
     async delAccessRequest(user, shortname, requestingUser) {
         if (!user)

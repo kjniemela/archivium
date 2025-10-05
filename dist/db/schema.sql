@@ -336,6 +336,7 @@ CREATE TABLE universeaccessrequest (
   universe_id INT NOT NULL,
   user_id INT NOT NULL,
   permission_level TINYINT NOT NULL,
+  is_invite BOOLEAN DEFAULT FALSE,
   FOREIGN KEY (universe_id) REFERENCES universe (id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
 );

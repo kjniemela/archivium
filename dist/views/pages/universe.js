@@ -127,22 +127,14 @@ exports.default = {
     },
     async admin(req, res) {
         const universe = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, utils_1.perms.ADMIN);
-        const users = await api_1.default.user.getMany();
-        const contacts = await api_1.default.contact.getAll(req.session.user, false);
         const requests = await api_1.default.universe.getAccessRequests(req.session.user, req.params.universeShortname);
-        contacts.forEach(contact => {
-            if (!(contact.id in universe.authors)) {
-                universe.authors[contact.id] = contact.username;
-                universe.author_permissions[contact.id] = utils_1.perms.NONE;
-            }
-        });
         let ownerCount = 0;
         for (const userID in universe.author_permissions) {
             if (universe.author_permissions[userID] === utils_1.perms.OWNER)
                 ownerCount++;
         }
         const totalStoredImages = await api_1.default.universe.getTotalStoredByShortname(universe.shortname);
-        res.prepareRender('universeAdmin', { universe, users, requests, ownerCount, totalStoredImages, tierLimits: utils_1.tierLimits[universe.tier ?? 0] });
+        res.prepareRender('universeAdmin', { universe, requests, ownerCount, totalStoredImages, tierLimits: utils_1.tierLimits[universe.tier ?? 0] });
     },
     async upgrade(req, res) {
         const universe = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, utils_1.perms.ADMIN);

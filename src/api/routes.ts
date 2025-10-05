@@ -292,7 +292,7 @@ export default function (app: Express, upload: Multer) {
         }),
         new APIRoute('/request', {
           PUT: async (req) => {
-            await api.universe.putAccessRequest(req.session.user, req.params.universeShortName, req.body.permissionLevel);
+            await api.universe.putAccessRequest(req.session.user, req.params.universeShortName, req.body.permissionLevel, false);
             const user = req.session.user as User;
 
             const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [req.params.universeShortName]))[0];
@@ -308,13 +308,43 @@ export default function (app: Express, upload: Multer) {
               await api.notification.notify(target, api.notification.types.UNIVERSE, {
                 title: 'Universe Access Request',
                 body: `${user.username} is requesting ${permText[req.body.permissionLevel]} permissions on your universe ${universe.title}.`,
-                icon: getPfpUrl(req.session.user),
+                icon: getPfpUrl(user),
                 clickUrl: `/universes/${req.params.universeShortName}/permissions`,
               });
             }
           },
         }, [
           new APIRoute('/:requestingUser', {
+            DELETE: async (req) => {
+              const user = await api.user.getOne({ 'user.username': req.params.requestingUser ?? null });
+              return await api.universe.delAccessRequest(req.session.user, req.params.universeShortName, user);
+            },
+          }),
+        ]),
+        new APIRoute('/invite', {}, [
+          new APIRoute('/:username', {
+            PUT: async (req) => {
+              await api.universe.putAccessRequest(req.session.user, req.params.universeShortName, req.body.permissionLevel, true);
+              const user = req.session.user as User;
+
+              const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [req.params.universeShortName]))[0];
+              const target = await api.user.getOne({ 'user.username': req.params.username }).catch(handleAsNull(NotFoundError));
+              const permText = {
+                [perms.READ]: 'read',
+                [perms.COMMENT]: 'comment',
+                [perms.WRITE]: 'write',
+                [perms.ADMIN]: 'admin',
+                [perms.OWNER]: 'owner',
+              };
+              if (target) {
+                await api.notification.notify(target, api.notification.types.UNIVERSE, {
+                  title: 'Universe Access Request',
+                  body: `${user.username} is inviting you to ${universe.title} with ${permText[req.body.permissionLevel]} permissions.`,
+                  icon: getPfpUrl(user),
+                  clickUrl: `/universes/${req.params.universeShortName}`,
+                });
+              }
+            },
             DELETE: async (req) => {
               const user = await api.user.getOne({ 'user.username': req.params.requestingUser ?? null });
               return await api.universe.delAccessRequest(req.session.user, req.params.universeShortName, user);
