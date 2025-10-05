@@ -24,6 +24,7 @@ export type ItemImage = {
   name: string,
   mimetype: string,
   label: string,
+  idx: number,
   data?: Buffer,
 };
 
@@ -149,11 +150,12 @@ class ItemImageAPI {
     let queryString = `
       SELECT 
         image.id, itemimage.item_id, image.name, image.mimetype,
-        itemimage.label ${inclData ? ', image.data' : ''}
+        itemimage.label, itemimage.idx ${inclData ? ', image.data' : ''}
       FROM itemimage
       INNER JOIN image ON image.id = itemimage.image_id
     `;
     if (options) queryString += ` WHERE ${parsedOptions.strings.join(' AND ')}`;
+    queryString += ' ORDER BY itemimage.idx';
     const images = await executeQuery(queryString, parsedOptions.values) as ItemImage[];
     return images;
   }
@@ -185,8 +187,8 @@ class ItemImageAPI {
       );
       
       await conn.execute<ResultSetHeader>(
-        `INSERT INTO itemimage (item_id, image_id, label) VALUES (?, ?, ?)`,
-        [item.id, data.insertId, ''],
+        `INSERT INTO itemimage (item_id, image_id, label, idx) VALUES (?, ?, ?, ?)`,
+        [item.id, data.insertId, '', 0],
       );
     });
     return data;
@@ -199,6 +201,15 @@ class ItemImageAPI {
     if (!image) throw new NotFoundError();
     await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
     return await executeQuery<ResultSetHeader>(`UPDATE itemimage SET label = ? WHERE image_id = ?`, [label, imageId], conn);
+  }
+
+  async putIdx(user: User | undefined, imageId: number, idx: number, conn?: PoolConnection): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
+    const images = await this.getMany({ id: imageId }, false) as ItemImage[];
+    const image = images && images[0];
+    if (!image) throw new NotFoundError();
+    await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
+    return await executeQuery<ResultSetHeader>(`UPDATE itemimage SET idx = ? WHERE image_id = ?`, [idx, imageId], conn);
   }
 
   async del(user: User | undefined, imageId: number, conn?: PoolConnection): Promise<void> {
@@ -261,6 +272,7 @@ export class ItemAPI {
       FROM itemimage
       INNER JOIN image ON image.id = itemimage.image_id
       WHERE itemimage.item_id = ?
+      ORDER BY itemimage.idx
     `, [item.id]) as GalleryImage[];
     item.gallery = gallery;
 
@@ -715,12 +727,15 @@ export class ItemAPI {
         for (const img of existingImages ?? []) {
           oldImages[img.id] = img;
         }
-        for (const img of body.gallery ?? []) {
+        await Promise.all((body.gallery ?? []).map(async (img, i) => {
           newImages[img.id] = img;
           if (img.label && oldImages[img.id] && img.label !== oldImages[img.id].label) {
             await this.image.putLabel(user, img.id, img.label, conn);
           }
-        }
+          if (oldImages[img.id] && i !== oldImages[img.id].idx) {
+            await this.image.putIdx(user, img.id, i, conn);
+          }
+        }));
         for (const img of existingImages ?? []) {
           if (!newImages[img.id]) await this.image.del(user, img.id, conn);
         }
