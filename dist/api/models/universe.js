@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UniverseAPI = void 0;
-const utils_1 = require("../utils");
 const errors_1 = require("../../errors");
+const utils_1 = require("../utils");
 const validateShortname = (shortname, reservedShortnames = ['create']) => {
     if (shortname.length < 3 || shortname.length > 64) {
         return 'Shortnames must be between 3 and 64 characters long.';
@@ -17,6 +17,13 @@ const validateShortname = (shortname, reservedShortnames = ['create']) => {
         return 'Shortnames can only contain letters, numbers, and hyphens.';
     }
     return null;
+};
+const permText = {
+    [utils_1.perms.READ]: 'read',
+    [utils_1.perms.COMMENT]: 'comment',
+    [utils_1.perms.WRITE]: 'write',
+    [utils_1.perms.ADMIN]: 'admin',
+    [utils_1.perms.OWNER]: 'owner',
 };
 class UniverseAPI {
     api;
@@ -330,7 +337,32 @@ class UniverseAPI {
         const requests = await (0, utils_1.executeQuery)('SELECT ua.*, user.username FROM universeaccessrequest ua INNER JOIN user ON user.id = ua.user_id WHERE ua.universe_id = ?', [universe.id]);
         return requests;
     }
-    async putAccessRequest(user, shortname, permissionLevel, isInvite) {
+    async putAccessRequest(user, shortname, permissionLevel) {
+        this._putAccessRequest(user, shortname, permissionLevel, false);
+        user = user;
+        const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
+        const target = await this.api.user.getOne({ 'user.id': universe.author_id }).catch((0, utils_1.handleAsNull)(errors_1.NotFoundError));
+        if (target) {
+            await this.api.notification.notify(target, this.api.notification.types.UNIVERSE, {
+                title: 'Universe Access Request',
+                body: `${user.username} is requesting ${permText[permissionLevel]} permissions on your universe ${universe.title}.`,
+                icon: (0, utils_1.getPfpUrl)(user),
+                clickUrl: `/universes/${universe.shortname}/permissions`,
+            });
+        }
+    }
+    async putAccessInvite(user, shortname, invitee, permissionLevel) {
+        const universe = await this.api.universe.getOne(user, { shortname }, Math.max(utils_1.perms.ADMIN, permissionLevel)); // Validate we have permssion to invite.
+        this._putAccessRequest(invitee, universe.shortname, permissionLevel, true);
+        user = user;
+        await this.api.notification.notify(invitee, this.api.notification.types.UNIVERSE, {
+            title: 'Universe Access Request',
+            body: `${user.username} is inviting you to ${universe.title} with ${permText[permissionLevel]} permissions.`,
+            icon: (0, utils_1.getPfpUrl)(user),
+            clickUrl: `/universes/${universe.shortname}`,
+        });
+    }
+    async _putAccessRequest(user, shortname, permissionLevel, isInvite) {
         if (!user)
             throw new errors_1.UnauthorizedError();
         const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];

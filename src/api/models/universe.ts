@@ -1,10 +1,9 @@
-import { executeQuery, parseData, perms, withTransaction, tiers, tierAllowance, BaseOptions, Tier } from '../utils';
-import logger from '../../logger';
-import { API } from '..';
 import { PoolConnection, ResultSetHeader } from 'mysql2/promise';
-import { User } from './user';
-import { ForbiddenError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
+import { API } from '..';
+import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
+import { BaseOptions, Tier, executeQuery, getPfpUrl, handleAsNull, parseData, perms, tierAllowance, tiers, withTransaction } from '../utils';
 import { ItemEvent } from './item';
+import { User } from './user';
 
 export type UniverseAccessRequest = {
   universe_id: number,
@@ -52,7 +51,15 @@ const validateShortname = (shortname: string, reservedShortnames: string[] = ['c
   }
 
   return null;
-}
+};
+
+const permText = {
+  [perms.READ]: 'read',
+  [perms.COMMENT]: 'comment',
+  [perms.WRITE]: 'write',
+  [perms.ADMIN]: 'admin',
+  [perms.OWNER]: 'owner',
+};
 
 export class UniverseAPI {
   readonly api: API;
@@ -402,7 +409,37 @@ export class UniverseAPI {
     return requests;
   }
 
-  async putAccessRequest(user: User | undefined, shortname: string, permissionLevel: perms, isInvite: boolean): Promise<void> {
+  async putAccessRequest(user: User | undefined, shortname: string, permissionLevel: perms): Promise<void> {
+    this._putAccessRequest(user, shortname, permissionLevel, false);
+    user = user as User;
+
+    const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
+    const target = await this.api.user.getOne({ 'user.id': universe.author_id }).catch(handleAsNull(NotFoundError));
+
+    if (target) {
+      await this.api.notification.notify(target, this.api.notification.types.UNIVERSE, {
+        title: 'Universe Access Request',
+        body: `${user.username} is requesting ${permText[permissionLevel]} permissions on your universe ${universe.title}.`,
+        icon: getPfpUrl(user),
+        clickUrl: `/universes/${universe.shortname}/permissions`,
+      });
+    }
+  }
+
+  async putAccessInvite(user: User | undefined, shortname: string, invitee: User, permissionLevel: perms): Promise<void> {
+    const universe = await this.api.universe.getOne(user, { shortname }, Math.max(perms.ADMIN, permissionLevel)); // Validate we have permssion to invite.
+    this._putAccessRequest(invitee, universe.shortname, permissionLevel, true);
+    user = user as User;
+
+    await this.api.notification.notify(invitee, this.api.notification.types.UNIVERSE, {
+      title: 'Universe Access Request',
+      body: `${user.username} is inviting you to ${universe.title} with ${permText[permissionLevel]} permissions.`,
+      icon: getPfpUrl(user),
+      clickUrl: `/universes/${universe.shortname}`,
+    });
+  }
+
+  private async _putAccessRequest(user: User | undefined, shortname: string, permissionLevel: perms, isInvite: boolean): Promise<void> {
     if (!user) throw new UnauthorizedError();
 
     const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
