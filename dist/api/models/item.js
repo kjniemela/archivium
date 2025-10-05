@@ -65,12 +65,13 @@ class ItemImageAPI {
         let queryString = `
       SELECT 
         image.id, itemimage.item_id, image.name, image.mimetype,
-        itemimage.label ${inclData ? ', image.data' : ''}
+        itemimage.label, itemimage.idx ${inclData ? ', image.data' : ''}
       FROM itemimage
       INNER JOIN image ON image.id = itemimage.image_id
     `;
         if (options)
             queryString += ` WHERE ${parsedOptions.strings.join(' AND ')}`;
+        queryString += ' ORDER BY itemimage.idx';
         const images = await (0, utils_1.executeQuery)(queryString, parsedOptions.values);
         return images;
     }
@@ -94,7 +95,7 @@ class ItemImageAPI {
         let data;
         await (0, utils_1.withTransaction)(async (conn) => {
             [data] = await conn.execute(`INSERT INTO image (name, mimetype, data) VALUES (?, ?, ?)`, [originalname.substring(0, 64), mimetype, buffer]);
-            await conn.execute(`INSERT INTO itemimage (item_id, image_id, label) VALUES (?, ?, ?)`, [item.id, data.insertId, '']);
+            await conn.execute(`INSERT INTO itemimage (item_id, image_id, label, idx) VALUES (?, ?, ?, ?)`, [item.id, data.insertId, '', 0]);
         });
         return data;
     }
@@ -107,6 +108,16 @@ class ItemImageAPI {
             throw new errors_1.NotFoundError();
         await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
         return await (0, utils_1.executeQuery)(`UPDATE itemimage SET label = ? WHERE image_id = ?`, [label, imageId], conn);
+    }
+    async putIdx(user, imageId, idx, conn) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
+        const images = await this.getMany({ id: imageId }, false);
+        const image = images && images[0];
+        if (!image)
+            throw new errors_1.NotFoundError();
+        await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
+        return await (0, utils_1.executeQuery)(`UPDATE itemimage SET idx = ? WHERE image_id = ?`, [idx, imageId], conn);
     }
     async del(user, imageId, conn) {
         if (!user)
@@ -164,6 +175,7 @@ class ItemAPI {
       FROM itemimage
       INNER JOIN image ON image.id = itemimage.image_id
       WHERE itemimage.item_id = ?
+      ORDER BY itemimage.idx
     `, [item.id]);
         item.gallery = gallery;
         const children = await (0, utils_1.executeQuery)(`
@@ -580,12 +592,15 @@ class ItemAPI {
                 for (const img of existingImages ?? []) {
                     oldImages[img.id] = img;
                 }
-                for (const img of body.gallery ?? []) {
+                await Promise.all((body.gallery ?? []).map(async (img, i) => {
                     newImages[img.id] = img;
                     if (img.label && oldImages[img.id] && img.label !== oldImages[img.id].label) {
                         await this.image.putLabel(user, img.id, img.label, conn);
                     }
-                }
+                    if (oldImages[img.id] && i !== oldImages[img.id].idx) {
+                        await this.image.putIdx(user, img.id, i, conn);
+                    }
+                }));
                 for (const img of existingImages ?? []) {
                     if (!newImages[img.id])
                         await this.image.del(user, img.id, conn);

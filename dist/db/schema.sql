@@ -264,6 +264,7 @@ CREATE TABLE itemimage (
   image_id INT NOT NULL,
   item_id INT NOT NULL,
   label VARCHAR(256) NOT NULL,
+  idx INT NOT NULL,
   FOREIGN KEY (item_id) REFERENCES item (id) ON DELETE CASCADE,
   FOREIGN KEY (image_id) REFERENCES image (id) ON DELETE CASCADE
 );
