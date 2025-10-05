@@ -39,10 +39,11 @@ export async function tryRenderContent(req: Request, content: unknown, universeS
     };
     const htmlBody = renderToHTMLString({ extensions: editorExtensions(false, renderContext), content: jsonBody });
     const sanitizedHtml = sanitizeHtml(htmlBody, {
-      allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'iframe']),
       allowedAttributes: {
         ...sanitizeHtml.defaults.allowedAttributes,
         img: ['src', 'alt', 'title', 'width', 'height'],
+        iframe: ['src'],
         h1: ['id'], h2: ['id'], h3: ['id'], h4: ['id'], h5: ['id'], h6: ['id'],
       },
       disallowedTagsMode: 'escape',
