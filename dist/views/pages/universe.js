@@ -22,6 +22,7 @@ exports.default = {
     },
     async view(req, res) {
         const user = req.session.user;
+        const accessRequest = await api_1.default.universe.getUserAccessRequestIfExists(user, req.params.universeShortname).catch(() => null);
         try {
             const universe = await api_1.default.universe.getOne(user, { shortname: req.params.universeShortname });
             const authors = await api_1.default.user.getByUniverseShortname(user, universe.shortname);
@@ -40,7 +41,7 @@ exports.default = {
                 .filter(row => row.tier > (universe.tier ?? 0))
             // .some(row => row.universes.length < tierAllowance[user.plan][row.tier])
             ) : false;
-            res.prepareRender('universe', { universe, authors: authorMap, threads, counts, totalItems, stories, couldUpgrade });
+            res.prepareRender('universe', { universe, authors: authorMap, threads, counts, totalItems, stories, couldUpgrade, accessRequest });
         }
         catch (err) {
             // If the user is not authorized to view the universe, check if there is a public page to display instead
@@ -52,8 +53,7 @@ exports.default = {
                     // req.useExQuery = true; // TODO why is this here?
                     return;
                 }
-                const request = await api_1.default.universe.getUserAccessRequestIfExists(user, req.params.universeShortname).catch(() => null);
-                return res.prepareRender('privateUniverse', { shortname: req.params.universeShortname, hasRequested: Boolean(request), publicBody });
+                return res.prepareRender('privateUniverse', { shortname: req.params.universeShortname, accessRequest, publicBody });
             }
             throw err;
         }

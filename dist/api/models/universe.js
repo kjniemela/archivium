@@ -239,7 +239,11 @@ class UniverseAPI {
     async putPermissions(user, shortname, targetUser, permission_level) {
         if (!user)
             throw new errors_1.UnauthorizedError();
-        const universe = await this.getOne(user, { shortname }, permission_level === utils_1.perms.OWNER ? utils_1.perms.OWNER : Math.max(utils_1.perms.ADMIN, permission_level + 1));
+        // If we have a pending invite to this universe for the same permission level, use the admin who invited us to assign the new permission level.
+        const accessInvite = await this.getUserAccessRequestIfExists(user, shortname);
+        const validInvite = accessInvite?.is_invite && accessInvite.permission_level === permission_level && user.id === targetUser.id;
+        const invitingAdmin = validInvite && await this.api.user.getOne({ 'user.id': accessInvite.inviter_id });
+        const universe = await this.getOne(invitingAdmin || user, { shortname }, permission_level === utils_1.perms.OWNER ? utils_1.perms.OWNER : Math.max(utils_1.perms.ADMIN, permission_level + 1));
         if (universe.author_permissions[targetUser.id] > universe.author_permissions[user.id])
             throw new errors_1.ForbiddenError();
         if (universe.author_permissions[targetUser.id] === utils_1.perms.OWNER && permission_level < utils_1.perms.OWNER) {
@@ -325,7 +329,7 @@ class UniverseAPI {
         const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
         if (!universe)
             throw new errors_1.NotFoundError();
-        const request = (await (0, utils_1.executeQuery)('SELECT * FROM universeaccessrequest WHERE universe_id = ? AND user_id = ?', [universe.id, user.id]))[0];
+        const request = (await (0, utils_1.executeQuery)('SELECT ua.*, user.username FROM universeaccessrequest AS ua INNER JOIN user ON user.id = ua.user_id WHERE ua.universe_id = ? AND ua.user_id = ?', [universe.id, user.id]))[0];
         if (!request)
             return null;
         return request;
@@ -340,11 +344,11 @@ class UniverseAPI {
         if (!user)
             throw new errors_1.UnauthorizedError();
         const universe = await this.getOne(user, { shortname }, utils_1.perms.ADMIN);
-        const requests = await (0, utils_1.executeQuery)('SELECT ua.*, user.username FROM universeaccessrequest ua INNER JOIN user ON user.id = ua.user_id WHERE ua.universe_id = ? AND ua.is_invite = ?', [universe.id, getInvites]);
+        const requests = await (0, utils_1.executeQuery)('SELECT ua.*, user.username FROM universeaccessrequest AS ua INNER JOIN user ON user.id = ua.user_id WHERE ua.universe_id = ? AND ua.is_invite = ?', [universe.id, getInvites]);
         return requests;
     }
     async putAccessRequest(user, shortname, permissionLevel) {
-        this._putAccessRequest(user, shortname, permissionLevel, false);
+        this._putAccessRequest(user, shortname, permissionLevel);
         user = user;
         const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
         const target = await this.api.user.getOne({ 'user.id': universe.author_id }).catch((0, utils_1.handleAsNull)(errors_1.NotFoundError));
@@ -359,8 +363,8 @@ class UniverseAPI {
     }
     async putAccessInvite(user, shortname, invitee, permissionLevel) {
         const universe = await this.api.universe.getOne(user, { shortname }, Math.max(utils_1.perms.ADMIN, permissionLevel)); // Validate we have permssion to invite.
-        this._putAccessRequest(invitee, universe.shortname, permissionLevel, true);
         user = user;
+        this._putAccessRequest(invitee, universe.shortname, permissionLevel, user);
         await this.api.notification.notify(invitee, this.api.notification.types.UNIVERSE, {
             title: 'Universe Access Request',
             body: `${user.username} is inviting you to ${universe.title} with ${permText[permissionLevel]} permissions.`,
@@ -368,7 +372,7 @@ class UniverseAPI {
             clickUrl: `/universes/${universe.shortname}`,
         });
     }
-    async _putAccessRequest(user, shortname, permissionLevel, isInvite) {
+    async _putAccessRequest(user, shortname, permissionLevel, invidingAdmin) {
         if (!user)
             throw new errors_1.UnauthorizedError();
         const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
@@ -381,7 +385,7 @@ class UniverseAPI {
             else
                 await this.delAccessRequest(user, shortname, user);
         }
-        await (0, utils_1.executeQuery)('INSERT INTO universeaccessrequest (universe_id, user_id, permission_level, is_invite) VALUES (?, ?, ?, ?)', [universe.id, user.id, permissionLevel, isInvite]);
+        await (0, utils_1.executeQuery)('INSERT INTO universeaccessrequest (universe_id, user_id, permission_level, is_invite, inviter_id) VALUES (?, ?, ?, ?, ?)', [universe.id, user.id, permissionLevel, invidingAdmin !== null, invidingAdmin?.id]);
     }
     async delAccessRequest(user, shortname, requestingUser) {
         if (!user)

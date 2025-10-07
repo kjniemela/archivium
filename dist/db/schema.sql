@@ -337,8 +337,10 @@ CREATE TABLE universeaccessrequest (
   user_id INT NOT NULL,
   permission_level TINYINT NOT NULL,
   is_invite BOOLEAN DEFAULT FALSE,
+  inviter_id INT,
   FOREIGN KEY (universe_id) REFERENCES universe (id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE,
+  FOREIGN KEY (inviter_id) REFERENCES user (id) ON DELETE CASCADE
 );
 
 CREATE TABLE followeruniverse (

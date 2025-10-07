@@ -27,7 +27,10 @@ block content
         | #{T('Looks like the universe you\'re trying to reach is private.')}
         br
         if contextUser
-          | #{T('You can ask the owner of this universe for access by clicking the button below:')}
+          if accessRequest && accessRequest.is_invite
+            | #{T('You have been invited to access this universe with %s permissions:', T(`perms_${accessRequest.permission_level}`).toLowerCase())} 
+          else
+            | #{T('You can ask the owner of this universe for access by clicking the button below:')}
   
   .center.d-flex.flex-col.align-center
     if contextUser
@@ -36,7 +39,20 @@ block content
             await putJSON('/api/universes/#{shortname}/request', { permissionLevel: #{perms.READ} });
             window.location.reload();
           }
-        button.button.large(type='submit' onclick='requestAccess()' disabled=hasRequested) #{hasRequested ? T('Request Pending') : T('Request Access')}
+        if accessRequest && accessRequest.is_invite
+          .d-flex
+            button.button.large(
+              onclick=`putJSON(
+                '/api/universes/${shortname}/perms', { username: '${accessRequest.username}', permissionLevel: ${accessRequest.permission_level} }
+              ).then(() => window.location.reload())`
+            ) #{T('Accept')}
+            button.button.large(
+              onclick=`deleteJSON(
+                '/api/universes/${shortname}/request/${accessRequest.username}'
+              ).then(() => window.location.reload())`
+            ) #{T('Reject')}
+        else
+          button.button.large(type='submit' onclick='requestAccess()' disabled=accessRequest) #{accessRequest ? T('Request Pending') : T('Request Access')}
     else
       p
         a.link.link-animated(href=`${ADDR_PREFIX}/login?${encodedPath}`) #{T('Log in')}

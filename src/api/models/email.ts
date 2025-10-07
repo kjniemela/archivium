@@ -103,6 +103,7 @@ export class EmailAPI {
     if (!sessionUser) throw new UnauthorizedError();
     if (sessionUser.username != username) throw new ForbiddenError();
     if (sessionUser.verified) return { alreadyVerified: true };
+    if (!sessionUser.email) throw new ValidationError();
 
     const now = new Date();
     const timeout = 60 * 1000;

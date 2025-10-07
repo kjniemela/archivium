@@ -51,7 +51,8 @@ export const tierLimits: Record<Tier, TierLimit> = {
   [tiers.PREMIUM]: { images: 5_000_000_000 },
 };
 
-export async function executeQuery<T extends QueryResult = RowDataPacket[]>(query: string, values: any[] = [], conn?: PoolConnection): Promise<T> {
+export type SQLValue = number | string | boolean | Date | null;
+export async function executeQuery<T extends QueryResult = RowDataPacket[]>(query: string, values: SQLValue[] = [], conn?: PoolConnection): Promise<T> {
   const [ results ] = await (conn ?? db).execute<T>(query, values);
   return results;
 }
