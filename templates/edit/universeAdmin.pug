@@ -78,7 +78,8 @@ block content
           input(id='username' name='username' placeholder=T('Username'))
           select(id='new_permission_level' name='new_permission_level' style={ 'grid-column': '3 / 4' } disabled=((perm === perms.OWNER && ownerCount === 1) || (perm > universe.author_permissions[contextUser.id])))
             each permission_level in Object.keys(perms).filter((item) => !isNaN(Number(item)))
-              option(value=permission_level selected=(permission_level == perms.READ) disabled=(permission_level > universe.author_permissions[contextUser.id])) #{T(`perms_${permission_level}`)}
+              if permission_level > (universe.is_public ? (universe.discussion_open ? perms.COMMENT : perms.READ) : perms.NONE)
+                option(value=permission_level selected=(permission_level == perms.READ) disabled=(permission_level > universe.author_permissions[contextUser.id])) #{T(`perms_${permission_level}`)}
           button(type='submit' id='invite_user') #{T('Invite User')}
 
       br

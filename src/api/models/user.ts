@@ -33,7 +33,7 @@ export type User = {
   custom_theme: Theme | null,
   isContact?: boolean,
   hasPfp?: boolean,
-  plan?: plans, 
+  plan?: plans,
   notifications?: number,
 };
 
