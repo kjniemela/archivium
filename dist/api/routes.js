@@ -299,7 +299,7 @@ function default_1(app, upload) {
                             await _1.default.universe.putAccessInvite(req.session.user, req.params.universeShortName, target, req.body.permissionLevel);
                         },
                         DELETE: async (req) => {
-                            const user = await _1.default.user.getOne({ 'user.username': req.params.requestingUser ?? null });
+                            const user = await _1.default.user.getOne({ 'user.username': req.params.username ?? null });
                             return await _1.default.universe.delAccessRequest(req.session.user, req.params.universeShortName, user);
                         },
                     }),

@@ -307,7 +307,7 @@ export default function (app: Express, upload: Multer) {
               await api.universe.putAccessInvite(req.session.user, req.params.universeShortName, target, req.body.permissionLevel);
             },
             DELETE: async (req) => {
-              const user = await api.user.getOne({ 'user.username': req.params.requestingUser ?? null });
+              const user = await api.user.getOne({ 'user.username': req.params.username ?? null });
               return await api.universe.delAccessRequest(req.session.user, req.params.universeShortName, user);
             },
           }),

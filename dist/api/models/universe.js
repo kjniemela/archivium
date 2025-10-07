@@ -331,10 +331,16 @@ class UniverseAPI {
         return request;
     }
     async getAccessRequests(user, shortname) {
+        return this._getAccessRequests(user, shortname, false);
+    }
+    async getAccessInvites(user, shortname) {
+        return this._getAccessRequests(user, shortname, true);
+    }
+    async _getAccessRequests(user, shortname, getInvites) {
         if (!user)
             throw new errors_1.UnauthorizedError();
         const universe = await this.getOne(user, { shortname }, utils_1.perms.ADMIN);
-        const requests = await (0, utils_1.executeQuery)('SELECT ua.*, user.username FROM universeaccessrequest ua INNER JOIN user ON user.id = ua.user_id WHERE ua.universe_id = ?', [universe.id]);
+        const requests = await (0, utils_1.executeQuery)('SELECT ua.*, user.username FROM universeaccessrequest ua INNER JOIN user ON user.id = ua.user_id WHERE ua.universe_id = ? AND ua.is_invite = ?', [universe.id, getInvites]);
         return requests;
     }
     async putAccessRequest(user, shortname, permissionLevel) {
@@ -382,7 +388,7 @@ class UniverseAPI {
             throw new errors_1.UnauthorizedError();
         if (!requestingUser)
             throw new errors_1.ValidationError('Requesting user is required.');
-        const permsUniverse = await this.getOne(user, { shortname }, utils_1.perms.ADMIN);
+        const permsUniverse = await this.getOne(user, { shortname }, utils_1.perms.ADMIN).catch((0, utils_1.handleAsNull)(errors_1.ForbiddenError));
         if (!(permsUniverse || (user.id === requestingUser.id)))
             throw new errors_1.ForbiddenError();
         const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];

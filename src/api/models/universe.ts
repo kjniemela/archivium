@@ -5,10 +5,11 @@ import { BaseOptions, Tier, executeQuery, getPfpUrl, handleAsNull, parseData, pe
 import { ItemEvent } from './item';
 import { User } from './user';
 
-export type UniverseAccessRequest = {
+export type UniverseAccessRequest<T = boolean> = {
   universe_id: number,
   user_id: number,
   permission_level: perms,
+  is_invite: T,
 };
 
 export type Universe = {
@@ -396,15 +397,23 @@ export class UniverseAPI {
     return request;
   }
 
-  async getAccessRequests(user: User | undefined, shortname: string): Promise<UniverseAccessRequest[]> {
+  async getAccessRequests(user: User | undefined, shortname: string): Promise<UniverseAccessRequest<false>[]> {
+    return this._getAccessRequests(user, shortname, false);
+  }
+
+  async getAccessInvites(user: User | undefined, shortname: string): Promise<UniverseAccessRequest<true>[]> {
+    return this._getAccessRequests(user, shortname, true);
+  }
+
+  private async _getAccessRequests<T = boolean>(user: User | undefined, shortname: string, getInvites: T): Promise<UniverseAccessRequest<T>[]> {
     if (!user) throw new UnauthorizedError();
 
     const universe = await this.getOne(user, { shortname }, perms.ADMIN);
 
     const requests = await executeQuery(
-      'SELECT ua.*, user.username FROM universeaccessrequest ua INNER JOIN user ON user.id = ua.user_id WHERE ua.universe_id = ?',
-      [universe.id],
-    ) as UniverseAccessRequest[];
+      'SELECT ua.*, user.username FROM universeaccessrequest ua INNER JOIN user ON user.id = ua.user_id WHERE ua.universe_id = ? AND ua.is_invite = ?',
+      [universe.id, getInvites],
+    ) as UniverseAccessRequest<T>[];
 
     return requests;
   }
@@ -460,7 +469,7 @@ export class UniverseAPI {
   async delAccessRequest(user: User | undefined, shortname: string, requestingUser: User): Promise<void> {
     if (!user) throw new UnauthorizedError();
     if (!requestingUser) throw new ValidationError('Requesting user is required.');
-    const permsUniverse = await this.getOne(user, { shortname }, perms.ADMIN);
+    const permsUniverse = await this.getOne(user, { shortname }, perms.ADMIN).catch(handleAsNull(ForbiddenError));
     if (!(permsUniverse || (user.id === requestingUser.id))) throw new ForbiddenError();
 
     const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];

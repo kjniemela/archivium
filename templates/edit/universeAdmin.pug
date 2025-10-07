@@ -49,6 +49,15 @@ block content
               }
             }
           });
+
+          document.querySelectorAll('form #invite_user').forEach((input) => {
+            const form = input.form;
+            form.onsubmit = async (e) => {
+              e.preventDefault();
+              await putJSON(`/api/universes/#{universe.shortname}/invite/${form.username.value}`, { permissionLevel: Number(form.new_permission_level.value) });
+              window.location.reload();
+            }
+          });
         });
         
       .d-flex.flex-col.align-start
@@ -61,6 +70,32 @@ block content
               select(class='permission_level' name='permission_level' style={ 'grid-column': '3 / 4' } disabled=((perm === perms.OWNER && ownerCount === 1) || (perm > universe.author_permissions[contextUser.id])))
                 each permission_level in Object.keys(perms).filter((item) => !isNaN(Number(item)))
                   option(value=permission_level selected=(permission_level == perm) disabled=(permission_level > universe.author_permissions[contextUser.id])) #{T(`perms_${permission_level}`)}
+
+      br
+      
+      form
+        .d-flex
+          input(id='username' name='username' placeholder=T('Username'))
+          select(id='new_permission_level' name='new_permission_level' style={ 'grid-column': '3 / 4' } disabled=((perm === perms.OWNER && ownerCount === 1) || (perm > universe.author_permissions[contextUser.id])))
+            each permission_level in Object.keys(perms).filter((item) => !isNaN(Number(item)))
+              option(value=permission_level selected=(permission_level == perms.READ) disabled=(permission_level > universe.author_permissions[contextUser.id])) #{T(`perms_${permission_level}`)}
+          button(type='submit' id='invite_user') #{T('Invite User')}
+
+      br
+
+      #invites.d-flex.flex-col.gap-2
+        each invite in invites
+          .d-flex.nowrap.gap-1.align-center
+            span
+              a.link.link-animated(href=`${ADDR_PREFIX}/users/${invite.username}`) #{invite.username}
+              |  was invited with  
+              b #{T(`perms_${invite.permission_level}`).toLowerCase()}
+              |  permissions.
+            button(
+              onclick=`deleteJSON(
+                '/api/universes/${universe.shortname}/invite/${invite.username}'
+              ).then(() => window.location.reload())`
+            ) #{T('Cancel')}
 
       br
       hr
