@@ -55,7 +55,7 @@ describe('Universe spec', () => {
     cy.get('#save-btn').click();
   });
 
-  it('removes and then restores an author of the public universe', () => {
+  it('demotes and then restores an author of the public universe', () => {
     cy.visit('/universes/public-test-universe');
     cy.get('#action-bar').contains('Admin Menu').click();
 
@@ -74,22 +74,34 @@ describe('Universe spec', () => {
     cy.get('.tabs [data-tab=authors] .card').contains('testwriter').should('exist');
   });
 
-  it('removes and restores an author of the private universe', () => {
+  it('removes and then reinvites an author of the private universe', () => {
     cy.visit('/universes/private-test-universe');
     cy.get('#action-bar').contains('Admin Menu').click();
 
-    cy.get('form').contains('testwriter').parent().find('select').select('1');
+    cy.intercept('PUT', '/api/universes/private-test-universe/perms').as('setperms');
+    cy.get('form').contains('testwriter').parent().find('select').select('0');
+    cy.wait('@setperms');
     cy.get('#breadcrumbs').contains('Private Test Universe').click();
 
     cy.get('#tabBtns').contains('Authors').click();
     cy.get('.tabs [data-tab=authors] .card').contains('testwriter').should('not.exist');
 
+    cy.get('#tabBtns').contains('Viewers').click();
+    cy.get('.tabs [data-tab=viewers] .card').contains('testwriter').should('not.exist');
+
     cy.visit('/universes/private-test-universe');
     cy.get('#action-bar').contains('Admin Menu').click();
 
-    cy.get('form').contains('testwriter').parent().find('select').select('3');
-    cy.get('#breadcrumbs').contains('Private Test Universe').click();
+    cy.get('#invite_user').parent().find('#username').type('testwriter');
+    cy.get('#new_permission_level').select('3');
+    cy.get('#invite_user').click();
 
+    cy.login('testwriter');
+    cy.visit('/universes/private-test-universe');
+    cy.get('button').contains('Accept').click();
+
+    cy.login('testadmin');
+    cy.visit('/universes/private-test-universe');
     cy.get('#tabBtns').contains('Authors').click();
     cy.get('.tabs [data-tab=authors] .card').contains('testwriter').should('exist');
   });
