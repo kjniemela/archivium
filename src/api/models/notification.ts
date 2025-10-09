@@ -151,7 +151,7 @@ export class NotificationAPI {
     }
     
     if (previousNotif) {
-      await executeQuery('UPDATE sentnotification title = ?, body = ?, icon_url = ?, click_url = ?, sent_at = ? WHERE id = ?', [
+      await executeQuery('UPDATE sentnotification SET title = ?, body = ?, icon_url = ?, click_url = ?, sent_at = ? WHERE id = ?', [
         title,
         body,
         icon ?? null,
