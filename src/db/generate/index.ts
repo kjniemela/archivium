@@ -2,7 +2,7 @@ import mysql, { Connection } from 'mysql2/promise';
 import { DB_CONFIG } from '../../config';
 import { loadSchema, askQuestion } from '../import';
 import api from '../../api';
-import { perms } from '../../api/utils';
+import { executeQuery, perms, plans } from '../../api/utils';
 import db from '..';
 import { defaultUniverseData, defaultItemData, unformattedTiptapDocument } from './defaults.js';
 import { User } from '../../api/models/user';
@@ -27,8 +27,16 @@ async function createContact(requester: User, target: User, accept: boolean = tr
   }
 }
 
-async function createUniverse(owner: User, title: string, shortname: string, is_public: boolean = true, discussion_enabled: boolean = false, discussion_open: boolean = false): Promise<Universe> {
-  const [data] = await api.universe.post(owner, { title, shortname, is_public, discussion_enabled, discussion_open, obj_data: defaultUniverseData });
+async function createUniverse(
+  owner: User,
+  title: string,
+  shortname: string,
+  is_public = true,
+  discussion_enabled = false,
+  discussion_open = false,
+  obj_data: any = defaultUniverseData // TODO remove any
+): Promise<Universe> {
+  const [data] = await api.universe.post(owner, { title, shortname, is_public, discussion_enabled, discussion_open, obj_data });
   const universe = await api.universe.getOne(owner, { 'universe.id': data.insertId });
   return universe;
 }
@@ -109,6 +117,10 @@ async function main(): Promise<void> {
   `.split('\n').map(line => line.trim()).join('\n').trim();
 
   console.log('Creating users...');
+  const sysadmin = await createUser('sysadmin');
+  await executeQuery('INSERT INTO userplan (user_id, plan) VALUES (?, ?)', [sysadmin.id, plans.SUPER]);
+  const betatester = await createUser('betatester');
+  await executeQuery('INSERT INTO userplan (user_id, plan) VALUES (?, ?)', [betatester.id, plans.BETA]);
   const users: Record<string, User> = {};
   for (const user of ['user', 'owner', 'admin', 'writer', 'commenter', 'reader']) {
     const username = `test${user}`;
@@ -134,6 +146,7 @@ async function main(): Promise<void> {
   await setUniversePerms(users.testadmin, privateUniverse, users.testwriter, perms.WRITE);
   await setUniversePerms(users.testadmin, privateUniverse, users.testcommenter, perms.COMMENT);
   await setUniversePerms(users.testadmin, privateUniverse, users.testreader, perms.READ);
+  await setUniversePerms(users.testadmin, privateUniverse, betatester, perms.READ);
   await setUniversePerms(users.testowner, chatroomUniverse, users.testuser, perms.ADMIN);
 
   console.log('Creating items...');
@@ -195,6 +208,18 @@ async function main(): Promise<void> {
   await createNote(users.testwriter, 'Public Article Note', loremIpsum, true, ['article', 'public'], [testArticle]);
   await createNote(users.testwriter, 'Private Test Note', loremIpsum, false, ['test', 'private']);
   await createNote(users.testwriter, 'Private Article Note', loremIpsum, false, ['article', 'private'], [testArticle]);
+
+  console.log('Posting newsletters...');
+  const archivum = await createUniverse(sysadmin, 'Archivium', 'archivium', true, true, true, { cats: { newsletter: ['newsletter', 'newsletters', '#deddca'] } });
+  const newsletter = await createItem(sysadmin, archivum, 'Test Newsletter', 'test-newsletter', 'newsletter', { body: unformattedTiptapDocument(loremIpsum) });
+  for (const username in users) {
+    const user = users[username];
+    await api.notification.notify(user, api.notification.types.FEATURES, {
+      title: newsletter.title,
+      body: 'This is a test newsletter. Click me to read more.',
+      clickUrl: `/news/${newsletter.shortname}`,
+    });
+  }
 
   schemaConn.end();
   db.end();
