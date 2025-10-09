@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const api_1 = __importDefault(require("../../api"));
 const utils_1 = require("../../api/utils");
 const promises_1 = __importDefault(require("fs/promises"));
-const config_1 = require("../../config");
 const path_1 = __importDefault(require("path"));
 const errors_1 = require("../../errors");
 const staticDir = path_1.default.join(__dirname, '../../static');
@@ -55,19 +54,6 @@ exports.default = {
             return res.prepareRender('home', { universes, followedUniverses, recentlyUpdated, oldestUpdated });
         }
         res.prepareRender('home', { universes: [] });
-    },
-    /* Newsletter */
-    async news(req, res) {
-        const newsletter = await api_1.default.newsletter.getOne(Number(req.params.id));
-        res.prepareRender('docs', {
-            title: newsletter.title,
-            content: newsletter.body,
-            breadcrumbs: [['Home', `${config_1.ADDR_PREFIX}/`], ['News', `${config_1.ADDR_PREFIX}/news`], [newsletter.title]],
-        });
-    },
-    async newsList(_, res) {
-        const newsletters = (await api_1.default.newsletter.getMany()).map(n => n.body);
-        res.prepareRender('news', { newsletters });
     },
     /* Help Pages */
     async markdownDemo(_, res) {
