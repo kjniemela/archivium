@@ -1,43 +1,16 @@
-import db from ".";
+import db from '.';
 import readline from 'readline';
-import api from "../api";
-import { askQuestion } from "./import";
-
-function askMultiline(query) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  console.log(query);
-
-  return new Promise(resolve => {
-    let lines = [];
-    let blankCount = 0;
-    rl.on('line', line => {
-      lines.push(line);
-      if (!line) {
-        blankCount++;
-      } else {
-        blankCount = 0;
-      }
-      if (blankCount === 2) {
-        rl.close();
-        lines.pop();
-        resolve(lines.join('\n'));
-      }
-    });
-  });
-}
+import api from '../api';
+import { askQuestion } from './import';
+import { handleAsNull } from '../api/utils';
+import { ForbiddenError, UnauthorizedError } from '../errors';
 
 async function main() {
   console.log('Please input newletter info below:');
-  const title = await askQuestion('Title: ');
+  const shortname = await askQuestion('Newsletter shortname: ');
   const preview = await askQuestion('Preview: ');
-  const body = await askMultiline('Body:');
-  console.log(`Title: ${title}`);
+  console.log(`Shortname: ${shortname}`);
   console.log(`Preview: ${preview}`);
-  console.log(`Body: ${body}`);
   const ans = await askQuestion('Does this look right? [y/N] ');
   if (ans.toUpperCase() === 'N') {
     const ans = await askQuestion('Try again? [y/N] ');
@@ -49,8 +22,6 @@ async function main() {
     return;
   }
 
-  const { insertId } = await api.newsletter.post({ title, preview, body });
-
   const users = await api.user.getMany(null, true);
   const proceed = await askQuestion(`${users.length} users to send to, proceed? [y/N] `);
   if (proceed.toUpperCase() === 'N') {
@@ -58,13 +29,19 @@ async function main() {
     return;
   }
 
+  const newsletter = await api.item.getByUniverseAndItemShortnames(undefined, 'archivium', shortname).catch(handleAsNull([UnauthorizedError, ForbiddenError]));
+  if (!newsletter) {
+    console.log('Newsletter not found or env is badly configured, exiting.');
+    return;
+  }
+
   for (let i = 0; i < users.length; i++) {
     const user = users[i];
     console.log(`Sending... (${i}/${users.length})`);
     await api.notification.notify(user, api.notification.types.FEATURES, {
-      title,
+      title: newsletter.title,
       body: preview,
-      clickUrl: `/news/${insertId}`,
+      clickUrl: `/news/${shortname}`,
     });
     readline.moveCursor(process.stdout, 0, -1);
   }
