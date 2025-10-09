@@ -10,7 +10,7 @@ block title
     
 block breadcrumbs
   if displayUniverse
-      a.link.link-animated(href=`${ADDR_PREFIX}/`) #{systemDisplayModes.includes(displayUniverse) ? T('Home') : universe.title}
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{systemDisplayModes.includes(displayUniverse) ? T('Home') : universe.title}
   else
     a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
     |  / 
