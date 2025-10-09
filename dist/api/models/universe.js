@@ -348,7 +348,7 @@ class UniverseAPI {
         return requests;
     }
     async putAccessRequest(user, shortname, permissionLevel) {
-        this._putAccessRequest(user, shortname, permissionLevel);
+        await this._putAccessRequest(user, shortname, permissionLevel);
         user = user;
         const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
         const target = await this.api.user.getOne({ 'user.id': universe.author_id }).catch((0, utils_1.handleAsNull)(errors_1.NotFoundError));
@@ -364,13 +364,15 @@ class UniverseAPI {
     async putAccessInvite(user, shortname, invitee, permissionLevel) {
         const universe = await this.api.universe.getOne(user, { shortname }, Math.max(utils_1.perms.ADMIN, permissionLevel)); // Validate we have permssion to invite.
         user = user;
-        this._putAccessRequest(invitee, universe.shortname, permissionLevel, user);
-        await this.api.notification.notify(invitee, this.api.notification.types.UNIVERSE, {
-            title: 'Universe Access Request',
-            body: `${user.username} is inviting you to ${universe.title} with ${permText[permissionLevel]} permissions.`,
-            icon: (0, utils_1.getPfpUrl)(user),
-            clickUrl: `/universes/${universe.shortname}`,
-        });
+        const inviteChanged = await this._putAccessRequest(invitee, universe.shortname, permissionLevel, user);
+        if (inviteChanged) {
+            await this.api.notification.notify(invitee, this.api.notification.types.UNIVERSE, {
+                title: `Invitation to ${universe.title}`,
+                body: `${user.username} is inviting you to ${universe.title} with ${permText[permissionLevel]} permissions.`,
+                icon: (0, utils_1.getPfpUrl)(user),
+                clickUrl: `/universes/${universe.shortname}`,
+            }, `invite-${shortname}-${invitee.username}`);
+        }
     }
     async _putAccessRequest(user, shortname, permissionLevel, invidingAdmin) {
         if (!user)
@@ -381,11 +383,12 @@ class UniverseAPI {
         const request = await this.getUserAccessRequestIfExists(user, shortname);
         if (request) {
             if (request.permission_level >= permissionLevel)
-                return;
+                return false;
             else
                 await this.delAccessRequest(user, shortname, user);
         }
         await (0, utils_1.executeQuery)('INSERT INTO universeaccessrequest (universe_id, user_id, permission_level, is_invite, inviter_id) VALUES (?, ?, ?, ?, ?)', [universe.id, user.id, permissionLevel, invidingAdmin !== null, invidingAdmin?.id]);
+        return true;
     }
     async delAccessRequest(user, shortname, requestingUser) {
         if (!user)

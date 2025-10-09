@@ -426,7 +426,7 @@ export class UniverseAPI {
   }
 
   async putAccessRequest(user: User | undefined, shortname: string, permissionLevel: perms): Promise<void> {
-    this._putAccessRequest(user, shortname, permissionLevel);
+    await this._putAccessRequest(user, shortname, permissionLevel);
     user = user as User;
 
     const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
@@ -445,17 +445,19 @@ export class UniverseAPI {
   async putAccessInvite(user: User | undefined, shortname: string, invitee: User, permissionLevel: perms): Promise<void> {
     const universe = await this.api.universe.getOne(user, { shortname }, Math.max(perms.ADMIN, permissionLevel)); // Validate we have permssion to invite.
     user = user as User;
-    this._putAccessRequest(invitee, universe.shortname, permissionLevel, user);
+    const inviteChanged = await this._putAccessRequest(invitee, universe.shortname, permissionLevel, user);
 
-    await this.api.notification.notify(invitee, this.api.notification.types.UNIVERSE, {
-      title: 'Universe Access Request',
-      body: `${user.username} is inviting you to ${universe.title} with ${permText[permissionLevel]} permissions.`,
-      icon: getPfpUrl(user),
-      clickUrl: `/universes/${universe.shortname}`,
-    });
+    if (inviteChanged) {
+      await this.api.notification.notify(invitee, this.api.notification.types.UNIVERSE, {
+        title: `Invitation to ${universe.title}`,
+        body: `${user.username} is inviting you to ${universe.title} with ${permText[permissionLevel]} permissions.`,
+        icon: getPfpUrl(user),
+        clickUrl: `/universes/${universe.shortname}`,
+      }, `invite-${shortname}-${invitee.username}`);
+    }
   }
 
-  private async _putAccessRequest(user: User | undefined, shortname: string, permissionLevel: perms, invidingAdmin?: User): Promise<void> {
+  private async _putAccessRequest(user: User | undefined, shortname: string, permissionLevel: perms, invidingAdmin?: User): Promise<boolean> {
     if (!user) throw new UnauthorizedError();
 
     const universe = (await executeQuery('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
@@ -463,7 +465,7 @@ export class UniverseAPI {
 
     const request = await this.getUserAccessRequestIfExists(user, shortname);
     if (request) {
-      if (request.permission_level >= permissionLevel) return;
+      if (request.permission_level >= permissionLevel) return false;
       else await this.delAccessRequest(user, shortname, user);
     }
 
@@ -471,6 +473,8 @@ export class UniverseAPI {
       'INSERT INTO universeaccessrequest (universe_id, user_id, permission_level, is_invite, inviter_id) VALUES (?, ?, ?, ?, ?)',
       [universe.id, user.id, permissionLevel, invidingAdmin !== null, invidingAdmin?.id],
     );
+
+    return true;
   }
 
   async delAccessRequest(user: User | undefined, shortname: string, requestingUser: User): Promise<void> {

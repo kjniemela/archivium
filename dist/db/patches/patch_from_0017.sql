@@ -12,3 +12,6 @@ ALTER TABLE universeaccessrequest
 ADD CONSTRAINT universeaccessrequest_inviterfk
 FOREIGN KEY (inviter_id) REFERENCES user (id)
 ON DELETE CASCADE;
+
+ALTER TABLE sentnotification
+ADD dedup_key VARCHAR(128);

@@ -407,5 +407,6 @@ CREATE TABLE sentnotification (
   user_id INT NOT NULL,
   sent_at TIMESTAMP NOT NULL,
   is_read BOOLEAN DEFAULT FALSE,
+  dedup_key VARCHAR(128),
   FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
 );
