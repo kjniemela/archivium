@@ -59,7 +59,7 @@ describe('Universe spec', () => {
     cy.visit('/universes/public-test-universe');
     cy.get('#action-bar').contains('Admin Menu').click();
 
-    cy.get('form').contains('testwriter').parent().find('select').select('0');
+    cy.get('form').contains('testwriter').parent().find('select').select('1');
     cy.get('#breadcrumbs').contains('Public Test Universe').click();
 
     cy.get('#tabBtns').contains('Authors').click();
@@ -78,7 +78,7 @@ describe('Universe spec', () => {
     cy.visit('/universes/private-test-universe');
     cy.get('#action-bar').contains('Admin Menu').click();
 
-    cy.get('form').contains('testwriter').parent().find('select').select('0');
+    cy.get('form').contains('testwriter').parent().find('select').select('1');
     cy.get('#breadcrumbs').contains('Private Test Universe').click();
 
     cy.get('#tabBtns').contains('Authors').click();
@@ -157,7 +157,7 @@ describe('Universe spec', () => {
     cy.visit('/universes/cypress-universe');
     cy.get('#action-bar').contains('Admin Menu').click();
 
-    cy.intercept('POST', '/universes/cypress-universe/permissions').as('setperms');
+    cy.intercept('PUT', '/api/universes/cypress-universe/perms').as('setperms');
     cy.get('form').contains('testreader').parent().find('select').select('0');
     cy.wait('@setperms');
 
