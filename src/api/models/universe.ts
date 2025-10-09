@@ -311,12 +311,19 @@ export class UniverseAPI {
 
     let query: Promise<ResultSetHeader>;
     if (targetUser.id in universe.author_permissions) {
-      query = executeQuery(`
-        UPDATE authoruniverse 
-        SET permission_level = ? 
-        WHERE user_id = ? AND universe_id = ?`,
-        [permission_level, targetUser.id, universe.id],
-      );
+      if (permission_level === perms.NONE) {
+        query = executeQuery(
+          'DELETE FROM authoruniverse WHERE universe_id = ? AND user_id = ?',
+          [universe.id, targetUser.id],
+        );
+      } else {
+        query = executeQuery(`
+          UPDATE authoruniverse 
+          SET permission_level = ? 
+          WHERE user_id = ? AND universe_id = ?`,
+          [permission_level, targetUser.id, universe.id],
+        );
+      }
     } else {
       query = executeQuery(`
         INSERT INTO authoruniverse (permission_level, universe_id, user_id) VALUES (?, ?, ?)`,

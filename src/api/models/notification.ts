@@ -137,26 +137,27 @@ export class NotificationAPI {
     const settings = await this.getTypeSettings(target);
     const enabledMethods = settings.filter(s => s.notif_type === notifType).reduce((acc, val) => ({ ...acc, [val.notif_method]: Boolean(val.is_enabled) }), {});
 
-    let hasPreviousNotif = false;
+    let previousNotif: { id: number } | null = null;
     if (dedupKey) {
-      hasPreviousNotif = (await executeQuery(`
-        SELECT 1
+      previousNotif = (await executeQuery(`
+        SELECT id
         FROM sentnotification
         WHERE dedup_key = ?
           AND sent_at > DATE_SUB(NOW(), INTERVAL 2 DAY)
           AND NOT is_read
           AND user_id = ?
           AND notif_type = ?
-      `, [dedupKey, target.id, notifType])).length > 0;
+      `, [dedupKey, target.id, notifType]))[0];
     }
     
-    if (hasPreviousNotif) {
-      await executeQuery('UPDATE sentnotification title = ?, body = ?, icon_url = ?, click_url = ?, sent_at = ?', [
+    if (previousNotif) {
+      await executeQuery('UPDATE sentnotification title = ?, body = ?, icon_url = ?, click_url = ?, sent_at = ? WHERE id = ?', [
         title,
         body,
         icon ?? null,
         clickUrl ?? null,
         new Date(),
+        previousNotif.id,
       ]);
     } else {
       const autoMark = enabledMethods[methods.WEB] === false;

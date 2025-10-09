@@ -259,10 +259,15 @@ class UniverseAPI {
         }
         let query;
         if (targetUser.id in universe.author_permissions) {
-            query = (0, utils_1.executeQuery)(`
-        UPDATE authoruniverse 
-        SET permission_level = ? 
-        WHERE user_id = ? AND universe_id = ?`, [permission_level, targetUser.id, universe.id]);
+            if (permission_level === utils_1.perms.NONE) {
+                query = (0, utils_1.executeQuery)('DELETE FROM authoruniverse WHERE universe_id = ? AND user_id = ?', [universe.id, targetUser.id]);
+            }
+            else {
+                query = (0, utils_1.executeQuery)(`
+          UPDATE authoruniverse 
+          SET permission_level = ? 
+          WHERE user_id = ? AND universe_id = ?`, [permission_level, targetUser.id, universe.id]);
+            }
         }
         else {
             query = (0, utils_1.executeQuery)(`

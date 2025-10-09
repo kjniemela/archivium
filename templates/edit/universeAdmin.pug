@@ -46,6 +46,10 @@ block content
                 select.value = select.form.init.value;
               } else {
                 select.form.init.value = select.value;
+                const invite = document.querySelector(`#invites [data-user=${select.form.username.value}]`);
+                if (invite || Number(select.value) === #{perms.NONE}) {
+                  window.location.reload();
+                }
               }
             }
           });
@@ -86,7 +90,7 @@ block content
 
       #invites.d-flex.flex-col.gap-2
         each invite in invites
-          .d-flex.nowrap.gap-1.align-center
+          .d-flex.nowrap.gap-1.align-center(data-user=invite.username)
             span
               a.link.link-animated(href=`${ADDR_PREFIX}/users/${invite.username}`) #{invite.username}
               |  was invited with  
