@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.systemDisplayModes = void 0;
 exports.universeLink = universeLink;
 exports.render = render;
 const pug_1 = __importDefault(require("pug"));
@@ -24,6 +25,7 @@ function universeLink(req, uniShort) {
         return `${config_1.ADDR_PREFIX}/universes/${uniShort}`;
     }
 }
+exports.systemDisplayModes = ['news'];
 // Basic context information to be sent to the templates
 function contextData(req) {
     const user = req.session.user;
@@ -33,7 +35,7 @@ function contextData(req) {
         notifications: user.notifications,
         plan: user.plan,
         pfpUrl: (0, utils_1.getPfpUrl)(user),
-        maxTier: Math.max(...Object.keys(utils_1.tierAllowance[user.plan] || {}).filter(k => k !== 'total').map(k => Number(k))),
+        maxTier: Math.max(...Object.keys(utils_1.tierAllowance[user.plan ?? utils_1.plans.FREE] || {}).filter(k => k !== 'total').map(k => Number(k))),
     } : null;
     const searchQueries = new URLSearchParams(req.query);
     const pageQuery = new URLSearchParams();
@@ -47,6 +49,7 @@ function contextData(req) {
         VAPID_PUBLIC_KEY: config_1.VAPID_PUBLIC_KEY,
         encodedPath: pageQuery.toString(),
         displayUniverse: req.headers['x-subdomain'],
+        systemDisplayModes: exports.systemDisplayModes,
         universeLink: universeLink.bind(null, req),
         searchQueries: searchQueries.toString(),
         perms: utils_1.perms,

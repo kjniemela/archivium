@@ -10,10 +10,14 @@
             else
               |  #{T('Item')}
   each item in items
-    .card.sheet.gap-4.align-start(data-goto=`${universeLink(item.universe_short)}/items/${item.shortname}`)
+    -
+      const itemLink = systemDisplayModes.includes(displayUniverse)
+        ? `/${displayUniverse}/${item.shortname}`
+        : `${universeLink(item.universe_short)}/items/${item.shortname}`;
+    .card.sheet.gap-4.align-start(data-goto=itemLink)
       .d-flex.flex-col.grow-1
         h3.ma-0
-          a.link.link-animated(href=`${universeLink(item.universe_short)}/items/${item.shortname}`) #{item.title}
+          a.link.link-animated(href=itemLink) #{item.title}
         .d-flex.gap-1
           a.filter.link.link-animated(
             class={ 'link-selected': item.item_type == type }
