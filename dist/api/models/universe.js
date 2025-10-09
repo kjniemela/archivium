@@ -379,7 +379,7 @@ class UniverseAPI {
             }, `invite-${shortname}-${invitee.username}`);
         }
     }
-    async _putAccessRequest(user, shortname, permissionLevel, invidingAdmin) {
+    async _putAccessRequest(user, shortname, permissionLevel, invitingAdmin) {
         if (!user)
             throw new errors_1.UnauthorizedError();
         const universe = (await (0, utils_1.executeQuery)('SELECT * FROM universe WHERE shortname = ?', [shortname]))[0];
@@ -392,7 +392,7 @@ class UniverseAPI {
             else
                 await this.delAccessRequest(user, shortname, user);
         }
-        await (0, utils_1.executeQuery)('INSERT INTO universeaccessrequest (universe_id, user_id, permission_level, is_invite, inviter_id) VALUES (?, ?, ?, ?, ?)', [universe.id, user.id, permissionLevel, invidingAdmin !== null, invidingAdmin?.id]);
+        await (0, utils_1.executeQuery)('INSERT INTO universeaccessrequest (universe_id, user_id, permission_level, is_invite, inviter_id) VALUES (?, ?, ?, ?, ?)', [universe.id, user.id, permissionLevel, invitingAdmin !== undefined, invitingAdmin?.id ?? null]);
         return true;
     }
     async delAccessRequest(user, shortname, requestingUser) {
