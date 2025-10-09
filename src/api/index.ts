@@ -2,7 +2,6 @@ import { ContactAPI } from './models/contact';
 import { DiscussionAPI } from './models/discussion';
 import { EmailAPI } from './models/email';
 import { ItemAPI } from './models/item';
-import { NewsletterAPI } from './models/newsletter';
 import { NoteAPI } from './models/note';
 import { NotificationAPI } from './models/notification';
 import { SessionAPI } from './models/session';
@@ -15,7 +14,6 @@ export class API {
   readonly discussion: DiscussionAPI;
   readonly email: EmailAPI;
   readonly item: ItemAPI;
-  readonly newsletter: NewsletterAPI;
   readonly note: NoteAPI;
   readonly notification: NotificationAPI;
   readonly session: SessionAPI;
@@ -28,7 +26,6 @@ export class API {
     this.discussion = new DiscussionAPI(this);
     this.email = new EmailAPI(this);
     this.item = new ItemAPI(this);
-    this.newsletter = new NewsletterAPI(this);
     this.note = new NoteAPI(this);
     this.notification = new NotificationAPI(this);
     this.session = new SessionAPI(this);

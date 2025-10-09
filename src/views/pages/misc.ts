@@ -56,20 +56,6 @@ export default {
     res.prepareRender('home', { universes: [] })
   },
 
-  /* Newsletter */
-  async news(req, res) {
-    const newsletter = await api.newsletter.getOne(Number(req.params.id));
-    res.prepareRender('docs', {
-      title: newsletter.title,
-      content: newsletter.body,
-      breadcrumbs: [['Home', `${ADDR_PREFIX}/`], ['News', `${ADDR_PREFIX}/news`], [newsletter.title]],
-    });
-  },
-  async newsList(_, res) {
-    const newsletters = (await api.newsletter.getMany()).map(n => n.body);
-    res.prepareRender('news', { newsletters });
-  },
-
   /* Help Pages */
   async markdownDemo(_, res) {
     const content = (await fs.readFile('static/markdown_demo.md')).toString();
