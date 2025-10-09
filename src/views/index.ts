@@ -156,12 +156,13 @@ export default function(app: Express) {
   get('/news', sites.ALL, [], async (req, res) => {
     req.params.universeShortname = 'archivium';
     req.query.type = 'newsletter';
-    req.headers['x-subdomain'] = 'archivium';
+    req.query.sort = 'created_at';
+    req.headers['x-subdomain'] = 'news';
     await pages.universe.itemList(req, res);
   });
   get('/news/:itemShortname', sites.ALL, [], async (req, res) => {
     req.params.universeShortname = 'archivium';
-    req.headers['x-subdomain'] = 'archivium';
+    req.headers['x-subdomain'] = 'news';
     await pages.item.view(req, res);
   });
 

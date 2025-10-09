@@ -29,8 +29,12 @@ block scripts
     //- include /static/scripts/editor/rich.js
 
 block breadcrumbs
+  -
+    const universeItemsLink = systemDisplayModes.includes(displayUniverse)
+      ? `/${displayUniverse}`
+      : `${universeLink(universe.shortname)}/items`;
   if displayUniverse
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{universe.title}
+    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{systemDisplayModes.includes(displayUniverse) ? T('Home') : universe.title}
   else
     a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
     |  / 
@@ -38,7 +42,7 @@ block breadcrumbs
     |  / 
     a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
   |  / 
-  a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}/items?type=${item.item_type}`) #{capitalize(T(`${((universe.obj_data.cats || {})[item.item_type] || [, 'Missing Category'])[1]}`))}
+  a.link.link-animated(href=`${universeItemsLink}?type=${item.item_type}`) #{capitalize(T(`${((universe.obj_data.cats || {})[item.item_type] || [, 'Missing Category'])[1]}`))}
   |  / 
   span #{item.title}
 
@@ -100,7 +104,7 @@ block content
       if item.tags
         each tag in item.tags
           if tag
-            a.link.link-animated(href=`${universeLink(universe.shortname)}/items?tag=${tag}`) ##{tag} 
+            a.link.link-animated(href=`${universeItemsLink}?tag=${tag}`) ##{tag} 
   .center#links
     small #{T('Linked to by %s items', item.links.length)} (
       a.link.link-animated#show-links #{T('show')}
@@ -108,7 +112,7 @@ block content
     ul#links-display.d-flex.gap-2.justify-center.flex-wrap.ma-0.pa-0.pt-1.overflow-hidden
       each link in item.links
         li.navbarBtn
-          a.link.link-animated(href=`${universeLink(link.universe_short)}/items/${link.shortname}`) #{link.title}
+          a.link.link-animated(href=`${universeItemsLink}/${link.shortname}`) #{link.title}
     script.
       (() => {
         const display = document.querySelector('#links-display');
@@ -190,13 +194,13 @@ block content
           .itemKey
             span #{parent.parent_label || T('Parent')}
             hr
-            a.link.link-animated(href=`${universeLink(universe.shortname)}/items/${parent.parent_shortname}`)
+            a.link.link-animated(href=`${universeItemsLink}/${parent.parent_shortname}`)
               | #{parent.parent_title}
         each child in item.children
           .itemKey
             span #{child.child_label || T('Child')}
             hr
-            a.link.link-animated(href=`${universeLink(universe.shortname)}/items/${child.child_shortname}`)
+            a.link.link-animated(href=`${universeItemsLink}/${child.child_shortname}`)
               | #{child.child_title}
         
     if item.obj_data.comments

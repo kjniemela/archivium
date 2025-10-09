@@ -179,12 +179,13 @@ function default_1(app) {
     get('/news', sites.ALL, [], async (req, res) => {
         req.params.universeShortname = 'archivium';
         req.query.type = 'newsletter';
-        req.headers['x-subdomain'] = 'archivium';
+        req.query.sort = 'created_at';
+        req.headers['x-subdomain'] = 'news';
         await pages_1.default.universe.itemList(req, res);
     });
     get('/news/:itemShortname', sites.ALL, [], async (req, res) => {
         req.params.universeShortname = 'archivium';
-        req.headers['x-subdomain'] = 'archivium';
+        req.headers['x-subdomain'] = 'news';
         await pages_1.default.item.view(req, res);
     });
     /* Note pages */

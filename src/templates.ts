@@ -18,8 +18,10 @@ export function universeLink(req: Request, uniShort) {
   }
 }
 
+export const systemDisplayModes = ['news'];
+
 // Basic context information to be sent to the templates
-function contextData(req) {
+function contextData(req: Request) {
   const user = req.session.user;
   const contextUser = user ? {
     id: user.id,
@@ -27,10 +29,10 @@ function contextData(req) {
     notifications: user.notifications,
     plan: user.plan,
     pfpUrl: getPfpUrl(user),
-    maxTier: Math.max(...Object.keys(tierAllowance[user.plan] || {}).filter(k => k !== 'total').map(k => Number(k))),
+    maxTier: Math.max(...Object.keys(tierAllowance[user.plan ?? plans.FREE] || {}).filter(k => k !== 'total').map(k => Number(k))),
   } : null;
 
-  const searchQueries = new URLSearchParams(req.query);
+  const searchQueries = new URLSearchParams(req.query as Record<string, string>);
   const pageQuery = new URLSearchParams();
   pageQuery.append('page', req.path)
   if (searchQueries.toString()) pageQuery.append('search', searchQueries.toString())
@@ -42,6 +44,7 @@ function contextData(req) {
     VAPID_PUBLIC_KEY,
     encodedPath: pageQuery.toString(),
     displayUniverse: req.headers['x-subdomain'],
+    systemDisplayModes,
     universeLink: universeLink.bind(null, req),
     searchQueries: searchQueries.toString(),
     perms,

@@ -69,7 +69,7 @@ html(lang='en')
             a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/search`) #{T('Search')}
           li.navbarBtn
             a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/contacts`) #{T('Contacts')}
-          if !displayUniverse
+          if !displayUniverse || systemDisplayModes.includes(displayUniverse)
             li.navbarBtn
               a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
           li.navbarBtn
