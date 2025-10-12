@@ -336,8 +336,11 @@ CREATE TABLE universeaccessrequest (
   universe_id INT NOT NULL,
   user_id INT NOT NULL,
   permission_level TINYINT NOT NULL,
+  is_invite BOOLEAN DEFAULT FALSE,
+  inviter_id INT,
   FOREIGN KEY (universe_id) REFERENCES universe (id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE,
+  FOREIGN KEY (inviter_id) REFERENCES user (id) ON DELETE CASCADE
 );
 
 CREATE TABLE followeruniverse (
@@ -404,5 +407,6 @@ CREATE TABLE sentnotification (
   user_id INT NOT NULL,
   sent_at TIMESTAMP NOT NULL,
   is_read BOOLEAN DEFAULT FALSE,
+  dedup_key VARCHAR(128),
   FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
 );

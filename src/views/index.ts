@@ -219,7 +219,6 @@ export default function(app: Express) {
     post('/universes/:universeShortname/edit', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.editUniverse);
     post('/universes/:universeShortname/discuss/create', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.createUniverseThread);
     post('/universes/:universeShortname/discuss/:threadId/comment', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.commentOnThread);
-    post('/universes/:universeShortname/permissions', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.editUniversePerms);
     post('/universes/:universeShortname/upgrade', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.sponsorUniverse);
     post('/universes/:universeShortname/items/create', sites.NORMAL, [Auth.verifySessionOrRedirect], forms.createItem);
     post('/universes/:universeShortname/items/:itemShortname/edit', sites.NORMAL, [Auth.verifySessionOrRedirect], () => { throw new RequestError('This endpoint is deprecared.', { code: HttpStatusCode.Gone }) });
@@ -228,7 +227,6 @@ export default function(app: Express) {
     post('/edit', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.editUniverse, (sub) => ({ universeShortname: sub })));
     post('/discuss/create', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.createUniverseThread, (sub) => ({ universeShortname: sub })));
     post('/discuss/:threadId/comment', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.commentOnThread, (sub) => ({ universeShortname: sub })));
-    post('/permissions', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.editUniversePerms, (sub) => ({ universeShortname: sub })));
     post('/upgrade', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.sponsorUniverse, (sub) => ({ universeShortname: sub })));
     post('/items/create', sites.DISPLAY, [Auth.verifySessionOrRedirect], subdomain(forms.createItem, (sub) => ({ universeShortname: sub })));
     post('/items/:itemShortname/edit', sites.DISPLAY, [Auth.verifySessionOrRedirect], () => { throw new RequestError('This endpoint is deprecared.', { code: HttpStatusCode.Gone }) });

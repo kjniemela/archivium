@@ -257,7 +257,7 @@ class MultiCond extends Cond {
     }
 }
 function getPfpUrl(user) {
-    return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${(0, md5_1.default)(user.email)}.jpg`;
+    return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${(0, md5_1.default)(user.email ?? '')}.jpg`;
 }
 function handleAsNull(type) {
     if (type instanceof Array) {

@@ -69,8 +69,8 @@ block content
     .inputGroup
       label(for='visibility') #{T('Visibility')}: 
       select#visibility(name='visibility')
-        option(value='public' selected=(universe.public)) #{T('Public')}
-        option(value='private' selected=(!universe.public)) #{T('Private')}
+        option(value='public' selected=(universe.is_public)) #{T('Public')}
+        option(value='private' selected=(!universe.is_public)) #{T('Private')}
 
     .inputGroup
       label(for='discussion_enabled') #{T('Discussion')}: 

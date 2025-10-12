@@ -22,6 +22,7 @@ exports.default = {
     },
     async view(req, res) {
         const user = req.session.user;
+        const accessRequest = await api_1.default.universe.getUserAccessRequestIfExists(user, req.params.universeShortname).catch(() => null);
         try {
             const universe = await api_1.default.universe.getOne(user, { shortname: req.params.universeShortname });
             const authors = await api_1.default.user.getByUniverseShortname(user, universe.shortname);
@@ -40,7 +41,7 @@ exports.default = {
                 .filter(row => row.tier > (universe.tier ?? 0))
             // .some(row => row.universes.length < tierAllowance[user.plan][row.tier])
             ) : false;
-            res.prepareRender('universe', { universe, authors: authorMap, threads, counts, totalItems, stories, couldUpgrade });
+            res.prepareRender('universe', { universe, authors: authorMap, threads, counts, totalItems, stories, couldUpgrade, accessRequest });
         }
         catch (err) {
             // If the user is not authorized to view the universe, check if there is a public page to display instead
@@ -52,8 +53,7 @@ exports.default = {
                     // req.useExQuery = true; // TODO why is this here?
                     return;
                 }
-                const request = await api_1.default.universe.getUserAccessRequestIfExists(user, req.params.universeShortname).catch(() => null);
-                return res.prepareRender('privateUniverse', { shortname: req.params.universeShortname, hasRequested: Boolean(request), publicBody });
+                return res.prepareRender('privateUniverse', { shortname: req.params.universeShortname, accessRequest, publicBody });
             }
             throw err;
         }
@@ -127,22 +127,15 @@ exports.default = {
     },
     async admin(req, res) {
         const universe = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, utils_1.perms.ADMIN);
-        const users = await api_1.default.user.getMany();
-        const contacts = await api_1.default.contact.getAll(req.session.user, false);
         const requests = await api_1.default.universe.getAccessRequests(req.session.user, req.params.universeShortname);
-        contacts.forEach(contact => {
-            if (!(contact.id in universe.authors)) {
-                universe.authors[contact.id] = contact.username;
-                universe.author_permissions[contact.id] = utils_1.perms.NONE;
-            }
-        });
+        const invites = await api_1.default.universe.getAccessInvites(req.session.user, req.params.universeShortname);
         let ownerCount = 0;
         for (const userID in universe.author_permissions) {
             if (universe.author_permissions[userID] === utils_1.perms.OWNER)
                 ownerCount++;
         }
         const totalStoredImages = await api_1.default.universe.getTotalStoredByShortname(universe.shortname);
-        res.prepareRender('universeAdmin', { universe, users, requests, ownerCount, totalStoredImages, tierLimits: utils_1.tierLimits[universe.tier ?? 0] });
+        res.prepareRender('universeAdmin', { universe, requests, invites, ownerCount, totalStoredImages, tierLimits: utils_1.tierLimits[universe.tier ?? 0] });
     },
     async upgrade(req, res) {
         const universe = await api_1.default.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, utils_1.perms.ADMIN);

@@ -93,35 +93,60 @@ class NotificationAPI {
             throw new errors_1.ForbiddenError();
         }
     }
-    async notify(target, notifType, message) {
+    async notify(target, notifType, message, dedupKey) {
         const { title, body, icon, clickUrl } = message;
         if (!title || !body)
             throw new errors_1.ValidationError('Missing notification data');
         const settings = await this.getTypeSettings(target);
         const enabledMethods = settings.filter(s => s.notif_type === notifType).reduce((acc, val) => ({ ...acc, [val.notif_method]: Boolean(val.is_enabled) }), {});
-        const autoMark = enabledMethods[methods.WEB] === false;
-        const { insertId } = await executeQuery('INSERT INTO sentnotification (title, body, icon_url, click_url, notif_type, user_id, sent_at, is_read) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [
-            title,
-            body,
-            icon ?? null,
-            clickUrl ?? null,
-            notifType,
-            target.id,
-            new Date(),
-            autoMark,
-        ]);
-        const payload = JSON.stringify({ id: insertId, title, body, icon, clickUrl });
-        if (WEB_PUSH_ENABLED && enabledMethods[methods.PUSH]) {
-            const subscriptions = await this.getByUser(target);
-            for (const { push_endpoint, push_keys } of subscriptions) {
-                await webpush.sendNotification({ endpoint: push_endpoint, keys: push_keys }, payload).catch(err => {
-                    logger.error(err);
-                    // subscriptions.splice(index, 1); // Remove invalid subscriptions
-                });
-            }
+        let previousNotif = null;
+        if (dedupKey) {
+            previousNotif = (await executeQuery(`
+        SELECT id
+        FROM sentnotification
+        WHERE dedup_key = ?
+          AND sent_at > DATE_SUB(NOW(), INTERVAL 2 DAY)
+          AND NOT is_read
+          AND user_id = ?
+          AND notif_type = ?
+      `, [dedupKey, target.id, notifType]))[0];
         }
-        if (enabledMethods[methods.EMAIL] && target.email_notifications) {
-            await this.api.email.sendTemplateEmail(this.api.email.templates.NOTIFY, target.email, { title, body, icon, clickUrl: `https://${DOMAIN}${ADDR_PREFIX}${clickUrl}` });
+        if (previousNotif) {
+            await executeQuery('UPDATE sentnotification SET title = ?, body = ?, icon_url = ?, click_url = ?, sent_at = ? WHERE id = ?', [
+                title,
+                body,
+                icon ?? null,
+                clickUrl ?? null,
+                new Date(),
+                previousNotif.id,
+            ]);
+        }
+        else {
+            const autoMark = enabledMethods[methods.WEB] === false;
+            const { insertId } = await executeQuery('INSERT INTO sentnotification (title, body, icon_url, click_url, notif_type, user_id, sent_at, is_read, dedup_key) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+                title,
+                body,
+                icon ?? null,
+                clickUrl ?? null,
+                notifType,
+                target.id,
+                new Date(),
+                autoMark,
+                dedupKey ?? null,
+            ]);
+            const payload = JSON.stringify({ id: insertId, title, body, icon, clickUrl });
+            if (WEB_PUSH_ENABLED && enabledMethods[methods.PUSH]) {
+                const subscriptions = await this.getByUser(target);
+                for (const { push_endpoint, push_keys } of subscriptions) {
+                    await webpush.sendNotification({ endpoint: push_endpoint, keys: push_keys }, payload).catch(err => {
+                        logger.error(err);
+                        // subscriptions.splice(index, 1); // Remove invalid subscriptions
+                    });
+                }
+            }
+            if (enabledMethods[methods.EMAIL] && target.email_notifications) {
+                await this.api.email.sendTemplateEmail(this.api.email.templates.NOTIFY, target.email, { title, body, icon, clickUrl: `https://${DOMAIN}${ADDR_PREFIX}${clickUrl}` });
+            }
         }
     }
     /**

@@ -39,8 +39,27 @@ block content
       script.
         window.addEventListener('load', () => {
           document.querySelectorAll('form .permission_level').forEach((select) => {
-            select.onchange = () => {
-              select.form.submit();
+            select.onchange = async () => {
+              console.log(select, select.value)
+              const [response] = await putJSON('/api/universes/#{universe.shortname}/perms', { username: select.form.username.value, permissionLevel: Number(select.value) });
+              if (response.status !== 200) {
+                select.value = select.form.init.value;
+              } else {
+                select.form.init.value = select.value;
+                const invite = document.querySelector(`#invites [data-user=${select.form.username.value}]`);
+                if (invite || Number(select.value) === #{perms.NONE}) {
+                  window.location.reload();
+                }
+              }
+            }
+          });
+
+          document.querySelectorAll('form #invite_user').forEach((input) => {
+            const form = input.form;
+            form.onsubmit = async (e) => {
+              e.preventDefault();
+              await putJSON(`/api/universes/#{universe.shortname}/invite/${form.username.value}`, { permissionLevel: Number(form.new_permission_level.value) });
+              window.location.reload();
             }
           });
         });
@@ -48,12 +67,40 @@ block content
       .d-flex.flex-col.align-start
         .grid(style={ 'grid-template-columns': '1fr 1rem 1fr' })
           each perm, authorId in universe.author_permissions
-            form.grid.grid-inherit.align-center(method='POST' action=`${universeLink(universe.shortname)}/permissions` style={ 'grid-column': '1 / 4' })
+            form.grid.grid-inherit.align-center(style={ 'grid-column': '1 / 4' })
               input(class='username' name='username' type='hidden' value=universe.authors[authorId])
+              input(class='init' name='init' type='hidden' value=perm)
               b(style={ 'grid-column': '1 / 2' }) #{universe.authors[authorId]}
               select(class='permission_level' name='permission_level' style={ 'grid-column': '3 / 4' } disabled=((perm === perms.OWNER && ownerCount === 1) || (perm > universe.author_permissions[contextUser.id])))
                 each permission_level in Object.keys(perms).filter((item) => !isNaN(Number(item)))
                   option(value=permission_level selected=(permission_level == perm) disabled=(permission_level > universe.author_permissions[contextUser.id])) #{T(`perms_${permission_level}`)}
+
+      br
+      
+      form
+        .d-flex
+          input(id='username' name='username' placeholder=T('Username'))
+          select(id='new_permission_level' name='new_permission_level' style={ 'grid-column': '3 / 4' } disabled=((perm === perms.OWNER && ownerCount === 1) || (perm > universe.author_permissions[contextUser.id])))
+            each permission_level in Object.keys(perms).filter((item) => !isNaN(Number(item)))
+              if permission_level > (universe.is_public ? (universe.discussion_open ? perms.COMMENT : perms.READ) : perms.NONE)
+                option(value=permission_level selected=(permission_level == perms.READ) disabled=(permission_level > universe.author_permissions[contextUser.id])) #{T(`perms_${permission_level}`)}
+          button(type='submit' id='invite_user') #{T('Invite User')}
+
+      br
+
+      #invites.d-flex.flex-col.gap-2
+        each invite in invites
+          .d-flex.nowrap.gap-1.align-center(data-user=invite.username)
+            span
+              a.link.link-animated(href=`${ADDR_PREFIX}/users/${invite.username}`) #{invite.username}
+              |  was invited with  
+              b #{T(`perms_${invite.permission_level}`).toLowerCase()}
+              |  permissions.
+            button(
+              onclick=`deleteJSON(
+                '/api/universes/${universe.shortname}/invite/${invite.username}'
+              ).then(() => window.location.reload())`
+            ) #{T('Cancel')}
 
       br
       hr
@@ -69,7 +116,7 @@ block content
               |  permissions.
             button(
               onclick=`putJSON(
-                '/api/universes/${universe.shortname}/perms', { username: '${request.username}', permission_level: ${request.permission_level} }
+                '/api/universes/${universe.shortname}/perms', { username: '${request.username}', permissionLevel: ${request.permission_level} }
               ).then(() => window.location.reload())`
             ) #{T('Approve')}
             button(

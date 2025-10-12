@@ -4,6 +4,7 @@ import md5 from 'md5';
 import logger from '../logger';
 import { PoolConnection, QueryResult, RowDataPacket } from 'mysql2/promise';
 import { ForbiddenError, NotFoundError, RequestError } from '../errors';
+import { User } from './models/user';
 
 export enum perms {
   NONE,
@@ -50,7 +51,8 @@ export const tierLimits: Record<Tier, TierLimit> = {
   [tiers.PREMIUM]: { images: 5_000_000_000 },
 };
 
-export async function executeQuery<T extends QueryResult = RowDataPacket[]>(query: string, values: any[] = [], conn?: PoolConnection): Promise<T> {
+export type SQLValue = number | string | boolean | Date | null;
+export async function executeQuery<T extends QueryResult = RowDataPacket[]>(query: string, values: SQLValue[] = [], conn?: PoolConnection): Promise<T> {
   const [ results ] = await (conn ?? db).execute<T>(query, values);
   return results;
 }
@@ -277,8 +279,8 @@ class MultiCond extends Cond {
   }
 }
 
-export function getPfpUrl(user) {
-  return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email)}.jpg`;
+export function getPfpUrl(user: User) {
+  return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email ?? '')}.jpg`;
 }
 
 export function handleAsNull(type: typeof RequestError | (typeof RequestError)[]) {

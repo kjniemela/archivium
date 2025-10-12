@@ -110,6 +110,25 @@ block content
       li.navbarBtn#bodyBtn(data-tab='stories')
         h3.navbarBtnLink.navbarText(onclick=`showTab('stories')`) #{T('Stories')}
 
+  if accessRequest && accessRequest.is_invite
+    .d-flex.nowrap.gap-1.align-center.justify-center
+      span
+        | You have been invited to 
+        b #{universe.title}
+        |  with 
+        b #{T(`perms_${accessRequest.permission_level}`).toLowerCase()}
+        |  permissions.
+      button(
+        onclick=`putJSON(
+          '/api/universes/${universe.shortname}/perms', { username: '${accessRequest.username}', permissionLevel: ${accessRequest.permission_level} }
+        ).then(() => window.location.reload())`
+      ) #{T('Accept')}
+      button(
+        onclick=`deleteJSON(
+          '/api/universes/${universe.shortname}/request/${accessRequest.username}'
+        ).then(() => window.location.reload())`
+      ) #{T('Reject')}
+
   .tabs.mt-2
     .hidden( data-tab='home' )
       if universe.obj_data.homeBody

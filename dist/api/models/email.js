@@ -107,6 +107,8 @@ class EmailAPI {
             throw new errors_1.ForbiddenError();
         if (sessionUser.verified)
             return { alreadyVerified: true };
+        if (!sessionUser.email)
+            throw new errors_1.ValidationError();
         const now = new Date();
         const timeout = 60 * 1000;
         const cutoff = new Date(now.getTime() - timeout);
