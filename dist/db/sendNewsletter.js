@@ -7,39 +7,14 @@ const _1 = __importDefault(require("."));
 const readline_1 = __importDefault(require("readline"));
 const api_1 = __importDefault(require("../api"));
 const import_1 = require("./import");
-function askMultiline(query) {
-    const rl = readline_1.default.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-    console.log(query);
-    return new Promise(resolve => {
-        let lines = [];
-        let blankCount = 0;
-        rl.on('line', line => {
-            lines.push(line);
-            if (!line) {
-                blankCount++;
-            }
-            else {
-                blankCount = 0;
-            }
-            if (blankCount === 2) {
-                rl.close();
-                lines.pop();
-                resolve(lines.join('\n'));
-            }
-        });
-    });
-}
+const utils_1 = require("../api/utils");
+const errors_1 = require("../errors");
 async function main() {
     console.log('Please input newletter info below:');
-    const title = await (0, import_1.askQuestion)('Title: ');
+    const shortname = await (0, import_1.askQuestion)('Newsletter shortname: ');
     const preview = await (0, import_1.askQuestion)('Preview: ');
-    const body = await askMultiline('Body:');
-    console.log(`Title: ${title}`);
+    console.log(`Shortname: ${shortname}`);
     console.log(`Preview: ${preview}`);
-    console.log(`Body: ${body}`);
     const ans = await (0, import_1.askQuestion)('Does this look right? [y/N] ');
     if (ans.toUpperCase() === 'N') {
         const ans = await (0, import_1.askQuestion)('Try again? [y/N] ');
@@ -51,20 +26,24 @@ async function main() {
         }
         return;
     }
-    const { insertId } = await api_1.default.newsletter.post({ title, preview, body });
     const users = await api_1.default.user.getMany(null, true);
     const proceed = await (0, import_1.askQuestion)(`${users.length} users to send to, proceed? [y/N] `);
     if (proceed.toUpperCase() === 'N') {
         console.log('Exiting.');
         return;
     }
+    const newsletter = await api_1.default.item.getByUniverseAndItemShortnames(undefined, 'archivium', shortname).catch((0, utils_1.handleAsNull)([errors_1.UnauthorizedError, errors_1.ForbiddenError]));
+    if (!newsletter) {
+        console.log('Newsletter not found or env is badly configured, exiting.');
+        return;
+    }
     for (let i = 0; i < users.length; i++) {
         const user = users[i];
         console.log(`Sending... (${i}/${users.length})`);
         await api_1.default.notification.notify(user, api_1.default.notification.types.FEATURES, {
-            title,
+            title: newsletter.title,
             body: preview,
-            clickUrl: `/news/${insertId}`,
+            clickUrl: `/news/${shortname}`,
         });
         readline_1.default.moveCursor(process.stdout, 0, -1);
     }

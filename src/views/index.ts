@@ -153,8 +153,18 @@ export default function(app: Express) {
 
   /* Misc pages */
   get('/search', sites.ALL, [], pages.misc.search);
-  get('/news', sites.ALL, [], pages.misc.newsList);
-  get('/news/:id', sites.ALL, [], pages.misc.news);
+  get('/news', sites.ALL, [], async (req, res) => {
+    req.params.universeShortname = 'archivium';
+    req.query.type = 'newsletter';
+    req.query.sort = 'created_at';
+    req.headers['x-subdomain'] = 'news';
+    await pages.universe.itemList(req, res);
+  });
+  get('/news/:itemShortname', sites.ALL, [], async (req, res) => {
+    req.params.universeShortname = 'archivium';
+    req.headers['x-subdomain'] = 'news';
+    await pages.item.view(req, res);
+  });
 
   /* Note pages */
   get('/notes', sites.ALL, [Auth.verifySessionOrRedirect], pages.misc.notes);

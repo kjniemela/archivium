@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UniverseAPI = void 0;
 const errors_1 = require("../../errors");
 const utils_1 = require("../utils");
-const validateShortname = (shortname, reservedShortnames = ['create']) => {
+const validateShortname = (shortname, reservedShortnames = ['create', 'news']) => {
     if (shortname.length < 3 || shortname.length > 64) {
         return 'Shortnames must be between 3 and 64 characters long.';
     }

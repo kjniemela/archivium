@@ -176,8 +176,18 @@ function default_1(app) {
     get('/reset-password/:key', sites.ALL, [], (_, res) => res.prepareRender('resetPassword'));
     /* Misc pages */
     get('/search', sites.ALL, [], pages_1.default.misc.search);
-    get('/news', sites.ALL, [], pages_1.default.misc.newsList);
-    get('/news/:id', sites.ALL, [], pages_1.default.misc.news);
+    get('/news', sites.ALL, [], async (req, res) => {
+        req.params.universeShortname = 'archivium';
+        req.query.type = 'newsletter';
+        req.query.sort = 'created_at';
+        req.headers['x-subdomain'] = 'news';
+        await pages_1.default.universe.itemList(req, res);
+    });
+    get('/news/:itemShortname', sites.ALL, [], async (req, res) => {
+        req.params.universeShortname = 'archivium';
+        req.headers['x-subdomain'] = 'news';
+        await pages_1.default.item.view(req, res);
+    });
     /* Note pages */
     get('/notes', sites.ALL, [auth_1.default.verifySessionOrRedirect], pages_1.default.misc.notes);
     /* Story pages */

@@ -5,7 +5,6 @@ const contact_1 = require("./models/contact");
 const discussion_1 = require("./models/discussion");
 const email_1 = require("./models/email");
 const item_1 = require("./models/item");
-const newsletter_1 = require("./models/newsletter");
 const note_1 = require("./models/note");
 const notification_1 = require("./models/notification");
 const session_1 = require("./models/session");
@@ -17,7 +16,6 @@ class API {
     discussion;
     email;
     item;
-    newsletter;
     note;
     notification;
     session;
@@ -29,7 +27,6 @@ class API {
         this.discussion = new discussion_1.DiscussionAPI(this);
         this.email = new email_1.EmailAPI(this);
         this.item = new item_1.ItemAPI(this);
-        this.newsletter = new newsletter_1.NewsletterAPI(this);
         this.note = new note_1.NoteAPI(this);
         this.notification = new notification_1.NotificationAPI(this);
         this.session = new session_1.SessionAPI(this);
