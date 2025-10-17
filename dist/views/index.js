@@ -180,6 +180,7 @@ function default_1(app) {
         req.params.universeShortname = 'archivium';
         req.query.type = 'newsletter';
         req.query.sort = 'created_at';
+        req.query.sort_order = 'desc';
         req.headers['x-subdomain'] = 'news';
         await pages_1.default.universe.itemList(req, res);
     });
