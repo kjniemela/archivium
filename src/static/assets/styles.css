@@ -1009,10 +1009,6 @@ button:disabled, .button-link:disabled {
   font-size: 1.1875rem;
 }
 
-.markdown ul {
-  margin-top: 0;
-}
-
 .markdown .list-label {
   margin: 10px 0 0;
   display: block;
