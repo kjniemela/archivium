@@ -740,10 +740,6 @@ button:disabled {
   padding-left: 0.25rem;
 }
 
-.markdown ul {
-  margin-top: 0;
-}
-
 .markdown .list-label {
   margin: 10px 0 0;
   display: block;
