@@ -5,14 +5,16 @@ type SearchableSelectProps = {
   options: { [shortname: string]: string },
   onSelect: (selectedValue: string) => void,
   groups?: { [shortname: string]: string },
+  groupPriority?: { [group: string]: number },
 };
 
-export default function SearchableSelect({ id, options, onSelect, groups }: SearchableSelectProps) {
+export default function SearchableSelect({ id, options, onSelect, groups, groupPriority }: SearchableSelectProps) {
   const [searchText, setSearchText] = useState<string>('');
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
 
   groups = groups ?? {};
+  groupPriority = groupPriority ?? {};
 
   useEffect(() => {
     if (selectedKey !== null) onSelect(selectedKey);
@@ -45,7 +47,7 @@ export default function SearchableSelect({ id, options, onSelect, groups }: Sear
     />
     <div className='options-container' style={{ display: dropdownVisible ? 'block' : 'none' }}>
       {ungroupedOptions.map((key) => createOption(key))}
-      {Object.keys(optionGroups).map((group) => (
+      {Object.keys(optionGroups).sort((a, b) => ((groupPriority[a] ?? 0) > (groupPriority[b] ?? 0) ? -1 : 1)).map((group) => (
         <>
           <div key={group} className='option-group-heading'>
             <b>{group}</b>

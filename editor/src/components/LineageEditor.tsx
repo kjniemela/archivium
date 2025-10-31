@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import type { Item } from '../../../src/api/models/item';
-import { T } from '../helpers';
+import { capitalize, T } from '../helpers';
 import SearchableSelect from './SearchableSelect';
+import type { Categories, ItemOptionEntry } from '../pages/ItemEdit';
 
 type LineageEditorProps = {
   item: Item,
+  categories: Categories,
   onUpdate: (newItem: Item) => void,
-  itemMap: Record<string, string>,
+  itemMap: Record<string, ItemOptionEntry>,
 };
 
-export default function LineageEditor({ item, onUpdate, itemMap }: LineageEditorProps) {
+export default function LineageEditor({ item, categories, onUpdate, itemMap }: LineageEditorProps) {
   const [newParent, setNewParent] = useState<string | null>(null);
   const [newParentSelfLabel, setNewParentSelfLabel] = useState<string>('');
   const [newParentOtherLabel, setNewParentOtherLabel] = useState<string>('');
@@ -39,7 +41,7 @@ export default function LineageEditor({ item, onUpdate, itemMap }: LineageEditor
     } else {
       newState.parents.push({
         parent_shortname: newParent,
-        parent_title: itemMap[newParent],
+        parent_title: itemMap[newParent].title,
         child_label: newParentSelfLabel,
         parent_label: newParentOtherLabel,
       });
@@ -57,13 +59,17 @@ export default function LineageEditor({ item, onUpdate, itemMap }: LineageEditor
     } else {
       newState.children.push({
         child_shortname: newChild,
-        child_title: itemMap[newChild],
+        child_title: itemMap[newChild].title,
         parent_label: newChildSelfLabel,
         child_label: newChildOtherLabel,
       });
     }
     onUpdate(newState);
   };
+
+  const itemTitles = Object.keys(itemMap).reduce((acc, key) => ({ ...acc, [key]: itemMap[key].title }), {});
+  const itemTypes = Object.keys(itemMap).reduce((acc, key) => ({ ...acc, [key]: capitalize(categories[itemMap[key].type][1]) }), {});
+  const characterGroup = capitalize((categories['character'] ?? [])[1] ?? '');
 
   return <>
     <div className='item-parents'>
@@ -86,7 +92,12 @@ export default function LineageEditor({ item, onUpdate, itemMap }: LineageEditor
     </div>
     <div>
       <button onClick={addParent}>{T('Add New Parent')}</button>
-      <SearchableSelect options={itemMap} onSelect={setNewParent} />
+      <SearchableSelect
+        options={itemTitles}
+        onSelect={setNewParent}
+        groups={itemTypes}
+        groupPriority={{ [characterGroup]: 1 }}
+      />
       <input
         value={newParentSelfLabel}
         onChange={({ target }) => setNewParentSelfLabel(target.value)}
@@ -100,7 +111,12 @@ export default function LineageEditor({ item, onUpdate, itemMap }: LineageEditor
     </div>
     <div>
       <button onClick={addChild}>{T('Add New Child')}</button>
-      <SearchableSelect options={itemMap} onSelect={setNewChild} />
+      <SearchableSelect
+        options={itemTitles}
+        onSelect={setNewChild}
+        groups={itemTypes}
+        groupPriority={{ [characterGroup]: 1 }}
+      />
       <input
         value={newChildSelfLabel}
         onChange={({ target }) => setNewChildSelfLabel(target.value)}
