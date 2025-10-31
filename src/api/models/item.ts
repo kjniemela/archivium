@@ -42,6 +42,21 @@ export type GalleryImage = {
   label: string,
 };
 
+export type Map = {
+  id: number,
+  width: number,
+  height: number,
+  image_id: number,
+  locations: MapLocation[],
+};
+
+export type MapLocation = {
+  item_id: number,
+  title: string,
+  x: number,
+  y: number,
+};
+
 export type Child = {
   child_shortname: string,
   child_title: string,
