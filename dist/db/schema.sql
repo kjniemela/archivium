@@ -325,6 +325,7 @@ CREATE TABLE map (
 );
 
 CREATE TABLE maplocation (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   map_id INT NOT NULL,
   item_id INT,
   title VARCHAR(64),

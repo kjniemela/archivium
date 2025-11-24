@@ -555,6 +555,20 @@ header {
   }
 }
 
+.map-container {
+  border-radius: 0.25rem;
+  background-color: silver;
+  box-sizing: content-box;
+  position: relative;
+}
+
+.map-location label {
+  position: absolute;
+  top: -0.53125rem;
+  left: 1rem;
+  white-space: nowrap;
+}
+
 table {
   border-collapse: collapse;
   border-radius: 0.25rem;
