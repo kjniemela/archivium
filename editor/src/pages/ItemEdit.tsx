@@ -15,6 +15,7 @@ import SaveBtn from '../components/SaveBtn';
 import TabsBar from '../components/TabsBar';
 import TimelineEditor from '../components/TimelineEditor';
 import { BulkExistsFetcher, capitalize, fetchData, T } from '../helpers';
+import MapEditor from '../components/MapEditor';
 
 export type Categories = {
   [key: string]: [string, string],
@@ -289,10 +290,12 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
         }) : prev);
       }} />
     ),
+    location: (
+      <MapEditor item={item} categories={categories} onUpdate={(newItem) => setItem(newItem)} itemMap={itemMap} />
+    ),
     timeline: (
       <TimelineEditor item={item} onEventsUpdate={(newEvents) => {
         const newState = { ...item };
-        console.log(newEvents)
         newState.events = newEvents;
         setItem(newState);
       }} eventItemMap={eventItemMap ?? {}} />

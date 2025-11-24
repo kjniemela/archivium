@@ -42,17 +42,20 @@ export type GalleryImage = {
   label: string,
 };
 
+// TODO this typing is ugly...
 export type Map = {
-  id: number,
-  width: number,
-  height: number,
-  image_id: number,
+  id: number | null,
+  width: number | null,
+  height: number | null,
+  image_id: number | null,
   locations: MapLocation[],
 };
 
 export type MapLocation = {
-  item_id: number,
-  title: string,
+  id: number | null,
+  title: string | null,
+  universe: string | null,
+  item: string | null,
   x: number,
   y: number,
 };
@@ -96,9 +99,10 @@ export type BasicItem<T = string | Object> = {
 };
 
 export type Item<T = string | Object> = BasicItem<T> & {
-  events: ItemEvent[];
-  gallery: GalleryImage[];
-  parents: Parent[];
+  events: ItemEvent[],
+  map: Map | null,
+  gallery: GalleryImage[],
+  parents: Parent[],
   children: Child[],
   links: ItemLink[],
 };
@@ -263,6 +267,7 @@ export class ItemAPI {
     const item: Item = {
       ...await this.getOneBasic(user, conditions, permissionsRequired, options),
       events: [],
+      map: null,
       gallery: [],
       parents: [],
       children: [],
@@ -280,6 +285,30 @@ export class ItemAPI {
       ORDER BY itemevent.abstime DESC
     `, [item.id, item.id]);
     item.events = events as ItemEvent[];
+
+    const map = (await executeQuery(`
+      SELECT
+        map.id, map.width, map.height, map.image_id,
+        JSON_ARRAYAGG(JSON_OBJECT(
+          'id', loc.id,
+          'title', loc.title,
+          'universe', universe.shortname,
+          'item', item.shortname,
+          'x', loc.x,
+          'y', loc.y
+        )) as locations
+      FROM map
+      LEFT JOIN maplocation AS loc ON loc.map_id = map.id
+      LEFT JOIN item ON item.id = loc.item_id
+      LEFT JOIN universe ON universe.id = item.universe_id
+      WHERE map.item_id = ?
+      GROUP BY map.id
+    `, [item.id]))[0] ?? null;
+    if (map.locations.length === 1 && map.locations[0].id === null) {
+      map.locations = [];
+    }
+    item.map = map as Map | null;
+    console.log(map)
 
     const gallery = await executeQuery(`
       SELECT
@@ -735,6 +764,7 @@ export class ItemAPI {
         }
       }
 
+      // Handle gallery data
       if (body.gallery) {
         const existingImages = await this.image.getManyByItemShort(user, universeShortname, item.shortname);
         const oldImages = {};
@@ -755,9 +785,78 @@ export class ItemAPI {
           if (!newImages[img.id]) await this.image.del(user, img.id, conn);
         }
       }
+
+      // Handle map data
+      if (body.map) {
+        console.log(body.map)
+        let mapId: number;
+        if (body.map.id === null) {
+          mapId = await this.insertMap(item.id, body.map, conn);
+        } else {
+          mapId = body.map.id;
+          await this.updateMap(body.map, conn);
+        }
+
+        // TODO: bunch of typing nonsense here too
+        const existingLocations = (await this.fetchLocations(mapId)).reduce((acc, loc) => ({ ...acc, [loc.id!]: loc }), {});
+        const updatedLocations = body.map.locations.filter(loc => loc.id && existingLocations[loc.id] && (
+          existingLocations[loc.id].x !== loc.x
+          || existingLocations[loc.id].y !== loc.y
+          || existingLocations[loc.id].universe !== loc.universe
+          || existingLocations[loc.id].item !== loc.item
+        ));
+        const newLocations = body.map.locations.filter(loc => loc.id === null || !(loc.id in existingLocations));
+        for (const loc of newLocations) {
+          const targetItem = (loc.item && loc.universe) 
+            ? await this.getByUniverseAndItemShortnames(user, loc.universe, loc.item, perms.READ, true)
+            : null;
+          await this.insertLocation(mapId, loc, targetItem?.id ?? null, conn);
+        }
+        for (const loc of updatedLocations) {
+          let targetItemId: number | null | undefined = undefined;
+          if (loc.item !== existingLocations[loc.id!].item || loc.universe !== existingLocations[loc.id!].universe) {
+            if (loc.item && loc.universe) {
+              const targetItem = await this.getByUniverseAndItemShortnames(user, loc.universe, loc.item, perms.READ, true);
+              targetItemId = targetItem.id;
+            } else {
+              targetItemId = null;
+            }
+          }
+          await this.updateLocation(loc, targetItemId, conn);
+        }
+      }
     });
 
     return item.id;
+  }
+
+  async insertMap(itemId: number, map: Map, conn?: PoolConnection): Promise<number> {
+    const { insertId } = await executeQuery<ResultSetHeader>(`
+      INSERT INTO map (width, height, image_id, item_id) VALUES (?, ?, ?, ?)
+    `, [map.width, map.height, map.image_id, itemId], conn);
+    return insertId;
+  }
+  async updateMap(map: Map, conn?: PoolConnection): Promise<void> {
+    await executeQuery<ResultSetHeader>(`
+      UPDATE map SET width = ?, height = ?, image_id = ? WHERE id = ?
+    `, [map.width, map.height, map.image_id, map.id], conn);
+  }
+  async fetchLocations(mapId: number): Promise<MapLocation[]> {
+    let queryString = `SELECT * FROM maplocation WHERE map_id = ?`;
+    const values: (string | number)[] = [mapId];
+    return await executeQuery(queryString, values) as MapLocation[];
+  }
+  async insertLocation(mapId: number, loc: MapLocation, itemId: number | null, conn?: PoolConnection): Promise<void> {
+    await executeQuery<ResultSetHeader>(`
+      INSERT INTO maplocation (map_id, item_id, title, x, y) VALUES (?, ?, ?, ?, ?)
+    `, [mapId, itemId, loc.title, loc.x, loc.y], conn);
+  }
+  async updateLocation(loc: MapLocation, itemId?: number | null, conn?: PoolConnection): Promise<void> {
+    await executeQuery(`
+      UPDATE maplocation
+      SET title = ?, ${itemId !== undefined ? 'item_id = ?' : ''} x = ?, y = ?
+      WHERE id = ?
+    `, [loc.title, ...(itemId !== undefined ? [itemId] : []), loc.x, loc.y, loc.id], conn);
   }
 
   private async _getLinks(item): Promise<{ to_universe_short: string, to_item_short: string, href: string }[]> {

@@ -153,6 +153,7 @@ class ItemAPI {
         const item = {
             ...await this.getOneBasic(user, conditions, permissionsRequired, options),
             events: [],
+            map: null,
             gallery: [],
             parents: [],
             children: [],
@@ -169,6 +170,29 @@ class ItemAPI {
       ORDER BY itemevent.abstime DESC
     `, [item.id, item.id]);
         item.events = events;
+        const map = (await (0, utils_1.executeQuery)(`
+      SELECT
+        map.id, map.width, map.height, map.image_id,
+        JSON_ARRAYAGG(JSON_OBJECT(
+          'id', loc.id,
+          'title', loc.title,
+          'universe', universe.shortname,
+          'item', item.shortname,
+          'x', loc.x,
+          'y', loc.y
+        )) as locations
+      FROM map
+      LEFT JOIN maplocation AS loc ON loc.map_id = map.id
+      LEFT JOIN item ON item.id = loc.item_id
+      LEFT JOIN universe ON universe.id = item.universe_id
+      WHERE map.item_id = ?
+      GROUP BY map.id
+    `, [item.id]))[0] ?? null;
+        if (map.locations.length === 1 && map.locations[0].id === null) {
+            map.locations = [];
+        }
+        item.map = map;
+        console.log(map);
         const gallery = await (0, utils_1.executeQuery)(`
       SELECT
         image.id, image.name, itemimage.label
@@ -585,6 +609,7 @@ class ItemAPI {
                     await this.deleteImports(item.id, deletedImports, conn);
                 }
             }
+            // Handle gallery data
             if (body.gallery) {
                 const existingImages = await this.image.getManyByItemShort(user, universeShortname, item.shortname);
                 const oldImages = {};
@@ -606,8 +631,74 @@ class ItemAPI {
                         await this.image.del(user, img.id, conn);
                 }
             }
+            // Handle map data
+            if (body.map) {
+                console.log(body.map);
+                let mapId;
+                if (body.map.id === null) {
+                    mapId = await this.insertMap(item.id, body.map, conn);
+                }
+                else {
+                    mapId = body.map.id;
+                    await this.updateMap(body.map, conn);
+                }
+                // TODO: bunch of typing nonsense here too
+                const existingLocations = (await this.fetchLocations(mapId)).reduce((acc, loc) => ({ ...acc, [loc.id]: loc }), {});
+                const updatedLocations = body.map.locations.filter(loc => loc.id && existingLocations[loc.id] && (existingLocations[loc.id].x !== loc.x
+                    || existingLocations[loc.id].y !== loc.y
+                    || existingLocations[loc.id].universe !== loc.universe
+                    || existingLocations[loc.id].item !== loc.item));
+                const newLocations = body.map.locations.filter(loc => loc.id === null || !(loc.id in existingLocations));
+                for (const loc of newLocations) {
+                    const targetItem = (loc.item && loc.universe)
+                        ? await this.getByUniverseAndItemShortnames(user, loc.universe, loc.item, utils_1.perms.READ, true)
+                        : null;
+                    await this.insertLocation(mapId, loc, targetItem?.id ?? null, conn);
+                }
+                for (const loc of updatedLocations) {
+                    let targetItemId = undefined;
+                    if (loc.item !== existingLocations[loc.id].item || loc.universe !== existingLocations[loc.id].universe) {
+                        if (loc.item && loc.universe) {
+                            const targetItem = await this.getByUniverseAndItemShortnames(user, loc.universe, loc.item, utils_1.perms.READ, true);
+                            targetItemId = targetItem.id;
+                        }
+                        else {
+                            targetItemId = null;
+                        }
+                    }
+                    await this.updateLocation(loc, targetItemId, conn);
+                }
+            }
         });
         return item.id;
+    }
+    async insertMap(itemId, map, conn) {
+        const { insertId } = await (0, utils_1.executeQuery)(`
+      INSERT INTO map (width, height, image_id, item_id) VALUES (?, ?, ?, ?)
+    `, [map.width, map.height, map.image_id, itemId], conn);
+        return insertId;
+    }
+    async updateMap(map, conn) {
+        await (0, utils_1.executeQuery)(`
+      UPDATE map SET width = ?, height = ?, image_id = ? WHERE id = ?
+    `, [map.width, map.height, map.image_id, map.id], conn);
+    }
+    async fetchLocations(mapId) {
+        let queryString = `SELECT * FROM maplocation WHERE map_id = ?`;
+        const values = [mapId];
+        return await (0, utils_1.executeQuery)(queryString, values);
+    }
+    async insertLocation(mapId, loc, itemId, conn) {
+        await (0, utils_1.executeQuery)(`
+      INSERT INTO maplocation (map_id, item_id, title, x, y) VALUES (?, ?, ?, ?, ?)
+    `, [mapId, itemId, loc.title, loc.x, loc.y], conn);
+    }
+    async updateLocation(loc, itemId, conn) {
+        await (0, utils_1.executeQuery)(`
+      UPDATE maplocation
+      SET title = ?, ${itemId !== undefined ? 'item_id = ?' : ''} x = ?, y = ?
+      WHERE id = ?
+    `, [loc.title, ...(itemId !== undefined ? [itemId] : []), loc.x, loc.y, loc.id], conn);
     }
     async _getLinks(item) {
         const result = await (0, utils_1.executeQuery)('SELECT to_universe_short, to_item_short, href FROM itemlink WHERE from_item = ?', [item.id]);
