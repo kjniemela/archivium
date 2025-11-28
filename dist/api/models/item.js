@@ -178,6 +178,7 @@ class ItemAPI {
           'title', loc.title,
           'universe', universe.shortname,
           'item', item.shortname,
+          'itemTitle', item.title,
           'x', loc.x,
           'y', loc.y
         )) as locations
@@ -696,7 +697,7 @@ class ItemAPI {
     async updateLocation(loc, itemId, conn) {
         await (0, utils_1.executeQuery)(`
       UPDATE maplocation
-      SET title = ?, ${itemId !== undefined ? 'item_id = ?' : ''} x = ?, y = ?
+      SET title = ?, ${itemId !== undefined ? 'item_id = ?,' : ''} x = ?, y = ?
       WHERE id = ?
     `, [loc.title, ...(itemId !== undefined ? [itemId] : []), loc.x, loc.y, loc.id], conn);
     }

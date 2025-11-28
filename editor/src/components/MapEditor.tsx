@@ -89,6 +89,7 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
             title: null,
             universe: null,
             item: null,
+            itemTitle: null,
             x, y,
           });
         }}
@@ -108,7 +109,7 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
               index={i}
               label={
                 location.title || (
-                  location.item && location.universe === item.universe_short && itemMap[location.item].title
+                  location.item && location.universe === item.universe_short && location.itemTitle
                 ) || 'Untitled Location'
               }
               x={location.x}
@@ -191,10 +192,6 @@ function MapLocation({
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
-    position: 'absolute',
-    border: '0.5rem solid black',
-    borderRadius: '0.5rem',
-    padding: 0,
     top: (y * scale),
     left: (x * scale),
   }
@@ -207,7 +204,7 @@ function MapLocation({
       className='map-location'
       style={style}
     >
-      <label>{label} ({x.toFixed(2)} / {y.toFixed(2)})</label>
+      <label className={x > 0.5 ? 'left' : 'right'}>{label} ({x.toFixed(2)} / {y.toFixed(2)})</label>
     </button>
   );
 }
