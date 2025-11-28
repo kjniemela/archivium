@@ -562,11 +562,23 @@ header {
   position: relative;
 }
 
+.map-location {
+  position: absolute;
+  border: 0.5rem solid black;
+  border-radius: 0.5rem;
+  padding: 0;
+}
+
 .map-location label {
   position: absolute;
   top: -0.53125rem;
-  left: 1rem;
   white-space: nowrap;
+}
+.map-location label.right {
+  left: 1rem;
+}
+.map-location label.left {
+  right: 1rem;
 }
 
 table {

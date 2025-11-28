@@ -56,6 +56,7 @@ export type MapLocation = {
   title: string | null,
   universe: string | null,
   item: string | null,
+  itemTitle: string | null,
   x: number,
   y: number,
 };
@@ -294,6 +295,7 @@ export class ItemAPI {
           'title', loc.title,
           'universe', universe.shortname,
           'item', item.shortname,
+          'itemTitle', item.title,
           'x', loc.x,
           'y', loc.y
         )) as locations
@@ -854,7 +856,7 @@ export class ItemAPI {
   async updateLocation(loc: MapLocation, itemId?: number | null, conn?: PoolConnection): Promise<void> {
     await executeQuery(`
       UPDATE maplocation
-      SET title = ?, ${itemId !== undefined ? 'item_id = ?' : ''} x = ?, y = ?
+      SET title = ?, ${itemId !== undefined ? 'item_id = ?,' : ''} x = ?, y = ?
       WHERE id = ?
     `, [loc.title, ...(itemId !== undefined ? [itemId] : []), loc.x, loc.y, loc.id], conn);
   }
