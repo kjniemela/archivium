@@ -243,6 +243,23 @@ function default_1(app, upload) {
                                 }),
                             ]),
                         ]),
+                        new APIRoute('/map', {}, [
+                            new APIRoute('/upload', {
+                                middleware: [upload.single('image')],
+                                POST: (req) => _1.default.item.mapImage.post(req.session.user, req.file, req.params.universeShortName, req.params.itemShortName),
+                            }),
+                            new APIRoute('/image', {
+                                GET: (req, res) => _1.default.item.mapImage.getOneByItemShort(req.session.user, req.params.universeShortName, req.params.itemShortName)
+                                    .then((image) => {
+                                    if (!image)
+                                        return;
+                                    res.contentType(image.mimetype);
+                                    if (req.query.download === '1')
+                                        res.setHeader('Content-Disposition', `attachment; filename="${image.name}"`);
+                                    return image.data;
+                                }),
+                            }),
+                        ]),
                         new APIRoute('/comments', {
                             GET: async (req) => {
                                 const item = await _1.default.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortName, req.params.itemShortName);

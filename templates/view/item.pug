@@ -208,42 +208,18 @@ block content
 
     if 'location' in item.obj_data && 'title' in item.obj_data.location
       .itemTab.hidden(data-tab='location')
-        #map-display.scroll-x.w-100
-          .map-container.pa-2
-            each location in item.map.locations
-              button.map-location(data-x=location.x data-y=location.y)
-                -
-                  const title = location.title || (
-                    location.item && location.universe === item.universe_short && location.itemTitle
-                  ) || 'Untitled Location';
-                label(class={ right: location.x <= 0.5, left: location.x > 0.5  }) #{title}
-      script.
-        const remSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
-        const map = document.querySelector('#map-display');
-        const container = map.querySelector('.map-container');
-        let mapContainerSize = window.outerHeight;
-        let mapContainerMaxHeight = window.innerHeight * 0.8;
-
-        const handleResize = () => {
-          const maxHeight = window.innerHeight - (remSize * 16);
-          const containerSize = Math.min((map.clientWidth ?? remSize), maxHeight);
-          mapContainerSize = containerSize - remSize;
-          mapContainerMaxHeight = maxHeight;
-
-          map.style.maxHeight = `${mapContainerMaxHeight}px`;
-          container.style.width = `${mapContainerSize}px`;
-          container.style.height = `${mapContainerSize}px`;
-
-          for (const location of map.querySelectorAll('.map-location')) {
-            location.style.top = `${location.dataset.y * mapContainerSize}px`;
-            location.style.left = `${location.dataset.x * mapContainerSize}px`;
-          }
-        };
-        window.addEventListener('load', () => {
-          handleResize();
-        });
-
-        window.addEventListener('resize', handleResize);
+        #map-display.w-100
+          .map-container.d-flex.flex-col.pa-2(class={ square: item.map.image_id === null })
+            if item.map.image_id
+              img(src=`/api/universes/${universe.shortname}/items/${item.shortname}/map/image`)
+            if item.map
+              each location in item.map.locations
+                button.map-location(style={ top: `calc(${location.y * 100}% - ${location.y}rem)`, left: `calc(${location.x * 100}% - ${location.x}rem)` })
+                  -
+                    const title = location.title || (
+                      location.item && location.universe === item.universe_short && location.itemTitle
+                    ) || 'Untitled Location';
+                  label(class={ right: location.x <= 0.5, left: location.x > 0.5  }) #{title}
         
     if item.obj_data.comments
       .hidden(data-tab='comments')

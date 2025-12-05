@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemAPI = void 0;
+const buffer_image_size_1 = __importDefault(require("buffer-image-size"));
 const __1 = __importDefault(require(".."));
 const errors_1 = require("../../errors");
 const editor_1 = require("../../lib/editor");
@@ -47,6 +48,77 @@ function getQuery(selects = [], permsCond, whereConds, options = {}) {
     }
     return query;
 }
+class MapImageAPI {
+    item;
+    constructor(item) {
+        this.item = item;
+    }
+    async getOneByItemShort(user, universeShortname, itemShortname, options) {
+        const item = await this.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.READ, true);
+        return await this.getOneByItem(item, options);
+    }
+    async getMany(options) {
+        const parsedOptions = (0, utils_1.parseData)(options);
+        let queryString = `
+      SELECT image.id, image.name, image.mimetype, image.data, map.item_id
+      FROM map
+      INNER JOIN image ON image.id = map.image_id
+      WHERE map.image_id IS NOT NULL
+    `;
+        if (options)
+            queryString += ` AND ${parsedOptions.strings.join(' AND ')}`;
+        const images = await (0, utils_1.executeQuery)(queryString, parsedOptions.values);
+        return images;
+    }
+    /**
+     * The caller of this mehtod must ensure that the user has adequate permissions!
+     */
+    async getOneByItem(item, options) {
+        const data = await this.getMany({ item_id: item.id, ...(options ?? {}) });
+        const image = data[0];
+        if (!image)
+            throw new errors_1.NotFoundError();
+        return image;
+    }
+    async post(user, file, universeShortname, itemShortname) {
+        if (!file)
+            throw new errors_1.ValidationError('Missing required fields');
+        if (!user)
+            throw new errors_1.UnauthorizedError();
+        const universe = await __1.default.universe.getOne(user, { shortname: universeShortname });
+        const totalStoredSize = await __1.default.universe.getTotalStoredByShortname(universe.shortname);
+        if (totalStoredSize + file.buffer.length > utils_1.tierLimits[universe.tier ?? 0].images) {
+            throw new errors_1.InsufficientStorageError();
+        }
+        const { originalname, buffer, mimetype } = file;
+        const { width, height } = (0, buffer_image_size_1.default)(buffer);
+        console.log(width, height);
+        const item = await this.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE, true);
+        const map = (await (0, utils_1.executeQuery)('SELECT id FROM map WHERE item_id'))[0];
+        if (!map)
+            throw new errors_1.NotFoundError();
+        const existingImage = await this.getOneByItem(item).catch((0, utils_1.handleAsNull)(errors_1.NotFoundError));
+        let data;
+        await (0, utils_1.withTransaction)(async (conn) => {
+            [data] = await conn.execute('INSERT INTO image (name, mimetype, data) VALUES (?, ?, ?)', [originalname.substring(0, 64), mimetype, buffer]);
+            await conn.execute('UPDATE map SET image_id = ?, width = ?, height = ? WHERE id = ?', [data.insertId, width, height, map.id]);
+            if (existingImage) {
+                await conn.execute(`DELETE FROM image WHERE id = ?`, [existingImage.id]);
+            }
+        });
+        return data;
+    }
+    async del(user, imageId, conn) {
+        if (!user)
+            throw new errors_1.UnauthorizedError();
+        const images = await this.getMany({ 'image.id': imageId });
+        const image = images && images[0];
+        if (!image)
+            throw new errors_1.NotFoundError();
+        await this.item.getOne(user, { 'item.id': image.item_id }, utils_1.perms.WRITE); // we need to get the item here to make sure it exists
+        await (0, utils_1.executeQuery)(`DELETE FROM image WHERE id = ?`, [imageId], conn);
+    }
+}
 class ItemImageAPI {
     item;
     constructor(item) {
@@ -63,7 +135,7 @@ class ItemImageAPI {
     async getMany(options, inclData = true) {
         const parsedOptions = (0, utils_1.parseData)(options);
         let queryString = `
-      SELECT 
+      SELECT
         image.id, itemimage.item_id, image.name, image.mimetype,
         itemimage.label, itemimage.idx ${inclData ? ', image.data' : ''}
       FROM itemimage
@@ -126,15 +198,17 @@ class ItemImageAPI {
         const image = images && images[0];
         if (!image)
             throw new errors_1.NotFoundError();
-        await this.item.getOne(user, { 'item.id': image.item_id }); // we need to get the item here to make sure it exists
-        await (0, utils_1.executeQuery)(`DELETE FROM image WHERE id = ?;`, [imageId], conn); // itemimage will be deleted by cascade
+        await this.item.getOne(user, { 'item.id': image.item_id }, utils_1.perms.WRITE); // we need to get the item here to make sure it exists
+        await (0, utils_1.executeQuery)(`DELETE FROM image WHERE id = ?`, [imageId], conn); // itemimage will be deleted by cascade
     }
 }
 class ItemAPI {
     image;
+    mapImage;
     api;
     constructor(api) {
         this.image = new ItemImageAPI(this);
+        this.mapImage = new MapImageAPI(this);
         this.api = api;
     }
     async getOneBasic(user, conditions = {}, permissionsRequired = utils_1.perms.READ, options = {}) {
@@ -189,11 +263,10 @@ class ItemAPI {
       WHERE map.item_id = ?
       GROUP BY map.id
     `, [item.id]))[0] ?? null;
-        if (map.locations.length === 1 && map.locations[0].id === null) {
+        if (map?.locations.length === 1 && map.locations[0].id === null) {
             map.locations = [];
         }
         item.map = map;
-        console.log(map);
         const gallery = await (0, utils_1.executeQuery)(`
       SELECT
         image.id, image.name, itemimage.label
@@ -634,14 +707,12 @@ class ItemAPI {
             }
             // Handle map data
             if (body.map) {
-                console.log(body.map);
                 let mapId;
                 if (body.map.id === null) {
                     mapId = await this.insertMap(item.id, body.map, conn);
                 }
                 else {
                     mapId = body.map.id;
-                    await this.updateMap(body.map, conn);
                 }
                 // TODO: bunch of typing nonsense here too
                 const existingLocations = (await this.fetchLocations(mapId)).reduce((acc, loc) => ({ ...acc, [loc.id]: loc }), {});
@@ -678,11 +749,6 @@ class ItemAPI {
       INSERT INTO map (width, height, image_id, item_id) VALUES (?, ?, ?, ?)
     `, [map.width, map.height, map.image_id, itemId], conn);
         return insertId;
-    }
-    async updateMap(map, conn) {
-        await (0, utils_1.executeQuery)(`
-      UPDATE map SET width = ?, height = ?, image_id = ? WHERE id = ?
-    `, [map.width, map.height, map.image_id, map.id], conn);
     }
     async fetchLocations(mapId) {
         let queryString = `SELECT * FROM maplocation WHERE map_id = ?`;
