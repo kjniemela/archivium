@@ -2,8 +2,10 @@ import { DndContext, KeyboardSensor, MouseSensor, TouchSensor, useDraggable, use
 import { CSS } from '@dnd-kit/utilities';
 import { useEffect, useRef, useState } from 'react';
 import type { Item, Map, MapLocation } from '../../../src/api/models/item';
-import { T } from '../helpers';
+import { postFormData, T } from '../helpers';
 import type { Categories, ItemOptionEntry } from '../pages/ItemEdit';
+import { createPortal } from 'react-dom';
+import { HttpStatusCode } from 'axios';
 
 type MapEditorProps = {
   item: Item,
@@ -20,25 +22,7 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
   const [uploading, setUploading] = useState<boolean>(false);
   const modalAnchor = document.querySelector('#modal-anchor') as HTMLElement;
 
-  const [mapContainerSize, setMapContainerSize] = useState<number>(window.outerHeight);
-  const [mapContainerMaxHeight, setMapContainerMaxHeight] = useState<number>(window.innerHeight * 0.8);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const handleResize = () => {
-      console.log(mapContainerRef.current?.offsetWidth)
-      const maxHeight = window.innerHeight - (remSize * 16);
-      const containerSize = Math.min((mapContainerRef.current?.clientWidth ?? remSize), maxHeight);
-      setMapContainerSize(containerSize - remSize);
-      setMapContainerMaxHeight(maxHeight);
-    };
-    handleResize();
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
   
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor, {
@@ -76,14 +60,15 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
   };
 
   return <>
-    <div ref={mapContainerRef} className='scroll-x' style={{ maxHeight: `${mapContainerMaxHeight}px` }}>
+    <div>
       <div
-        className='map-container pa-2'
-        style={{ width: `${mapContainerSize}px`, height: `${mapContainerSize}px` }}
+        ref={mapContainerRef}
+        className={`map-container d-flex flex-col pa-2${item.map?.image_id === null ? ' square' : ''}`}
         onClick={(e) => {
-          const rect = (e.target as HTMLElement).getBoundingClientRect();
-          const x = Math.max(0, Math.min((e.clientX - rect.left - (remSize / 2)) / mapContainerSize, 1));
-          const y = Math.max(0, Math.min((e.clientY - rect.top - (remSize / 2)) / mapContainerSize, 1));
+          const target = e.target as HTMLElement;
+          const rect = target.getBoundingClientRect();
+          const x = Math.max(0, Math.min((e.clientX - rect.left - (remSize / 2)) / target.clientWidth, 1));
+          const y = Math.max(0, Math.min((e.clientY - rect.top - (remSize / 2)) / target.clientHeight, 1));
           addLocation({
             id: null,
             title: null,
@@ -94,13 +79,18 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
           });
         }}
       >
+        {item.map?.image_id && (
+          <img src={`/api/universes/${item.universe_short}/items/${item.shortname}/map/image`} />
+        )}
         <DndContext
           sensors={sensors}
           onDragEnd={(e) => {
             const { active, delta } = e;
+            const container = mapContainerRef.current;
+            if (!container) return;
             modifyLocation(Number(active.id), (location) => {
-              location.x = Math.max(0, Math.min(location.x + (delta.x / mapContainerSize), 1));
-              location.y = Math.max(0, Math.min(location.y + (delta.y / mapContainerSize), 1));
+              location.x = Math.max(0, Math.min(location.x + (delta.x / container.clientWidth), 1));
+              location.y = Math.max(0, Math.min(location.y + (delta.y / container.clientHeight), 1));
             });
           }}
         >
@@ -114,20 +104,20 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
               }
               x={location.x}
               y={location.y}
-              scale={mapContainerSize}
             />
           ))}
         </DndContext>
       </div>
     </div>
+    <br />
     <button type='button' onClick={() => setUploadModal(true)}>{T('Upload Image')}</button>
-    {/* {uploadModal && (
+    {uploadModal && (
       createPortal(
         <div className='modal' onClick={() => setUploadModal(false)}>
           <div className='modal-content' onClick={(e) => e.stopPropagation()}>
             <div className='sheet d-flex flex-col gap-1 align-center'>
               <h2>{T('Upload Image')}</h2>
-              <input type='file' accept='image/*' required multiple></input>
+              <input type='file' accept='image/*' required></input>
               {uploadModalError && <div>
                 <span id='item-error' className='color-error' style={{ fontSize: 'small' }}>{uploadModalError}</span>
               </div>}
@@ -140,25 +130,20 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
 
                 setUploading(true);
 
-                const uploadedImages = [];
-                for (const image of imageInput.files) {
-                  const response = await postFormData(`/api/universes/${universe}/items/${item}/gallery/upload`, { image });
-                  const data = await response.json();
-  
-                  if (response.status === HttpStatusCode.InsufficientStorage) {
-                    setUploadModalError('There is not enough available storage to upload this image!');
-                    setUploading(false);
-                    return;
-                  }
-                  
-                  uploadedImages.push({
-                    id: data.insertId,
-                    name: image.name,
-                    label: '',
-                  });
+                const image = imageInput.files[0];
+                const response = await postFormData(`/api/universes/${item.universe_short}/items/${item.shortname}/map/upload`, { image });
+                const data = await response.json();
+
+                if (response.status === HttpStatusCode.InsufficientStorage) {
+                  setUploadModalError('There is not enough available storage to upload this image!');
+                  setUploading(false);
+                  return;
                 }
 
-                onUploadImages(uploadedImages);
+                const newItem = prepNewItem();
+                newItem.map.image_id = data.insertId;
+                onUpdate(newItem);
+
                 setUploadModal(false);
                 setUploading(false);
               }}>{T('Upload')}</button>
@@ -167,7 +152,7 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
         </div>,
         modalAnchor
       )
-    )} */}
+    )}
   </>;
 }
 
@@ -176,7 +161,6 @@ interface MapLocationProps {
   label: string;
   x: number;
   y: number;
-  scale: number;
 }
 
 function MapLocation({
@@ -184,7 +168,6 @@ function MapLocation({
   label,
   x,
   y,
-  scale,
 }: MapLocationProps) {
   const { attributes, isDragging, listeners, setNodeRef, transform } = useDraggable({
     id: index,
@@ -192,8 +175,8 @@ function MapLocation({
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
-    top: (y * scale),
-    left: (x * scale),
+    top: `calc(${y * 100}% - ${y}rem)`,
+    left: `calc(${x * 100}% - ${x}rem)`,
   }
 
   return (
