@@ -569,6 +569,7 @@ header {
   border-radius: 0.25rem;
   background-color: silver;
   position: relative;
+  flex-grow: 1;
 }
 
 .map-location {
