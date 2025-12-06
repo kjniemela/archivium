@@ -2,10 +2,11 @@ import { DndContext, KeyboardSensor, MouseSensor, TouchSensor, useDraggable, use
 import { CSS } from '@dnd-kit/utilities';
 import { useEffect, useRef, useState } from 'react';
 import type { Item, Map, MapLocation } from '../../../src/api/models/item';
-import { postFormData, T } from '../helpers';
+import { capitalize, postFormData, T } from '../helpers';
 import type { Categories, ItemOptionEntry } from '../pages/ItemEdit';
 import { createPortal } from 'react-dom';
 import { HttpStatusCode } from 'axios';
+import SearchableSelect from './SearchableSelect';
 
 type MapEditorProps = {
   item: Item,
@@ -21,6 +22,8 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
   const [uploadModalError, setUploadModalError] = useState<string>('');
   const [uploading, setUploading] = useState<boolean>(false);
   const modalAnchor = document.querySelector('#modal-anchor') as HTMLElement;
+
+  const [selectedLocation, setSelectedLocation] = useState<number | null>(null);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   
@@ -51,6 +54,13 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
     newItem.map.locations.push(location);
     onUpdate(newItem);
   };
+  const removeLocation = (index: number): void => {
+    const newItem = prepNewItem();
+    if (!newItem.map.locations[index]) return;
+    newItem.map.locations.splice(index, 1);
+    if (selectedLocation === index) setSelectedLocation(null);
+    onUpdate(newItem);
+  };
   const modifyLocation = (index: number, fn: (location: MapLocation) => void): void => {
     const newItem = prepNewItem();
     const location = newItem.map.locations[index];
@@ -58,9 +68,12 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
     fn(location);
     onUpdate(newItem);
   };
+  
+  const itemTitles: Record<string, string> = Object.keys(itemMap).reduce((acc, key) => ({ ...acc, [key]: itemMap[key].title }), {});
+  const itemTypes = Object.keys(itemMap).reduce((acc, key) => ({ ...acc, [key]: capitalize(categories[itemMap[key].type][1]) }), {});
 
   return <>
-    <div>
+    <div className='map-editor'>
       <div
         ref={mapContainerRef}
         className={`map-container d-flex flex-col pa-2${item.map?.image_id === null ? ' square' : ''}`}
@@ -80,7 +93,7 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
         }}
       >
         {item.map?.image_id && (
-          <img src={`/api/universes/${item.universe_short}/items/${item.shortname}/map/image`} />
+          <img className='w-100' src={`/api/universes/${item.universe_short}/items/${item.shortname}/map/image#${item.map.image_id}`} />
         )}
         <DndContext
           sensors={sensors}
@@ -93,6 +106,7 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
               location.y = Math.max(0, Math.min(location.y + (delta.y / container.clientHeight), 1));
             });
           }}
+          onDragStart={({ active }) => setSelectedLocation(Number(active.id))}
         >
           {item.map?.locations.map((location, i) => (
             <MapLocation
@@ -108,6 +122,26 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
           ))}
         </DndContext>
       </div>
+      {item.map && selectedLocation !== null && <div className='d-flex flex-col gap-1 px-2'>
+        <input
+          value={item.map.locations[selectedLocation].title ?? ''}
+          onChange={({ target }) => modifyLocation(selectedLocation, (location) => {
+            location.title = target.value || null;
+          })}
+        />
+        <SearchableSelect
+          value={item.map.locations[selectedLocation].item ?? undefined}
+          options={itemTitles}
+          onSelect={(value) => modifyLocation(selectedLocation, (location) => {
+            location.item = value;
+            location.itemTitle = value && itemTitles[value];
+            location.universe = item.universe_short;
+          })}
+          groups={itemTypes}
+          clearText='None'
+        />
+        <button className='color-error' onClick={() => removeLocation(selectedLocation)}>Remove Location</button>
+      </div>}
     </div>
     <br />
     <button type='button' onClick={() => setUploadModal(true)}>{T('Upload Image')}</button>
@@ -187,7 +221,7 @@ function MapLocation({
       className='map-location'
       style={style}
     >
-      <label className={x > 0.5 ? 'left' : 'right'}>{label} ({x.toFixed(2)} / {y.toFixed(2)})</label>
+      <label className={x > 0.5 ? 'left' : 'right'}>{label}</label>
     </button>
   );
 }
