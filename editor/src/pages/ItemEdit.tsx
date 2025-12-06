@@ -24,7 +24,7 @@ export type Categories = {
 export type EventItem = [string, string, number, string, number];
 export type ItemOptionEntry = { title: string, type: string };
 
-const BUILTIN_TABS = ['lineage', 'location', 'timeline', 'gallery'] as const;
+const BUILTIN_TABS = ['lineage', 'map', 'timeline', 'gallery'] as const;
 
 type ObjData = {
   notes?: boolean,
@@ -290,7 +290,7 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
         }) : prev);
       }} />
     ),
-    location: (
+    map: (
       <MapEditor item={item} categories={categories} onUpdate={(newItem) => setItem(newItem)} itemMap={itemMap} />
     ),
     timeline: (

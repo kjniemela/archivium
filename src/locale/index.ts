@@ -25,6 +25,8 @@ export const locale = {
     'characters': 'karaktärer',
     'location:': 'plats',
     'locations': 'platser',
+    'map': 'karta',
+    'maps': 'kartor',
     'event': 'händelse',
     'events': 'händelser',
     'archive': 'arkiv',
