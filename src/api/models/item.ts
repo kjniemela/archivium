@@ -205,7 +205,6 @@ class MapImageAPI {
 
     const { originalname, buffer, mimetype } = file;
     const { width, height } = sizeOf(buffer);
-    console.log(width, height)
     const item = await this.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE, true);
     const map = (await executeQuery('SELECT id FROM map WHERE item_id'))[0] as { id: number } | undefined;
     if (!map) throw new NotFoundError();
@@ -895,6 +894,10 @@ export class ItemAPI {
           || existingLocations[loc.id].item !== loc.item
         ));
         const newLocations = body.map.locations.filter(loc => loc.id === null || !(loc.id in existingLocations));
+        const deletedLocations = body.map.locations.reduce((locations, loc) => {
+          if (loc.id && loc.id in locations) delete locations[loc.id];
+          return locations;
+        }, { ...existingLocations });
         for (const loc of newLocations) {
           const targetItem = (loc.item && loc.universe) 
             ? await this.getByUniverseAndItemShortnames(user, loc.universe, loc.item, perms.READ, true)
@@ -912,6 +915,9 @@ export class ItemAPI {
             }
           }
           await this.updateLocation(loc, targetItemId, conn);
+        }
+        for (const locId in deletedLocations) {
+          await this.deleteLocation(Number(locId));
         }
       }
     });
@@ -941,6 +947,11 @@ export class ItemAPI {
       SET title = ?, ${itemId !== undefined ? 'item_id = ?,' : ''} x = ?, y = ?
       WHERE id = ?
     `, [loc.title, ...(itemId !== undefined ? [itemId] : []), loc.x, loc.y, loc.id], conn);
+  }
+  async deleteLocation(locId: number, conn?: PoolConnection): Promise<void> {
+    await executeQuery<ResultSetHeader>(`
+      DELETE FROM maplocation WHERE id = ?
+    `, [locId], conn);
   }
 
   private async _getLinks(item): Promise<{ to_universe_short: string, to_item_short: string, href: string }[]> {

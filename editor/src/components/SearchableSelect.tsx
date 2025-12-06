@@ -2,23 +2,20 @@ import { useEffect, useState } from 'react';
 
 type SearchableSelectProps = {
   id?: string,
+  value?: string,
   options: { [shortname: string]: string },
-  onSelect: (selectedValue: string) => void,
+  onSelect: (selectedValue: string | null) => void,
   groups?: { [shortname: string]: string },
   groupPriority?: { [group: string]: number },
+  clearText?: string,
 };
 
-export default function SearchableSelect({ id, options, onSelect, groups, groupPriority }: SearchableSelectProps) {
+export default function SearchableSelect({ id, value, options, onSelect, groups, groupPriority, clearText }: SearchableSelectProps) {
   const [searchText, setSearchText] = useState<string>('');
-  const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
 
   groups = groups ?? {};
   groupPriority = groupPriority ?? {};
-
-  useEffect(() => {
-    if (selectedKey !== null) onSelect(selectedKey);
-  }, [selectedKey]);
 
   const filteredOptions = Object.keys(options).filter(option => (!searchText || !options[option] || options[option].toLowerCase().includes(searchText.toLowerCase())));
 
@@ -30,22 +27,22 @@ export default function SearchableSelect({ id, options, onSelect, groups, groupP
     optionGroups[groups[key]].push(key);
   }
 
-  const createOption = (key: string) => {
+  const createOption = (key: string | null) => {
     return <div key={key} className='option' onClick={() => {
-      setSearchText(options[key]);
-      setSelectedKey(key);
+      onSelect(key);
       setDropdownVisible(false);
-    }}>{options[key]}</div>;
+    }}>{key === null ? clearText : options[key]}</div>;
   };
   
   return <div id={id} className='searchable-select'>
     <input
-      value={searchText}
+      value={dropdownVisible ? searchText : value && options[value]}
       onChange={({ target }) => setSearchText(target.value)}
       onFocus={() => setDropdownVisible(true)}
       onBlur={() => setTimeout(() => setDropdownVisible(false), 100)} // Timeout to allow click event to register
     />
     <div className='options-container' style={{ display: dropdownVisible ? 'block' : 'none' }}>
+      {clearText && createOption(null)}
       {ungroupedOptions.map((key) => createOption(key))}
       {Object.keys(optionGroups).sort((a, b) => ((groupPriority[a] ?? 0) > (groupPriority[b] ?? 0) ? -1 : 1)).map((group) => (
         <>

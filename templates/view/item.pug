@@ -215,11 +215,13 @@ block content
             if item.map
               each location in item.map.locations
                 button.map-location(style={ top: `calc(${location.y * 100}% - ${location.y}rem)`, left: `calc(${location.x * 100}% - ${location.x}rem)` })
-                  -
-                    const title = location.title || (
-                      location.item && location.universe === item.universe_short && location.itemTitle
-                    ) || 'Untitled Location';
-                  label(class={ right: location.x <= 0.5, left: location.x > 0.5  }) #{title}
+                  if location.item && location.universe
+                    a.link.link-animated(
+                      href=`${universeLink(location.universe)}/items/${location.item}`
+                      class={ right: location.x <= 0.5, left: location.x > 0.5  }
+                    ) #{location.title || location.itemTitle}
+                  else
+                    label(class={ right: location.x <= 0.5, left: location.x > 0.5  }) #{location.title || 'Untitled Location'}
         
     if item.obj_data.comments
       .hidden(data-tab='comments')

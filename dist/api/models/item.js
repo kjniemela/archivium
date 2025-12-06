@@ -92,7 +92,6 @@ class MapImageAPI {
         }
         const { originalname, buffer, mimetype } = file;
         const { width, height } = (0, buffer_image_size_1.default)(buffer);
-        console.log(width, height);
         const item = await this.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, utils_1.perms.WRITE, true);
         const map = (await (0, utils_1.executeQuery)('SELECT id FROM map WHERE item_id'))[0];
         if (!map)
@@ -721,6 +720,11 @@ class ItemAPI {
                     || existingLocations[loc.id].universe !== loc.universe
                     || existingLocations[loc.id].item !== loc.item));
                 const newLocations = body.map.locations.filter(loc => loc.id === null || !(loc.id in existingLocations));
+                const deletedLocations = body.map.locations.reduce((locations, loc) => {
+                    if (loc.id && loc.id in locations)
+                        delete locations[loc.id];
+                    return locations;
+                }, { ...existingLocations });
                 for (const loc of newLocations) {
                     const targetItem = (loc.item && loc.universe)
                         ? await this.getByUniverseAndItemShortnames(user, loc.universe, loc.item, utils_1.perms.READ, true)
@@ -739,6 +743,9 @@ class ItemAPI {
                         }
                     }
                     await this.updateLocation(loc, targetItemId, conn);
+                }
+                for (const locId in deletedLocations) {
+                    await this.deleteLocation(Number(locId));
                 }
             }
         });
@@ -766,6 +773,11 @@ class ItemAPI {
       SET title = ?, ${itemId !== undefined ? 'item_id = ?,' : ''} x = ?, y = ?
       WHERE id = ?
     `, [loc.title, ...(itemId !== undefined ? [itemId] : []), loc.x, loc.y, loc.id], conn);
+    }
+    async deleteLocation(locId, conn) {
+        await (0, utils_1.executeQuery)(`
+      DELETE FROM maplocation WHERE id = ?
+    `, [locId], conn);
     }
     async _getLinks(item) {
         const result = await (0, utils_1.executeQuery)('SELECT to_universe_short, to_item_short, href FROM itemlink WHERE from_item = ?', [item.id]);
