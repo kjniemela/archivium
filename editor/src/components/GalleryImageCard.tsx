@@ -26,9 +26,9 @@ export default function GalleryImageCard({ id, src, label, onRemoveImage, onChan
     transition,
     padding: '8px 12px',
     marginBottom: '8px',
-    border: '1px solid #ccc',
+    border: '1px solid var(--input-border-color)',
     borderRadius: '8px',
-    backgroundColor: 'white',
+    backgroundColor: 'var(--sheet-color)',
     height: '24rem',
     width: '16rem',
     boxShadow: isDragging ? '0 0.5rem 1rem 0 rgb(0 0 0 / 30%)' : '0 0.25rem 0.5rem 0 rgb(0 0 0 / 20%)',
@@ -45,7 +45,7 @@ export default function GalleryImageCard({ id, src, label, onRemoveImage, onChan
           <a className='link link-animated align-self-start' href={`${src}?download=1`}>{T('Download')}</a>
           <div
             className='mt-1 d-flex align-center justify-center clickable'
-            style={{ height: '2rem', backgroundColor: '#e9e9e9', borderRadius: '0.325rem', touchAction: 'none' }}
+            style={{ height: '2rem', backgroundColor: 'var(--page-color)', borderRadius: '0.325rem', touchAction: 'none' }}
             {...listeners}
             {...attributes}
           >
