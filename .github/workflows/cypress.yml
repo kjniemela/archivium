@@ -51,8 +51,7 @@ jobs:
 
       - name: Start server
         run: |
-          npm run editor:build &
-          npm run build &
+          npm run build:all &
           nohup npm start &
           sleep 5
         env:
