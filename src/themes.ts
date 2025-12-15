@@ -12,7 +12,7 @@ const themes: Record<string, Theme> = {
   },
   glass: {
     glass: true,
-    background: 'radial-gradient(circle, #d2dbe5 0%, #718ea7 100%) 0 0',
+    background: 'radial-gradient(circle, light-dark(#d2dbe5, #484f57) 0%, light-dark(#718ea7, #23384b) 100%) 0 0',
   },
   space: {
     glass: true,
