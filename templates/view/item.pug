@@ -143,7 +143,7 @@ block content
       each tab, name in item.obj_data.tabs
         li.navbarBtn(data-tab=name)
           h3.navbarBtnLink.navbarText.ma-0(onclick=`showTab('${name}')`) #{name}
-    each dataType in ['timeline', 'gallery', 'lineage']
+    each dataType in ['timeline', 'gallery', 'lineage', 'map']
       if dataType in item.obj_data && 'title' in item.obj_data[dataType]
         li.navbarBtn(data-tab=dataType)
           h3.navbarBtnLink.navbarText.ma-0(onclick=`showTab('${dataType}')`) #{item.obj_data[dataType].title}
@@ -152,7 +152,7 @@ block content
         h3.navbarBtnLink.navbarText.ma-0(onclick=`showTab('comments')`) #{capitalize(T('comments'))}
     if item.obj_data.notes || (contextUser && universe.author_permissions[contextUser.id] >= perms.WRITE && notes.length > 0)
       li.navbarBtn(data-tab='notes')
-        h3.navbarBtnLink.navbarText.ma-0( onclick=`showTab('notes')` ) #{capitalize(T('notes'))}
+        h3.navbarBtnLink.navbarText.ma-0(onclick=`showTab('notes')`) #{capitalize(T('notes'))}
           if !item.obj_data.notes
             |  #{T('(Hidden)')}
 
@@ -205,6 +205,23 @@ block content
             hr
             a.link.link-animated(href=`${universeItemsLink}/${child.child_shortname}`)
               | #{child.child_title}
+
+    if 'map' in item.obj_data && 'title' in item.obj_data.map
+      .itemTab.hidden(data-tab='map')
+        #map-display.w-100
+          .map-container.d-flex.flex-col.pa-2(class={ square: item.map.image_id === null })
+            if item.map.image_id
+              img(src=`/api/universes/${universe.shortname}/items/${item.shortname}/map/image`)
+            if item.map
+              each location in item.map.locations
+                button.map-location(style={ top: `calc(${location.y * 100}% - ${location.y}rem)`, left: `calc(${location.x * 100}% - ${location.x}rem)` })
+                  if location.item && location.universe
+                    a.link.link-animated(
+                      href=`${universeLink(location.universe)}/items/${location.item}`
+                      class={ right: location.x <= 0.5, left: location.x > 0.5  }
+                    ) #{location.title || location.itemTitle}
+                  else
+                    label(class={ right: location.x <= 0.5, left: location.x > 0.5  }) #{location.title || 'Untitled Location'}
         
     if item.obj_data.comments
       .hidden(data-tab='comments')

@@ -15,14 +15,16 @@ import SaveBtn from '../components/SaveBtn';
 import TabsBar from '../components/TabsBar';
 import TimelineEditor from '../components/TimelineEditor';
 import { BulkExistsFetcher, capitalize, fetchData, T } from '../helpers';
+import MapEditor from '../components/MapEditor';
 
-type Categories = {
+export type Categories = {
   [key: string]: [string, string],
 };
 
 export type EventItem = [string, string, number, string, number];
+export type ItemOptionEntry = { title: string, type: string };
 
-const BUILTIN_TABS = ['lineage', 'location', 'timeline', 'gallery'] as const;
+const BUILTIN_TABS = ['lineage', 'map', 'timeline', 'gallery'] as const;
 
 type ObjData = {
   notes?: boolean,
@@ -60,8 +62,8 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
   const [currentModal, setCurrentModal] = useState<ModalType | null>(null);
   const [currentTab, setCurrentTab] = useState<string | null>(null);
   const [tabNames, setTabNames] = useState<Record<string, string>>({});
-  const [eventItemMap, setEventItemMap] = useState<Record<number, EventItem[]>>();
-  const [lineageItemMap, setLineageItemMap] = useState<Record<number, string>>();
+  const [eventItemMap, setEventItemMap] = useState<Record<string, EventItem[]>>();
+  const [itemMap, setItemMap] = useState<Record<string, ItemOptionEntry>>();
 
   const context: TiptapContext = {
     currentUniverse: universeShort,
@@ -96,16 +98,16 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
       }
       setEventItemMap(newEventItemMap);
     });
-    const lineageItemPromise = fetchData(`/api/universes/${universeShort}/items?type=character`, (items) => {
-      const newLineageItemMap: Record<number, string> = {};
-      for (const { shortname, title } of items) {
+    const itemMapPromise = fetchData(`/api/universes/${universeShort}/items`, (items) => {
+      const newItemMap: Record<number, ItemOptionEntry> = {};
+      for (const { shortname, title, item_type } of items) {
         if (shortname === itemShort) continue;
-        newLineageItemMap[shortname] = title;
+        newItemMap[shortname] = { title, type: item_type };
       }
-      setLineageItemMap(newLineageItemMap);
+      setItemMap(newItemMap);
     });
     fetchData(`/api/universes/${universeShort}/items/${itemShort}`, async (data) => {
-      await Promise.all([categoryPromise, eventItemPromise, lineageItemPromise]);
+      await Promise.all([categoryPromise, eventItemPromise, itemMapPromise]);
       const objData = JSON.parse(data.obj_data) as ObjData;
       if (objData.body) {
         const links: LinkData[] = []; 
@@ -182,7 +184,7 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
   }
 
   /* Loading Screen */
-  if (!item || !objData) {
+  if (!item || !objData || !categories || !itemMap) {
     return <div className='d-flex justify-center align-center'>
       <div className='loader' style={{ marginTop: 'max(0px, calc(50vh - 50px - var(--page-margin-top)))' }}></div>
     </div>;
@@ -288,16 +290,18 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
         }) : prev);
       }} />
     ),
+    map: (
+      <MapEditor item={item} categories={categories} onUpdate={(newItem) => setItem(newItem)} itemMap={itemMap} />
+    ),
     timeline: (
       <TimelineEditor item={item} onEventsUpdate={(newEvents) => {
         const newState = { ...item };
-        console.log(newEvents)
         newState.events = newEvents;
         setItem(newState);
       }} eventItemMap={eventItemMap ?? {}} />
     ),
     lineage: (
-      <LineageEditor item={item} onUpdate={(newItem) => setItem(newItem)} itemMap={lineageItemMap ?? {}} />
+      <LineageEditor item={item} categories={categories} onUpdate={(newItem) => setItem(newItem)} itemMap={itemMap} />
     ),
   };
 

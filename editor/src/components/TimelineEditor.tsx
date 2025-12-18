@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { T } from '../helpers';
 import { createPortal } from 'react-dom';
 import TimePicker from './TimePicker';
-import type { EventItem } from '../App';
+import type { EventItem } from '../pages/ItemEdit';
 import SearchableSelect from './SearchableSelect';
 import { type Item, type ItemEvent } from '../../../src/api/models/item';
 

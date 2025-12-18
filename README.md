@@ -12,9 +12,9 @@ You can work privately or collaborate with others, bringing your imaginative lan
 
 The basic components of Archivium are Items and Universes. Items contain information about specific things within your world, such as individual characters, locations, organizations, etc. Universes allow you to group items that belong to the same world or story together.
 
-### Markdown Descriptions
+### Rich Text Descriptions
 
-Items may have a text body that supports standard markdown syntax (with some exceptions — we're working on it!), as well as some extra syntax to make designing the layout of your item's page or linking to another item easier.
+Items may have a rich text body, which you can edit with our WYSIWYG editor powered by TipTap.
 
 ### Galleries
 
@@ -28,6 +28,10 @@ An item can list other items as its Parents or Children. This information is dis
 
 An item can have a list of timestamps — either linking to another item or having a simple text description — that are collected together in the **Timeline** tab. (More timeline tools coming soon!)
 
+### Maps
+
+An image can be uploaded to an item as a map, and locations — either just text labels or links to another item — can be pinned to it. This map is displayed in the **Map** tab. (More map tools coming soon!)
+
 ### Custom Data Tabs
 
 An item can have any number of tabs containing custom key-value data. The markdown body can also pull information from these tabs, making them useful for data storage as well as display.
@@ -40,17 +44,21 @@ The home page lets you stay up to date on what other collaborators have been doi
 
 You can create text notes, which can be pinned to several different items. These notes can be visible to others or only to you, and when pinned to an item, will be collected together in the **Notes** tab.
 
+### Discussion
+
+You can create discussion threads for a universe which will be collected in the **Discuss** tab, and you can allow leaving comments on items which will be collected in the **Comments** tab.
+
+### Stories
+
+You can draft and publish stories about your universe, which will be collected on the **Stories** page. Published stories can be seen by anyone, even if the universe they're tied to are private.
+
 # Planned Features
 
-- Maps
 - In-universe date/calendar management
 - More extensive family tree tools
-- On-site discussion and collaboration tools
-- Tools for sharing stories about your universe
 - Dark Mode
 - Improved note boards
 - Direct messaging
-- Video embeds
 - Stats and admin tools
 
 Want a new feature not on this list? Feel free to [open a ticket](https://github.com/HMI-Studios/archivium/issues/new/choose) here on github or shoot us an email at [contact@archivium.net](mailto:contact@archivium.net)!

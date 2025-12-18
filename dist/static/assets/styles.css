@@ -555,6 +555,43 @@ header {
   }
 }
 
+.map-editor {
+  display: flex;
+}
+
+@media only screen and (max-device-width: 480px) {
+  .map-editor {
+    flex-direction: column;
+  }
+}
+
+.map-container {
+  border-radius: 0.25rem;
+  background-color: silver;
+  position: relative;
+  flex-grow: 1;
+}
+
+.map-location {
+  position: absolute;
+  border: 0.5rem solid black;
+  border-radius: 0.5rem;
+  padding: 0;
+}
+
+.map-location label, .map-location a {
+  position: absolute;
+  top: -0.53125rem;
+  white-space: nowrap;
+  filter: drop-shadow(0px 1px 3px white);
+}
+.map-location .right {
+  left: 1rem;
+}
+.map-location .left {
+  right: 1rem;
+}
+
 table {
   border-collapse: collapse;
   border-radius: 0.25rem;
@@ -1597,8 +1634,15 @@ aside .iframe-wrapper>iframe {
   height: 100%;
 }
 
+.square {
+  aspect-ratio: 1 / 1;
+}
+
 .scroll-x {
   overflow-x: auto;
+}
+.scroll-y {
+  overflow-y: auto;
 }
 
 .overflow-hidden {
