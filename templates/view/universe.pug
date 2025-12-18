@@ -7,7 +7,8 @@ block title
 mixin typeCard(shortname, category)
   .card.item-type
     a.cardLink( href=`${universeLink(universe.shortname)}/items${shortname ? `?type=${shortname}` : ''}` )
-      div(style={ 'background-color': shortname ? category[2] : '#f3f3f3' })
+      .card-backdrop(style={ 'background-color': shortname ? category[2] : '#f3f3f3' })
+      .card-text
         h2.mb-0.center= shortname ? capitalize(category[1]) : T('All Items')
         h2.mt-0.center (#{shortname ? (counts[shortname] || 0) : totalItems})
     if contextUser && (universe.author_permissions[contextUser.id] >= perms.WRITE)
@@ -42,7 +43,7 @@ block content
         | Deleted User
       |  #{formatDate(new Date(universe.created_at))}
       |  - Last updated #{formatDate(new Date(universe.updated_at))}
-  
+
   #action-bar.d-flex.flex-wrap.justify-center.align-center.gap-2.mb-1
     if contextUser
       script let isFollowing = #{universe.followers[contextUser.id] || false};

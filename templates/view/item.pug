@@ -48,11 +48,13 @@ block breadcrumbs
 
 block content
   .d-flex.justify-center
-    .sheet.mt-8.px-8.py-4(style={ 'background-color': item.itemTypeColor, 'min-width': '15vw' })
-      h1.center.ma-0 #{item.title}
-      p.center.ma-0 #{capitalize(T(item.itemTypeName))}
-        if !displayUniverse
-          |  of #{item.universe}
+    .sheet.overflow-hidden.mt-8.px-8.py-4(style={ 'position': 'relative', 'min-width': '15vw' })
+      .card-backdrop(style={ 'background-color': item.itemTypeColor })
+      .card-text
+        h1.center.ma-0 #{item.title}
+        p.center.ma-0 #{capitalize(T(item.itemTypeName))}
+          if !displayUniverse
+            |  of #{item.universe}
   p.center.mb-2
     small #{T('Created by ')}
       if item.author
@@ -129,6 +131,7 @@ block content
           console.log(display.style.maxHeight)
         });
       })();
+
   hr
 
   //- Tab buttons

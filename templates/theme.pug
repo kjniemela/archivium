@@ -8,7 +8,7 @@ style
       .
         .card.item-type {
           backdrop-filter: blur(1rem);
-          background-color: #e9e9e99e;
+          background-color: color-mix(in srgb, var(--page-color), transparent 38%);
         }
   if theme.background
     .
@@ -23,7 +23,7 @@ style
     if !theme.glass
       .
         main {
-          text-shadow: 0.0625rem 0.0625rem 0.125rem #fefefe, 0 0 0.5rem #e9e9e9, 0.0625rem 0 0.125rem #e9e9e9;
+          text-shadow: 0.0625rem 0.0625rem 0.125rem var(--sheet-color), 0 0 0.5rem var(--page-color), 0.0625rem 0 0.125rem var(--page-color);
         }
         .sheet {
           text-shadow: none;

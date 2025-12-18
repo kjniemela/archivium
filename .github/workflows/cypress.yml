@@ -10,7 +10,7 @@ on:
 
 jobs:
   cypress-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     services:
       mysql:
@@ -51,8 +51,7 @@ jobs:
 
       - name: Start server
         run: |
-          npm run editor:build &
-          npm run build &
+          npm run build:all &
           nohup npm start &
           sleep 5
         env:
