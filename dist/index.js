@@ -57,8 +57,10 @@ app.use(express_1.default.json());
 app.use(cookieParser_1.default);
 app.use(auth_1.default.createSession);
 // Configure multer storage
-const storage = multer_1.default.memoryStorage();
-const upload = (0, multer_1.default)({ storage: storage });
+const upload = (0, multer_1.default)({
+    storage: multer_1.default.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
+});
 // Cron Jobs
 node_cron_1.default.schedule('0 0 * * *', () => {
     logger_1.default.info('Running daily DB export...');

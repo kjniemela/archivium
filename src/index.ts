@@ -29,8 +29,10 @@ app.use(CookieParser);
 app.use(Auth.createSession);
 
 // Configure multer storage
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 
 
 // Cron Jobs
