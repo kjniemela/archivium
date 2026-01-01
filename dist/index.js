@@ -59,7 +59,7 @@ app.use(auth_1.default.createSession);
 // Configure multer storage
 const upload = (0, multer_1.default)({
     storage: multer_1.default.memoryStorage(),
-    limits: { fileSize: 5 * 1024 * 1024 },
+    limits: { fileSize: 25 * 1024 * 1024 },
 });
 // Cron Jobs
 node_cron_1.default.schedule('0 0 * * *', () => {

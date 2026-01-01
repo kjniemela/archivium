@@ -20,12 +20,12 @@ block scripts
     include /static/scripts/table.js
   script.
     let firstOpen = true;
-    function editPfp() {
-      const container = document.querySelector('#pdfEditModal');
-      uploadImage('/api/users/#{user.username}/pfp', container, (imageId, imageName) => {
+    async function editPfp() {
+      await uploadImage('/api/users/#{user.username}/pfp', (imageId, imageName) => {
         window.location.reload();
       });
       if (firstOpen) {
+        const container = document.querySelector('#upload-image-modal');
         container.querySelector('input').addEventListener('change', (event) => {
           const file = event.target.files[0];
           const maxSizeInMB = 1;
@@ -55,7 +55,6 @@ block content
           small #{user.hasPfp ? 'Change' : 'Upload'}
         if user.hasPfp
           .material-symbols-outlined.badge.badge-large.clickable(style=({ top: '-0.25rem', right: '-0.25rem'}) onclick='clearPfp()') delete
-        #pdfEditModal
   p.center
     small Joined
       |  #{formatDate(new Date(user.created_at))}
