@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { debounce, deepCompare, T } from '../helpers';
+import { debounce, T } from '../helpers';
+import { deepCompare } from '../../../src/lib/utils';
 
 export interface SaveBtnProps<T> {
   data: T | null;

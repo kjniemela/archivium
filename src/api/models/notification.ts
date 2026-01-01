@@ -52,6 +52,10 @@ enum methods {
   EMAIL,
 };
 
+const methodDict = Object.keys(methods)
+  .filter((x) => Number.isNaN(Number(x)))
+  .reduce((acc, key) => ({ ...acc, [key]: methods[key] }), {});
+
 export class NotificationAPI {
   readonly api: API;
   readonly types = {
@@ -60,7 +64,7 @@ export class NotificationAPI {
     COMMENTS: 'comments',
     FEATURES: 'features',
   } as const;
-  readonly methods = methods;
+  readonly methods = methodDict;
 
   constructor(api: API) {
     this.api = api;

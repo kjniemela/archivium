@@ -51,7 +51,8 @@ block scripts
 
 block content
   h2 #{T('New')} 
-    span#type-header-span #{capitalize(T(`${((universe.obj_data.cats || {})[item_type] || [, 'Missing Category'])[0]}`))}
+    - const type = item_type ? ((universe.obj_data.cats || {})[item_type] || ['Missing Category'])[0] : 'Item';
+    span#type-header-span #{capitalize(T(type))}
     |  for #{universe.title}
   if universe.obj_data.cats
     form(method='POST')

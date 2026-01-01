@@ -10,6 +10,7 @@ const errors_1 = require("../../errors");
 const editor_1 = require("../../lib/editor");
 const tiptapHelpers_1 = require("../../lib/tiptapHelpers");
 const utils_1 = require("../utils");
+const utils_2 = require("../../lib/utils");
 function getQuery(selects = [], permsCond, whereConds, options = {}) {
     const query = new utils_1.QueryBuilder()
         .select('item.id')
@@ -416,15 +417,34 @@ class ItemAPI {
                 .or('item.shortname LIKE ?', `%${options.search}%`)
                 .or('search_tag.tag = ?', options.search)
                 .or('search_tag.tag LIKE ?', `%${options.search}%`)
-                .or(`JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body')) LIKE ?`, `%${options.search}%`);
+                .or(`
+          CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body.text')) AS CHAR CHARACTER SET utf8mb4)
+            COLLATE utf8mb4_general_ci LIKE ?
+        `, `%${options.search}%`);
             whereConds = whereConds.and(searchCond);
-            selects.push([`LOCATE(?, JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body'))) AS match_pos`, undefined, options.search]);
+            selects.push([`
+        LOCATE(
+          ?,
+          CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body.text')) AS CHAR CHARACTER SET utf8mb4)
+            COLLATE utf8mb4_general_ci
+        ) AS match_pos`, undefined, options.search]);
             selects.push([`
           CASE
-            WHEN LOCATE(?, JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body'))) > 0
+            WHEN LOCATE(
+              ?,
+              CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body.text')) AS CHAR CHARACTER SET utf8mb4)
+                COLLATE utf8mb4_general_ci
+            ) > 0
             THEN SUBSTRING(
-              JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body')),
-              GREATEST(1, LOCATE(?, JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body'))) - 50),
+              CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body.text')) AS CHAR CHARACTER SET utf8mb4),
+              GREATEST(
+                1,
+                LOCATE(
+                  ?,
+                  CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body.text')) AS CHAR CHARACTER SET utf8mb4)
+                    COLLATE utf8mb4_general_ci
+                ) - 50
+              ),
               100
             )
             ELSE NULL
@@ -437,7 +457,7 @@ class ItemAPI {
             query.join(...join);
         }
         if (options.search) {
-            query.innerJoin(['tag', 'search_tag'], new utils_1.Cond('search_tag.item_id = item.id'));
+            query.leftJoin(['tag', 'search_tag'], new utils_1.Cond('search_tag.item_id = item.id'));
         }
         const data = await query.execute();
         return data;
@@ -601,6 +621,7 @@ class ItemAPI {
             };
             const itemId = await this.put(user, universeShortname, itemShortname, changes, conn);
             item = await this.getOne(user, { 'item.id': itemId }, utils_1.perms.WRITE);
+            let dataChanged = false;
             // Handle lineage data
             if (body.parents || body.children) {
                 const existingParents = {};
@@ -618,6 +639,7 @@ class ItemAPI {
                     if (!(parent_shortname in existingParents)
                         || existingParents[parent_shortname].parent_label !== parent_label
                         || existingParents[parent_shortname].child_label !== child_label) {
+                        dataChanged = true;
                         await this.putLineage(parent.id, item.id, parent_label ?? null, child_label ?? null, conn);
                     }
                 }
@@ -629,18 +651,21 @@ class ItemAPI {
                     if (!(child_shortname in existingChildren)
                         || existingChildren[child_shortname].parent_label !== parent_label
                         || existingChildren[child_shortname].child_label !== child_label) {
+                        dataChanged = true;
                         await this.putLineage(item.id, child.id, parent_label ?? null, child_label ?? null, conn);
                     }
                 }
                 for (const { parent_shortname } of item.parents) {
                     if (!newParents[parent_shortname]) {
                         const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, parent_shortname, utils_1.perms.WRITE);
+                        dataChanged = true;
                         await this.delLineage(parent.id, item.id, conn);
                     }
                 }
                 for (const { child_shortname } of item.children) {
                     if (!newChildren[child_shortname]) {
                         const child = await this.getByUniverseAndItemShortnames(user, universeShortname, child_shortname, utils_1.perms.WRITE);
+                        dataChanged = true;
                         await this.delLineage(item.id, child.id, conn);
                     }
                 }
@@ -662,6 +687,9 @@ class ItemAPI {
                         await this.updateEvent(event.id, event, conn);
                     }
                     await this.deleteEvents(deletedEvents, conn);
+                    if (newEvents.length > 0 || updatedEvents.length > 0 || deletedEvents.length > 0) {
+                        dataChanged = true;
+                    }
                 }
                 if (myImports) {
                     const imports = await this.fetchImports(item.id);
@@ -680,6 +708,9 @@ class ItemAPI {
                     const deletedImports = imports.filter(ti => !importsMap[ti.event_id]).map(ti => ti.event_id);
                     await this.importEvents(item.id, newImports, conn);
                     await this.deleteImports(item.id, deletedImports, conn);
+                    if (newImports.length > 0 || deletedImports.length > 0) {
+                        dataChanged = true;
+                    }
                 }
             }
             // Handle gallery data
@@ -693,21 +724,27 @@ class ItemAPI {
                 await Promise.all((body.gallery ?? []).map(async (img, i) => {
                     newImages[img.id] = img;
                     if (img.label && oldImages[img.id] && img.label !== oldImages[img.id].label) {
+                        dataChanged = true;
                         await this.image.putLabel(user, img.id, img.label, conn);
                     }
                     if (oldImages[img.id] && i !== oldImages[img.id].idx) {
+                        dataChanged = true;
                         await this.image.putIdx(user, img.id, i, conn);
                     }
                 }));
                 for (const img of existingImages ?? []) {
-                    if (!newImages[img.id])
+                    if (!newImages[img.id]) {
+                        dataChanged = true;
                         await this.image.del(user, img.id, conn);
+                    }
                 }
             }
             // Handle map data
             if (body.map) {
+                dataChanged = true;
                 let mapId;
                 if (body.map.id === null) {
+                    dataChanged = true;
                     mapId = await this.insertMap(item.id, body.map, conn);
                 }
                 else {
@@ -747,6 +784,12 @@ class ItemAPI {
                 for (const locId in deletedLocations) {
                     await this.deleteLocation(Number(locId));
                 }
+                if (newLocations.length > 0 || updatedLocations.length > 0 || Object.keys(deletedLocations).length > 0) {
+                    dataChanged = true;
+                }
+            }
+            if (dataChanged) {
+                this.markUpdated(item.id, conn);
             }
         });
         return item.id;
@@ -909,12 +952,15 @@ class ItemAPI {
           shortname = ?,
           item_type = ?,
           obj_data = ?,
-          updated_at = ?,
           last_updated_by = ?
         WHERE id = ?;
       `;
-            await conn.execute(queryString, [title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), new Date(), user.id, item.id]);
-            this.api.universe.putUpdatedAtWithTransaction(conn, item.universe_id, new Date());
+            await conn.execute(queryString, [title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), user.id, item.id]);
+            if (title !== item.title || shortname !== item.shortname || item_type !== item.item_type ||
+                !(0, utils_2.deepCompare)(objData, JSON.parse(item.obj_data)) || !(0, utils_2.deepCompare)(tags, item.tags)) {
+                this.markUpdated(item.id, conn);
+                this.api.universe.putUpdatedAtWithTransaction(conn, item.universe_id, new Date());
+            }
         };
         if (conn) {
             await doUpdate(conn);
@@ -923,6 +969,9 @@ class ItemAPI {
             await (0, utils_1.withTransaction)(doUpdate);
         }
         return item.id;
+    }
+    async markUpdated(itemId, conn) {
+        await conn.execute('UPDATE item SET updated_at = ? WHERE id = ?', [new Date(), itemId]);
     }
     async putData(user, universeShortname, itemShortname, changes) {
         if (!user)
