@@ -456,9 +456,10 @@ class ItemAPI {
             query.join(...join);
         }
         if (options.search) {
-            query.innerJoin(['tag', 'search_tag'], new utils_1.Cond('search_tag.item_id = item.id'));
+            query.leftJoin(['tag', 'search_tag'], new utils_1.Cond('search_tag.item_id = item.id'));
         }
         const data = await query.execute();
+        console.log(data);
         return data;
     }
     async getByAuthorUsername(user, username, permissionsRequired, options) {

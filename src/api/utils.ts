@@ -244,12 +244,14 @@ export class Cond {
   or(cond?: string | Cond, value?) {
     if (!(cond instanceof Cond)) return this.or(new Cond(cond, value));
     if (cond && !(cond.check || cond instanceof MultiCond)) return this;
+    if (this && !(this.check || this instanceof MultiCond)) return cond;
     return new MultiCond('OR', this, cond);
   }
 
   and(cond?: string | Cond, value?) {
     if (!(cond instanceof Cond)) return this.and(new Cond(cond, value));
     if (cond && !(cond.check || cond instanceof MultiCond)) return this;
+    if (this && !(this.check || this instanceof MultiCond)) return cond;
     return new MultiCond('AND', this, cond);
   }
 
