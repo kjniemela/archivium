@@ -3,7 +3,7 @@ extends ../layout.pug
 block content
   script.
     async function deleteChapter() {
-      const response = await fetch(`/api/stories/#{storyShort}/#{chapter.chapter_number}`, { method: 'DELETE' })
+      const response = await fetch(`/api/stories/#{storyShort}/chapters/#{chapter.chapter_number}`, { method: 'DELETE' })
       if (response.ok) {
         window.location.href = `#{ADDR_PREFIX}/stories/#{storyShort}`;
       } else {

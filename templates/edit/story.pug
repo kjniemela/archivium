@@ -12,16 +12,31 @@ block breadcrumbs
   |  / 
   span #{T('Edit')}
 
+block scripts
+  script
+    include /static/scripts/domUtils.js
+    include /static/scripts/fetchUtils.js
+    include /static/scripts/modal.js
+    include /static/scripts/fileUpload.js
+  script.
+    let firstOpen = true;
+    async function editCover() {
+      await uploadImage('/api/stories/#{story.shortname}/cover', (imageId, imageName) => {
+        window.location.reload();
+      });
+    }
+
+    async function clearCover() {
+      await deleteJSON('/api/stories/#{story.shortname}/cover');
+      window.location.reload();
+    }
+
 block append save
   li#save-btn.navbarBtn
     script.
     a.navbarBtnLink.navbarText(onclick='document.forms.edit.requestSubmit()') #{T('Save Changes')}
 
 block content
-  script
-    include /static/scripts/domUtils.js
-    include /static/scripts/fetchUtils.js
-
   .d-flex.justify-between.align-baseline
     h2 #{T('Edit %s', story.title)}
     a.link.link-animated.color-error(href=`${ADDR_PREFIX}/stories/${story.shortname}`) #{T('Discard Changes')}
@@ -49,6 +64,14 @@ block content
       label.switch
         input(id='drafts_public' name='drafts_public' type='checkbox' checked=Boolean(story.drafts_public))
         span.slider
+
+    .inputGroup
+      .w-100.d-flex.flex-col.gap-1
+        label #{T('Cover Image')}:
+        img.w-100(src=`/api/stories/${story.shortname}/cover`)
+      .d-flex.gap-2
+        button(type='button' onclick='editCover()') Upload Cover
+        button(type='button' onclick='clearCover()') Remove Cover
 
     div
       button(type='submit') #{T('Save Changes')}

@@ -7,6 +7,7 @@ exports.editorExtensions = void 0;
 exports.extractLinkData = extractLinkData;
 exports.shorthandResolver = shorthandResolver;
 const starter_kit_1 = __importDefault(require("@tiptap/starter-kit"));
+const extension_text_align_1 = __importDefault(require("@tiptap/extension-text-align"));
 const Aside_1 = __importDefault(require("./extensions/Aside"));
 const Image_1 = __importDefault(require("./extensions/Image"));
 const Link_1 = __importDefault(require("./extensions/Link"));
@@ -66,5 +67,9 @@ const editorExtensions = (editMode, context) => ([
         context,
     }),
     ToC_1.default.configure({ context }),
+    extension_text_align_1.default.configure({
+        types: ['heading', 'paragraph'],
+        defaultAlignment: 'left',
+    }),
 ]);
 exports.editorExtensions = editorExtensions;

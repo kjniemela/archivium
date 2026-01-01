@@ -45,7 +45,7 @@ block content
           
   hr
 
-  .sheet
+  .sheet(style={ 'max-width': '42rem', 'margin': 'auto' })
     if renderedBody.type === 'html'
       .markdown !{renderedBody.content}
     else
@@ -67,6 +67,6 @@ block content
   -
     const canComment = contextUser && chapter.is_published;
     const canDelete = contextUser && contextUser.id === story.author_id;
-    const apiRoute = `/api/stories/${story.shortname}/${chapter.chapter_number}/comments`;
+    const apiRoute = `/api/stories/${story.shortname}/chapters/${chapter.chapter_number}/comments`;
     const universeShortname = story.universe_short;
   include ../components/comments.pug

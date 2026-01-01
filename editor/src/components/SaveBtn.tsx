@@ -5,7 +5,7 @@ import { debounce, deepCompare, T } from '../helpers';
 export interface SaveBtnProps<T> {
   data: T | null;
   saveUrl: string;
-  previewUrl?: string;
+  previewUrl?: string | ((data: unknown) => string);
   onSave?: (data: T) => void;
 }
 
@@ -36,7 +36,7 @@ export default function SaveBtn<T>({ data, saveUrl, previewUrl, onSave }: SaveBt
     }
   }, [data]);
     
-  async function save(delay: number, callback?: () => void) {
+  async function save(delay: number, callback?: (data?: unknown) => void) {
     if (saveTimeout) {
       clearTimeout(saveTimeout);
     }
@@ -63,16 +63,16 @@ export default function SaveBtn<T>({ data, saveUrl, previewUrl, onSave }: SaveBt
           },
           body: JSON.stringify(data),
         });
-        const err = await response.json();
+        const responseData = await response.json();
         if (!response.ok) {
-          setErrorMessage(err);
-          throw err;
+          setErrorMessage(responseData);
+          throw responseData;
         }
         console.log('SAVED.');
         setSaveText('Saved');
         setPreviousData(saveData);
         setNeedsSaving(false);
-        if (callback) callback();
+        if (callback) callback(responseData);
         if (onSave) onSave(saveData);
       } catch (err) {
         console.error('Failed to save!');
@@ -95,8 +95,12 @@ export default function SaveBtn<T>({ data, saveUrl, previewUrl, onSave }: SaveBt
       saveBtnAnchor,
     )}
     {previewUrl && previewBtnAnchor && createPortal(
-      <a className='navbarBtnLink navbarText' onClick={() => save(0, () => {
-        location.href = previewUrl;
+      <a className='navbarBtnLink navbarText' onClick={() => save(0, (data) => {
+        if (typeof previewUrl === 'string') {
+          location.href = previewUrl;
+        } else {
+          location.href = previewUrl(data);
+        }
       })}>{T('Preview')}</a>,
       previewBtnAnchor,
     )}

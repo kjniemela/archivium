@@ -29,8 +29,10 @@ app.use(CookieParser);
 app.use(Auth.createSession);
 
 // Configure multer storage
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 25 * 1024 * 1024 },
+});
 
 
 // Cron Jobs
@@ -94,12 +96,12 @@ app.get(`${ADDR_PREFIX}/login`, async (req, res, next) => {
       res.sendStatus(500);
     }
   }
-  res.end(render(req, 'login'));
+  res.end(await render(req, 'login'));
   next();
 });
 
-app.get(`${ADDR_PREFIX}/signup`, (req, res, next) => {
-  res.end(render(req, 'signup'));
+app.get(`${ADDR_PREFIX}/signup`, async (req, res, next) => {
+  res.end(await render(req, 'signup'));
   next();
 });
 
@@ -128,11 +130,11 @@ app.post(`${ADDR_PREFIX}/login`, async (req, res, next) => {
         res.redirect(`${ADDR_PREFIX}${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
       } else {
         res.status(401);
-        res.end(render(req, 'login', { error: 'Username or password incorrect.' }));
+        res.end(await render(req, 'login', { error: 'Username or password incorrect.' }));
       }
     } else {
       res.status(401);
-      res.end(render(req, 'login', { error: 'Username or password incorrect.' }));
+      res.end(await render(req, 'login', { error: 'Username or password incorrect.' }));
     }
   } catch (err) {
     logger.error(err);
@@ -165,17 +167,17 @@ app.post(`${ADDR_PREFIX}/signup`, ReCaptcha.verifyReCaptcha, async (req, res, ne
     }
   } catch (err) {
     logger.error(err);
-    res.end(render(req, 'signup', { username: req.body.username, email: req.body.email, error: err }));
+    res.end(await render(req, 'signup', { username: req.body.username, email: req.body.email, error: err }));
   }
   next();
 });
 
 // 404 errors
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   if (!res.headersSent) {
     res.status(404);
     if (req.isApiRequest) res.json({ error: 'Not Found.', code: 404 });
-    else res.send(render(req, 'error', { code: 404 }));
+    else res.send(await render(req, 'error', { code: 404 }));
   }
   next();
 });

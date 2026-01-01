@@ -73,11 +73,11 @@ export default function(app: Express) {
     try {
       if (!res.templateData) throw `Code ${res.statusCode} returned by page handler.`;
       const { template, data } = res.templateData;
-      res.end(render(req, template, data));
+      res.end(await render(req, template, data));
     } catch (err) {
       logger.error(`Error ${res.statusCode} rendered.`);
       logger.error(err);
-      res.end(render(req, 'error', { code: res.statusCode }));
+      res.end(await render(req, 'error', { code: res.statusCode }));
     }
   };
 

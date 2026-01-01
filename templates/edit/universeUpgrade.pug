@@ -62,7 +62,7 @@ block content
           li #{T('Default theme only')}
           li #{T('Image upload limits')}
 
-      - const premiumDisabled = sponsored[tiers.PREMIUM] >= (tierAllowance[contextUser.plan][tiers.PREMIUM] || 0);
+      - const premiumDisabled = (sponsored[tiers.PREMIUM] || 0) >= (tierAllowance[contextUser.plan][tiers.PREMIUM] || 0);
       label.sheet.card(
         style={ display: 'unset', 'grid-column': 'unset' }
         class={ disabled: premiumDisabled }

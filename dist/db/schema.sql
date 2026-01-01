@@ -209,6 +209,13 @@ CREATE TABLE storychaptercomment (
   FOREIGN KEY (comment_id) REFERENCES comment (id)
 );
 
+CREATE TABLE storyimage (
+  story_id INT NOT NULL,
+  image_id INT NOT NULL,
+  FOREIGN KEY (story_id) REFERENCES story (id) ON DELETE CASCADE,
+  FOREIGN KEY (image_id) REFERENCES image (id) ON DELETE CASCADE
+);
+
 CREATE TABLE item (
   id INT NOT NULL AUTO_INCREMENT,
   title VARCHAR(64) NOT NULL,

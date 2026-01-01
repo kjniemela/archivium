@@ -1,11 +1,72 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StoryAPI = void 0;
+exports.StoryAPI = exports.StoryCoverAPI = void 0;
 const utils_1 = require("../utils");
 const errors_1 = require("../../errors");
+const sharp_1 = __importDefault(require("sharp"));
+class StoryCoverAPI {
+    story;
+    constructor(story) {
+        this.story = story;
+    }
+    async getByShortname(user, shortname) {
+        const story = await this.story.getOne(user, { 'story.shortname': shortname });
+        if (!story)
+            throw new errors_1.NotFoundError();
+        let queryString = `
+      SELECT 
+        si.story_id, image.name, image.mimetype, image.data
+      FROM storyimage AS si
+      INNER JOIN image ON image.id = si.image_id
+      WHERE si.story_id = ?;
+    `;
+        const image = (await (0, utils_1.executeQuery)(queryString, [story.id]))[0];
+        return image;
+    }
+    async post(user, file, shortname) {
+        if (!file)
+            throw new errors_1.ValidationError('No file provided');
+        const { originalname, buffer, mimetype } = file;
+        const story = await this.story.getOne(user, { 'story.shortname': shortname }, utils_1.perms.WRITE);
+        const resizedBuffer = await (0, sharp_1.default)(buffer)
+            .resize({
+            width: 512,
+            height: 800,
+            fit: 'cover',
+            withoutEnlargement: true
+        })
+            .jpeg({ quality: 80 })
+            .toBuffer();
+        let data;
+        await (0, utils_1.withTransaction)(async (conn) => {
+            await conn.execute(`
+        DELETE image FROM image
+        INNER JOIN storyimage AS ui ON ui.image_id = image.id
+        WHERE ui.story_id = ?
+      `, [story.id]);
+            [data] = await conn.execute(`INSERT INTO image (name, mimetype, data) VALUES (?, ?, ?)`, [originalname.substring(0, 64), mimetype, resizedBuffer]);
+            await conn.execute(`INSERT INTO storyimage (story_id, image_id) VALUES (?, ?)`, [story.id, data.insertId]);
+        });
+        return data;
+    }
+    async del(user, shortname) {
+        const story = await this.story.getOne(user, { 'story.shortname': shortname }, utils_1.perms.WRITE);
+        return await (0, utils_1.executeQuery)(`
+      DELETE image FROM image
+      INNER JOIN storyimage AS ui ON ui.image_id = image.id
+      WHERE ui.story_id = ?
+    `, [story.id]);
+    }
+}
+exports.StoryCoverAPI = StoryCoverAPI;
 class StoryAPI {
+    cover;
     api;
     constructor(api) {
+        this.cover = new StoryCoverAPI(this);
         this.api = api;
     }
     async getOne(user, conditions, permissionsRequired = utils_1.perms.READ, options = {}) {

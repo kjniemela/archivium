@@ -84,11 +84,17 @@ block content
         option(value='enabled' selected=(universe.discussion_open)) #{T('Anyone')}
         option(value='disabled' selected=(!universe.discussion_open)) #{T('Only with COMMENT permissions')}
 
+    .inputGroup
+      label #{T('Stories enabled')}: 
+      label.switch
+        input#stories-enabled(type='checkbox' onChange='updateStoriesEnabled()' checked=Boolean(universe.obj_data.storiesEnabled))
+        span.slider
+
     if universe.tier >= tiers.PREMIUM
       .inputGroup
         label #{T('Theme')}: 
         select#theme
-          option(value=null selected=(!universe.obj_data.themey)) #{T('None')}
+          option(value=null selected=(!universe.obj_data.theme)) #{T('None')}
           each _, themeKey in themes
             option(value=themeKey selected=(universe.obj_data.theme === themeKey)) #{T(`theme_${themeKey}`)}
 
@@ -113,6 +119,12 @@ block content
     div
       input#obj_data(type='hidden' name='obj_data' value='{}')
       button(type='submit') #{T('Save Changes')}
+
+    script.
+      const storiesEnabled = document.querySelector('#stories-enabled');
+      storiesEnabled.addEventListener('change', () => {
+        updateObjData({ storiesEnabled: storiesEnabled.checked });
+      });
 
     if universe.tier >= tiers.PREMIUM
       script.

@@ -13,6 +13,7 @@ const locale_1 = require("./locale");
 const api_1 = __importDefault(require("./api"));
 const themes_1 = __importDefault(require("./themes"));
 const logger_1 = __importDefault(require("./logger"));
+const errors_1 = require("./errors");
 function universeLink(req, uniShort) {
     const displayUniverse = req.headers['x-subdomain'];
     if (displayUniverse) {
@@ -27,13 +28,13 @@ function universeLink(req, uniShort) {
 }
 exports.systemDisplayModes = ['news'];
 // Basic context information to be sent to the templates
-function contextData(req) {
+async function contextData(req) {
     const user = req.session.user;
     const contextUser = user ? {
         id: user.id,
         username: user.username,
         notifications: user.notifications,
-        plan: user.plan,
+        plan: user.plan ?? utils_1.plans.FREE,
         pfpUrl: (0, utils_1.getPfpUrl)(user),
         maxTier: Math.max(...Object.keys(utils_1.tierAllowance[user.plan ?? utils_1.plans.FREE] || {}).filter(k => k !== 'total').map(k => Number(k))),
     } : null;
@@ -42,13 +43,19 @@ function contextData(req) {
     pageQuery.append('page', req.path);
     if (searchQueries.toString())
         pageQuery.append('search', searchQueries.toString());
+    const displayUniverse = req.headers['x-subdomain'];
+    let contextUniverse = null;
+    if (displayUniverse) {
+        contextUniverse = await api_1.default.universe.getOne(user, { 'universe.shortname': displayUniverse }).catch((0, utils_1.handleAsNull)([errors_1.NotFoundError]));
+    }
     return {
         contextUser,
+        contextUniverse,
         DOMAIN: config_1.DOMAIN,
         ADDR_PREFIX: config_1.ADDR_PREFIX,
         VAPID_PUBLIC_KEY: config_1.VAPID_PUBLIC_KEY,
         encodedPath: pageQuery.toString(),
-        displayUniverse: req.headers['x-subdomain'],
+        displayUniverse,
         systemDisplayModes: exports.systemDisplayModes,
         universeLink: universeLink.bind(null, req),
         searchQueries: searchQueries.toString(),
@@ -114,14 +121,14 @@ const templates = {
     resetPassword: compile('templates/edit/resetPassword.pug'),
     editor: compile('templates/editor.pug'),
 };
-function render(req, template, context = {}) {
+async function render(req, template, context = {}) {
     if (template in templates)
-        return templates[template]({ ...context, ...contextData(req), curTemplate: template });
+        return templates[template]({ ...context, ...(await contextData(req)), curTemplate: template });
     else
         return templates.error({
             code: 404,
             hint: `Template ${template} not found.`,
-            ...contextData(req),
+            ...(await contextData(req)),
             curTemplate: template,
         });
 }
