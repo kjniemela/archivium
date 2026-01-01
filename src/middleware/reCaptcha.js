@@ -22,6 +22,6 @@ export async function verifyReCaptcha(req, res, next) {
       warn('Bot also failed honeypot challenge.');
     }
     res.status(400);
-    res.end(render(req, 'spamblock'));
+    res.end(await render(req, 'spamblock'));
   }
 }

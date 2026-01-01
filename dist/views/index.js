@@ -103,12 +103,12 @@ function default_1(app) {
             if (!res.templateData)
                 throw `Code ${res.statusCode} returned by page handler.`;
             const { template, data } = res.templateData;
-            res.end((0, templates_1.render)(req, template, data));
+            res.end(await (0, templates_1.render)(req, template, data));
         }
         catch (err) {
             logger_1.default.error(`Error ${res.statusCode} rendered.`);
             logger_1.default.error(err);
-            res.end((0, templates_1.render)(req, 'error', { code: res.statusCode }));
+            res.end(await (0, templates_1.render)(req, 'error', { code: res.statusCode }));
         }
     };
     function use(method, path, site, middleware, handler) {

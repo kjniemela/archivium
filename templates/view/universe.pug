@@ -107,7 +107,7 @@ block content
     if universe.discussion_enabled
       li.navbarBtn#bodyBtn(data-tab='discuss')
         h3.navbarBtnLink.navbarText(onclick=`showTab('discuss')`) #{T('Discuss')}
-    if stories.length > 0 || (contextUser && universe.author_permissions[contextUser.id] >= perms.WRITE)
+    if universe.obj_data.storiesEnabled && (stories.length > 0 || (contextUser && universe.author_permissions[contextUser.id] >= perms.WRITE))
       li.navbarBtn#bodyBtn(data-tab='stories')
         h3.navbarBtnLink.navbarText(onclick=`showTab('stories')`) #{T('Stories')}
 

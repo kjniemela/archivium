@@ -112,11 +112,11 @@ app.get(`${config_1.ADDR_PREFIX}/login`, async (req, res, next) => {
             res.sendStatus(500);
         }
     }
-    res.end((0, templates_1.render)(req, 'login'));
+    res.end(await (0, templates_1.render)(req, 'login'));
     next();
 });
-app.get(`${config_1.ADDR_PREFIX}/signup`, (req, res, next) => {
-    res.end((0, templates_1.render)(req, 'signup'));
+app.get(`${config_1.ADDR_PREFIX}/signup`, async (req, res, next) => {
+    res.end(await (0, templates_1.render)(req, 'signup'));
     next();
 });
 app.get(`${config_1.ADDR_PREFIX}/logout`, async (req, res, next) => {
@@ -145,12 +145,12 @@ app.post(`${config_1.ADDR_PREFIX}/login`, async (req, res, next) => {
             }
             else {
                 res.status(401);
-                res.end((0, templates_1.render)(req, 'login', { error: 'Username or password incorrect.' }));
+                res.end(await (0, templates_1.render)(req, 'login', { error: 'Username or password incorrect.' }));
             }
         }
         else {
             res.status(401);
-            res.end((0, templates_1.render)(req, 'login', { error: 'Username or password incorrect.' }));
+            res.end(await (0, templates_1.render)(req, 'login', { error: 'Username or password incorrect.' }));
         }
     }
     catch (err) {
@@ -182,18 +182,18 @@ app.post(`${config_1.ADDR_PREFIX}/signup`, ReCaptcha.verifyReCaptcha, async (req
     }
     catch (err) {
         logger_1.default.error(err);
-        res.end((0, templates_1.render)(req, 'signup', { username: req.body.username, email: req.body.email, error: err }));
+        res.end(await (0, templates_1.render)(req, 'signup', { username: req.body.username, email: req.body.email, error: err }));
     }
     next();
 });
 // 404 errors
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
     if (!res.headersSent) {
         res.status(404);
         if (req.isApiRequest)
             res.json({ error: 'Not Found.', code: 404 });
         else
-            res.send((0, templates_1.render)(req, 'error', { code: 404 }));
+            res.send(await (0, templates_1.render)(req, 'error', { code: 404 }));
     }
     next();
 });

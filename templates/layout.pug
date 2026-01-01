@@ -73,8 +73,9 @@ html(lang='en')
           if !displayUniverse || systemDisplayModes.includes(displayUniverse)
             li.navbarBtn
               a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
-          li.navbarBtn
-            a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/stories`) #{T('Stories')}
+          if !contextUniverse || contextUniverse.obj_data.storiesEnabled
+            li.navbarBtn
+              a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/stories`) #{T('Stories')}
           li.navbarBtn
             a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/items`) #{T('Items')}
           li.navbarBtn

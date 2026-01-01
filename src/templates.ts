@@ -1,12 +1,14 @@
 import pug from 'pug';
 import { Request } from 'express';
 import { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN } from './config';
-import { perms, getPfpUrl, tiers, plans, tierAllowance } from './api/utils';
+import { perms, getPfpUrl, tiers, plans, tierAllowance, handleAsNull } from './api/utils';
 import { locale, lang, sprintf, T } from './locale';
 import api from './api';
 import path from 'path';
 import themes from './themes';
 import logger from './logger';
+import { ParsedUniverse } from './api/models/universe';
+import { NotFoundError } from './errors';
 
 export function universeLink(req: Request, uniShort) {
   const displayUniverse = req.headers['x-subdomain'];
@@ -21,29 +23,36 @@ export function universeLink(req: Request, uniShort) {
 export const systemDisplayModes = ['news'];
 
 // Basic context information to be sent to the templates
-function contextData(req: Request) {
+async function contextData(req: Request) {
   const user = req.session.user;
   const contextUser = user ? {
     id: user.id,
     username: user.username,
     notifications: user.notifications,
-    plan: user.plan,
+    plan: user.plan ?? plans.FREE,
     pfpUrl: getPfpUrl(user),
     maxTier: Math.max(...Object.keys(tierAllowance[user.plan ?? plans.FREE] || {}).filter(k => k !== 'total').map(k => Number(k))),
   } : null;
 
   const searchQueries = new URLSearchParams(req.query as Record<string, string>);
   const pageQuery = new URLSearchParams();
-  pageQuery.append('page', req.path)
-  if (searchQueries.toString()) pageQuery.append('search', searchQueries.toString())
+  pageQuery.append('page', req.path);
+  if (searchQueries.toString()) pageQuery.append('search', searchQueries.toString());
+
+  const displayUniverse = req.headers['x-subdomain'];
+  let contextUniverse: ParsedUniverse | null = null;
+  if (displayUniverse) {
+    contextUniverse = await api.universe.getOne(user, { 'universe.shortname': displayUniverse }).catch(handleAsNull([NotFoundError]));
+  }
 
   return {
     contextUser,
+    contextUniverse,
     DOMAIN,
     ADDR_PREFIX,
     VAPID_PUBLIC_KEY,
     encodedPath: pageQuery.toString(),
-    displayUniverse: req.headers['x-subdomain'],
+    displayUniverse,
     systemDisplayModes,
     universeLink: universeLink.bind(null, req),
     searchQueries: searchQueries.toString(),
@@ -121,12 +130,12 @@ const templates = {
   editor: compile('templates/editor.pug'),
 };
 
-export function render(req: Request, template, context = {}) {
-  if (template in templates) return templates[template]({ ...context, ...contextData(req), curTemplate: template });
+export async function render(req: Request, template, context = {}) {
+  if (template in templates) return templates[template]({ ...context, ...(await contextData(req)), curTemplate: template });
   else return templates.error({
     code: 404,
     hint: `Template ${template} not found.`,
-    ...contextData(req),
+    ...(await contextData(req)),
     curTemplate: template,
   });
 }
