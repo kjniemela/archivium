@@ -46,7 +46,7 @@ export async function tryRenderContent(req: Request, content: unknown, universeS
         iframe: ['src'],
         h1: ['id', 'style'], h2: ['id', 'style'], h3: ['id', 'style'],
         h4: ['id', 'style'], h5: ['id', 'style'], h6: ['id', 'style'],
-        p: ['style']
+        p: ['style'],
       },
       disallowedTagsMode: 'escape',
       allowedClasses: {

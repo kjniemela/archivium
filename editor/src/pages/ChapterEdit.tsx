@@ -86,7 +86,10 @@ export default function ChapterEdit({ universeLink }: ItemEditProps) {
     <>
       {/* Editor Page */}
       <div className='d-flex justify-between align-baseline'>
-        <h2>{T('Edit %s', chapter.title)}</h2>
+        <div className='d-flex align-baseline gap-1'>
+          <h2>{T('Edit %s', chapter.title)}</h2>
+          {!chapter.is_published && (<span>(Draft)</span>)}
+        </div>
         <a className='link link-animated color-error' href={`/stories/${story.shortname}/${chapter.chapter_number}`}>{T('Discard Changes')}</a>
       </div>
       <div id='edit' className='form-row-group'>
@@ -98,26 +101,20 @@ export default function ChapterEdit({ universeLink }: ItemEditProps) {
         </div>
 
         <div className='inputGroup'>
-          <label htmlFor='comments'>{T('Published')}:</label>
-          <label className='switch'>
-            <input id='comments' name='comments' type='checkbox' checked={chapter.is_published} onChange={({ target }) =>
-              setChapter({ ...chapter, is_published: target.checked })
-            } />
-            <span className='slider'></span>
+          <label style={{ gridColumn: '2 / 3' }}>
+            <button className='big-text' onClick={() => setChapter({ ...chapter, is_published: !chapter.is_published })}>
+              {chapter.is_published ? T('Unpublish') : T('Publish')} {T('Chapter')}
+            </button>
           </label>
-        </div>
-
-        <div className='inputGroup'>
-          <small style={{ gridColumn: '2 / 4' }}>
-            <i>{T('NOTE: other users currently editing this item will be unable to save their work. Change with caution.')}</i>
-          </small>
         </div>
 
         <div className='mt-2'>
           <SaveBtn<Chapter>
             data={chapter}
             saveUrl={`/api/stories/${story.shortname}/chapters/${chapter.chapter_number}`}
-            previewUrl={`/stories/${story.shortname}/${chapter.chapter_number}`}
+            previewUrl={(data: unknown) => (
+              `/stories/${story.shortname}/${Number(data)}`
+            )}
           />
         </div>
 
