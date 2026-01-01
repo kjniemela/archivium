@@ -259,10 +259,10 @@ block content
                 b #{T('Last activity')}: 
                 | #{formatDate(thread.last_activity)}
     .hidden( data-tab='stories' )
-      .card-list.mt-3
+      .story-list.mt-3
         if contextUser && universe.author_permissions[contextUser.id] >= perms.WRITE
           .card.sheet(data-goto=`${ADDR_PREFIX}/stories/create`)
-            .d-flex.justify-center(style={ 'grid-column': '1 / 4' })
+            .d-flex.justify-center(style={ 'grid-column': '1 / 3' })
               a.link.d-flex.justify-center(href=`${ADDR_PREFIX}/stories/create`)
                 .navbarText.material-symbols-outlined.heavy.ma-0.pa-1.pr-0.grow-0(style={ 'font-size': '1.5rem' }) add
                 .big-text.navbarText.pa-1.grow-0 #{T('New Story')}
