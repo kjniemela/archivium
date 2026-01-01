@@ -31,6 +31,10 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         isHeading4: ctx.editor.isActive('heading', { level: 4 }) ?? false,
         isHeading5: ctx.editor.isActive('heading', { level: 5 }) ?? false,
         isHeading6: ctx.editor.isActive('heading', { level: 6 }) ?? false,
+        alignedLeft: editor.isActive({ textAlign: 'left' }) ?? true,
+        alignedCenter: editor.isActive({ textAlign: 'center' }) ?? false,
+        alignedRight: editor.isActive({ textAlign: 'right' }) ?? false,
+        alignedJustify: editor.isActive({ textAlign: 'justify' }) ?? false,
         isLink: ctx.editor.isActive('link') ?? false,
         isBulletList: ctx.editor.isActive('bulletList') ?? false,
         isOrderedList: ctx.editor.isActive('orderedList') ?? false,
@@ -207,6 +211,38 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
         title={T('Heading 6')}
       >
         format_h6
+      </button>
+      <button
+        onMouseDown={e => e.preventDefault()}
+        onClick={() => editor.chain().focus().setTextAlign('left').run()}
+        className={`material-symbols-outlined ${editorState.alignedLeft ? 'is-active' : ''}`}
+        title={T('Align Left')}
+      >
+        format_align_left
+      </button>
+      <button
+        onMouseDown={e => e.preventDefault()}
+        onClick={() => editor.chain().focus().setTextAlign('center').run()}
+        className={`material-symbols-outlined ${editorState.alignedCenter ? 'is-active' : ''}`}
+        title={T('Align Center')}
+      >
+        format_align_center
+      </button>
+      <button
+        onMouseDown={e => e.preventDefault()}
+        onClick={() => editor.chain().focus().setTextAlign('right').run()}
+        className={`material-symbols-outlined ${editorState.alignedRight ? 'is-active' : ''}`}
+        title={T('Align Right')}
+      >
+        format_align_right
+      </button>
+      <button
+        onMouseDown={e => e.preventDefault()}
+        onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+        className={`material-symbols-outlined ${editorState.alignedJustify ? 'is-active' : ''}`}
+        title={T('Align Justify')}
+      >
+        format_align_justify
       </button>
       <button
         onMouseDown={e => e.preventDefault()}

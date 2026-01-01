@@ -42,7 +42,9 @@ async function tryRenderContent(req, content, universeShortname) {
                 ...sanitize_html_1.default.defaults.allowedAttributes,
                 img: ['src', 'alt', 'title', 'width', 'height'],
                 iframe: ['src'],
-                h1: ['id'], h2: ['id'], h3: ['id'], h4: ['id'], h5: ['id'], h6: ['id'],
+                h1: ['id', 'style'], h2: ['id', 'style'], h3: ['id', 'style'],
+                h4: ['id', 'style'], h5: ['id', 'style'], h6: ['id', 'style'],
+                p: ['style']
             },
             disallowedTagsMode: 'escape',
             allowedClasses: {

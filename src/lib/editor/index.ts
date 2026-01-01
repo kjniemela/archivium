@@ -1,4 +1,5 @@
 import StarterKit from '@tiptap/starter-kit';
+import TextAlign from '@tiptap/extension-text-align';
 import Aside from './extensions/Aside';
 import Image from './extensions/Image';
 import Link, { ResolveResult } from './extensions/Link';
@@ -79,4 +80,8 @@ export const editorExtensions = (editMode: boolean, context?: TiptapContext) => 
     context,
   }),
   ToC.configure({ context }),
+  TextAlign.configure({
+    types: ['heading', 'paragraph'],
+    defaultAlignment: 'left',
+  }),
 ]);
