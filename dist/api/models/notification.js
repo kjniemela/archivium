@@ -17,6 +17,9 @@ var methods;
     methods[methods["EMAIL"] = 2] = "EMAIL";
 })(methods || (methods = {}));
 ;
+const methodDict = Object.keys(methods)
+    .filter((x) => Number.isNaN(Number(x)))
+    .reduce((acc, key) => ({ ...acc, [key]: methods[key] }), {});
 class NotificationAPI {
     api;
     types = {
@@ -25,7 +28,7 @@ class NotificationAPI {
         COMMENTS: 'comments',
         FEATURES: 'features',
     };
-    methods = methods;
+    methods = methodDict;
     constructor(api) {
         this.api = api;
     }
