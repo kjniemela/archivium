@@ -417,30 +417,30 @@ class ItemAPI {
                 .or('search_tag.tag = ?', options.search)
                 .or('search_tag.tag LIKE ?', `%${options.search}%`)
                 .or(`
-          CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body')) AS CHAR CHARACTER SET utf8mb4)
+          CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body.text')) AS CHAR CHARACTER SET utf8mb4)
             COLLATE utf8mb4_general_ci LIKE ?
         `, `%${options.search}%`);
             whereConds = whereConds.and(searchCond);
             selects.push([`
         LOCATE(
           ?,
-          CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body')) AS CHAR CHARACTER SET utf8mb4)
+          CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body.text')) AS CHAR CHARACTER SET utf8mb4)
             COLLATE utf8mb4_general_ci
         ) AS match_pos`, undefined, options.search]);
             selects.push([`
           CASE
             WHEN LOCATE(
               ?,
-              CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body')) AS CHAR CHARACTER SET utf8mb4)
+              CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body.text')) AS CHAR CHARACTER SET utf8mb4)
                 COLLATE utf8mb4_general_ci
             ) > 0
             THEN SUBSTRING(
-              CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body')) AS CHAR CHARACTER SET utf8mb4),
+              CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body.text')) AS CHAR CHARACTER SET utf8mb4),
               GREATEST(
                 1,
                 LOCATE(
                   ?,
-                  CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body')) AS CHAR CHARACTER SET utf8mb4)
+                  CAST(JSON_UNQUOTE(JSON_EXTRACT(item.obj_data, '$.body.text')) AS CHAR CHARACTER SET utf8mb4)
                     COLLATE utf8mb4_general_ci
                 ) - 50
               ),
