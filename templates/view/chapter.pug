@@ -45,7 +45,7 @@ block content
           
   hr
 
-  .sheet
+  .sheet(style={ 'max-width': '42rem', 'margin': 'auto' })
     if renderedBody.type === 'html'
       .markdown !{renderedBody.content}
     else
