@@ -602,7 +602,6 @@ export class ItemAPI {
       query.leftJoin(['tag', 'search_tag'], new Cond('search_tag.item_id = item.id'));
     }
     const data = await query.execute() as BasicItem[];
-    console.log(data)
 
     return data;
   }
