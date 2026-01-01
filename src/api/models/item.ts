@@ -6,6 +6,7 @@ import { extractLinkData, LinkData } from '../../lib/editor';
 import { IndexedDocument, indexedToJson, updateLinks } from '../../lib/tiptapHelpers';
 import { BaseOptions, Cond, executeQuery, handleAsNull, parseData, perms, QueryBuilder, tierLimits, withTransaction } from '../utils';
 import { User } from './user';
+import { deepCompare } from '../../lib/utils';
 
 export type ItemOptions = BaseOptions & {
   type?: string,
@@ -788,6 +789,8 @@ export class ItemAPI {
 
       item = await this.getOne(user, { 'item.id': itemId }, perms.WRITE);
 
+      let dataChanged = false;
+      
       // Handle lineage data
       if (body.parents || body.children) {
         const existingParents: { [key: string]: Parent } = {};
@@ -804,6 +807,7 @@ export class ItemAPI {
             || existingParents[parent_shortname].parent_label !== parent_label
             || existingParents[parent_shortname].child_label !== child_label
           ) {
+            dataChanged = true;
             await this.putLineage(parent.id, item.id, parent_label ?? null, child_label ?? null, conn);
           }
         }
@@ -816,18 +820,21 @@ export class ItemAPI {
             || existingChildren[child_shortname].parent_label !== parent_label
             || existingChildren[child_shortname].child_label !== child_label
           ) {
+            dataChanged = true;
             await this.putLineage(item.id, child.id, parent_label ?? null, child_label ?? null, conn);
           }
         }
         for (const { parent_shortname } of item.parents) {
           if (!newParents[parent_shortname]) {
             const parent = await this.getByUniverseAndItemShortnames(user, universeShortname, parent_shortname, perms.WRITE);
+            dataChanged = true;
             await this.delLineage(parent.id, item.id, conn);
           }
         }
         for (const { child_shortname } of item.children) {
           if (!newChildren[child_shortname]) {
             const child = await this.getByUniverseAndItemShortnames(user, universeShortname, child_shortname, perms.WRITE);
+            dataChanged = true;
             await this.delLineage(item.id, child.id, conn);
           }
         }
@@ -852,6 +859,9 @@ export class ItemAPI {
             await this.updateEvent(event.id, event, conn);
           }
           await this.deleteEvents(deletedEvents, conn);
+          if (newEvents.length > 0 || updatedEvents.length > 0 || deletedEvents.length > 0) {
+            dataChanged = true;
+          }
         }
 
         if (myImports) {
@@ -870,6 +880,9 @@ export class ItemAPI {
           const deletedImports = imports.filter(ti => !importsMap[ti.event_id]).map(ti => ti.event_id);
           await this.importEvents(item.id, newImports, conn);
           await this.deleteImports(item.id, deletedImports, conn);
+          if (newImports.length > 0 || deletedImports.length > 0) {
+            dataChanged = true;
+          }
         }
       }
 
@@ -884,21 +897,28 @@ export class ItemAPI {
         await Promise.all((body.gallery ?? []).map(async (img, i) => {
           newImages[img.id] = img;
           if (img.label && oldImages[img.id] && img.label !== oldImages[img.id].label) {
+            dataChanged = true;
             await this.image.putLabel(user, img.id, img.label, conn);
           }
           if (oldImages[img.id] && i !== oldImages[img.id].idx) {
+            dataChanged = true;
             await this.image.putIdx(user, img.id, i, conn);
           }
         }));
         for (const img of existingImages ?? []) {
-          if (!newImages[img.id]) await this.image.del(user, img.id, conn);
+          if (!newImages[img.id]) {
+            dataChanged = true;
+            await this.image.del(user, img.id, conn);
+          }
         }
       }
 
       // Handle map data
       if (body.map) {
+        dataChanged = true;
         let mapId: number;
         if (body.map.id === null) {
+          dataChanged = true;
           mapId = await this.insertMap(item.id, body.map, conn);
         } else {
           mapId = body.map.id;
@@ -938,6 +958,13 @@ export class ItemAPI {
         for (const locId in deletedLocations) {
           await this.deleteLocation(Number(locId));
         }
+        if (newLocations.length > 0 || updatedLocations.length > 0 || Object.keys(deletedLocations).length > 0) {
+          dataChanged = true;
+        }
+      }
+
+      if (dataChanged) {
+        this.markUpdated(item.id, conn);
       }
     });
 
@@ -1111,14 +1138,19 @@ export class ItemAPI {
           shortname = ?,
           item_type = ?,
           obj_data = ?,
-          updated_at = ?,
           last_updated_by = ?
         WHERE id = ?;
       `;
 
-      await conn.execute(queryString, [title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), new Date(), user.id, item.id]);
+      await conn.execute(queryString, [title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(objData), user.id, item.id]);
 
-      this.api.universe.putUpdatedAtWithTransaction(conn, item.universe_id, new Date());
+      if (
+        title !== item.title || shortname !== item.shortname || item_type !== item.item_type ||
+        !deepCompare(objData, JSON.parse(item.obj_data as string)) || !deepCompare(tags, item.tags)
+      ) {
+        this.markUpdated(item.id, conn);
+        this.api.universe.putUpdatedAtWithTransaction(conn, item.universe_id, new Date());
+      }
     };
 
     if (conn) {
@@ -1128,6 +1160,10 @@ export class ItemAPI {
     }
 
     return item.id;
+  }
+
+  async markUpdated(itemId: number, conn: PoolConnection): Promise<void> {
+    await conn.execute('UPDATE item SET updated_at = ? WHERE id = ?', [new Date(), itemId]);
   }
 
   async putData(user: User | undefined, universeShortname: string, itemShortname: string, changes): Promise<ResultSetHeader> {
