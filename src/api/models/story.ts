@@ -1,9 +1,17 @@
 import { BaseOptions, executeQuery, parseData, perms, withTransaction } from '../utils';
 import { API } from '..';
 import { User } from './user';
-import { ResultSetHeader } from 'mysql2/promise';
+import { PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
 import { IndexedDocument } from '../../lib/tiptapHelpers';
+import sharp from 'sharp';
+
+export type StoryCover = {
+  user_id: number,
+  name: string,
+  mimetype: string,
+  data: Buffer,
+};
 
 export type Story = {
   id: number,
@@ -36,10 +44,80 @@ export type Chapter = {
   updated_at: Date,
 };
 
+export class StoryCoverAPI {
+  readonly story: StoryAPI;
+
+  constructor(story: StoryAPI) {
+    this.story = story;
+  }
+
+  async getByShortname(user: User | undefined, shortname: string): Promise<StoryCover | undefined> {
+    const story = await this.story.getOne(user, { 'story.shortname': shortname });
+    if (!story) throw new NotFoundError();
+    let queryString = `
+      SELECT 
+        si.story_id, image.name, image.mimetype, image.data
+      FROM storyimage AS si
+      INNER JOIN image ON image.id = si.image_id
+      WHERE si.story_id = ?;
+    `;
+    const image = (await executeQuery(queryString, [story.id]))[0] as StoryCover | undefined;
+    return image;
+  }
+
+  async post(user: User | undefined, file: Express.Multer.File | undefined, shortname: string): Promise<ResultSetHeader> {
+    if (!file) throw new ValidationError('No file provided');
+
+    const { originalname, buffer, mimetype } = file;
+    const story = await this.story.getOne(user, { 'story.shortname': shortname }, perms.WRITE);
+    
+    const resizedBuffer = await sharp(buffer)
+      .resize({
+        width: 512,
+        height: 800,
+        fit: 'cover',
+        withoutEnlargement: true
+      })
+      .jpeg({ quality: 80 })
+      .toBuffer();
+
+    let data!: ResultSetHeader;
+    await withTransaction(async (conn: PoolConnection) => {
+      await conn.execute(`
+        DELETE image FROM image
+        INNER JOIN storyimage AS ui ON ui.image_id = image.id
+        WHERE ui.story_id = ?
+      `, [story.id]);
+
+      [data] = await conn.execute<ResultSetHeader>(
+        `INSERT INTO image (name, mimetype, data) VALUES (?, ?, ?)`,
+        [originalname.substring(0, 64), mimetype, resizedBuffer],
+      );
+
+      await conn.execute<ResultSetHeader>(
+        `INSERT INTO storyimage (story_id, image_id) VALUES (?, ?)`,
+        [story.id, data.insertId],
+      );
+    });
+    return data;
+  }
+
+  async del(user: User | undefined, shortname: string): Promise<ResultSetHeader> {
+    const story = await this.story.getOne(user, { 'story.shortname': shortname }, perms.WRITE);
+    return await executeQuery<ResultSetHeader>(`
+      DELETE image FROM image
+      INNER JOIN storyimage AS ui ON ui.image_id = image.id
+      WHERE ui.story_id = ?
+    `, [story.id]);
+  }
+}
+
 export class StoryAPI {
+  readonly cover: StoryCoverAPI;
   readonly api: API;
 
   constructor(api: API) {
+    this.cover = new StoryCoverAPI(this);
     this.api = api;
   }
 

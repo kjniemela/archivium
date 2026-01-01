@@ -43,7 +43,7 @@ export default function ChapterEdit({ universeLink }: ItemEditProps) {
   });
 
   useEffect(() => {
-    fetchData(`/api/stories/${storyShort}/${chapterIndex}`, async (chapterData: Chapter) => {
+    fetchData(`/api/stories/${storyShort}/chapters/${chapterIndex}`, async (chapterData: Chapter) => {
       const storyData = await fetchAsync(`/api/stories/${storyShort}`) as Story;
       if (chapterData.body) {
         const links: LinkData[] = [];
@@ -116,7 +116,7 @@ export default function ChapterEdit({ universeLink }: ItemEditProps) {
         <div className='mt-2'>
           <SaveBtn<Chapter>
             data={chapter}
-            saveUrl={`/api/stories/${story.shortname}/${chapter.chapter_number}`}
+            saveUrl={`/api/stories/${story.shortname}/chapters/${chapter.chapter_number}`}
             previewUrl={`/stories/${story.shortname}/${chapter.chapter_number}`}
           />
         </div>

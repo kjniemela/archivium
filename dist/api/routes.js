@@ -149,11 +149,29 @@ function default_1(app, upload) {
                 PUT: (req) => _1.default.story.put(req.session.user, req.params.shortname, req.body),
                 DELETE: (req) => _1.default.story.del(req.session.user, req.params.shortname),
             }, [
-                new APIRoute('/:index', {
-                    GET: (req) => _1.default.story.getChapter(req.session.user, req.params.shortname, Number(req.params.index)),
-                    PUT: (req) => _1.default.story.putChapter(req.session.user, req.params.shortname, Number(req.params.index), req.body),
-                    DELETE: (req) => _1.default.story.delChapter(req.session.user, req.params.shortname, Number(req.params.index)),
-                }, []),
+                new APIRoute('/cover', {
+                    GET: (req, res) => _1.default.story.cover.getByShortname(req.session.user, req.params.shortname).then((image) => {
+                        if (!image)
+                            return;
+                        res.contentType(image.mimetype);
+                        if (req.query.download === '1')
+                            res.setHeader('Content-Disposition', `attachment; filename="${image.name}"`);
+                        return image?.data;
+                    }),
+                    DELETE: (req) => _1.default.story.cover.del(req.session.user, req.params.shortname),
+                }, [
+                    new APIRoute('/upload', {
+                        middleware: [upload.single('image')],
+                        POST: (req) => _1.default.story.cover.post(req.session.user, req.file, req.params.shortname),
+                    }),
+                ]),
+                new APIRoute('/chapters', {}, [
+                    new APIRoute('/:index', {
+                        GET: (req) => _1.default.story.getChapter(req.session.user, req.params.shortname, Number(req.params.index)),
+                        PUT: (req) => _1.default.story.putChapter(req.session.user, req.params.shortname, Number(req.params.index), req.body),
+                        DELETE: (req) => _1.default.story.delChapter(req.session.user, req.params.shortname, Number(req.params.index)),
+                    }, []),
+                ]),
             ]),
         ]),
         new APIRoute('/universes', {
