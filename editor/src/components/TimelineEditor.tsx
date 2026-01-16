@@ -187,7 +187,12 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
           <div className='modal' onClick={() => setImportEventModal(false)}>
             <div className='modal-content' onClick={(e) => e.stopPropagation()}>
               <div id='import-event' className='sheet d-flex flex-col gap-1'>
-                <SearchableSelect id='import-event-item' options={importItemOptions} onSelect={(id) => setImportItem(Number(id))} />
+                <SearchableSelect
+                  id='import-event-item'
+                  value={String(importItem) ?? undefined}
+                  options={importItemOptions}
+                  onSelect={(id) => setImportItem(Number(id))}
+                />
                 {importItem !== null && <SearchableSelect
                   id='import-event-event'
                   options={eventItemMap[importItem].reduce((acc, [,,, eventTitle]) => ({ ...acc, [eventTitle]: eventTitle || T('Default') }), {})}

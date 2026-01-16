@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 type SearchableSelectProps = {
   id?: string,
@@ -28,7 +28,8 @@ export default function SearchableSelect({ id, value, options, onSelect, groups,
   }
 
   const createOption = (key: string | null) => {
-    return <div key={key} className='option' onClick={() => {
+    return <div key={key} className='option' onMouseDown={(e) => {
+      e.stopPropagation();
       onSelect(key);
       setDropdownVisible(false);
     }}>{key === null ? clearText : options[key]}</div>;
@@ -36,7 +37,7 @@ export default function SearchableSelect({ id, value, options, onSelect, groups,
   
   return <div id={id} className='searchable-select'>
     <input
-      value={dropdownVisible ? searchText : value && options[value]}
+      value={dropdownVisible ? searchText : value && options[value] || ''}
       onChange={({ target }) => setSearchText(target.value)}
       onFocus={() => setDropdownVisible(true)}
       onBlur={() => setTimeout(() => setDropdownVisible(false), 100)} // Timeout to allow click event to register

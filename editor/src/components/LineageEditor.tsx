@@ -46,6 +46,7 @@ export default function LineageEditor({ item, categories, onUpdate, itemMap }: L
         parent_label: newParentOtherLabel,
       });
     }
+    setNewParent(null);
     onUpdate(newState);
   };
 
@@ -64,6 +65,7 @@ export default function LineageEditor({ item, categories, onUpdate, itemMap }: L
         child_label: newChildOtherLabel,
       });
     }
+    setNewChild(null);
     onUpdate(newState);
   };
 
@@ -93,6 +95,7 @@ export default function LineageEditor({ item, categories, onUpdate, itemMap }: L
     <div>
       <button onClick={addParent}>{T('Add New Parent')}</button>
       <SearchableSelect
+        value={newParent ?? undefined}
         options={itemTitles}
         onSelect={setNewParent}
         groups={itemTypes}
@@ -112,6 +115,7 @@ export default function LineageEditor({ item, categories, onUpdate, itemMap }: L
     <div>
       <button onClick={addChild}>{T('Add New Child')}</button>
       <SearchableSelect
+        value={newChild ?? undefined}
         options={itemTitles}
         onSelect={setNewChild}
         groups={itemTypes}
