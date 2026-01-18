@@ -12,15 +12,15 @@ export type FamilyTreeLayout = {
   },
 };
 
-function _layoutDown(start: string, family: Family): FamilyTreeLayout {
+function _layoutDown(start: string, family: Family, height = 0): FamilyTreeLayout {
   const tree: FamilyTreeLayout = {
     width: 0,
-    members: { [start]: { row: 0, col: 0 } },
+    members: { [start]: { row: height, col: 0 } },
   };
 
   const childTrees: FamilyTreeLayout[] = [];
   for (const { child_shortname } of family[start].children) {
-    const childTree = _layoutDown(child_shortname, family);
+    const childTree = _layoutDown(child_shortname, family, height + 1);
     tree.width += childTree.width;
     childTrees.push(childTree);
   }
@@ -34,7 +34,6 @@ function _layoutDown(start: string, family: Family): FamilyTreeLayout {
     }
   }
   const startGenWidth = 2 + Object.keys(spouses).length * 2;
-  console.log(spouses)
 
   let offset = Math.max(0, startGenWidth - tree.width) / 2;
   for (const childTree of childTrees) {
@@ -42,7 +41,6 @@ function _layoutDown(start: string, family: Family): FamilyTreeLayout {
       childTree.members[member].col += offset;
       if (childTree.members[member].cStart !== undefined) childTree.members[member].cStart += offset;
       if (childTree.members[member].cEnd !== undefined) childTree.members[member].cEnd += offset;
-      childTree.members[member].row += 1;
     }
     offset += childTree.width;
     tree.members = { ...tree.members, ...childTree.members };
@@ -54,7 +52,7 @@ function _layoutDown(start: string, family: Family): FamilyTreeLayout {
   for (const spouse in spouses) {
     i++;
     tree.members[spouse] = {
-      row: 0,
+      row: height,
       col: tree.members[start].col + i*2,
     };
   }
@@ -72,15 +70,149 @@ function _layoutDown(start: string, family: Family): FamilyTreeLayout {
     tree.members[start].cEnd = cEnd;
   }
 
-  console.log(tree)
   return tree;
 }
 
+function _layoutUp(start: string, family: Family, height = 0): FamilyTreeLayout {
+  const tree: FamilyTreeLayout = {
+    width: 0,
+    members: { [start]: { row: height, col: 0 } },
+  };
+
+  const parentTrees: FamilyTreeLayout[] = [];
+  for (const { parent_shortname } of family[start].parents) {
+    const parentTree = _layoutUp(parent_shortname, family, height - 1);
+    tree.width += parentTree.width;
+    parentTrees.push(parentTree);
+  }
+
+  let offset = 0;
+  let leastRow = 0;
+  for (const parentTree of parentTrees) {
+    for (const member in parentTree.members) {
+      parentTree.members[member].col += offset;
+      // if (childTree.members[member].cStart !== undefined) childTree.members[member].cStart += offset;
+      // if (childTree.members[member].cEnd !== undefined) childTree.members[member].cEnd += offset;
+      leastRow = Math.min(leastRow, parentTree.members[member].row);
+    }
+    offset += parentTree.width;
+    tree.members = { ...tree.members, ...parentTree.members };
+  }
+
+  tree.width = Math.max(2, tree.width);
+  tree.members[start].col += tree.width / 2;
+
+  return tree;
+}
+
+function _joinTrees(treeA: FamilyTreeLayout, treeB: FamilyTreeLayout): FamilyTreeLayout {
+  for (const member in treeB.members) {
+    treeB.members[member].col += treeA.width;
+      if (treeB.members[member].cStart !== undefined) treeB.members[member].cStart += treeA.width;
+      if (treeB.members[member].cEnd !== undefined) treeB.members[member].cEnd += treeA.width;
+  }
+
+  return { 
+    width: treeA.width + treeB.width,
+    members: {
+      ...treeA.members,
+      ...treeB.members,
+    }
+  };
+}
+
+function _addParents(tree: FamilyTreeLayout, parents: string[], children: string[]): void {
+  if (parents.length === 0 || children.length === 0) return;
+  const cols: number[] = [];
+  for (const child of children) {
+    cols.push(tree.members[child].col);
+  }
+  const childRow = tree.members[children[0]].row;
+  const minCol = Math.min(...cols);
+  const maxCol = Math.max(...cols);
+  const avgCol = Math.floor((minCol + maxCol) / 2);
+
+  let offset = (avgCol - (parents.length - 1));
+  tree.members[parents[0]] = {
+    row: childRow - 1,
+    col: offset,
+    cStart: minCol,
+    cEnd: maxCol,
+  };
+  for (const parent of parents.slice(1)) {
+    offset += 2;
+    tree.members[parent] = {
+      row: childRow - 1,
+      col: offset,
+    };
+  }
+}
+
 export function layoutFamilyTree(start: string, family: Family): FamilyTreeLayout {
-  const tree: FamilyTreeLayout = { width: 0, members: {} };
+  // Fetch descendants
+  let tree = _layoutDown(start, family);
 
-  // First our own width downwards
-  const me = _layoutDown(start, family);
+  // Fetch two parents and two sets of two grandparents
+  // If more than two, select the two with the longest lineage
+  const parents = family[start].parents.map(({ parent_shortname }): [[string, [string, FamilyTreeLayout][]], number] => {
+    const grandparents = family[parent_shortname].parents.map(({ parent_shortname }): [[string, FamilyTreeLayout], number] => {
+      const grandparentTree = _layoutUp(parent_shortname, family);
+      const leastRow = Math.min(...Object.values(grandparentTree.members).map(({ row }) => row));
+      return [[parent_shortname, grandparentTree], -leastRow];
+    }).sort((a, b) => a[1] - b[1]).slice(0, 2);
+    return [[parent_shortname, grandparents.map(gp => gp[0])], Math.max(...grandparents.map(gp => gp[1]))];
+  }).sort((a, b) => a[1] - b[1]).slice(0, 2).map(parent => parent[0]);
 
-  return me;
+  // Fetch sibling descendants
+  const siblingTrees = {};
+  const parentShorts = family[start].parents.map(({ parent_shortname }) => parent_shortname);
+  if (parentShorts.length > 0) {
+    const childShorts: string[] = [];
+    for (const parent of parentShorts) {
+      for (const { child_shortname } of family[parent].children) {
+        if (child_shortname in siblingTrees || child_shortname === start) continue;
+        childShorts.push(child_shortname);
+        siblingTrees[child_shortname] = true;
+        tree = _joinTrees(tree, _layoutDown(child_shortname, family));
+      }
+    }
+    _addParents(tree, parentShorts, [start, ...childShorts]);
+  }
+
+  const uaTrees = {};
+  // Fetch uncle/aunt descendants from the left side of the tree
+  if (parents[0]) {
+    const lhChildren: string[] = [];
+    for (const { parent_shortname } of family[parents[0][0]].parents) {
+      for (const { child_shortname } of family[parent_shortname].children) {
+        if (child_shortname in uaTrees || child_shortname === parents[0][0]) continue;
+        lhChildren.push(child_shortname);
+        uaTrees[child_shortname] = true;
+        tree = _joinTrees(_layoutDown(child_shortname, family, -1), tree);
+      }
+    }
+    _addParents(tree, parents[0][1].map(t => t[0]), [parents[0][0], ...lhChildren]);
+  }
+
+  // And the right side
+  if (parents[1]) {
+    const rhChildren: string[] = [];
+    for (const { parent_shortname } of family[parents[1][0]].parents) {
+      for (const { child_shortname } of family[parent_shortname].children) {
+        if (child_shortname in uaTrees || child_shortname === parents[1][0]) continue;
+        rhChildren.push(child_shortname);
+        uaTrees[child_shortname] = true;
+        tree = _joinTrees(tree, _layoutDown(child_shortname, family, -1));
+      }
+    }
+    _addParents(tree, parents[1][1].map(t => t[0]), [parents[1][0], ...rhChildren]);
+  }
+
+  const leastRow = Math.min(...Object.values(tree.members).map(({ row }) => row));
+
+  for (const member in tree.members) {
+    tree.members[member].row += -leastRow;
+  }
+
+  return tree;
 }
