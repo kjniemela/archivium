@@ -191,20 +191,55 @@ block content
 
       #gallery-fullscreen-modal
 
-    if 'lineage' in item.obj_data && 'title' in item.obj_data.lineage
-      .itemTab.hidden( data-tab='lineage' )
-        each parent in item.parents
-          .itemKey
-            span #{parent.parent_label || T('Parent')}
-            hr
-            a.link.link-animated(href=`${universeItemsLink}/${parent.parent_shortname}`)
-              | #{parent.parent_title}
-        each child in item.children
-          .itemKey
-            span #{child.child_label || T('Child')}
-            hr
-            a.link.link-animated(href=`${universeItemsLink}/${child.child_shortname}`)
-              | #{child.child_title}
+    if 'lineage' in item.obj_data && 'title' in item.obj_data.lineage && familyLayout
+      .hidden( data-tab='lineage' )
+        //- each parent in item.parents
+        //-   .itemKey
+        //-     span #{parent.parent_label || T('Parent')}
+        //-     hr
+        //-     a.link.link-animated(href=`${universeItemsLink}/${parent.parent_shortname}`)
+        //-       | #{parent.parent_title}
+        //- each child in item.children
+        //-   .itemKey
+        //-     span #{child.child_label || T('Child')}
+        //-     hr
+        //-     a.link.link-animated(href=`${universeItemsLink}/${child.child_shortname}`)
+        //-       | #{child.child_title}
+
+        style.
+          #family-grid {
+            display: grid;
+            grid-template-columns:#{' 1fr'.repeat(familyLayout.width)}
+          }
+          
+          .children-bar {
+            position: relative;
+            top: 50%;
+            z-index: -1;
+            border: 0.125rem solid black;
+            border-bottom: none;
+            border-radius: 1rem;
+          }
+
+          .parent-bar {
+            position: relative;
+            top: 50%;
+            left: -0.0625rem;
+            width: 0;
+            z-index: -1;
+            border-right: 0.125rem solid black;
+          }
+        #family-grid
+          each coord, key in familyLayout.members
+            .sheet.ma-2(style={ 'grid-column': `${coord.col} / ${coord.col + 2}`, 'grid-row': coord.row + 1 })
+              a.link.link-animated(href=`${universeItemsLink}/${key}`)
+                | #{family[key].title}
+            if coord.cStart !== coord.cEnd
+              .children-bar(style={ 'grid-column': `${coord.cStart + 1} / ${coord.cEnd + 1}`, 'grid-row': coord.row + 1 })
+            each child in family[key].children
+              - const childCol = familyLayout.members[child.child_shortname].col;
+              if childCol !== coord.cStart && childCol !== coord.cEnd || coord.cStart === coord.cEnd
+                .parent-bar(style={ 'grid-column': `${childCol + 1}`, 'grid-row': coord.row + 1 })
 
     if 'map' in item.obj_data && 'title' in item.obj_data.map
       .itemTab.hidden(data-tab='map')
