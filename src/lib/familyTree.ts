@@ -79,9 +79,11 @@ function _layoutUp(start: string, family: Family, height = 0): FamilyTreeLayout 
     members: { [start]: { row: height, col: 0 } },
   };
 
+  let firstParent: string | null = null;
   const parentTrees: FamilyTreeLayout[] = [];
   for (const { parent_shortname } of family[start].parents) {
     const parentTree = _layoutUp(parent_shortname, family, height - 1);
+    if (!firstParent) firstParent = parent_shortname;
     tree.width += parentTree.width;
     parentTrees.push(parentTree);
   }
@@ -91,8 +93,8 @@ function _layoutUp(start: string, family: Family, height = 0): FamilyTreeLayout 
   for (const parentTree of parentTrees) {
     for (const member in parentTree.members) {
       parentTree.members[member].col += offset;
-      // if (childTree.members[member].cStart !== undefined) childTree.members[member].cStart += offset;
-      // if (childTree.members[member].cEnd !== undefined) childTree.members[member].cEnd += offset;
+      if (parentTree.members[member].cStart !== undefined) parentTree.members[member].cStart += offset;
+      if (parentTree.members[member].cEnd !== undefined) parentTree.members[member].cEnd += offset;
       leastRow = Math.min(leastRow, parentTree.members[member].row);
     }
     offset += parentTree.width;
@@ -101,6 +103,13 @@ function _layoutUp(start: string, family: Family, height = 0): FamilyTreeLayout 
 
   tree.width = Math.max(2, tree.width);
   tree.members[start].col += tree.width / 2;
+
+  if (firstParent) {
+    tree.members[firstParent].cStart = tree.members[firstParent].col;
+    tree.members[firstParent].cEnd = Math.max(
+      ...family[start].parents.map(({ parent_shortname }) => tree.members[parent_shortname].col),
+    );
+  }
 
   return tree;
 }
@@ -121,7 +130,7 @@ function _joinTrees(treeA: FamilyTreeLayout, treeB: FamilyTreeLayout): FamilyTre
   };
 }
 
-function _addParents(tree: FamilyTreeLayout, parents: string[], children: string[]): void {
+function _addParents(tree: FamilyTreeLayout, parents: string[], children: string[], parentTrees: { [key: string]: FamilyTreeLayout }): void {
   if (parents.length === 0 || children.length === 0) return;
   const cols: number[] = [];
   for (const child of children) {
@@ -130,22 +139,37 @@ function _addParents(tree: FamilyTreeLayout, parents: string[], children: string
   const childRow = tree.members[children[0]].row;
   const minCol = Math.min(...cols);
   const maxCol = Math.max(...cols);
-  const avgCol = Math.floor((minCol + maxCol) / 2);
+  const avgCol = Math.ceil((minCol + maxCol) / 2);
 
-  let offset = (avgCol - (parents.length - 1));
-  tree.members[parents[0]] = {
-    row: childRow - 1,
-    col: offset,
-    cStart: minCol,
-    cEnd: maxCol,
-  };
-  for (const parent of parents.slice(1)) {
-    offset += 2;
-    tree.members[parent] = {
-      row: childRow - 1,
-      col: offset,
-    };
+  let offset = (avgCol - ((parents.reduce((w, p) => w + parentTrees[p].width, 0) / 2) - 1));
+  if (offset === 0) {
+    for (const member in tree.members) {
+      tree.members[member].col += 1;
+      if (tree.members[member].cStart !== undefined) tree.members[member].cStart += 1;
+      if (tree.members[member].cEnd !== undefined) tree.members[member].cEnd += 1;
+    }
+    offset += 1;
   }
+  const firstParent = parents[0];
+  for (const parent of parents) {
+    for (const member in parentTrees[parent].members) {
+      parentTrees[parent].members[member].col += offset;
+      if (parentTrees[parent].members[member].cStart !== undefined) parentTrees[parent].members[member].cStart += offset;
+      if (parentTrees[parent].members[member].cEnd !== undefined) parentTrees[parent].members[member].cEnd += offset;
+      parentTrees[parent].members[member].row += childRow - 1;
+    }
+    Object.assign(tree.members, parentTrees[parent].members);
+    console.log(parent, tree.width, offset+parentTrees[parent].width, parentTrees[parent].width)
+    tree.width = Math.max(tree.width, offset + parentTrees[parent].width);
+    offset += 2;
+  }
+
+  const [cStart, cEnd] = [
+    Math.min(tree.members[firstParent].col, minCol),
+    Math.max(maxCol, ...parents.map(parent => tree.members[parent].col)),
+  ];
+  tree.members[firstParent].cStart = cStart;
+  tree.members[firstParent].cEnd = cEnd;
 }
 
 export function layoutFamilyTree(start: string, family: Family): FamilyTreeLayout {
@@ -167,6 +191,7 @@ export function layoutFamilyTree(start: string, family: Family): FamilyTreeLayou
   const siblingTrees = {};
   const parentShorts = family[start].parents.map(({ parent_shortname }) => parent_shortname);
   if (parentShorts.length > 0) {
+    const parentStubs = {};
     const childShorts: string[] = [];
     for (const parent of parentShorts) {
       for (const { child_shortname } of family[parent].children) {
@@ -175,8 +200,9 @@ export function layoutFamilyTree(start: string, family: Family): FamilyTreeLayou
         siblingTrees[child_shortname] = true;
         tree = _joinTrees(tree, _layoutDown(child_shortname, family));
       }
+      parentStubs[parent] = { width: 2, members: { [parent]: { row: 0, col: 0 }}};
     }
-    _addParents(tree, parentShorts, [start, ...childShorts]);
+    _addParents(tree, parentShorts, [start, ...childShorts], parentStubs);
   }
 
   const uaTrees = {};
@@ -191,7 +217,7 @@ export function layoutFamilyTree(start: string, family: Family): FamilyTreeLayou
         tree = _joinTrees(_layoutDown(child_shortname, family, -1), tree);
       }
     }
-    _addParents(tree, parents[0][1].map(t => t[0]), [parents[0][0], ...lhChildren]);
+    _addParents(tree, parents[0][1].map(t => t[0]), [parents[0][0], ...lhChildren], parents[0][1].reduce((acc, [p, t]) => ({ ...acc, [p]: t }), {}));
   }
 
   // And the right side
@@ -205,7 +231,7 @@ export function layoutFamilyTree(start: string, family: Family): FamilyTreeLayou
         tree = _joinTrees(tree, _layoutDown(child_shortname, family, -1));
       }
     }
-    _addParents(tree, parents[1][1].map(t => t[0]), [parents[1][0], ...rhChildren]);
+    _addParents(tree, parents[1][1].map(t => t[0]), [parents[1][0], ...rhChildren], parents[1][1].reduce((acc, [p, t]) => ({ ...acc, [p]: t }), {}));
   }
 
   const leastRow = Math.min(...Object.values(tree.members).map(({ row }) => row));
