@@ -71,7 +71,7 @@ exports.default = {
         let family = {};
         let familyLayout = null;
         if ('lineage' in item.obj_data) {
-            family = await api_1.default.item.getFamilyTree(req.session.user, item, 7);
+            family = await api_1.default.item.getFamilyTree(req.session.user, item, 10);
             familyLayout = (0, familyTree_1.layoutFamilyTree)(item.shortname, family);
         }
         const [comments, commentUsers] = await api_1.default.discussion.getCommentsByItem(item.id, true);

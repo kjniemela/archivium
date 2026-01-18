@@ -212,6 +212,10 @@ block content
             grid-template-columns:#{' 1fr'.repeat(familyLayout.width)};
             min-width: #{7 * familyLayout.width}rem;
           }
+
+          .me {
+            border: 0.25rem outset gold;
+          }
           
           .children-bar {
             position: relative;
@@ -245,7 +249,7 @@ block content
         .scroll-x
           #family-grid
             each coord, key in familyLayout.members
-              .sheet.ma-2.mb-8(style={ 'grid-column': `${coord.col} / ${coord.col + 2}`, 'grid-row': coord.row + 1 })
+              .sheet.ma-2.mb-8(class={ me: key === item.shortname } style={ 'grid-column': `${coord.col} / ${coord.col + 2}`, 'grid-row': coord.row + 1 })
                 a.link.link-animated(href=`${universeItemsLink}/${key}`)
                   | #{family[key].title}
               if coord.cStart !== undefined

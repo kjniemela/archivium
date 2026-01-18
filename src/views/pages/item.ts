@@ -77,7 +77,7 @@ export default {
     let family: Family = {};
     let familyLayout: FamilyTreeLayout | null = null;
     if ('lineage' in item.obj_data) {
-      family = await api.item.getFamilyTree(req.session.user, item, 7);
+      family = await api.item.getFamilyTree(req.session.user, item, 10);
       familyLayout = layoutFamilyTree(item.shortname, family);
     }
 
