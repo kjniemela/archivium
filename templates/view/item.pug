@@ -209,37 +209,63 @@ block content
         style.
           #family-grid {
             display: grid;
-            grid-template-columns:#{' 1fr'.repeat(familyLayout.width)}
+            grid-template-columns:#{' 1fr'.repeat(familyLayout.width)};
+            min-width: #{7 * familyLayout.width}rem;
           }
           
           .children-bar {
             position: relative;
             top: 50%;
             z-index: -1;
-            border: 0.125rem solid black;
-            border-bottom: none;
-            border-radius: 1rem;
+            margin: 0 1rem;
+            border-top: 0.125rem solid black;
           }
 
           .parent-bar {
             position: relative;
             top: 50%;
-            left: -0.0625rem;
+            left: -0.125rem;
             width: 0;
             z-index: -1;
             border-right: 0.125rem solid black;
           }
-        #family-grid
-          each coord, key in familyLayout.members
-            .sheet.ma-2(style={ 'grid-column': `${coord.col} / ${coord.col + 2}`, 'grid-row': coord.row + 1 })
-              a.link.link-animated(href=`${universeItemsLink}/${key}`)
-                | #{family[key].title}
-            if coord.cStart !== coord.cEnd
-              .children-bar(style={ 'grid-column': `${coord.cStart + 1} / ${coord.cEnd + 1}`, 'grid-row': coord.row + 1 })
-            each child in family[key].children
-              - const childCol = familyLayout.members[child.child_shortname].col;
-              if childCol !== coord.cStart && childCol !== coord.cEnd || coord.cStart === coord.cEnd
-                .parent-bar(style={ 'grid-column': `${childCol + 1}`, 'grid-row': coord.row + 1 })
+
+          .parent-corner {
+            top: calc(50% + 1rem);
+          }
+
+          .corner-bar {
+            position: relative;
+            top: 50%;
+            width: 1rem;
+            height: 1rem;
+            z-index: -1;
+            border-top: 0.125rem solid black;
+          }
+        .scroll-x
+          #family-grid
+            each coord, key in familyLayout.members
+              .sheet.ma-2(style={ 'grid-column': `${coord.col} / ${coord.col + 2}`, 'grid-row': coord.row + 1 })
+                a.link.link-animated(href=`${universeItemsLink}/${key}`)
+                  | #{family[key].title}
+              if coord.cStart !== undefined
+                if coord.cStart !== coord.cEnd
+                  .children-bar(style={ 'grid-column': `${coord.cStart + 1} / ${coord.cEnd + 1}`, 'grid-row': coord.row + 1 })
+                each child in family[key].children
+                  - const childCol = familyLayout.members[child.child_shortname].col;
+                  - const isCorner = coord.cStart !== coord.cEnd && childCol === coord.cStart || childCol === coord.cEnd;
+                  - const isLeft = childCol === coord.cStart;
+                  .parent-bar(class={ 'parent-corner': isCorner } style={ 'grid-column': `${childCol + 1}`, 'grid-row': coord.row + 1 })
+                  if isCorner
+                    .corner-bar(
+                      style={
+                        'grid-column': `${childCol + 1}`,
+                        'grid-row': coord.row + 1,
+                        [`border-${isLeft ? 'left' : 'right'}`]: '0.125rem solid black',
+                        'border-radius': isLeft ? '1rem 0' : '0 1rem',
+                        [isLeft ? 'left' : 'right']: isLeft ? '-0.125rem' : '1rem',
+                      }
+                    )
 
     if 'map' in item.obj_data && 'title' in item.obj_data.map
       .itemTab.hidden(data-tab='map')
