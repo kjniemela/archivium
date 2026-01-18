@@ -1004,10 +1004,13 @@ class ItemAPI {
         return [parents, children];
     }
     async getFamilyTreeStep(user, item, depth, family = {}) {
+        if (depth < 1) {
+            family[item.shortname] = { title: item.title, parents: [], children: [] };
+            return;
+        }
+        ;
         const [parents, children] = await this.getLineage(item);
         family[item.shortname] = { title: item.title, parents, children };
-        if (depth < 2)
-            return;
         for (const { parent_shortname } of parents) {
             if (parent_shortname in family)
                 continue;
