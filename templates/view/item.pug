@@ -270,7 +270,7 @@ block content
               const grid = new Array(familyLayout.width-1).fill(null).map(r => []);
               function ensureRows(col, requestedRow) {
                 while (requestedRow >= grid[col-1].length) {
-                  grid[col-1].push([null, null, [false, false, false]]);
+                  grid[col-1].push([null, null, [false, false, false], null]);
                 }
               }
               for (const member in familyLayout.members) {
@@ -292,6 +292,18 @@ block content
                   }
                 }
               }
+              for (const { child_shortname, child_label } of family[item.shortname].children) {
+                if (child_shortname in familyLayout.members) {
+                  const { row, col } = familyLayout.members[child_shortname];
+                  grid[col-1][row][3] = child_label || T('Child');
+                }
+              }
+              for (const { parent_shortname, parent_label } of family[item.shortname].parents) {
+                if (parent_shortname in familyLayout.members) {
+                  const { row, col } = familyLayout.members[parent_shortname];
+                  grid[col-1][row][3] = parent_label || T('Child');
+                }
+              }
 
             each column in grid
               .family-col
@@ -301,6 +313,9 @@ block content
                       .sheet.ma-2(class={ 'me': row[0] === item.shortname })
                         a.link.link-animated(href=`${universeItemsLink}/${row[0]}?tab=lineage`)
                           | #{family[row[0]].title}
+                        if row[3]
+                          hr.my-1
+                          small #{row[3]}
                     if row[1]
                       .children-bar(style={ 'width': `${(row[1] * 7) - 2}rem` })
                     if row[2][0]
