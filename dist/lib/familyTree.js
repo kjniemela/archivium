@@ -113,19 +113,21 @@ function _addParents(tree, parents, children, parentTrees) {
         cols.push(tree.members[child].col);
     }
     const childRow = tree.members[children[0]].row;
-    const minCol = Math.min(...cols);
-    const maxCol = Math.max(...cols);
+    let minCol = Math.min(...cols);
+    let maxCol = Math.max(...cols);
     const avgCol = Math.ceil((minCol + maxCol) / 2);
-    let offset = (avgCol - ((parents.reduce((w, p) => w + parentTrees[p].width, 0) / 2) - 1));
-    if (offset === 0) {
+    let offset = avgCol - (parents.reduce((w, p) => w + parentTrees[p].width, 0) / 2);
+    if (offset < 0) {
         for (const member in tree.members) {
-            tree.members[member].col += 1;
+            tree.members[member].col -= offset;
             if (tree.members[member].cStart !== undefined)
-                tree.members[member].cStart += 1;
+                tree.members[member].cStart -= offset;
             if (tree.members[member].cEnd !== undefined)
-                tree.members[member].cEnd += 1;
+                tree.members[member].cEnd -= offset;
         }
-        offset += 1;
+        minCol -= offset;
+        maxCol -= offset;
+        offset -= offset;
     }
     const firstParent = parents[0];
     for (const parent of parents) {
@@ -138,9 +140,8 @@ function _addParents(tree, parents, children, parentTrees) {
             parentTrees[parent].members[member].row += childRow - 1;
         }
         Object.assign(tree.members, parentTrees[parent].members);
-        console.log(parent, tree.width, offset + parentTrees[parent].width, parentTrees[parent].width);
         tree.width = Math.max(tree.width, offset + parentTrees[parent].width);
-        offset += 2;
+        offset += parentTrees[parent].width;
     }
     const [cStart, cEnd] = [
         Math.min(tree.members[firstParent].col, minCol),
@@ -154,17 +155,18 @@ function layoutFamilyTree(start, family) {
     let tree = _layoutDown(start, family);
     // Fetch two parents and two sets of two grandparents
     // If more than two, select the two with the longest lineage
-    const parents = family[start].parents.map(({ parent_shortname }) => {
+    const allParents = family[start].parents.map(({ parent_shortname }) => {
         const grandparents = family[parent_shortname].parents.map(({ parent_shortname }) => {
             const grandparentTree = _layoutUp(parent_shortname, family);
             const leastRow = Math.min(...Object.values(grandparentTree.members).map(({ row }) => row));
             return [[parent_shortname, grandparentTree], -leastRow];
         }).sort((a, b) => a[1] - b[1]).slice(0, 2);
         return [[parent_shortname, grandparents.map(gp => gp[0])], Math.max(...grandparents.map(gp => gp[1]))];
-    }).sort((a, b) => a[1] - b[1]).slice(0, 2).map(parent => parent[0]);
+    }).sort((a, b) => a[1] - b[1]).map(parent => parent[0]);
+    const parents = allParents.slice(0, 2);
     // Fetch sibling descendants
     const siblingTrees = {};
-    const parentShorts = family[start].parents.map(({ parent_shortname }) => parent_shortname);
+    const parentShorts = allParents.map(parent => parent[0]);
     if (parentShorts.length > 0) {
         const parentStubs = {};
         const childShorts = [];
@@ -176,7 +178,7 @@ function layoutFamilyTree(start, family) {
                 siblingTrees[child_shortname] = true;
                 tree = _joinTrees(tree, _layoutDown(child_shortname, family));
             }
-            parentStubs[parent] = { width: 2, members: { [parent]: { row: 0, col: 0 } } };
+            parentStubs[parent] = { width: 2, members: { [parent]: { row: 0, col: 1 } } };
         }
         _addParents(tree, parentShorts, [start, ...childShorts], parentStubs);
     }
