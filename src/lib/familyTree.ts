@@ -142,17 +142,36 @@ function _addParents(tree: FamilyTreeLayout, parents: string[], children: string
   const avgCol = Math.ceil((minCol + maxCol) / 2);
 
   let offset = avgCol - (parents.reduce((w, p) => w + parentTrees[p].width, 0) / 2);
-  if (offset < 0) {
-    for (const member in tree.members) {
-      tree.members[member].col -= offset;
-      if (tree.members[member].cStart !== undefined) tree.members[member].cStart -= offset;
-      if (tree.members[member].cEnd !== undefined) tree.members[member].cEnd -= offset;
+  const maxLeftCols: { [row: number]: number } = {};
+  const shift = Math.max(0, -offset);
+  for (const member in tree.members) {
+    tree.members[member].col += shift;
+    if (tree.members[member].cStart !== undefined) tree.members[member].cStart += shift;
+    if (tree.members[member].cEnd !== undefined) tree.members[member].cEnd += shift;
+    const row = tree.members[member].row;
+    if (row < childRow) {
+      maxLeftCols[row] = Math.max(maxLeftCols[row] ?? 0, tree.members[member].col);
     }
-    minCol -= offset;
-    maxCol -= offset;
-    offset -= offset;
   }
+  minCol += shift;
+  maxCol += shift;
+  offset += shift;
+
   const firstParent = parents[0];
+
+  const minRightCols: { [row: number]: number } = {};
+  for (const member in parentTrees[firstParent].members) {
+    const row = parentTrees[firstParent].members[member].row + (childRow - 1);
+    minRightCols[row] = Math.min(minRightCols[row] ?? Infinity, parentTrees[firstParent].members[member].col + offset);
+  }
+  let overlap = 0;
+  for (const row in minRightCols) {
+    if (row in maxLeftCols) {
+      overlap = Math.max(overlap, maxLeftCols[row] - (minRightCols[row] - 2));
+    }
+  }
+  offset += overlap;
+
   for (const parent of parents) {
     for (const member in parentTrees[parent].members) {
       parentTrees[parent].members[member].col += offset;
