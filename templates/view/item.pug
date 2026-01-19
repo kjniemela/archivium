@@ -208,9 +208,7 @@ block content
 
         style.
           #family-grid {
-            display: grid;
-            grid-template-columns:#{' 1fr'.repeat(familyLayout.width)};
-            min-width: #{7 * familyLayout.width}rem;
+            display: flex;
           }
 
           .me {
@@ -218,60 +216,127 @@ block content
           }
           
           .children-bar {
-            position: relative;
+            position: absolute;
             top: 50%;
+            left: 50%;
             z-index: -1;
             margin: 0 1rem;
             border-top: 0.125rem solid black;
           }
 
           .parent-bar {
-            position: relative;
-            top: 50%;
-            left: -0.125rem;
+            position: absolute;
+            top: -50%;
+            left: 50%;
             width: 0;
+            height: calc(50% + 1rem);
             z-index: -1;
             border-right: 0.125rem solid black;
           }
 
           .parent-corner {
-            top: calc(50% + 1rem);
-            height: calc(100% - 1rem);
+            top: calc(-50% + 1rem);
+            height: 50%;
+          }
+
+          .parent-corner-right {
+            left: calc(50% - 0.125rem);
           }
 
           .corner-bar {
-            position: relative;
-            top: 50%;
+            position: absolute;
+            top: -50%;
+            left: 50%;
             width: 1rem;
             height: 1rem;
             z-index: -1;
             border-top: 0.125rem solid black;
           }
+
+          .family-col {
+            display: flex;
+            flex-direction: column;
+            min-width: 14rem;
+            margin-right: -7rem;
+          }
+
+          .family-cell {
+            position: relative;
+            height: 7rem;
+          }
         .scroll-x
           #family-grid
-            each coord, key in familyLayout.members
-              .sheet.ma-2.mb-8(class={ me: key === item.shortname } style={ 'grid-column': `${coord.col} / ${coord.col + 2}`, 'grid-row': coord.row + 1 })
-                a.link.link-animated(href=`${universeItemsLink}/${key}?tab=lineage`)
-                  | #{family[key].title}
-              if coord.cStart !== undefined
-                if coord.cStart !== coord.cEnd
-                  .children-bar(style={ 'grid-column': `${coord.cStart + 1} / ${coord.cEnd + 1}`, 'grid-row': coord.row + 1 })
-                each child in family[key].children
-                  if child.child_shortname in familyLayout.members
-                    - const childCol = familyLayout.members[child.child_shortname].col;
-                    - const isCorner = coord.cStart !== coord.cEnd && childCol === coord.cStart || childCol === coord.cEnd;
-                    - const isLeft = childCol === coord.cStart;
-                    .parent-bar(class={ 'parent-corner': isCorner } style={ 'grid-column': `${childCol + 1}`, 'grid-row': coord.row + 1 })
-                    if isCorner
-                      .corner-bar(
-                        style={
-                          'grid-column': `${childCol + 1}`,
-                          'grid-row': coord.row + 1,
-                          [`border-${isLeft ? 'left' : 'right'}`]: '0.125rem solid black',
-                          'border-radius': isLeft ? '1rem 0' : '0 1rem',
-                          [isLeft ? 'left' : 'right']: isLeft ? '-0.125rem' : '1rem',
-                        }
-                      )
+            -
+              const grid = new Array(familyLayout.width-1).fill(null).map(r => []);
+              function ensureRows(col, requestedRow) {
+                while (requestedRow >= grid[col-1].length) {
+                  grid[col-1].push([null, null, [false, false, false]]);
+                }
+              }
+              for (const member in familyLayout.members) {
+                const { row, col, cStart, cEnd } = familyLayout.members[member];
+                ensureRows(col, row);
+                grid[col-1][row][0] = member;
+                if (cStart !== undefined) {
+                  ensureRows(cStart, row);
+                  grid[cStart-1][row][1] = cEnd - cStart;
+                  
+                  for (const { child_shortname } of family[member].children) {
+                    if (child_shortname in familyLayout.members) {
+                      const childCol = familyLayout.members[child_shortname].col;
+                      const isCorner = cStart !== cEnd && childCol === cStart || childCol === cEnd;
+                      const isLeft = childCol === cStart;
+                      ensureRows(childCol, row+1);
+                      grid[childCol-1][row+1][2] = [true, isCorner, isLeft];
+                    }
+                  }
+                }
+              }
+
+            each column in grid
+              .family-col
+                each row in column
+                  .family-cell
+                    if row[0]
+                      .sheet.ma-2(class={ 'me': row[0] === item.shortname })
+                        a.link.link-animated(href=`${universeItemsLink}/${row[0]}?tab=lineage`)
+                          | #{family[row[0]].title}
+                    if row[1]
+                      .children-bar(style={ 'width': `${(row[1] * 7) - 2}rem` })
+                    if row[2][0]
+                      .parent-bar(class={ 'parent-corner': row[2][1], 'parent-corner-right': row[2][1] && !row[2][2] })
+                      if row[2][1]
+                        .corner-bar(
+                          style={
+                            [`border-${row[2][2] ? 'left' : 'right'}`]: '0.125rem solid black',
+                            'border-radius': row[2][2] ? '1rem 0' : '0 1rem',
+                            'left': row[2][2] ? '50%' : 'calc(50% - 1rem)',
+                          }
+                        )
+
+            //- each coord, key in familyLayout.members
+            //-   .sheet.ma-2.mb-8(class={ me: key === item.shortname } style={ 'grid-column': `${coord.col} / ${coord.col + 2}`, 'grid-row': coord.row + 1 })
+            //-     a.link.link-animated(href=`${universeItemsLink}/${key}?tab=lineage`)
+            //-       | #{family[key].title}
+            //-   if coord.cStart !== undefined
+            //-     if coord.cStart !== coord.cEnd
+            //-       .children-bar(style={ 'grid-column': `${coord.cStart + 1} / ${coord.cEnd + 1}`, 'grid-row': coord.row + 1 })
+            //-     each child in family[key].children
+            //-       if child.child_shortname in familyLayout.members
+            //-         - const childCol = familyLayout.members[child.child_shortname].col;
+            //-         - const isCorner = coord.cStart !== coord.cEnd && childCol === coord.cStart || childCol === coord.cEnd;
+            //-         - const isLeft = childCol === coord.cStart;
+            //-         .parent-bar(class={ 'parent-corner': isCorner } style={ 'grid-column': `${childCol + 1}`, 'grid-row': coord.row + 1 })
+            //-         if isCorner
+            //-           .corner-bar(
+            //-             style={
+            //-               'grid-column': `${childCol + 1}`,
+            //-               'grid-row': coord.row + 1,
+            //-               [`border-${isLeft ? 'left' : 'right'}`]: '0.125rem solid black',
+            //-               'border-radius': isLeft ? '1rem 0' : '0 1rem',
+            //-               [isLeft ? 'left' : 'right']: isLeft ? '-0.125rem' : '1rem',
+            //-             }
+            //-           )
 
     if 'map' in item.obj_data && 'title' in item.obj_data.map
       .itemTab.hidden(data-tab='map')

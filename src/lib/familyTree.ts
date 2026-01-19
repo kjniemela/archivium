@@ -223,6 +223,8 @@ export function layoutFamilyTree(start: string, family: Family): FamilyTreeLayou
       }
       parentStubs[parent] = { width: 2, members: { [parent]: { row: 0, col: 1 }}};
     }
+
+    // Add parents
     _addParents(tree, parentShorts, [start, ...childShorts], parentStubs);
   }
 
@@ -238,10 +240,12 @@ export function layoutFamilyTree(start: string, family: Family): FamilyTreeLayou
         tree = _joinTrees(_layoutDown(child_shortname, family, -1), tree);
       }
     }
+
+    // Add left side grandparents
     _addParents(tree, parents[0][1].map(t => t[0]), [parents[0][0], ...lhChildren], parents[0][1].reduce((acc, [p, t]) => ({ ...acc, [p]: t }), {}));
   }
 
-  // And the right side
+  // Fetch uncle/aunt descendants from the right side of the tree
   if (parents[1]) {
     const rhChildren: string[] = [];
     for (const { parent_shortname } of family[parents[1][0]].parents) {
@@ -252,6 +256,8 @@ export function layoutFamilyTree(start: string, family: Family): FamilyTreeLayou
         tree = _joinTrees(tree, _layoutDown(child_shortname, family, -1));
       }
     }
+
+    // Add right side grandparents
     _addParents(tree, parents[1][1].map(t => t[0]), [parents[1][0], ...rhChildren], parents[1][1].reduce((acc, [p, t]) => ({ ...acc, [p]: t }), {}));
   }
 
