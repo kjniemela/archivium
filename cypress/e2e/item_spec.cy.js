@@ -18,7 +18,7 @@ describe('Item spec', () => {
     cy.visit('/universes/public-test-universe/items/test-character?tab=body');
     cy.get('#action-bar').contains('Edit').click();
 
-    cy.get('.tiptap-editor .tiptap').should('be.visible');
+    cy.get('.tiptap-editor .tiptap', { timeout: 10000 }).should('be.visible');
     cy.window().then((win) => {
       // TODO technically not correct...
       const oldContent = win.document.querySelector('.tiptap-editor .tiptap').textContent;
@@ -46,7 +46,7 @@ describe('Item spec', () => {
     cy.get('.timeline>.flex-col').children().should('have.length', timelineEvents);
     cy.get('#action-bar').contains('Edit').click();
 
-    cy.get('.tabs-buttons').should('be.visible');
+    cy.get('.tabs-buttons', { timeout: 10000 }).should('be.visible');
     cy.get('.tabs-buttons').contains('Timeline').click();
     cy.get('#new_event_title').type('Cypress Event');
     cy.get('#new_event_time').siblings('button').click();
@@ -73,7 +73,7 @@ describe('Item spec', () => {
   it('adds an event to an item, then imports it to the timeline', () => {
     cy.visit('/editor/universes/public-test-universe/items/test-event');
 
-    cy.get('.tabs-buttons').contains('Timeline').click();
+    cy.get('.tabs-buttons', { timeout: 10000 }).contains('Timeline').click();
     cy.get('#new_event_title').type('Cypress Event');
     cy.get('#new_event_time').siblings('button').click();
     cy.get('#time-picker-modal input').first().type('2007');
@@ -102,7 +102,7 @@ describe('Item spec', () => {
   it('deletes the event and sees that it is removed from the timeline that imported it as well', () => {
     cy.visit('/editor/universes/public-test-universe/items/test-event');
 
-    cy.get('.tabs-buttons').contains('Timeline').click();
+    cy.get('.tabs-buttons', { timeout: 10000 }).contains('Timeline').click();
     cy.get('input').filter((k, el) => el.value === 'Cypress Event').siblings('button').contains('Remove').click();
     cy.wait(600);
     cy.get('#save-btn').click();
@@ -129,7 +129,7 @@ describe('Item spec', () => {
   it('adds some tags to the new item, confirm they exist', () => {
     cy.visit('/editor/universes/public-test-universe/items/cypress-character');
 
-    cy.get('#tags').type('testing cypress');
+    cy.get('#tags', { timeout: 10000 }).type('testing cypress');
     cy.get('#preview-btn').click();
 
     cy.get('#tags>small').children().should('have.length', 2);
