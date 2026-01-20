@@ -192,20 +192,7 @@ block content
       #gallery-fullscreen-modal
 
     if 'lineage' in item.obj_data && 'title' in item.obj_data.lineage && familyLayout
-      .hidden( data-tab='lineage' )
-        //- each parent in item.parents
-        //-   .itemKey
-        //-     span #{parent.parent_label || T('Parent')}
-        //-     hr
-        //-     a.link.link-animated(href=`${universeItemsLink}/${parent.parent_shortname}`)
-        //-       | #{parent.parent_title}
-        //- each child in item.children
-        //-   .itemKey
-        //-     span #{child.child_label || T('Child')}
-        //-     hr
-        //-     a.link.link-animated(href=`${universeItemsLink}/${child.child_shortname}`)
-        //-       | #{child.child_title}
-
+      .hidden(data-tab='lineage')
         style.
           #family-grid {
             display: flex;
@@ -329,29 +316,10 @@ block content
                           }
                         )
 
-            //- each coord, key in familyLayout.members
-            //-   .sheet.ma-2.mb-8(class={ me: key === item.shortname } style={ 'grid-column': `${coord.col} / ${coord.col + 2}`, 'grid-row': coord.row + 1 })
-            //-     a.link.link-animated(href=`${universeItemsLink}/${key}?tab=lineage`)
-            //-       | #{family[key].title}
-            //-   if coord.cStart !== undefined
-            //-     if coord.cStart !== coord.cEnd
-            //-       .children-bar(style={ 'grid-column': `${coord.cStart + 1} / ${coord.cEnd + 1}`, 'grid-row': coord.row + 1 })
-            //-     each child in family[key].children
-            //-       if child.child_shortname in familyLayout.members
-            //-         - const childCol = familyLayout.members[child.child_shortname].col;
-            //-         - const isCorner = coord.cStart !== coord.cEnd && childCol === coord.cStart || childCol === coord.cEnd;
-            //-         - const isLeft = childCol === coord.cStart;
-            //-         .parent-bar(class={ 'parent-corner': isCorner } style={ 'grid-column': `${childCol + 1}`, 'grid-row': coord.row + 1 })
-            //-         if isCorner
-            //-           .corner-bar(
-            //-             style={
-            //-               'grid-column': `${childCol + 1}`,
-            //-               'grid-row': coord.row + 1,
-            //-               [`border-${isLeft ? 'left' : 'right'}`]: '0.125rem solid black',
-            //-               'border-radius': isLeft ? '1rem 0' : '0 1rem',
-            //-               [isLeft ? 'left' : 'right']: isLeft ? '-0.125rem' : '1rem',
-            //-             }
-            //-           )
+            script.
+              window.addEventListener('load', () => {
+                document.querySelector('#family-grid .me').scrollIntoView({ inline: 'center' });
+              });
 
     if 'map' in item.obj_data && 'title' in item.obj_data.map
       .itemTab.hidden(data-tab='map')
