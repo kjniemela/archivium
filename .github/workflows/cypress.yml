@@ -89,7 +89,3 @@ jobs:
           ARCHIVIUM_DB_USER: testuser
           ARCHIVIUM_DB_PASSWORD: testpassword
           ARCHIVIUM_DB: archiviumtest
-
-      - name: Show server logs
-        if: failure()
-        run: cat logs/current.log
