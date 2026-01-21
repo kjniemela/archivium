@@ -12,6 +12,11 @@ jobs:
   cypress-test:
     runs-on: ubuntu-22.04
 
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1, 2]
+
     services:
       mysql:
         image: mysql:8.0
@@ -49,12 +54,27 @@ jobs:
             sleep 1
           done
 
-      - name: Start server
-        run: |
-          npm run build:all &
-          nohup npm start &
-          sleep 5
+      - name: Setup database
+        run: yes | npm run db:reset
         env:
+          DEV_MODE: true
+          ARCHIVIUM_DB_HOST: localhost
+          ARCHIVIUM_DB_USER: testuser
+          ARCHIVIUM_DB_PASSWORD: testpassword
+          ARCHIVIUM_DB: archiviumtest
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          build: npm run build:all
+          start: npm start
+          wait-on: 'http://localhost:33004'
+          record: true
+          parallel: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
           PORT: 33004
           DOMAIN: dev.archivium.net
           ADDR_PREFIX: 
@@ -67,18 +87,6 @@ jobs:
           ARCHIVIUM_DB_USER: testuser
           ARCHIVIUM_DB_PASSWORD: testpassword
           ARCHIVIUM_DB: archiviumtest
-
-      - name: Setup database
-        run: yes | npm run db:reset
-        env:
-          DEV_MODE: true
-          ARCHIVIUM_DB_HOST: localhost
-          ARCHIVIUM_DB_USER: testuser
-          ARCHIVIUM_DB_PASSWORD: testpassword
-          ARCHIVIUM_DB: archiviumtest
-
-      - name: Run tests
-        run: npm test
 
       - name: Show server logs
         if: failure()
