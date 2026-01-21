@@ -706,7 +706,7 @@ class ItemAPI {
                 }
                 await Promise.all((body.gallery ?? []).map(async (img, i) => {
                     newImages[img.id] = img;
-                    if (img.label && oldImages[img.id] && img.label !== oldImages[img.id].label) {
+                    if (img.label !== undefined && oldImages[img.id] && img.label !== oldImages[img.id].label) {
                         dataChanged = true;
                         await this.image.putLabel(user, img.id, img.label, conn);
                     }
