@@ -17,13 +17,13 @@ import backup from './db/backup';
 // Logging
 import logger from './logger';
 
-import { PORT, DOMAIN, ADDR_PREFIX, DEV_MODE, HOCUSPOCUS_PORT } from './config';
+import { PORT, ADDR_PREFIX, HOCUSPOCUS_PORT } from './config';
 
 // Hocuspocus Server
 import { Server } from '@hocuspocus/server';
 
 const server = new Server({
-  name: "hocuspocus-fra1-01",
+  name: "hocuspocus-archivium",
   port: HOCUSPOCUS_PORT,
   timeout: 30000,
   debounce: 5000,

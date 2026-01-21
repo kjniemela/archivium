@@ -53,7 +53,7 @@ const config_1 = require("./config");
 // Hocuspocus Server
 const server_1 = require("@hocuspocus/server");
 const server = new server_1.Server({
-    name: "hocuspocus-fra1-01",
+    name: "hocuspocus-archivium",
     port: config_1.HOCUSPOCUS_PORT,
     timeout: 30000,
     debounce: 5000,

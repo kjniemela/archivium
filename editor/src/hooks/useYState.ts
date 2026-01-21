@@ -1,8 +1,15 @@
 import { useY } from 'react-yjs';
 import * as Y from 'yjs';
 
-export function useYState<T>(yData: Y.Map<unknown>): [T, (newData: T) => void] {
+export function useYState<T>(yData: Y.Map<unknown>): [T, (newData: T) => void, (newData: Partial<T>) => void] {
   const data = useY(yData) as T;
+
+  const changeData = (changes: Partial<T>) => {
+    for (const key in changes) {
+      yData.set(key, changes[key as keyof T]);
+    }
+  }
+
   const setData = (newData: T) => {
     const newKeys: { [key: string]: true } = {};
     for (const key in newData) {
@@ -16,5 +23,5 @@ export function useYState<T>(yData: Y.Map<unknown>): [T, (newData: T) => void] {
     }
   }
 
-  return [data, setData];
+  return [data, setData, changeData];
 }
