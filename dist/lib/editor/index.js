@@ -8,6 +8,7 @@ exports.extractLinkData = extractLinkData;
 exports.shorthandResolver = shorthandResolver;
 const starter_kit_1 = __importDefault(require("@tiptap/starter-kit"));
 const extension_text_align_1 = __importDefault(require("@tiptap/extension-text-align"));
+const extension_collaboration_1 = __importDefault(require("@tiptap/extension-collaboration"));
 const Aside_1 = __importDefault(require("./extensions/Aside"));
 const Image_1 = __importDefault(require("./extensions/Image"));
 const Link_1 = __importDefault(require("./extensions/Link"));
@@ -51,25 +52,36 @@ function shorthandResolver(href, ctx) {
     }
     return { href };
 }
-const editorExtensions = (editMode, context) => ([
-    starter_kit_1.default.configure({
-        link: false,
-        heading: false,
-    }),
-    Aside_1.default,
-    Heading_1.default,
-    Image_1.default,
-    IFrame_1.default,
-    Link_1.default.configure({
-        enableClickSelection: editMode,
-        openOnClick: !editMode,
-        shorthandResolver,
-        context,
-    }),
-    ToC_1.default.configure({ context }),
-    extension_text_align_1.default.configure({
-        types: ['heading', 'paragraph'],
-        defaultAlignment: 'left',
-    }),
-]);
+const editorExtensions = (editMode, context, collabOptions) => {
+    const extensions = [
+        starter_kit_1.default.configure({
+            link: false,
+            heading: false,
+            undoRedo: collabOptions ? false : undefined,
+        }),
+        Aside_1.default,
+        Heading_1.default,
+        Image_1.default,
+        IFrame_1.default,
+        Link_1.default.configure({
+            enableClickSelection: editMode,
+            openOnClick: !editMode,
+            shorthandResolver,
+            context,
+        }),
+        ToC_1.default.configure({ context }),
+        extension_text_align_1.default.configure({
+            types: ['heading', 'paragraph'],
+            defaultAlignment: 'left',
+        }),
+    ];
+    if (collabOptions) {
+        const { ydoc, field } = collabOptions;
+        extensions.push(extension_collaboration_1.default.configure({
+            document: ydoc,
+            field,
+        }));
+    }
+    return extensions;
+};
 exports.editorExtensions = editorExtensions;

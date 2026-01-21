@@ -1,11 +1,15 @@
+import { Extendable } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
+import Collaboration from '@tiptap/extension-collaboration';
 import Aside from './extensions/Aside';
 import Image from './extensions/Image';
 import Link, { ResolveResult } from './extensions/Link';
 import ToC from './extensions/ToC';
 import Heading from './extensions/Heading';
 import IFrame from './extensions/IFrame';
+
+import * as Y from 'yjs';
 
 export interface TiptapContext {
   currentUniverse: string;
@@ -64,24 +68,37 @@ export function shorthandResolver(href: string, ctx: TiptapContext | undefined):
   return { href };
 }
 
-export const editorExtensions = (editMode: boolean, context?: TiptapContext) => ([
-  StarterKit.configure({
-    link: false,
-    heading: false,
-  }),
-  Aside,
-  Heading,
-  Image,
-  IFrame,
-  Link.configure({
-    enableClickSelection: editMode,
-    openOnClick: !editMode,
-    shorthandResolver,
-    context,
-  }),
-  ToC.configure({ context }),
-  TextAlign.configure({
-    types: ['heading', 'paragraph'],
-    defaultAlignment: 'left',
-  }),
-]);
+export const editorExtensions = (editMode: boolean, context?: TiptapContext, collabOptions?: { ydoc: Y.Doc, field?: string }) => {
+  const extensions: Extendable[] = [
+    StarterKit.configure({
+      link: false,
+      heading: false,
+      undoRedo: collabOptions ? false : undefined,
+    }),
+    Aside,
+    Heading,
+    Image,
+    IFrame,
+    Link.configure({
+      enableClickSelection: editMode,
+      openOnClick: !editMode,
+      shorthandResolver,
+      context,
+    }),
+    ToC.configure({ context }),
+    TextAlign.configure({
+      types: ['heading', 'paragraph'],
+      defaultAlignment: 'left',
+    }),
+  ];
+  
+  if (collabOptions) {
+    const { ydoc, field } = collabOptions;
+    extensions.push(Collaboration.configure({
+      document: ydoc,
+      field,
+    }));
+  }
+
+  return extensions;
+};

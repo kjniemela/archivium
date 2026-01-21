@@ -1,4 +1,4 @@
-import { Node, mergeAttributes, wrappingInputRule } from '@tiptap/core'
+import { Node, mergeAttributes, wrappingInputRule } from '@tiptap/core';
 
 export interface AsideOptions {
   HTMLAttributes: Record<string, any>
@@ -26,11 +26,11 @@ const Aside = Node.create<AsideOptions>({
   },
 
   parseHTML() {
-    return [{ tag: 'aside' }]
+    return [{ tag: 'aside' }];
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['aside', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0]
+    return ['aside', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
   },
 
   addCommands() {
@@ -41,7 +41,7 @@ const Aside = Node.create<AsideOptions>({
       toggleAside: () =>
         ({ commands }) =>
           commands.toggleWrap(this.name),
-    }
+    };
   },
 
   addInputRules() {
@@ -50,7 +50,7 @@ const Aside = Node.create<AsideOptions>({
         find: /^@aside\s$/,
         type: this.type,
       }),
-    ]
+    ];
   },
 });
 

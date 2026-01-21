@@ -1,3 +1,4 @@
+import { HocuspocusProvider } from '@hocuspocus/provider';
 import type { SetImageOptions } from '@tiptap/extension-image';
 import { useEditor } from '@tiptap/react';
 import { useEffect, useState, type ReactElement } from 'react';
@@ -11,11 +12,14 @@ import CustomDataEditor from '../components/CustomDataEditor';
 import EditorFrame from '../components/EditorFrame';
 import Gallery from '../components/Gallery';
 import LineageEditor from '../components/LineageEditor';
+import MapEditor from '../components/MapEditor';
 import SaveBtn from '../components/SaveBtn';
 import TabsBar from '../components/TabsBar';
 import TimelineEditor from '../components/TimelineEditor';
 import { BulkExistsFetcher, capitalize, fetchData, T } from '../helpers';
-import MapEditor from '../components/MapEditor';
+
+import * as Y from 'yjs';
+import { useYState } from '../hooks/useYState';
 
 export type Categories = {
   [key: string]: [string, string],
@@ -49,21 +53,26 @@ function computeTabs(objData: ObjData): Record<string, string> {
 
 const itemExistsCache: { [universe: string]: { [item: string]: boolean } } = {};
 
+const ydoc = new Y.Doc();
+const yItem = ydoc.getMap('item');
+const yObjData = ydoc.getMap('obj_data');
+
 export default function ItemEdit({ universeLink }: ItemEditProps) {
   const navigate = useNavigate();
   const { universeShort, itemShort } = useParams();
 
   if (!universeShort || !itemShort) return;
 
-  const [initContent, setInitContent] = useState<any | null>(null);
+  const [item, setItem] = useYState<Item>(yItem);
+  const [objData, setObjData] = useYState<ObjData>(yObjData);
+
   const [categories, setCategories] = useState<Categories | null>(null);
-  const [item, setItem] = useState<Item | null>(null);
-  const [objData, setObjData] = useState<ObjData | null>(null);
   const [currentModal, setCurrentModal] = useState<ModalType | null>(null);
   const [currentTab, setCurrentTab] = useState<string | null>(null);
-  const [tabNames, setTabNames] = useState<Record<string, string>>({});
   const [eventItemMap, setEventItemMap] = useState<Record<string, EventItem[]>>();
   const [itemMap, setItemMap] = useState<Record<string, ItemOptionEntry>>();
+
+  const [loading, setLoading] = useState(true);
 
   const context: TiptapContext = {
     currentUniverse: universeShort,
@@ -75,9 +84,9 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
   };
   
   const editor = useEditor({
-    extensions: editorExtensions(true, context),
+    extensions: editorExtensions(true, context, { ydoc, field: 'main' }),
     onUpdate: ({ editor }) => {
-      if (!objData) return;
+      if (loading) return;
       const json = editor.getJSON();
       const indexed = jsonToIndexed(json);
       setObjData({ ...objData, body: indexed });
@@ -85,6 +94,26 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
   });
 
   useEffect(() => {
+    const provider = new HocuspocusProvider({
+      url: `wss://dev.archivium.net`,
+      name: `arch-main-${universeShort}-${itemShort}`,
+      document: ydoc,
+    });
+
+    provider.on('awarenessChange', ({ states }: { states: any }) => {
+      // console.log(states)
+    });
+
+    document.addEventListener('mousemove', (event) => {
+      // Share any information you like
+      provider.setAwarenessField('user', {
+        name: 'Kevin James',
+        color: '#ffcc00',
+        mouseX: event.clientX,
+        mouseY: event.clientY,
+      });
+    });
+
     const categoryPromise = fetchData(`/api/universes/${universeShort}`, (data) => {
       setCategories(data.obj_data.cats);
     });
@@ -109,9 +138,10 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
     fetchData(`/api/universes/${universeShort}/items/${itemShort}`, async (data) => {
       await Promise.all([categoryPromise, eventItemPromise, itemMapPromise]);
       const objData = JSON.parse(data.obj_data) as ObjData;
+      let initialContent: Object | null = null;
       if (objData.body) {
         const links: LinkData[] = []; 
-        const json = indexedToJson(objData.body, (href) => links.push(extractLinkData(href)));
+        initialContent = indexedToJson(objData.body, (href) => links.push(extractLinkData(href)));
         const bulkFetcher = new BulkExistsFetcher();
         const fetchPromises = links.map(async (link) => {
           if (link.item) {
@@ -126,27 +156,27 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
         });
         bulkFetcher.fetchAll();
         await Promise.all(fetchPromises);
-        setInitContent(json);
       }
       delete data.obj_data;
-      setObjData(objData);
-      setTabNames(computeTabs(objData));
-      setItem(data);
+      provider.on('synced', () => {
+        if (!ydoc.getMap('config').get('initialContentLoaded') && editor) {
+          ydoc.getMap('config').set('initialContentLoaded', true);
+          if (initialContent) {
+            editor.commands.setContent(initialContent);
+          }
+          setItem(data);
+          setObjData(objData);
+        }
+        setLoading(false);
+      });
     });
   }, [itemShort, universeShort]);
 
-  useEffect(() => {
-    if (editor && initContent) {
-      editor.commands.setContent(initContent);
-    }
-  }, [editor, initContent]);
-
-  useEffect(() => {
-    if (!(currentTab && tabNames[currentTab])) {
-      if (Object.keys(tabNames).length > 0) setCurrentTab(Object.keys(tabNames)[0]);
-      else setCurrentTab(null);
-    }
-  }, [tabNames]);
+  const tabNames = computeTabs(objData);
+  if (!(currentTab && tabNames[currentTab])) {
+    if (Object.keys(tabNames).length > 0) setCurrentTab(Object.keys(tabNames)[0]);
+    else if (currentTab !== null) setCurrentTab(null);
+  }
 
   const modalAnchor = document.querySelector('#modal-anchor');
 
@@ -165,7 +195,6 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
       newObjData.tabs[newTabName] = {};
     }
     setObjData(newObjData);
-    setTabNames(computeTabs(newObjData));
     setCurrentModal(null);
   }
   function removeTab(tab: string) {
@@ -180,11 +209,10 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
       delete newObjData.tabs[tab];
     }
     setObjData(newObjData);
-    setTabNames(computeTabs(newObjData));
   }
 
   /* Loading Screen */
-  if (!item || !objData || !categories || !itemMap) {
+  if (loading || !categories || !itemMap) {
     return <div className='d-flex justify-center align-center'>
       <div className='loader' style={{ marginTop: 'max(0px, calc(50vh - 50px - var(--page-margin-top)))' }}></div>
     </div>;
@@ -284,10 +312,10 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
         }
         setItem(newState);
       }} onReorderImages={(newImages) => {
-        setItem(prev => prev ? ({
-          ...prev,
+        setItem({
+          ...item,
           gallery: newImages,
-        }) : prev);
+        });
       }} />
     ),
     map: (
@@ -346,7 +374,7 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
 
         <div className='inputGroup'>
           <label htmlFor='item_type'>{T('Type')}:</label>
-          <select id='item_type' name='item_type' defaultValue={item.item_type} onChange={({ target }) => item && setItem({ ...item, item_type: target.value })}>
+          <select id='item_type' name='item_type' value={item.item_type} onChange={({ target }) => setItem({ ...item, item_type: target.value })}>
             <option hidden disabled>{T('Select one')}...</option>
             {(categories && item) && Object.keys(categories).map(type => (
               <option key={type} value={type}>
@@ -358,7 +386,7 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
 
         <div className='inputGroup'>
           <label htmlFor='tags'>{T('Tags')}:</label>
-          <textarea id='tags' name='tags' value={item.tags.join(' ')} onChange={({ target }) => item && setItem({ ...item, tags: target.value.split(' ') })} />
+          <textarea id='tags' name='tags' value={item.tags.join(' ')} onChange={({ target }) => setItem({ ...item, tags: target.value.split(' ') })} />
         </div>
 
         <div className='inputGroup'>
