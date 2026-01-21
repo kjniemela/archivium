@@ -24,7 +24,7 @@ export default function App({ displayUniverse, addrPrefix, domain }: AppProps) {
         <Route path='universes'>
           <Route path=':universeShort'>
             <Route path='items'>
-              <Route path=':itemShort' element={<ItemEdit universeLink={universeLink} />} />
+              <Route path=':itemShort' element={<ItemEdit universeLink={universeLink} domain={domain} />} />
             </Route>
           </Route>
         </Route>

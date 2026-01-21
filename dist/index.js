@@ -50,6 +50,18 @@ const backup_1 = __importDefault(require("./db/backup"));
 // Logging
 const logger_1 = __importDefault(require("./logger"));
 const config_1 = require("./config");
+// Hocuspocus Server
+const server_1 = require("@hocuspocus/server");
+const server = new server_1.Server({
+    name: "hocuspocus-fra1-01",
+    port: config_1.HOCUSPOCUS_PORT,
+    timeout: 30000,
+    debounce: 5000,
+    maxDebounce: 30000,
+    quiet: true,
+});
+logger_1.default.info(`Starting hocuspocus server on port ${config_1.HOCUSPOCUS_PORT}...`);
+server.listen();
 logger_1.default.info('Server starting...');
 const app = (0, express_1.default)();
 app.use(express_1.default.urlencoded({ extended: true }));

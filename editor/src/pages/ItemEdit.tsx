@@ -41,6 +41,7 @@ type ModalType = 'newTab';
 
 export type ItemEditProps = {
   universeLink: (universe: string) => string,
+  domain: string,
 };
 
 function computeTabs(objData: ObjData): Record<string, string> {
@@ -57,7 +58,7 @@ const ydoc = new Y.Doc();
 const yItem = ydoc.getMap('item');
 const yObjData = ydoc.getMap('obj_data');
 
-export default function ItemEdit({ universeLink }: ItemEditProps) {
+export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
   const navigate = useNavigate();
   const { universeShort, itemShort } = useParams();
 
@@ -95,7 +96,7 @@ export default function ItemEdit({ universeLink }: ItemEditProps) {
 
   useEffect(() => {
     const provider = new HocuspocusProvider({
-      url: `wss://dev.archivium.net`,
+      url: `wss://${domain}`,
       name: `arch-main-${universeShort}-${itemShort}`,
       document: ydoc,
     });

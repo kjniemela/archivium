@@ -17,7 +17,22 @@ import backup from './db/backup';
 // Logging
 import logger from './logger';
 
-import { PORT, DOMAIN, ADDR_PREFIX, DEV_MODE } from './config';
+import { PORT, DOMAIN, ADDR_PREFIX, DEV_MODE, HOCUSPOCUS_PORT } from './config';
+
+// Hocuspocus Server
+import { Server } from '@hocuspocus/server';
+
+const server = new Server({
+  name: "hocuspocus-fra1-01",
+  port: HOCUSPOCUS_PORT,
+  timeout: 30000,
+  debounce: 5000,
+  maxDebounce: 30000,
+  quiet: true,
+});
+logger.info(`Starting hocuspocus server on port ${HOCUSPOCUS_PORT}...`);
+server.listen();
+
 
 logger.info('Server starting...');
 
