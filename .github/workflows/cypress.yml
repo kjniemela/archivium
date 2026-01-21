@@ -44,6 +44,9 @@ jobs:
       - name: Install dependencies
         run: npm i
 
+      - name: Build project
+        run: npm run build:all
+
       - name: Wait for MySQL
         run: |
           for i in {30..0}; do
@@ -66,7 +69,6 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
-          build: npm run build:all
           start: npm start
           wait-on: 'http://localhost:33004'
           record: true
