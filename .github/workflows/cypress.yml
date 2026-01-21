@@ -12,11 +12,6 @@ jobs:
   cypress-test:
     runs-on: ubuntu-22.04
 
-    strategy:
-      fail-fast: false
-      matrix:
-        containers: [1, 2]
-
     services:
       mysql:
         image: mysql:8.0
@@ -71,7 +66,6 @@ jobs:
         with:
           start: npm start
           wait-on: 'http://localhost:33004'
-          parallel: true
         env:
           PORT: 33004
           DOMAIN: dev.archivium.net
