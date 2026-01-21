@@ -780,7 +780,7 @@ class ItemAPI {
     async insertMap(itemId, map, conn) {
         const { insertId } = await (0, utils_1.executeQuery)(`
       INSERT INTO map (width, height, image_id, item_id) VALUES (?, ?, ?, ?)
-    `, [map.width, map.height, map.image_id, itemId], conn);
+    `, [map.width, map.height, map.image_id ?? null, itemId], conn);
         return insertId;
     }
     async fetchLocations(mapId) {

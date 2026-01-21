@@ -965,7 +965,7 @@ export class ItemAPI {
   async insertMap(itemId: number, map: Map, conn?: PoolConnection): Promise<number> {
     const { insertId } = await executeQuery<ResultSetHeader>(`
       INSERT INTO map (width, height, image_id, item_id) VALUES (?, ?, ?, ?)
-    `, [map.width, map.height, map.image_id, itemId], conn);
+    `, [map.width, map.height, map.image_id ?? null, itemId], conn);
     return insertId;
   }
   async fetchLocations(mapId: number): Promise<MapLocation[]> {
