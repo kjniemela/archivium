@@ -16,9 +16,11 @@ describe('Item spec', () => {
 
   it('adds a link from the test character to the test event, then follows it', () => {
     cy.visit('/universes/public-test-universe/items/test-character?tab=body');
+    cy.intercept('POST', '/api/universes/public-test-universe/items/test-character').as('request');
     cy.get('#action-bar').contains('Edit').click();
+    cy.wait('@request');
 
-    cy.get('.tiptap-editor .tiptap', { timeout: 10000 }).should('be.visible');
+    cy.get('.tiptap-editor .tiptap').should('be.visible');
     cy.window().then((win) => {
       // TODO technically not correct...
       const oldContent = win.document.querySelector('.tiptap-editor .tiptap').textContent;
@@ -44,9 +46,11 @@ describe('Item spec', () => {
   it('adds an event to the timline, then removes it', () => {
     cy.visit('/universes/public-test-universe/items/test-timeline?tab=timeline');
     cy.get('.timeline>.flex-col').children().should('have.length', timelineEvents);
+    cy.intercept('POST', '/api/universes/public-test-universe/items/test-timeline').as('request');
     cy.get('#action-bar').contains('Edit').click();
+    cy.wait('@request');
 
-    cy.get('.tabs-buttons', { timeout: 10000 }).should('be.visible');
+    cy.get('.tabs-buttons').should('be.visible');
     cy.get('.tabs-buttons').contains('Timeline').click();
     cy.get('#new_event_title').type('Cypress Event');
     cy.get('#new_event_time').siblings('button').click();
@@ -71,9 +75,11 @@ describe('Item spec', () => {
   });
 
   it('adds an event to an item, then imports it to the timeline', () => {
+    cy.intercept('POST', '/api/universes/public-test-universe/items/test-event').as('request');
     cy.visit('/editor/universes/public-test-universe/items/test-event');
+    cy.wait('@request');
 
-    cy.get('.tabs-buttons', { timeout: 10000 }).contains('Timeline').click();
+    cy.get('.tabs-buttons').contains('Timeline').click();
     cy.get('#new_event_title').type('Cypress Event');
     cy.get('#new_event_time').siblings('button').click();
     cy.get('#time-picker-modal input').first().type('2007');
@@ -100,9 +106,11 @@ describe('Item spec', () => {
   });
 
   it('deletes the event and sees that it is removed from the timeline that imported it as well', () => {
+    cy.intercept('POST', '/api/universes/public-test-universe/items/test-event').as('request');
     cy.visit('/editor/universes/public-test-universe/items/test-event');
+    cy.wait('@request');
 
-    cy.get('.tabs-buttons', { timeout: 10000 }).contains('Timeline').click();
+    cy.get('.tabs-buttons').contains('Timeline').click();
     cy.get('input').filter((k, el) => el.value === 'Cypress Event').siblings('button').contains('Remove').click();
     cy.wait(600);
     cy.get('#save-btn').click();
@@ -127,9 +135,11 @@ describe('Item spec', () => {
   });
 
   it('adds some tags to the new item, confirm they exist', () => {
+    cy.intercept('POST', '/api/universes/public-test-universe/items/cypress-character').as('request');
     cy.visit('/editor/universes/public-test-universe/items/cypress-character');
+    cy.wait('@request');
 
-    cy.get('#tags', { timeout: 10000 }).type('testing cypress');
+    cy.get('#tags').type('testing cypress');
     cy.get('#preview-btn').click();
 
     cy.get('#tags>small').children().should('have.length', 2);
