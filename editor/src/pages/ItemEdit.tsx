@@ -64,8 +64,8 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
 
   if (!universeShort || !itemShort) return;
 
-  const [item, setItem] = useYState<Item>(yItem);
-  const [objData, setObjData] = useYState<ObjData>(yObjData);
+  const [item, setItem, changeItem] = useYState<Item>(yItem);
+  const [objData, setObjData, changeObjData] = useYState<ObjData>(yObjData);
 
   const [categories, setCategories] = useState<Categories | null>(null);
   const [currentModal, setCurrentModal] = useState<ModalType | null>(null);
@@ -90,7 +90,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
       if (loading) return;
       const json = editor.getJSON();
       const indexed = jsonToIndexed(json);
-      setObjData({ ...objData, body: indexed });
+      changeObjData({ body: indexed });
     },
   });
 
@@ -191,8 +191,8 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
   const [newTabType, setNewTabType] = useState<string | undefined>(undefined);
   const [newTabName, setNewTabName] = useState<string>('');
   function addTabByType() {
-    if (!objData || newTabType === undefined) return;
-    let newObjData = { ...objData };
+    if (newTabType === undefined) return;
+    const newObjData = structuredClone(objData);
     if (BUILTIN_TABS.includes(newTabType as typeof BUILTIN_TABS[number])) {
       newObjData[newTabType as typeof BUILTIN_TABS[number]] = { title: capitalize(T(newTabType)) };
     } else if (newTabType === 'body') {
@@ -206,8 +206,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
     setCurrentModal(null);
   }
   function removeTab(tab: string) {
-    if (!objData) return;
-    let newObjData = { ...objData };
+    const newObjData = structuredClone(objData);
     if (BUILTIN_TABS.includes(tab as typeof BUILTIN_TABS[number])) {
       delete newObjData[tab as typeof BUILTIN_TABS[number]];
     } else if (tab === 'body') {
@@ -246,10 +245,10 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
   const customTabs: Record<string, ReactElement> = {};
   for (const tab in objData.tabs) {
     customTabs[tab] = <CustomDataEditor data={objData.tabs[tab]} onUpdate={(newData) => {
-      const newState = { ...objData };
+      const newState = { tabs: structuredClone(objData.tabs) };
       if (!newState.tabs) newState.tabs = {};
       newState.tabs[tab] = newData;
-      setObjData(newState);
+      changeObjData(newState);
     }} />;
   }
 
@@ -294,7 +293,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
     ),
     gallery: (
       <Gallery universe={universeShort} item={itemShort} images={item.gallery} onRemoveImage={(id) => {
-        const newState = { ...item };
+        const newState = { gallery: structuredClone(item.gallery) };
         for (let i = 0; i < newState.gallery.length; i++) {
           const img = newState.gallery[i];
           if (img.id === id) {
@@ -302,15 +301,15 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
             break;
           }
         }
-        setItem(newState);
+        changeItem(newState);
       }} onUploadImages={(imgs) => {
-        const newState = { ...item };
+        const newState = { gallery: structuredClone(item.gallery) };
         for (const img of imgs) {
           newState.gallery.push(img);
         }
-        setItem(newState);
+        changeItem(newState);
       }} onChangeLabel={(id, label) => {
-        const newState = { ...item };
+        const newState = { gallery: structuredClone(item.gallery) };
         for (let i = 0; i < newState.gallery.length; i++) {
           const img = newState.gallery[i];
           if (img.id === id) {
@@ -318,26 +317,25 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
             break;
           }
         }
-        setItem(newState);
+        changeItem(newState);
       }} onReorderImages={(newImages) => {
-        setItem({
-          ...item,
+        changeItem({
           gallery: newImages,
         });
       }} />
     ),
     map: (
-      <MapEditor item={item} categories={categories} onUpdate={(newItem) => setItem(newItem)} itemMap={itemMap} />
+      <MapEditor item={item} categories={categories} onUpdate={(newItem) => changeItem(newItem)} itemMap={itemMap} />
     ),
     timeline: (
       <TimelineEditor item={item} onEventsUpdate={(newEvents) => {
-        const newState = { ...item };
+        const newState = { events: structuredClone(item.events) };
         newState.events = newEvents;
-        setItem(newState);
+        changeItem(newState);
       }} eventItemMap={eventItemMap ?? {}} />
     ),
     lineage: (
-      <LineageEditor item={item} categories={categories} onUpdate={(newItem) => setItem(newItem)} itemMap={itemMap} />
+      <LineageEditor item={item} categories={categories} onUpdate={(newItem) => changeItem(newItem)} itemMap={itemMap} />
     ),
   };
 
@@ -363,14 +361,14 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
         <div className='inputGroup'>
           <label htmlFor='title'>{T('Title')}</label>
           <input id='title' type='text' name='title' value={item.title} onChange={({ target }) =>
-            setItem({ ...item, title: target.value })
+            changeItem({ title: target.value })
           } />
         </div>
 
         <div className='inputGroup'>
           <label htmlFor='shortname'>{T('Shortname')}:</label>
           <input id='shortname' type='text' name='shortname' value={item.shortname} onChange={({ target }) =>
-            setItem({ ...item, shortname: target.value })
+            changeItem({ shortname: target.value })
           } />
         </div>
 
@@ -382,7 +380,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
 
         <div className='inputGroup'>
           <label htmlFor='item_type'>{T('Type')}:</label>
-          <select id='item_type' name='item_type' value={item.item_type} onChange={({ target }) => setItem({ ...item, item_type: target.value })}>
+          <select id='item_type' name='item_type' value={item.item_type} onChange={({ target }) => changeItem({ item_type: target.value })}>
             <option hidden disabled>{T('Select one')}...</option>
             {(categories && item) && Object.keys(categories).map(type => (
               <option key={type} value={type}>
@@ -394,14 +392,14 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
 
         <div className='inputGroup'>
           <label htmlFor='tags'>{T('Tags')}:</label>
-          <textarea id='tags' name='tags' value={item.tags.join(' ')} onChange={({ target }) => setItem({ ...item, tags: target.value.split(' ') })} />
+          <textarea id='tags' name='tags' value={item.tags.join(' ')} onChange={({ target }) => changeItem({ tags: target.value.split(' ') })} />
         </div>
 
         <div className='inputGroup'>
           <label htmlFor='comments'>{T('Enable comments')}:</label>
           <label className='switch'>
             <input id='comments' name='comments' type='checkbox' checked={objData?.comments ?? false} onChange={({ target }) =>
-              setObjData({ ...objData, comments: target.checked })
+              changeObjData({ comments: target.checked })
             } />
             <span className='slider'></span>
           </label>
@@ -411,7 +409,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           <label htmlFor='notes'>{T('Enable notes')}:</label> 
           <label className='switch'>
             <input id='notes' name='notes' type='checkbox' checked={objData?.notes ?? false} onChange={({ target }) =>
-              setObjData({ ...objData, notes: target.checked })
+              changeObjData({ notes: target.checked })
             } />
             <span className='slider'></span>
           </label>
