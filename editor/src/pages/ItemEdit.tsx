@@ -136,40 +136,47 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
       }
       setItemMap(newItemMap);
     });
-    fetchData(`/api/universes/${universeShort}/items/${itemShort}`, async (data) => {
-      await Promise.all([categoryPromise, eventItemPromise, itemMapPromise]);
-      const objData = JSON.parse(data.obj_data) as ObjData;
-      let initialContent: Object | null = null;
-      if (objData.body) {
-        const links: LinkData[] = []; 
-        initialContent = indexedToJson(objData.body, (href) => links.push(extractLinkData(href)));
-        const bulkFetcher = new BulkExistsFetcher();
-        const fetchPromises = links.map(async (link) => {
-          if (link.item) {
-            const universe = link.universe ?? universeShort;
-            if (!(universe in itemExistsCache)) {
-              itemExistsCache[universe] = {};
-            }
-            if (!(link.item in itemExistsCache[universe])) {
-              itemExistsCache[universe][link.item] = await bulkFetcher.exists(universe, link.item);
-            }
-          }
-        });
-        bulkFetcher.fetchAll();
-        await Promise.all(fetchPromises);
-      }
-      delete data.obj_data;
-      provider.on('synced', () => {
+
+    Promise.all([categoryPromise, eventItemPromise, itemMapPromise]).then(() => {
+      const handleSync = async () => {
         if (!ydoc.getMap('config').get('initialContentLoaded') && editor) {
           ydoc.getMap('config').set('initialContentLoaded', true);
-          if (initialContent) {
-            editor.commands.setContent(initialContent);
-          }
-          setItem(data);
-          setObjData(objData);
+
+          await fetchData(`/api/universes/${universeShort}/items/${itemShort}`, async (data) => {
+            const objData = JSON.parse(data.obj_data) as ObjData;
+            let initialContent: Object | null = null;
+            if (objData.body) {
+              const links: LinkData[] = []; 
+              initialContent = indexedToJson(objData.body, (href) => links.push(extractLinkData(href)));
+              const bulkFetcher = new BulkExistsFetcher();
+              const fetchPromises = links.map(async (link) => {
+                if (link.item) {
+                  const universe = link.universe ?? universeShort;
+                  if (!(universe in itemExistsCache)) {
+                    itemExistsCache[universe] = {};
+                  }
+                  if (!(link.item in itemExistsCache[universe])) {
+                    itemExistsCache[universe][link.item] = await bulkFetcher.exists(universe, link.item);
+                  }
+                }
+              });
+              bulkFetcher.fetchAll();
+              await Promise.all(fetchPromises);
+            }
+            delete data.obj_data;
+
+            if (initialContent) {
+              editor.commands.setContent(initialContent);
+            }
+            setItem(data);
+            setObjData(objData);
+          });
         }
         setLoading(false);
-      });
+      };
+
+      if (provider.isSynced) handleSync();
+      else provider.on('synced', handleSync);
     });
   }, [itemShort, universeShort]);
 
