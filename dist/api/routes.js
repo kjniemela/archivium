@@ -75,6 +75,9 @@ function default_1(app, upload) {
     });
     const apiRoutes = new APIRoute('/api', {}, [
         new APIRoute('/*'),
+        new APIRoute('/me', {
+            GET: async (req) => req.session.user ? await _1.default.user.getOne({ 'user.username': req.session.user.username }) : null,
+        }),
         new APIRoute('/notifications', {}, [
             new APIRoute('/subscribe', { POST: (req) => _1.default.notification.subscribe(req.session.user, req.body) }),
             new APIRoute('/unsubscribe', { POST: (req) => _1.default.notification.unsubscribe(req.session.user, req.body) }),

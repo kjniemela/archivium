@@ -1,4 +1,3 @@
-import { HocuspocusProvider } from '@hocuspocus/provider';
 import type { SetImageOptions } from '@tiptap/extension-image';
 import { useEditor } from '@tiptap/react';
 import { useEffect, useState, type ReactElement } from 'react';
@@ -20,6 +19,11 @@ import { BulkExistsFetcher, capitalize, fetchData, T } from '../helpers';
 
 import * as Y from 'yjs';
 import { useYState } from '../hooks/useYState';
+import { useProvider } from '../hooks/useProvider';
+import { FormInput } from '../components/FormInput';
+import { FormSelect } from '../components/FormSelect';
+import { FormTextArea } from '../components/FormTextArea';
+import { FormSwitch } from '../components/FormSwitch';
 
 export type Categories = {
   [key: string]: [string, string],
@@ -83,7 +87,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
     },
     headings: [],
   };
-  
+
   const editor = useEditor({
     extensions: editorExtensions(true, context, { ydoc, field: 'main' }),
     onUpdate: ({ editor }) => {
@@ -94,91 +98,75 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
     },
   });
 
+  const [provider, docUsers, docSelections, setAwareness] = useProvider(`wss://${domain}`, `archivium-main-${universeShort}-${itemShort}`, ydoc);
+
   useEffect(() => {
-    const provider = new HocuspocusProvider({
-      url: `wss://${domain}`,
-      name: `arch-main-${universeShort}-${itemShort}`,
-      document: ydoc,
-    });
-
-    provider.on('awarenessChange', ({ states }: { states: any }) => {
-      // console.log(states)
-    });
-
-    document.addEventListener('mousemove', (event) => {
-      // Share any information you like
-      provider.setAwarenessField('user', {
-        name: 'Kevin James',
-        color: '#ffcc00',
-        mouseX: event.clientX,
-        mouseY: event.clientY,
+    if (provider) {
+      const categoryPromise = fetchData(`/api/universes/${universeShort}`, (data) => {
+        setCategories(data.obj_data.cats);
       });
-    });
-
-    const categoryPromise = fetchData(`/api/universes/${universeShort}`, (data) => {
-      setCategories(data.obj_data.cats);
-    });
-    const eventItemPromise = fetchData(`/api/universes/${universeShort}/events`, (events) => {
-      const newEventItemMap: Record<number, EventItem[]> = {};
-      for (const { src_id, src_title, src_shortname, event_title, abstime } of events) {
-        if (!(src_id in newEventItemMap)) {
-          newEventItemMap[src_id] = [];
+      const eventItemPromise = fetchData(`/api/universes/${universeShort}/events`, (events) => {
+        const newEventItemMap: Record<number, EventItem[]> = {};
+        for (const { src_id, src_title, src_shortname, event_title, abstime } of events) {
+          if (!(src_id in newEventItemMap)) {
+            newEventItemMap[src_id] = [];
+          }
+          newEventItemMap[src_id].push([src_shortname as string, src_title as string, Number(src_id), event_title ?? '', Number(abstime)]);
         }
-        newEventItemMap[src_id].push([src_shortname as string, src_title as string, Number(src_id), event_title ?? '', Number(abstime)]);
-      }
-      setEventItemMap(newEventItemMap);
-    });
-    const itemMapPromise = fetchData(`/api/universes/${universeShort}/items`, (items) => {
-      const newItemMap: Record<number, ItemOptionEntry> = {};
-      for (const { shortname, title, item_type } of items) {
-        if (shortname === itemShort) continue;
-        newItemMap[shortname] = { title, type: item_type };
-      }
-      setItemMap(newItemMap);
-    });
-
-    Promise.all([categoryPromise, eventItemPromise, itemMapPromise]).then(() => {
-      const handleSync = async () => {
-        if (!ydoc.getMap('config').get('initialContentLoaded') && editor) {
-          ydoc.getMap('config').set('initialContentLoaded', true);
-
-          await fetchData(`/api/universes/${universeShort}/items/${itemShort}`, async (data) => {
-            const objData = JSON.parse(data.obj_data) as ObjData;
-            let initialContent: Object | null = null;
-            if (objData.body) {
-              const links: LinkData[] = []; 
-              initialContent = indexedToJson(objData.body, (href) => links.push(extractLinkData(href)));
-              const bulkFetcher = new BulkExistsFetcher();
-              const fetchPromises = links.map(async (link) => {
-                if (link.item) {
-                  const universe = link.universe ?? universeShort;
-                  if (!(universe in itemExistsCache)) {
-                    itemExistsCache[universe] = {};
-                  }
-                  if (!(link.item in itemExistsCache[universe])) {
-                    itemExistsCache[universe][link.item] = await bulkFetcher.exists(universe, link.item);
-                  }
-                }
-              });
-              bulkFetcher.fetchAll();
-              await Promise.all(fetchPromises);
-            }
-            delete data.obj_data;
-
-            if (initialContent) {
-              editor.commands.setContent(initialContent);
-            }
-            setItem(data);
-            setObjData(objData);
-          });
+        setEventItemMap(newEventItemMap);
+      });
+      const itemMapPromise = fetchData(`/api/universes/${universeShort}/items`, (items) => {
+        const newItemMap: Record<number, ItemOptionEntry> = {};
+        for (const { shortname, title, item_type } of items) {
+          if (shortname === itemShort) continue;
+          newItemMap[shortname] = { title, type: item_type };
         }
-        setLoading(false);
-      };
+        setItemMap(newItemMap);
+      });
 
-      if (provider.isSynced) handleSync();
-      else provider.on('synced', handleSync);
-    });
-  }, [itemShort, universeShort]);
+      Promise.all([categoryPromise, eventItemPromise, itemMapPromise]).then(() => {
+        const handleSync = async () => {
+          if (!ydoc.getMap('config').get('initialContentLoaded') && editor) {
+            ydoc.getMap('config').set('initialContentLoaded', true);
+
+            await fetchData(`/api/universes/${universeShort}/items/${itemShort}`, async (data) => {
+              const objData = JSON.parse(data.obj_data) as ObjData;
+              let initialContent: Object | null = null;
+              if (objData.body) {
+                const links: LinkData[] = [];
+                initialContent = indexedToJson(objData.body, (href) => links.push(extractLinkData(href)));
+                const bulkFetcher = new BulkExistsFetcher();
+                const fetchPromises = links.map(async (link) => {
+                  if (link.item) {
+                    const universe = link.universe ?? universeShort;
+                    if (!(universe in itemExistsCache)) {
+                      itemExistsCache[universe] = {};
+                    }
+                    if (!(link.item in itemExistsCache[universe])) {
+                      itemExistsCache[universe][link.item] = await bulkFetcher.exists(universe, link.item);
+                    }
+                  }
+                });
+                bulkFetcher.fetchAll();
+                await Promise.all(fetchPromises);
+              }
+              delete data.obj_data;
+
+              if (initialContent) {
+                editor.commands.setContent(initialContent);
+              }
+              setItem(data);
+              setObjData(objData);
+            });
+          }
+          setLoading(false);
+        };
+
+        if (provider.isSynced) handleSync();
+        else provider.on('synced', handleSync);
+      });
+    }
+  }, [itemShort, universeShort, provider]);
 
   const tabNames = computeTabs(objData);
   if (!(currentTab && tabNames[currentTab])) {
@@ -255,41 +243,45 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
   const tabs: Record<string, ReactElement | null> = {
     ...customTabs,
     body: (
-      <EditorFrame editor={editor} getLink={async (previousUrl, type) => {
-        const url = window.prompt('URL', previousUrl);
-        if (url?.startsWith('@')) {
-          if (type === 'link') {
-            const link = extractLinkData(url);
-            if (link.item) {
-              const universe = link.universe ?? universeShort;
-              if (!(universe in itemExistsCache)) {
-                itemExistsCache[universe] = {};
+      <EditorFrame
+        id='main-editor' editor={editor} getLink={async (previousUrl, type) => {
+          const url = window.prompt('URL', previousUrl);
+          if (url?.startsWith('@')) {
+            if (type === 'link') {
+              const link = extractLinkData(url);
+              if (link.item) {
+                const universe = link.universe ?? universeShort;
+                if (!(universe in itemExistsCache)) {
+                  itemExistsCache[universe] = {};
+                }
+                if (!(link.item in itemExistsCache[universe])) {
+                  const existsFetcher = new BulkExistsFetcher();
+                  const fetchPromise = existsFetcher.exists(universe, link.item);
+                  existsFetcher.fetchAll();
+                  itemExistsCache[universe][link.item] = await fetchPromise;
+                }
               }
-              if (!(link.item in itemExistsCache[universe])) {
-                const existsFetcher = new BulkExistsFetcher();
-                const fetchPromise = existsFetcher.exists(universe, link.item);
-                existsFetcher.fetchAll();
-                itemExistsCache[universe][link.item] = await fetchPromise;
-              }
-            }
-          } else if (type === 'image') {
-            const [cmd, index, alt, height, width] = splitIgnoringQuotes(url.substring(1));
-            if (cmd === 'img') {
-              const image = item.gallery[Number(index)];
-              if (image) {
-                const attrs: Partial<SetImageOptions> = {
-                  alt: alt ?? image.name,
-                  title: alt ?? image.label,
-                };
-                if (height) attrs.height = Number(height);
-                if (width) attrs.width = Number(width);
-                return [`/api/universes/${item.universe_short}/items/${item.shortname}/gallery/images/${image.id}`, attrs];
+            } else if (type === 'image') {
+              const [cmd, index, alt, height, width] = splitIgnoringQuotes(url.substring(1));
+              if (cmd === 'img') {
+                const image = item.gallery[Number(index)];
+                if (image) {
+                  const attrs: Partial<SetImageOptions> = {
+                    alt: alt ?? image.name,
+                    title: alt ?? image.label,
+                  };
+                  if (height) attrs.height = Number(height);
+                  if (width) attrs.width = Number(width);
+                  return [`/api/universes/${item.universe_short}/items/${item.shortname}/gallery/images/${image.id}`, attrs];
+                }
               }
             }
           }
-        }
-        return [url];
-      }} />
+          return [url];
+        }}
+        setAwareness={setAwareness}
+        selections={docSelections}
+      />
     ),
     gallery: (
       <Gallery universe={universeShort} item={itemShort} images={item.gallery} onRemoveImage={(id) => {
@@ -352,25 +344,48 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           modalAnchor
         )
       )}
+
       {/* Editor Page */}
       <div className='d-flex justify-between align-baseline'>
         <h2>{T('Edit %s', item.title)}</h2>
         <a className='link link-animated color-error' href={`${context.universeLink(universeShort)}/items/${itemShort}`}>{T('Discard Changes')}</a>
       </div>
-      <div id='edit' className='form-row-group'>
-        <div className='inputGroup'>
-          <label htmlFor='title'>{T('Title')}</label>
-          <input id='title' type='text' name='title' value={item.title} onChange={({ target }) =>
-            changeItem({ title: target.value })
-          } />
-        </div>
 
-        <div className='inputGroup'>
-          <label htmlFor='shortname'>{T('Shortname')}:</label>
-          <input id='shortname' type='text' name='shortname' value={item.shortname} onChange={({ target }) =>
-            changeItem({ shortname: target.value })
-          } />
+      {/* Document user icons */}
+      {docUsers.length > 1 && (
+        <div className='d-flex justify-end flex-wrap gap-1 mb-4'>
+          {docUsers.map((user) => (
+            <img key={user.name} src={user.pfp} title={user.name} style={{
+              border: `0.1875rem solid ${user.color}`,
+              borderRadius: '50%',
+              width: '2.5rem',
+            }} />
+          ))}
         </div>
+      )}
+
+      <div id='edit' className='form-row-group'>
+        <FormInput
+          id='title'
+          title={T('Title')}
+          value={item.title}
+          onChange={({ target }) =>
+            changeItem({ title: target.value })
+          }
+          setAwareness={setAwareness}
+          selections={docSelections}
+        />
+
+        <FormInput
+          id='shortname'
+          title={T('Shortname')}
+          value={item.shortname}
+          onChange={({ target }) =>
+            changeItem({ shortname: target.value })
+          }
+          setAwareness={setAwareness}
+          selections={docSelections}
+        />
 
         <div className='inputGroup'>
           <small style={{ gridColumn: '2 / 4' }}>
@@ -378,42 +393,42 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           </small>
         </div>
 
-        <div className='inputGroup'>
-          <label htmlFor='item_type'>{T('Type')}:</label>
-          <select id='item_type' name='item_type' value={item.item_type} onChange={({ target }) => changeItem({ item_type: target.value })}>
-            <option hidden disabled>{T('Select one')}...</option>
-            {(categories && item) && Object.keys(categories).map(type => (
-              <option key={type} value={type}>
-                {capitalize(categories[type][0])}
-              </option>
-            ))}
-          </select>
-        </div>
+        <FormSelect
+          id='item_type'
+          title={T('Type')}
+          value={item.item_type}
+          options={categories && item ? Object.keys(categories).reduce((acc, type) => ({ ...acc, [type]: capitalize(categories[type][0]) }), {}) : {}}
+          onChange={({ target }) => changeItem({ item_type: target.value })}
+          setAwareness={setAwareness}
+          selections={docSelections}
+        />
 
-        <div className='inputGroup'>
-          <label htmlFor='tags'>{T('Tags')}:</label>
-          <textarea id='tags' name='tags' value={item.tags.join(' ')} onChange={({ target }) => changeItem({ tags: target.value.split(' ') })} />
-        </div>
+        <FormTextArea
+          id='tags'
+          title={T('Tags')}
+          value={item.tags?.join(' ') ?? ''}
+          onChange={({ target }) => changeItem({ tags: target.value.split(' ') })}
+          setAwareness={setAwareness}
+          selections={docSelections}
+        />
 
-        <div className='inputGroup'>
-          <label htmlFor='comments'>{T('Enable comments')}:</label>
-          <label className='switch'>
-            <input id='comments' name='comments' type='checkbox' checked={objData?.comments ?? false} onChange={({ target }) =>
-              changeObjData({ comments: target.checked })
-            } />
-            <span className='slider'></span>
-          </label>
-        </div>
+        <FormSwitch
+          id='comments'
+          title={T('Enable comments')}
+          checked={objData?.comments ?? false}
+          onChange={({ target }) => changeObjData({ comments: target.checked })}
+          setAwareness={setAwareness}
+          selections={docSelections}
+        />
 
-        <div className='inputGroup'>
-          <label htmlFor='notes'>{T('Enable notes')}:</label> 
-          <label className='switch'>
-            <input id='notes' name='notes' type='checkbox' checked={objData?.notes ?? false} onChange={({ target }) =>
-              changeObjData({ notes: target.checked })
-            } />
-            <span className='slider'></span>
-          </label>
-        </div>
+        <FormSwitch
+          id='notes'
+          title={T('Enable notes')}
+          checked={objData?.notes ?? false}
+          onChange={({ target }) => changeObjData({ notes: target.checked })}
+          setAwareness={setAwareness}
+          selections={docSelections}
+        />
 
         <div className='mt-2'>
           <SaveBtn<Item>

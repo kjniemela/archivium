@@ -79,6 +79,9 @@ export default function (app: Express, upload: Multer) {
 
   const apiRoutes = new APIRoute('/api', {}, [
     new APIRoute('/*'),
+    new APIRoute('/me', {
+      GET: async (req) => req.session.user ? await api.user.getOne({ 'user.username': req.session.user.username }) : null,
+    }),
     new APIRoute('/notifications', {}, [
       new APIRoute('/subscribe', { POST: (req) => api.notification.subscribe(req.session.user, req.body) }),
       new APIRoute('/unsubscribe', { POST: (req) => api.notification.unsubscribe(req.session.user, req.body) }),
