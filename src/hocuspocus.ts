@@ -1,9 +1,8 @@
 import { Server } from '@hocuspocus/server';
+import api from './api';
+import { perms } from './api/utils';
 import { HOCUSPOCUS_PORT } from './config';
 import logger from './logger';
-import api from './api';
-import { handleAsNull, perms } from './api/utils';
-import { ForbiddenError, UnauthorizedError } from './errors';
 
 const server = new Server({
   name: "hocuspocus-archivium",

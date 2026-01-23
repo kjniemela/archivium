@@ -96,7 +96,6 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
       const editor = new Editor({
         extensions: editorExtensions(true, context, { ydoc, field: 'main', provider }),
         onUpdate: ({ editor }) => {
-          if (loading) return;
           const json = editor.getJSON();
           const indexed = jsonToIndexed(json);
           changeObjData({ body: indexed });
@@ -373,7 +372,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
       {docUsers.length > 1 && (
         <div className='d-flex justify-end flex-wrap gap-1 mb-4'>
           {docUsers.map((user) => (
-            <img key={user.name} src={user.pfp} title={user.name} style={{
+            <img key={user.clientId} src={user.pfp} title={user.name} style={{
               border: `0.1875rem solid ${user.color}`,
               borderRadius: '50%',
               width: '2.5rem',

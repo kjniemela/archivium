@@ -88,7 +88,7 @@ const editorExtensions = (editMode, context, collabOptions) => {
                 return {
                     nodeName: 'span',
                     class: 'collaboration-carets__selection',
-                    style: `background-color: ${user.color}`,
+                    style: `background-color: ${user.color}70`,
                     'data-user': user.name,
                 };
             },
