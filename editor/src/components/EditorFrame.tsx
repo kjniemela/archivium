@@ -358,29 +358,6 @@ export default function EditorFrame({ id, editor, getLink, setAwareness, selecti
       id={id}
       editor={editor}
       data-selection-controlled={id}
-      onClick={(e) => {
-        let range;
-        let textNode;
-        let offset;
-
-        if (document.caretPositionFromPoint) {
-          range = document.caretPositionFromPoint(e.clientX, e.clientY);
-          if (!range) return;
-          textNode = range.offsetNode;
-          offset = range.offset;
-        } else if (document.caretRangeFromPoint) {
-          // Use WebKit-proprietary fallback method
-          range = document.caretRangeFromPoint(e.clientX, e.clientY);
-          if (!range) return;
-          textNode = range.startContainer;
-          offset = range.startOffset;
-        } else {
-          // Neither method is supported, do nothing
-          return;
-        }
-
-        console.log(textNode, offset, range)
-      }}
       onFocus={() => setAwareness({ selectedElement: id })}
       onBlur={({ relatedTarget }) => handleFormBlur(relatedTarget as HTMLElement, setAwareness)}
     />
