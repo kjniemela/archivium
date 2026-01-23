@@ -107,7 +107,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
   }, [provider]);
 
   useEffect(() => {
-    if (provider) {
+    if (provider && editor) {
       const categoryPromise = fetchData(`/api/universes/${universeShort}`, (data) => {
         setCategories(data.obj_data.cats);
       });
@@ -132,6 +132,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
 
       Promise.all([categoryPromise, eventItemPromise, itemMapPromise]).then(() => {
         const handleSync = async () => {
+          console.log(ydoc.getMap('config').get('initialContentLoaded'), editor)
           if (!ydoc.getMap('config').get('initialContentLoaded') && editor) {
             ydoc.getMap('config').set('initialContentLoaded', true);
 
@@ -172,7 +173,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
         else provider.on('synced', handleSync);
       });
     }
-  }, [itemShort, universeShort, provider]);
+  }, [itemShort, universeShort, provider, editor]);
 
   const tabNames = computeTabs(objData);
   if (!(currentTab && tabNames[currentTab])) {
