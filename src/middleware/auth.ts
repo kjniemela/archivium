@@ -32,7 +32,7 @@ const createSession = async (req: Request, res: Response, next: NextFunction): P
     }
   }
 
-  const { insertId } = await api.session.post() as ResultSetHeader;
+  const { insertId } = await api.session.post();
   const session = await api.session.getOne({ id: insertId }) as Session; // We just created this session, so it must exist.
   res.cookie('archiviumuid', session.hash, {
     httpOnly: true,
@@ -46,7 +46,7 @@ const createSession = async (req: Request, res: Response, next: NextFunction): P
     created_at: session.created_at,
   };
   if (staleSession) {
-    if (staleSession.user) {
+    if (staleSession.user_id) {
       await api.session.put({ id: session.id }, { user_id: staleSession.user_id });
       req.session = {
         ...req.session,

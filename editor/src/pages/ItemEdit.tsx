@@ -89,7 +89,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
 
   const [editor, setEditor] = useState<Editor | null>(null);
 
-  const [provider, docUsers, docSelections, setAwareness] = useProvider(`wss://${domain}`, `archivium-main-${universeShort}-${itemShort}`, ydoc);
+  const [provider, error, docUsers, docSelections, setAwareness] = useProvider(`wss://${domain}`, `item/${universeShort}/${itemShort}`, ydoc);
 
   useEffect(() => {
     if (provider && !editor) {
@@ -132,7 +132,6 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
 
       Promise.all([categoryPromise, eventItemPromise, itemMapPromise]).then(() => {
         const handleSync = async () => {
-          console.log(ydoc.getMap('config').get('initialContentLoaded'), editor)
           if (!ydoc.getMap('config').get('initialContentLoaded') && editor) {
             ydoc.getMap('config').set('initialContentLoaded', true);
 
@@ -211,6 +210,18 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
       delete newObjData.tabs[tab];
     }
     setObjData(newObjData);
+  }
+
+  /* Error Screen */
+  if (error) {
+    return <div className='d-flex justify-center align-center'>
+      <div className='d-flex flex-col gap-2' style={{ marginTop: 'max(0px, calc(50vh - 50px - var(--page-margin-top)))' }}>
+        <span className='color-error big-text'>{error}</span>
+        <button
+          onClick={() => location.href = `${context.universeLink(universeShort)}/items/${itemShort}`}
+        >Go Back</button>
+      </div>
+    </div>;
   }
 
   /* Loading Screen */

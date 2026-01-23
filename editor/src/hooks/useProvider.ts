@@ -38,8 +38,15 @@ const colors = [
   ].sort(() => Math.random() - 0.5),
 ];
 
-export function useProvider(url: string, name: string, ydoc: Y.Doc): [HocuspocusProvider | null, DocUser[], { [el: string]: DocUser }, (data: Partial<DocUser>) => void] {
+export function useProvider(url: string, name: string, ydoc: Y.Doc): [
+  HocuspocusProvider | null,
+  string | null,
+  DocUser[],
+  { [el: string]: DocUser },
+  (data: Partial<DocUser>) => void,
+] {
   const [provider, setProvider] = useState<HocuspocusProvider | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<{ [id: number]: DocUser }>({});
   const [me, setMe] = useState<DocUser | null>(null);
 
@@ -49,8 +56,10 @@ export function useProvider(url: string, name: string, ydoc: Y.Doc): [Hocuspocus
   }, [me]);
 
   useEffect(() => {
-    fetchAsync('/api/me').then((user) => {
-      const provider = new HocuspocusProvider({ url, name, document: ydoc });
+    fetchAsync('/api/me').then(async (user) => {
+      const token = await fetchAsync('/api/session-token');
+
+      const provider = new HocuspocusProvider({ url, name, document: ydoc, token });
 
       const me: DocUser = {
         clientId: provider.awareness!.clientID,
@@ -101,6 +110,10 @@ export function useProvider(url: string, name: string, ydoc: Y.Doc): [Hocuspocus
         handleAwarenessChange(states);
       });
 
+      provider.on('authenticationFailed', () => {
+        setError('Access denied');
+      });
+
       setProvider(provider);
     });
   }, []);
@@ -123,5 +136,5 @@ export function useProvider(url: string, name: string, ydoc: Y.Doc): [Hocuspocus
     setMe({ ...me, ...data });
   };
 
-  return [provider, userList, selections, setAwareness];
+  return [provider, error, userList, selections, setAwareness];
 }

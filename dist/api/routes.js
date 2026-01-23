@@ -78,6 +78,14 @@ function default_1(app, upload) {
         new APIRoute('/me', {
             GET: async (req) => req.session.user ? await _1.default.user.getOne({ 'user.username': req.session.user.username }) : null,
         }),
+        new APIRoute('/session-token', {
+            GET: async (req) => {
+                const { insertId } = await _1.default.session.post();
+                await _1.default.session.put({ id: insertId }, { user_id: req.session.user?.id ?? null });
+                const session = await _1.default.session.getOne({ id: insertId });
+                return session.hash;
+            },
+        }),
         new APIRoute('/notifications', {}, [
             new APIRoute('/subscribe', { POST: (req) => _1.default.notification.subscribe(req.session.user, req.body) }),
             new APIRoute('/unsubscribe', { POST: (req) => _1.default.notification.unsubscribe(req.session.user, req.body) }),

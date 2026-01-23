@@ -21,7 +21,7 @@ export type SessionConditions = {
 };
 
 export type SessionChanges = {
-  user_id?: number;
+  user_id: number | null;
 };
 
 export class SessionAPI {

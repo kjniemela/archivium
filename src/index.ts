@@ -19,19 +19,9 @@ import logger from './logger';
 
 import { PORT, ADDR_PREFIX, HOCUSPOCUS_PORT } from './config';
 
-// Hocuspocus Server
-import { Server } from '@hocuspocus/server';
 
-const server = new Server({
-  name: "hocuspocus-archivium",
-  port: HOCUSPOCUS_PORT,
-  timeout: 30000,
-  debounce: 5000,
-  maxDebounce: 30000,
-  quiet: true,
-});
-logger.info(`Starting hocuspocus server on port ${HOCUSPOCUS_PORT}...`);
-server.listen();
+// Hocuspocus Server
+import './hocuspocus';
 
 
 logger.info('Server starting...');

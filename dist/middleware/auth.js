@@ -45,7 +45,7 @@ const createSession = async (req, res, next) => {
         created_at: session.created_at,
     };
     if (staleSession) {
-        if (staleSession.user) {
+        if (staleSession.user_id) {
             await api_1.default.session.put({ id: session.id }, { user_id: staleSession.user_id });
             req.session = {
                 ...req.session,
