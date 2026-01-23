@@ -5,7 +5,9 @@ import logger from '../logger';
 import { ResultSetHeader } from 'mysql2/promise';
 import { Session } from '../api/models/session';
 
-const createSession = async (req: Request, res: Response, next: NextFunction) => {
+const createSession = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  let staleSession: Session | null = null;
+
   if (req.cookies['archiviumuid']) {
     const session = await api.session.getOne({ hash: req.cookies['archiviumuid'] });
     if (session) {
@@ -22,12 +24,10 @@ const createSession = async (req: Request, res: Response, next: NextFunction) =>
             user: session.user,
           }
         }
-        next();
-        return;
+        return next();
       } else {
-        // Session is older than 7 days, destroy it
-        await api.session.del({ id: session.id });
-        res.clearCookie('archiviumuid');
+        // Session is older than 7 days, it needs to be replaced
+        staleSession = session;
       }
     }
   }
@@ -45,12 +45,19 @@ const createSession = async (req: Request, res: Response, next: NextFunction) =>
     hash: session.hash,
     created_at: session.created_at,
   };
+  if (staleSession) {
+    if (staleSession.user) {
+      await api.session.put({ id: session.id }, { user_id: staleSession.user_id });
+      req.session = {
+        ...req.session,
+        user_id: staleSession.user_id,
+        user: staleSession.user,
+      }
+    }
+    await api.session.del({ id: staleSession.id });
+  }
   next();
 };
-
-/************************************************************/
-// Add additional authentication middleware functions below
-/************************************************************/
 
 async function refreshSession(user: any) {
   await api.user.put(user.id, user.id, { updated_at: new Date() });

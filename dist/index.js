@@ -152,8 +152,6 @@ app.post(`${config_1.ADDR_PREFIX}/login`, async (req, res, next) => {
             const isCorrectLogin = api_1.default.user.validatePassword(req.body.password, user.password, user.salt);
             if (isCorrectLogin) {
                 await api_1.default.session.put({ id: req.session.id }, { user_id: req.loginId });
-                // // Atypical use of user.put, normally the first argument should be req.session.user.id
-                // await api.user.put(user.id, user.id, { updated_at: new Date() });
                 res.status(200);
                 res.redirect(`${config_1.ADDR_PREFIX}${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
             }
