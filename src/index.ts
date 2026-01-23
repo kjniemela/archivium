@@ -52,8 +52,11 @@ const upload = multer({
 
 // Cron Jobs
 cron.schedule('0 0 * * *', () => {
-    logger.info('Running daily DB export...');
-    backup();
+  logger.info('Purging stale sessions...');
+  api.session.purge().then(({ affectedRows }) => logger.info(`Purged ${affectedRows} sessions`));
+
+  logger.info('Running daily DB export...');
+  backup();
 });
 
 
@@ -94,11 +97,11 @@ import { NotFoundError } from './errors';
 loadRoutes(app, upload);
 
 
-/* 
+/*
   ACCOUNT ROUTES
 */
 async function logout(req: express.Request, res: express.Response) {
-  await api.session.delete({ id: req.session.id });
+  await api.session.del({ id: req.session.id });
   res.clearCookie('archiviumuid');
 }
 
@@ -132,7 +135,7 @@ app.get(`${ADDR_PREFIX}/logout`, async (req, res, next) => {
 });
 
 app.post(`${ADDR_PREFIX}/login`, async (req, res, next) => {
-  try {  
+  try {
     const user = await api.user.getOne({ 'user.username': req.body.username }, true).catch(handleAsNull(NotFoundError));
     if (user) {
       req.loginId = user.id;

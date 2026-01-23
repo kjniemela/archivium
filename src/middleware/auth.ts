@@ -9,20 +9,26 @@ const createSession = async (req: Request, res: Response, next: NextFunction) =>
   if (req.cookies['archiviumuid']) {
     const session = await api.session.getOne({ hash: req.cookies['archiviumuid'] });
     if (session) {
-      req.session = {
-        id: session.id,
-        hash: session.hash,
-        created_at: session.created_at,
-      };
-      if (session.user) {
+      if (new Date().getTime() - session.created_at.getTime() < 1000 * 60 * 60 * 24 * 7) {
         req.session = {
-          ...req.session,
-          user_id: session.user_id,
-          user: session.user,
+          id: session.id,
+          hash: session.hash,
+          created_at: session.created_at,
+        };
+        if (session.user) {
+          req.session = {
+            ...req.session,
+            user_id: session.user_id,
+            user: session.user,
+          }
         }
+        next();
+        return;
+      } else {
+        // Session is older than 7 days, destroy it
+        await api.session.del({ id: session.id });
+        res.clearCookie('archiviumuid');
       }
-      next();
-      return;
     }
   }
 

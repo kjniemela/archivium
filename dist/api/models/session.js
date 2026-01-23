@@ -45,13 +45,8 @@ class SessionAPI {
         const queryString = `DELETE FROM session WHERE ${parsedOptions.strings.join(' AND ')}`;
         return await (0, utils_1.executeQuery)(queryString, parsedOptions.values);
     }
-    /**
-     * Alias for del method to maintain compatibility TODO: fix this!
-     * @param options
-     * @returns {Promise<ResultSetHeader>}
-     */
-    async delete(options) {
-        return this.del(options);
+    async purge() {
+        return await (0, utils_1.executeQuery)('DELETE FROM session WHERE created_at < NOW() - INTERVAL 8 DAY');
     }
 }
 exports.SessionAPI = SessionAPI;

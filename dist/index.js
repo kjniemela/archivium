@@ -75,6 +75,8 @@ const upload = (0, multer_1.default)({
 });
 // Cron Jobs
 node_cron_1.default.schedule('0 0 * * *', () => {
+    logger_1.default.info('Purging stale sessions...');
+    api_1.default.session.purge().then(({ affectedRows }) => logger_1.default.info(`Purged ${affectedRows} sessions`));
     logger_1.default.info('Running daily DB export...');
     (0, backup_1.default)();
 });
@@ -111,7 +113,7 @@ const errors_1 = require("./errors");
   ACCOUNT ROUTES
 */
 async function logout(req, res) {
-    await api_1.default.session.delete({ id: req.session.id });
+    await api_1.default.session.del({ id: req.session.id });
     res.clearCookie('archiviumuid');
 }
 app.get(`${config_1.ADDR_PREFIX}/login`, async (req, res, next) => {

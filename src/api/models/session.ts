@@ -59,7 +59,7 @@ export class SessionAPI {
 
   /**
    * for internal use only - does not conform to the standard return format!
-   * @param options 
+   * @param options
    * @returns {Promise<ResultSetHeader>}
    */
   async del(options: SessionConditions): Promise<ResultSetHeader> {
@@ -68,12 +68,7 @@ export class SessionAPI {
     return await executeQuery<ResultSetHeader>(queryString, parsedOptions.values);
   }
 
-  /**
-   * Alias for del method to maintain compatibility TODO: fix this!
-   * @param options 
-   * @returns {Promise<ResultSetHeader>}
-   */
-  async delete(options: SessionConditions): Promise<ResultSetHeader> {
-    return this.del(options);
+  async purge(): Promise<ResultSetHeader> {
+    return await executeQuery('DELETE FROM session WHERE created_at < NOW() - INTERVAL 8 DAY');
   }
-} 
+}
