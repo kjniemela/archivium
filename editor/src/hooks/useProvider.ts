@@ -17,24 +17,24 @@ type AwarenessState = { clientId: number, user: DocUser };
 
 const colors = [
   ...[
-    'mediumseagreen',
-    'crimson',
-    'mediumvioletred',
-    'coral',
-    'steelblue',
-    'olive',
+    '#3CB371',
+    '#DC143C',
+    '#C71585',
+    '#FF7F50',
+    '#4682B4',
+    '#808000',
   ].sort(() => Math.random() - 0.5),
   ...[
-    'green',
-    'lightcoral',
-    'tomato',
-    'khaki',
-    'slateblue',
-    'yellowgreen'
+    '#008000',
+    '#F08080',
+    '#FF6347',
+    '#F0E68C',
+    '#6A5ACD',
+    '#9ACD32'
   ].sort(() => Math.random() - 0.5),
   ...[
-    'mediumaquamarine',
-    'lightpink',
+    '#66CDAA',
+    '#FFB6C1',
   ].sort(() => Math.random() - 0.5),
 ];
 
