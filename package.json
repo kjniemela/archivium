@@ -40,6 +40,7 @@
     "@hocuspocus/provider": "^3.4.3",
     "@hocuspocus/server": "^3.4.3",
     "@tiptap/extension-collaboration": "^3.16.0",
+    "@tiptap/extension-collaboration-caret": "^3.17.0",
     "@tiptap/extension-image": "^3.0.9",
     "@tiptap/extension-text-align": "^3.14.0",
     "@tiptap/html": "^3.16.0",

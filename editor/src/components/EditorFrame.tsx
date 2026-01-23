@@ -331,7 +331,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
       </button>
       <button
         onMouseDown={e => e.preventDefault()}
-        onClick={() => editor.chain().focus().undo().run()} 
+        onClick={() => editor.chain().focus().undo().run()}
         disabled={!editorState.canUndo}
         className='material-symbols-outlined'
         title={T('Undo')}
@@ -352,15 +352,35 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
 }
 
 export default function EditorFrame({ id, editor, getLink, setAwareness, selections }: RichEditorProps) {
-  return <div
-    className='tiptap-editor markdown'
-    style={selections[id] ? { border: `0.1875rem solid ${selections[id].color}`, borderRadius: '0.25rem' } : undefined}
-  >
+  return <div className='tiptap-editor markdown'>
     <MenuBar id={id} editor={editor} getLink={getLink} setAwareness={setAwareness} selections={selections} />
     <EditorContent
       id={id}
       editor={editor}
       data-selection-controlled={id}
+      onClick={(e) => {
+        let range;
+        let textNode;
+        let offset;
+
+        if (document.caretPositionFromPoint) {
+          range = document.caretPositionFromPoint(e.clientX, e.clientY);
+          if (!range) return;
+          textNode = range.offsetNode;
+          offset = range.offset;
+        } else if (document.caretRangeFromPoint) {
+          // Use WebKit-proprietary fallback method
+          range = document.caretRangeFromPoint(e.clientX, e.clientY);
+          if (!range) return;
+          textNode = range.startContainer;
+          offset = range.startOffset;
+        } else {
+          // Neither method is supported, do nothing
+          return;
+        }
+
+        console.log(textNode, offset, range)
+      }}
       onFocus={() => setAwareness({ selectedElement: id })}
       onBlur={({ relatedTarget }) => handleFormBlur(relatedTarget as HTMLElement, setAwareness)}
     />

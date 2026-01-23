@@ -1,14 +1,19 @@
 import type { SetImageOptions } from '@tiptap/extension-image';
-import { useEditor } from '@tiptap/react';
+import { Editor } from '@tiptap/react';
 import { useEffect, useState, type ReactElement } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useParams } from 'react-router';
+import * as Y from 'yjs';
 import type { Item } from '../../../src/api/models/item';
 import { editorExtensions, extractLinkData, type LinkData, type TiptapContext } from '../../../src/lib/editor';
 import { splitIgnoringQuotes } from '../../../src/lib/markdown';
 import { indexedToJson, jsonToIndexed, type IndexedDocument } from '../../../src/lib/tiptapHelpers';
 import CustomDataEditor from '../components/CustomDataEditor';
 import EditorFrame from '../components/EditorFrame';
+import { FormInput } from '../components/FormInput';
+import { FormSelect } from '../components/FormSelect';
+import { FormSwitch } from '../components/FormSwitch';
+import { FormTextArea } from '../components/FormTextArea';
 import Gallery from '../components/Gallery';
 import LineageEditor from '../components/LineageEditor';
 import MapEditor from '../components/MapEditor';
@@ -16,14 +21,8 @@ import SaveBtn from '../components/SaveBtn';
 import TabsBar from '../components/TabsBar';
 import TimelineEditor from '../components/TimelineEditor';
 import { BulkExistsFetcher, capitalize, fetchData, T } from '../helpers';
-
-import * as Y from 'yjs';
-import { useYState } from '../hooks/useYState';
 import { useProvider } from '../hooks/useProvider';
-import { FormInput } from '../components/FormInput';
-import { FormSelect } from '../components/FormSelect';
-import { FormTextArea } from '../components/FormTextArea';
-import { FormSwitch } from '../components/FormSwitch';
+import { useYState } from '../hooks/useYState';
 
 export type Categories = {
   [key: string]: [string, string],
@@ -88,17 +87,24 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
     headings: [],
   };
 
-  const editor = useEditor({
-    extensions: editorExtensions(true, context, { ydoc, field: 'main' }),
-    onUpdate: ({ editor }) => {
-      if (loading) return;
-      const json = editor.getJSON();
-      const indexed = jsonToIndexed(json);
-      changeObjData({ body: indexed });
-    },
-  });
+  const [editor, setEditor] = useState<Editor | null>(null);
 
   const [provider, docUsers, docSelections, setAwareness] = useProvider(`wss://${domain}`, `archivium-main-${universeShort}-${itemShort}`, ydoc);
+
+  useEffect(() => {
+    if (provider && !editor) {
+      const editor = new Editor({
+        extensions: editorExtensions(true, context, { ydoc, field: 'main', provider }),
+        onUpdate: ({ editor }) => {
+          if (loading) return;
+          const json = editor.getJSON();
+          const indexed = jsonToIndexed(json);
+          changeObjData({ body: indexed });
+        },
+      });
+      setEditor(editor);
+    }
+  }, [provider]);
 
   useEffect(() => {
     if (provider) {
@@ -207,7 +213,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
   }
 
   /* Loading Screen */
-  if (loading || !categories || !itemMap) {
+  if (loading || !categories || !itemMap || !editor) {
     return <div className='d-flex justify-center align-center'>
       <div className='loader' style={{ marginTop: 'max(0px, calc(50vh - 50px - var(--page-margin-top)))' }}></div>
     </div>;

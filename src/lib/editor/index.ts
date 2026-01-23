@@ -2,12 +2,14 @@ import { Extendable } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
 import Collaboration from '@tiptap/extension-collaboration';
+import CollaborationCaret from '@tiptap/extension-collaboration-caret';
 import Aside from './extensions/Aside';
 import Image from './extensions/Image';
 import Link, { ResolveResult } from './extensions/Link';
 import ToC from './extensions/ToC';
 import Heading from './extensions/Heading';
 import IFrame from './extensions/IFrame';
+import { HocuspocusProvider } from '@hocuspocus/provider';
 
 import * as Y from 'yjs';
 
@@ -68,7 +70,7 @@ export function shorthandResolver(href: string, ctx: TiptapContext | undefined):
   return { href };
 }
 
-export const editorExtensions = (editMode: boolean, context?: TiptapContext, collabOptions?: { ydoc: Y.Doc, field?: string }) => {
+export const editorExtensions = (editMode: boolean, context?: TiptapContext, collabOptions?: { ydoc: Y.Doc, field?: string, provider: HocuspocusProvider }) => {
   const extensions: Extendable[] = [
     StarterKit.configure({
       link: false,
@@ -91,12 +93,23 @@ export const editorExtensions = (editMode: boolean, context?: TiptapContext, col
       defaultAlignment: 'left',
     }),
   ];
-  
+
   if (collabOptions) {
-    const { ydoc, field } = collabOptions;
+    const { ydoc, field, provider } = collabOptions;
     extensions.push(Collaboration.configure({
       document: ydoc,
       field,
+    }));
+    extensions.push(CollaborationCaret.configure({
+      provider,
+      selectionRender: (user) => {
+        return {
+          nodeName: 'span',
+          class: 'collaboration-carets__selection',
+          style: `background-color: ${user.color}`,
+          'data-user': user.name,
+        }
+      },
     }));
   }
 
