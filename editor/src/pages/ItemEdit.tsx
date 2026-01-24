@@ -179,6 +179,16 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
     else if (currentTab !== null) setCurrentTab(null);
   }
 
+  useEffect(() => {
+    if (provider?.isSynced) {
+      if (currentModal === 'newTab') {
+        setAwareness({ tab: '+' });
+      } else {
+        setAwareness({ tab: currentTab });
+      }
+    }
+  }, [currentTab, currentModal, provider?.isSynced]);
+
   const modalAnchor = document.querySelector('#modal-anchor');
 
   const [newTabType, setNewTabType] = useState<string | undefined>(undefined);
@@ -297,7 +307,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           return [url];
         }}
         setAwareness={setAwareness}
-        selections={docSelections}
+        selections={docSelections.selectedElement}
       />
     ),
     gallery: (
@@ -370,12 +380,13 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
 
       {/* Document user icons */}
       {docUsers.length > 1 && (
-        <div className='d-flex justify-end flex-wrap gap-1 mb-4'>
+        <div className='d-flex flex-wrap mb-4'>
           {docUsers.map((user) => (
             <img key={user.clientId} src={user.pfp} title={user.name} style={{
               border: `0.1875rem solid ${user.color}`,
               borderRadius: '50%',
               width: '2.5rem',
+              marginRight: '-1.25rem',
             }} />
           ))}
         </div>
@@ -390,7 +401,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
             changeItem({ title: target.value })
           }
           setAwareness={setAwareness}
-          selections={docSelections}
+          selections={docSelections.selectedElement}
         />
 
         <FormInput
@@ -401,7 +412,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
             changeItem({ shortname: target.value })
           }
           setAwareness={setAwareness}
-          selections={docSelections}
+          selections={docSelections.selectedElement}
         />
 
         <div className='inputGroup'>
@@ -417,7 +428,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           options={categories && item ? Object.keys(categories).reduce((acc, type) => ({ ...acc, [type]: capitalize(categories[type][0]) }), {}) : {}}
           onChange={({ target }) => changeItem({ item_type: target.value })}
           setAwareness={setAwareness}
-          selections={docSelections}
+          selections={docSelections.selectedElement}
         />
 
         <FormTextArea
@@ -426,7 +437,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           value={item.tags?.join(' ') ?? ''}
           onChange={({ target }) => changeItem({ tags: target.value.split(' ') })}
           setAwareness={setAwareness}
-          selections={docSelections}
+          selections={docSelections.selectedElement}
         />
 
         <FormSwitch
@@ -435,7 +446,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           checked={objData?.comments ?? false}
           onChange={({ target }) => changeObjData({ comments: target.checked })}
           setAwareness={setAwareness}
-          selections={docSelections}
+          selections={docSelections.selectedElement}
         />
 
         <FormSwitch
@@ -444,7 +455,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           checked={objData?.notes ?? false}
           onChange={({ target }) => changeObjData({ notes: target.checked })}
           setAwareness={setAwareness}
-          selections={docSelections}
+          selections={docSelections.selectedElement}
         />
 
         <div className='mt-2'>
@@ -464,10 +475,22 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
 
         {objData && <div>
           <div className='d-flex align-start mb-2'>
-            <TabsBar tabs={tabNames} selectedTab={currentTab} onSelectTab={(tab) => setCurrentTab(tab)} onRemoveTab={(tab) => removeTab(tab)} />
+            <TabsBar
+              tabs={tabNames}
+              selectedTab={currentTab}
+              onSelectTab={(tab) => setCurrentTab(tab)}
+              onRemoveTab={(tab) => removeTab(tab)}
+              selections={docSelections.tab}
+            />
             <ul className='navbarBtns'>
-              <li className='navbarBtn'>
-                <h3 className='navbarBtnLink navbarText ma-0 material-symbols-outlined heavy' onClick={() => setCurrentModal('newTab')}>add</h3>
+              <li className='navbarBtn badge-anchor'>
+                {docSelections.tab['+'] && docSelections.tab['+'].map((user, i) => (
+                  <img src={user.pfp} className='badge' style={{
+                    left: `${-0.5 + (0.5 * i)}rem`,
+                    backgroundColor: user.color ?? '',
+                  }} />
+                ))}
+                <h3 className='navbarBtnLink navbarText ma-0 material-symbols-outlined heavy' onClick={() =>  setCurrentModal('newTab')}>add</h3>
               </li>
             </ul>
           </div>

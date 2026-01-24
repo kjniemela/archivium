@@ -142,10 +142,10 @@ export class BulkExistsFetcher {
   }
 }
 
-export function handleFormBlur(relatedTarget: HTMLElement | null, setAwareness: (data: Partial<DocUser>) => void): void {
+export function handleFormBlur(relatedTarget: HTMLElement | null, awarenessCallback: () => void): void {
   if (relatedTarget && 'selectionControlled' in relatedTarget.dataset) {
     return;
   }
 
-  setAwareness({ selectedElement: null });
+  awarenessCallback();
 }

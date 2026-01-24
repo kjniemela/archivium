@@ -23,7 +23,7 @@ export const FormSwitch = ({ id, title, checked, onChange, setAwareness, selecti
         onChange={onChange}
         data-selection-controlled={id}
       onFocus={() => setAwareness({ selectedElement: id })}
-        onBlur={({ relatedTarget }) => handleFormBlur(relatedTarget as HTMLElement, setAwareness)}
+        onBlur={({ relatedTarget }) => handleFormBlur(relatedTarget as HTMLElement, () => setAwareness({ selectedElement: null }))}
       />
       <span
         className='slider'

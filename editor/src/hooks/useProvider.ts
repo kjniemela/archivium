@@ -1,17 +1,23 @@
 import { HocuspocusProvider } from '@hocuspocus/provider';
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchAsync } from '../helpers';
 
-import * as Y from 'yjs';
 import md5 from 'md5';
+import * as Y from 'yjs';
 
 export type DocUser = {
   clientId: number,
   name: string,
   color: string | null,
   selectedElement: string | null,
+  tab: string | null,
   pfp: string,
 };
+
+export type DocSelections = {
+  selectedElement: { [el: string]: DocUser },
+  tab: { [tab: string]: DocUser[] },
+}
 
 type AwarenessState = { clientId: number, user: DocUser };
 
@@ -42,7 +48,7 @@ export function useProvider(url: string, name: string, ydoc: Y.Doc): [
   HocuspocusProvider | null,
   string | null,
   DocUser[],
-  { [el: string]: DocUser },
+  DocSelections,
   (data: Partial<DocUser>) => void,
 ] {
   const [provider, setProvider] = useState<HocuspocusProvider | null>(null);
@@ -66,6 +72,7 @@ export function useProvider(url: string, name: string, ydoc: Y.Doc): [
         name: user.username,
         color: null,
         selectedElement: null,
+        tab: null,
         pfp: user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email ?? '')}.jpg`,
       };
 
@@ -119,15 +126,19 @@ export function useProvider(url: string, name: string, ydoc: Y.Doc): [
   }, []);
 
   const userList = me ? [
-    me,
     ...Object.keys(users).map(k => users[Number(k)]),
+    me,
   ] : [];
 
-  const selections: { [el: string]: DocUser } = {};
+  const selections: DocSelections = { selectedElement: {}, tab: {} };
   for (const id in users) {
     const user = users[id];
     if (user.selectedElement && user.color) {
-      selections[user.selectedElement] = user;
+      selections.selectedElement[user.selectedElement] = user;
+    }
+    if (user.tab && user.color) {
+      if (!selections.tab[user.tab]) selections.tab[user.tab] = [];
+      selections.tab[user.tab].push(user);
     }
   }
 
