@@ -1,15 +1,12 @@
 import type { SetImageOptions } from '@tiptap/extension-image';
 import { Editor, EditorContent, useEditorState } from '@tiptap/react';
 import { useCallback } from 'react';
-import { handleFormBlur, T } from '../helpers';
-import type { DocSelection, DocUser } from '../hooks/useProvider';
+import { T } from '../helpers';
 
 type RichEditorProps = {
   id: string,
   editor: Editor;
   getLink: (previousUrl: string, type: 'link' | 'image' | 'videoembed') => Promise<[string | null, { [attr: string]: any }?]>;
-  setAwareness: (data: Partial<DocSelection>) => void;
-  selectors: { [el: string]: DocUser };
 };
 
 function MenuBar({ editor, getLink }: RichEditorProps) {
@@ -351,17 +348,11 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
   )
 }
 
-export default function EditorFrame({ id, editor, getLink, setAwareness, selectors }: RichEditorProps) {
+export default function EditorFrame({ id, editor, getLink }: RichEditorProps) {
   return <div
     className='tiptap-editor markdown'
-    // data-selection-controlled={id}
-    // onFocus={() => {
-    //   setAwareness({ selectedElement: id });
-    //   setTimeout(() => setAwareness({ selectedElement: id }), 50);
-    // }}
-    // onBlur={({ relatedTarget }) => handleFormBlur(relatedTarget as HTMLElement, setAwareness)}
   >
-    <MenuBar id={id} editor={editor} getLink={getLink} setAwareness={setAwareness} selectors={selectors} />
+    <MenuBar id={id} editor={editor} getLink={getLink} />
     <EditorContent
       id={id}
       editor={editor}

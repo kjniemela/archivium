@@ -308,8 +308,6 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           }
           return [url];
         }}
-        setAwareness={setAwareness}
-        selectors={docSelectors.selectedElement}
       />
     ),
     gallery: (
