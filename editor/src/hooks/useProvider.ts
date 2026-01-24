@@ -76,6 +76,12 @@ export function useProvider(url: string, name: string, ydoc: Y.Doc): [
 
   useEffect(() => {
     if (me && provider) {
+      if (incomingState.length === 1) {
+        // We're alone in the room, which means that either
+        // 1. there are no other users, so we don't need to bother with this, or
+        // 2. the provider hasn't synced yet, so we need to wait for that.
+        return;
+      }
       const newUsers: { [id: number]: DocUser } = {};
       const newSelections: { [id: number]: DocSelection } = {};
       const usedColors: { [color: string]: true } = {};
