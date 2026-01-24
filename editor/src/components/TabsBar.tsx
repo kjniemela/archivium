@@ -10,7 +10,7 @@ type TabsBarProps = {
 
 export default function TabsBar({ tabs, selectedTab, onSelectTab, onRemoveTab, selectors }: TabsBarProps) {
   return (
-    <ul className='tabs-buttons navbarBtns gap-1 grow-1'>
+    <ul className='tabs-buttons navbarBtns gap-1 grow-1 flex-wrap'>
       {Object.entries(tabs).map(([tab, name]) => (
         <li
           key={tab}
