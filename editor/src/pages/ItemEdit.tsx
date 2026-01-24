@@ -224,9 +224,11 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
   /* Error Screen */
   if (error) {
     return <div className='d-flex justify-center align-center'>
-      <div className='d-flex flex-col gap-2' style={{ marginTop: 'max(0px, calc(50vh - 50px - var(--page-margin-top)))' }}>
+      <div className='d-flex flex-col align-center gap-2' style={{ marginTop: 'max(0px, calc(50vh - 50px - var(--page-margin-top)))' }}>
         <span className='color-error big-text'>{error}</span>
+        <button className='px-2' onClick={() => location.reload()}>Reload</button>
         <button
+          className='px-2'
           onClick={() => location.href = `${context.universeLink(universeShort)}/items/${itemShort}`}
         >Go Back</button>
       </div>

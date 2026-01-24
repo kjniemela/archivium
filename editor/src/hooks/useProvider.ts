@@ -112,7 +112,17 @@ export function useProvider(url: string, name: string, ydoc: Y.Doc): [
       url,
       name,
       document: ydoc,
-      token: () => fetchAsync('/api/session-token'),
+      token: async () => {
+        try {
+          return await fetchAsync('/api/session-token')
+        } catch {
+          setError('Disconnected from server');
+          provider.off('awarenessChange');
+          provider.off('awarenessUpdate');
+          provider.off('authenticationFailed');
+          provider.destroy();
+        }
+      },
     });
 
     fetchAsync('/api/me').then(async (user) => {
@@ -142,6 +152,7 @@ export function useProvider(url: string, name: string, ydoc: Y.Doc): [
     });
 
     provider.on('authenticationFailed', () => {
+      if (error) return;
       setError('Access denied');
     });
 
