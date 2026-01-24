@@ -1,6 +1,6 @@
 import type { ChangeEventHandler } from 'react';
 import { handleFormBlur, T } from '../helpers';
-import type { DocUser } from '../hooks/useProvider';
+import type { DocSelection, DocUser } from '../hooks/useProvider';
 
 export type FormSelectProps = {
   id: string,
@@ -8,11 +8,11 @@ export type FormSelectProps = {
   value: string,
   options: { [key: string]: string },
   onChange: ChangeEventHandler<HTMLSelectElement>,
-  setAwareness: (data: Partial<DocUser>) => void,
-  selections: { [el: string]: DocUser },
+  setAwareness: (data: Partial<DocSelection>) => void,
+  selectors: { [el: string]: DocUser },
 };
 
-export const FormSelect = ({ id, title, value, options, onChange, setAwareness, selections }: FormSelectProps) => (
+export const FormSelect = ({ id, title, value, options, onChange, setAwareness, selectors }: FormSelectProps) => (
   <div className='inputGroup'>
     <label htmlFor={id}>{title}:</label>
     <select
@@ -22,9 +22,9 @@ export const FormSelect = ({ id, title, value, options, onChange, setAwareness, 
       onChange={onChange}
       data-selection-controlled={id}
       onFocus={() => setAwareness({ selectedElement: id })}
-      onBlur={({ relatedTarget }) => handleFormBlur(relatedTarget as HTMLElement, () => setAwareness({ selectedElement: null }))}
-      style={selections[id] ? {
-        border: `0.1875rem solid ${selections[id].color}`,
+      onBlur={({ relatedTarget }) => handleFormBlur(relatedTarget as HTMLElement, setAwareness)}
+      style={selectors[id] ? {
+        border: `0.1875rem solid ${selectors[id].color}`,
         margin: 'calc(-0.1875rem + 0.0625rem)',
       } : undefined}
     >

@@ -1,15 +1,15 @@
-import { useCallback } from 'react';
-import { EditorContent, Editor, useEditorState } from '@tiptap/react';
-import { handleFormBlur, T } from '../helpers';
 import type { SetImageOptions } from '@tiptap/extension-image';
-import type { DocUser } from '../hooks/useProvider';
+import { Editor, EditorContent, useEditorState } from '@tiptap/react';
+import { useCallback } from 'react';
+import { handleFormBlur, T } from '../helpers';
+import type { DocSelection, DocUser } from '../hooks/useProvider';
 
 type RichEditorProps = {
   id: string,
   editor: Editor;
   getLink: (previousUrl: string, type: 'link' | 'image' | 'videoembed') => Promise<[string | null, { [attr: string]: any }?]>;
-  setAwareness: (data: Partial<DocUser>) => void;
-  selections: { [el: string]: DocUser };
+  setAwareness: (data: Partial<DocSelection>) => void;
+  selectors: { [el: string]: DocUser };
 };
 
 function MenuBar({ editor, getLink }: RichEditorProps) {
@@ -351,15 +351,20 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
   )
 }
 
-export default function EditorFrame({ id, editor, getLink, setAwareness, selections }: RichEditorProps) {
-  return <div className='tiptap-editor markdown'>
-    <MenuBar id={id} editor={editor} getLink={getLink} setAwareness={setAwareness} selections={selections} />
+export default function EditorFrame({ id, editor, getLink, setAwareness, selectors }: RichEditorProps) {
+  return <div
+    className='tiptap-editor markdown'
+    // data-selection-controlled={id}
+    // onFocus={() => {
+    //   setAwareness({ selectedElement: id });
+    //   setTimeout(() => setAwareness({ selectedElement: id }), 50);
+    // }}
+    // onBlur={({ relatedTarget }) => handleFormBlur(relatedTarget as HTMLElement, setAwareness)}
+  >
+    <MenuBar id={id} editor={editor} getLink={getLink} setAwareness={setAwareness} selectors={selectors} />
     <EditorContent
       id={id}
       editor={editor}
-      data-selection-controlled={id}
-      onFocus={() => setAwareness({ selectedElement: id })}
-      onBlur={({ relatedTarget }) => handleFormBlur(relatedTarget as HTMLElement, setAwareness)}
     />
   </div>;
 }

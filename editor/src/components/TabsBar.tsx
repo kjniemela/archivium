@@ -5,10 +5,10 @@ type TabsBarProps = {
   selectedTab: string | null,
   onSelectTab: (tab: string) => void,
   onRemoveTab: (tab: string) => void,
-  selections: { [el: string]: DocUser[] },
+  selectors: { [el: string]: DocUser[] },
 };
 
-export default function TabsBar({ tabs, selectedTab, onSelectTab, onRemoveTab, selections }: TabsBarProps) {
+export default function TabsBar({ tabs, selectedTab, onSelectTab, onRemoveTab, selectors }: TabsBarProps) {
   return (
     <ul className='tabs-buttons navbarBtns gap-1 grow-1'>
       {Object.entries(tabs).map(([tab, name]) => (
@@ -18,8 +18,8 @@ export default function TabsBar({ tabs, selectedTab, onSelectTab, onRemoveTab, s
           data-tab={tab}
           onClick={() => onSelectTab(tab)}
         >
-          {selections[tab] && selections[tab].map((user, i) => (
-            <img src={user.pfp} className='badge' style={{
+          {selectors[tab] && selectors[tab].map((user, i) => (
+            <img key={user.clientId} src={user.pfp} className='badge' style={{
               left: `${-0.5 + (0.5 * i)}rem`,
               backgroundColor: user.color ?? '',
             }} />

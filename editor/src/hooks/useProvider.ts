@@ -9,17 +9,21 @@ export type DocUser = {
   clientId: number,
   name: string,
   color: string | null,
-  selectedElement: string | null,
-  tab: string | null,
   pfp: string,
 };
 
-export type DocSelections = {
+export type DocSelection = {
+  selectedElement: string | null,
+  tab: string | null,
+};
+
+export type DocSelectors = {
+  mySelection: DocSelection,
   selectedElement: { [el: string]: DocUser },
   tab: { [tab: string]: DocUser[] },
 }
 
-type AwarenessState = { clientId: number, user: DocUser };
+type AwarenessState = { clientId: number, user: DocUser, selection: DocSelection };
 
 const colors = [
   ...[
@@ -48,13 +52,17 @@ export function useProvider(url: string, name: string, ydoc: Y.Doc): [
   HocuspocusProvider | null,
   string | null,
   DocUser[],
-  DocSelections,
-  (data: Partial<DocUser>) => void,
+  DocSelectors,
+  (data: Partial<DocSelection>) => void,
 ] {
   const [provider, setProvider] = useState<HocuspocusProvider | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<{ [id: number]: DocUser }>({});
   const [me, setMe] = useState<DocUser | null>(null);
+  const [selection, setSelection] = useState<DocSelection>({ selectedElement: null, tab: null });
+  const [selections, setSelections] = useState<{ [id: number]: DocSelection }>({});
+
+  const [incomingState, setIncomingState] = useState<AwarenessState[]>([]);
 
   useEffect(() => {
     if (!provider) return;
@@ -62,67 +70,83 @@ export function useProvider(url: string, name: string, ydoc: Y.Doc): [
   }, [me]);
 
   useEffect(() => {
+    if (!provider) return;
+    provider.setAwarenessField('selection', selection);
+  }, [selection]);
+
+  useEffect(() => {
+    if (me && provider) {
+      const newUsers: { [id: number]: DocUser } = {};
+      const newSelections: { [id: number]: DocSelection } = {};
+      const usedColors: { [color: string]: true } = {};
+      for (const { clientId, user, selection } of incomingState) {
+        if (clientId === me.clientId || !user) continue;
+        if (user.color) usedColors[user.color] = true;
+        newUsers[clientId] = user;
+        if (!selection) continue;
+        newSelections[clientId] = selection;
+      }
+      setUsers(newUsers);
+      setSelections(newSelections);
+
+      if (me.color === null) {
+        const newMe = { ...me };
+        let i = 0;
+        while (colors[i] in usedColors && i < colors.length) {
+          i++;
+        }
+        newMe.color = colors[i];
+        setMe(newMe);
+      }
+    }
+  }, [me?.clientId, provider, incomingState]);
+
+  useEffect(() => {
+    const provider = new HocuspocusProvider({
+      url,
+      name,
+      document: ydoc,
+      token: () => fetchAsync('/api/session-token'),
+    });
+
     fetchAsync('/api/me').then(async (user) => {
-      const token = await fetchAsync('/api/session-token');
-
-      const provider = new HocuspocusProvider({ url, name, document: ydoc, token });
-
       const me: DocUser = {
         clientId: provider.awareness!.clientID,
         name: user.username,
         color: null,
-        selectedElement: null,
-        tab: null,
         pfp: user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email ?? '')}.jpg`,
       };
-
-      let highlights: HTMLElement[] = [];
-
-      const handleAwarenessChange = (states: AwarenessState[]): { [color: string]: true } => {
-        for (const el of highlights) {
-          el.style.border = '';
-        }
-        highlights = [];
-
-        const newUsers: { [id: number]: DocUser } = {};
-        const usedColors: { [color: string]: true } = {};
-        for (const { clientId, user } of states) {
-          if (clientId === me.clientId || !user) continue;
-          if (user.color) usedColors[user.color] = true;
-          newUsers[clientId] = user;
-        }
-        setUsers(newUsers);
-
-        return usedColors;
-      };
-
-      provider.on('synced', () => {
-        const awareness = provider.awareness!.states;
-        const mappedStates: AwarenessState[] = Array
-          .from(awareness.keys())
-          .map(k => ({ clientId: k, ...awareness.get(k) } as AwarenessState));
-
-        const usedColors = handleAwarenessChange(mappedStates);
-        if (me.color === null) {
-          let i = 0;
-          while (colors[i] in usedColors && i < colors.length) {
-            i++;
-          }
-          me.color = colors[i];
-        }
-        setMe(me);
-      });
-
-      provider.on('awarenessChange', ({ states }: { states: AwarenessState[] }) => {
-        handleAwarenessChange(states);
-      });
-
-      provider.on('authenticationFailed', () => {
-        setError('Access denied');
-      });
-
-      setProvider(provider);
+      setMe(me);
     });
+
+    provider.on('synced', () => {
+      const awareness = provider.awareness!.states;
+      const mappedStates: AwarenessState[] = Array
+        .from(awareness.keys())
+        .map(k => ({ clientId: k, ...awareness.get(k) } as AwarenessState));
+        setIncomingState(mappedStates);
+    });
+
+    provider.on('awarenessChange', ({ states }: { states: AwarenessState[] }) => {
+      setIncomingState(states);
+    });
+
+    provider.on('awarenessUpdate', ({ states }: { states: AwarenessState[] }) => {
+      setIncomingState(states);
+    });
+
+    provider.on('authenticationFailed', () => {
+      setError('Access denied');
+    });
+
+    setProvider(provider);
+
+    return () => {
+      provider.off('awarenessChange');
+      provider.off('awarenessUpdate');
+      provider.off('authenticationFailed');
+      provider.destroy();
+    };
   }, []);
 
   const userList = me ? [
@@ -130,22 +154,26 @@ export function useProvider(url: string, name: string, ydoc: Y.Doc): [
     me,
   ] : [];
 
-  const selections: DocSelections = { selectedElement: {}, tab: {} };
-  for (const id in users) {
+  const selectors: DocSelectors = {
+    mySelection: selection,
+    selectedElement: {},
+    tab: {}
+  };
+  for (const id in selections) {
+    const { selectedElement, tab } = selections[id];
     const user = users[id];
-    if (user.selectedElement && user.color) {
-      selections.selectedElement[user.selectedElement] = user;
+    if (selectedElement && user.color) {
+      selectors.selectedElement[selectedElement] = user;
     }
-    if (user.tab && user.color) {
-      if (!selections.tab[user.tab]) selections.tab[user.tab] = [];
-      selections.tab[user.tab].push(user);
+    if (tab && user.color) {
+      if (!selectors.tab[tab]) selectors.tab[tab] = [];
+      selectors.tab[tab].push(user);
     }
   }
 
-  const setAwareness = (data: Partial<DocUser>): void => {
-    if (!me) return;
-    setMe({ ...me, ...data });
+  const setAwareness = (data: Partial<DocSelection>): void => {
+    setSelection({ ...selection, ...data });
   };
 
-  return [provider, error, userList, selections, setAwareness];
+  return [provider, error, userList, selectors, setAwareness];
 }

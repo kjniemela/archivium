@@ -89,7 +89,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
 
   const [editor, setEditor] = useState<Editor | null>(null);
 
-  const [provider, error, docUsers, docSelections, setAwareness] = useProvider(`wss://${domain}`, `item/${universeShort}/${itemShort}`, ydoc);
+  const [provider, error, docUsers, docSelectors, setAwareness] = useProvider(`wss://${domain}`, `item/${universeShort}/${itemShort}`, ydoc);
 
   useEffect(() => {
     if (provider && !editor) {
@@ -307,7 +307,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           return [url];
         }}
         setAwareness={setAwareness}
-        selections={docSelections.selectedElement}
+        selectors={docSelectors.selectedElement}
       />
     ),
     gallery: (
@@ -401,7 +401,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
             changeItem({ title: target.value })
           }
           setAwareness={setAwareness}
-          selections={docSelections.selectedElement}
+          selectors={docSelectors.selectedElement}
         />
 
         <FormInput
@@ -412,7 +412,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
             changeItem({ shortname: target.value })
           }
           setAwareness={setAwareness}
-          selections={docSelections.selectedElement}
+          selectors={docSelectors.selectedElement}
         />
 
         <div className='inputGroup'>
@@ -428,7 +428,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           options={categories && item ? Object.keys(categories).reduce((acc, type) => ({ ...acc, [type]: capitalize(categories[type][0]) }), {}) : {}}
           onChange={({ target }) => changeItem({ item_type: target.value })}
           setAwareness={setAwareness}
-          selections={docSelections.selectedElement}
+          selectors={docSelectors.selectedElement}
         />
 
         <FormTextArea
@@ -437,7 +437,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           value={item.tags?.join(' ') ?? ''}
           onChange={({ target }) => changeItem({ tags: target.value.split(' ') })}
           setAwareness={setAwareness}
-          selections={docSelections.selectedElement}
+          selectors={docSelectors.selectedElement}
         />
 
         <FormSwitch
@@ -446,7 +446,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           checked={objData?.comments ?? false}
           onChange={({ target }) => changeObjData({ comments: target.checked })}
           setAwareness={setAwareness}
-          selections={docSelections.selectedElement}
+          selectors={docSelectors.selectedElement}
         />
 
         <FormSwitch
@@ -455,7 +455,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
           checked={objData?.notes ?? false}
           onChange={({ target }) => changeObjData({ notes: target.checked })}
           setAwareness={setAwareness}
-          selections={docSelections.selectedElement}
+          selectors={docSelectors.selectedElement}
         />
 
         <div className='mt-2'>
@@ -480,12 +480,12 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
               selectedTab={currentTab}
               onSelectTab={(tab) => setCurrentTab(tab)}
               onRemoveTab={(tab) => removeTab(tab)}
-              selections={docSelections.tab}
+              selectors={docSelectors.tab}
             />
             <ul className='navbarBtns'>
               <li className='navbarBtn badge-anchor'>
-                {docSelections.tab['+'] && docSelections.tab['+'].map((user, i) => (
-                  <img src={user.pfp} className='badge' style={{
+                {docSelectors.tab['+'] && docSelectors.tab['+'].map((user, i) => (
+                  <img key={user.clientId} src={user.pfp} className='badge' style={{
                     left: `${-0.5 + (0.5 * i)}rem`,
                     backgroundColor: user.color ?? '',
                   }} />

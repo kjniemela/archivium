@@ -1,4 +1,4 @@
-import type { DocUser } from "./hooks/useProvider";
+import type { DocSelection } from "./hooks/useProvider";
 
 // TODO this is duplicated from helpers.pug
 export const capitalize = (str: string) => str[0]?.toUpperCase() + str.substr(1,str.length-1);
@@ -142,10 +142,10 @@ export class BulkExistsFetcher {
   }
 }
 
-export function handleFormBlur(relatedTarget: HTMLElement | null, awarenessCallback: () => void): void {
+export function handleFormBlur(relatedTarget: HTMLElement | null, setAwareness: (data: Partial<DocSelection>) => void): void {
   if (relatedTarget && 'selectionControlled' in relatedTarget.dataset) {
     return;
   }
 
-  awarenessCallback();
+  setAwareness({ selectedElement: null });
 }

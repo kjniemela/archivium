@@ -1,17 +1,17 @@
 import type { ChangeEventHandler } from 'react';
 import { handleFormBlur } from '../helpers';
-import type { DocUser } from '../hooks/useProvider';
+import type { DocSelection, DocUser } from '../hooks/useProvider';
 
 export type FormSwitchProps = {
   id: string,
   title: string,
   checked: boolean,
   onChange: ChangeEventHandler<HTMLInputElement>,
-  setAwareness: (data: Partial<DocUser>) => void,
-  selections: { [el: string]: DocUser },
+  setAwareness: (data: Partial<DocSelection>) => void,
+  selectors: { [el: string]: DocUser },
 };
 
-export const FormSwitch = ({ id, title, checked, onChange, setAwareness, selections }: FormSwitchProps) => (
+export const FormSwitch = ({ id, title, checked, onChange, setAwareness, selectors }: FormSwitchProps) => (
   <div className='inputGroup'>
     <label htmlFor={id}>{title}:</label>
     <label className='switch'>
@@ -23,11 +23,11 @@ export const FormSwitch = ({ id, title, checked, onChange, setAwareness, selecti
         onChange={onChange}
         data-selection-controlled={id}
       onFocus={() => setAwareness({ selectedElement: id })}
-        onBlur={({ relatedTarget }) => handleFormBlur(relatedTarget as HTMLElement, () => setAwareness({ selectedElement: null }))}
+        onBlur={({ relatedTarget }) => handleFormBlur(relatedTarget as HTMLElement, setAwareness)}
       />
       <span
         className='slider'
-        style={selections[id] ? { backgroundColor: selections[id].color ?? '' } : undefined}
+        style={selectors[id] ? { backgroundColor: selectors[id].color ?? '' } : undefined}
       />
     </label>
   </div>
