@@ -3,13 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const config_1 = require("../config");
 const api_1 = __importDefault(require("../api"));
-const templates_1 = require("../templates");
 const utils_1 = require("../api/utils");
-const logger_1 = __importDefault(require("../logger"));
-const pages_1 = __importDefault(require("./pages"));
+const config_1 = require("../config");
 const errors_1 = require("../errors");
+const logger_1 = __importDefault(require("../logger"));
+const templates_1 = require("../templates");
+const pages_1 = __importDefault(require("./pages"));
 exports.default = {
     async notificationSettings(req, res) {
         const { body, session } = req;

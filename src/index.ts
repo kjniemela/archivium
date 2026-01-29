@@ -7,7 +7,6 @@ import { render } from './templates';
 
 import CookieParser from './middleware/cookieParser';
 import multer from 'multer';
-// const bodyParser = require('body-parser');
 import Auth from './middleware/auth';
 import * as ReCaptcha from './middleware/reCaptcha';
 
@@ -17,7 +16,7 @@ import backup from './db/backup';
 // Logging
 import logger from './logger';
 
-import { PORT, ADDR_PREFIX, HOCUSPOCUS_PORT } from './config';
+import { PORT, ADDR_PREFIX } from './config';
 
 
 // Hocuspocus Server

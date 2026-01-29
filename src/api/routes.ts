@@ -11,7 +11,7 @@ import { NotFoundError } from '../errors';
 import { Session } from './models/session';
 
 type RouteMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
-export type APIRouteHandler = (req: Request, res: Response) => Promise<any>;
+export type APIRouteHandler = (req: Request<{ [key: string]: string }>, res: Response) => Promise<any>;
 type MethodFuncs = {
   [method in RouteMethod]?: APIRouteHandler;
 } & {

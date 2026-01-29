@@ -42,7 +42,6 @@ const api_1 = __importDefault(require("./api"));
 const templates_1 = require("./templates");
 const cookieParser_1 = __importDefault(require("./middleware/cookieParser"));
 const multer_1 = __importDefault(require("multer"));
-// const bodyParser = require('body-parser');
 const auth_1 = __importDefault(require("./middleware/auth"));
 const ReCaptcha = __importStar(require("./middleware/reCaptcha"));
 const node_cron_1 = __importDefault(require("node-cron"));

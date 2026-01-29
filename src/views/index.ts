@@ -15,9 +15,9 @@ import { HttpStatusCode } from 'axios';
 
 type Method = 'get' | 'post';
 type Site = 'DISPLAY' | 'NORMAL' | 'ALL';
-type SiteCheck = (req: Request) => boolean;
+type SiteCheck = (req: Request<{ [key: string]: string }>) => boolean;
 type RouterFn = (...args: [string, SiteCheck, Handler[], RouteHandler]) => void;
-export type RouteHandler = (req: Request, res: Response) => Promise<void> | void;
+export type RouteHandler = (req: Request<{ [key: string]: string }>, res: Response) => Promise<void> | void;
 
 const sites: Record<Site, SiteCheck> = {
   DISPLAY: (req) => !!req.headers['x-subdomain'],
@@ -82,7 +82,7 @@ export default function(app: Express) {
   };
 
   function use(method: Method, path: string, site: SiteCheck, middleware: Handler[], handler: RouteHandler): void {
-    app[method](`${ADDR_PREFIX}${path}`, ...middleware, async (req, res, next) => {
+    app[method](`${ADDR_PREFIX}${path}`, ...middleware, async (req: Request<{ [key: string]: string }>, res, next) => {
       if (site(req) && !res.headersSent) {
         try {
           await handler(req, res);
