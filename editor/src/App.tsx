@@ -6,9 +6,10 @@ export type AppProps = {
   displayUniverse: string,
   addrPrefix: string,
   domain: string,
+  providerAddress: string,
 };
 
-export default function App({ displayUniverse, addrPrefix, domain }: AppProps) {
+export default function App({ displayUniverse, addrPrefix, domain, providerAddress }: AppProps) {
   function universeLink(universe: string): string {
     if (displayUniverse) {
       if (displayUniverse === universe) return addrPrefix;
@@ -24,7 +25,7 @@ export default function App({ displayUniverse, addrPrefix, domain }: AppProps) {
         <Route path='universes'>
           <Route path=':universeShort'>
             <Route path='items'>
-              <Route path=':itemShort' element={<ItemEdit universeLink={universeLink} />} />
+              <Route path=':itemShort' element={<ItemEdit universeLink={universeLink} providerAddress={providerAddress} />} />
             </Route>
           </Route>
         </Route>

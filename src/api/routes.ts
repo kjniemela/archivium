@@ -8,9 +8,10 @@ import { Multer } from 'multer';
 import { Note } from './models/note';
 import { User } from './models/user';
 import { NotFoundError } from '../errors';
+import { Session } from './models/session';
 
 type RouteMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
-export type APIRouteHandler = (req: Request, res: Response) => Promise<any>;
+export type APIRouteHandler = (req: Request<{ [key: string]: string }>, res: Response) => Promise<any>;
 type MethodFuncs = {
   [method in RouteMethod]?: APIRouteHandler;
 } & {
@@ -79,6 +80,17 @@ export default function (app: Express, upload: Multer) {
 
   const apiRoutes = new APIRoute('/api', {}, [
     new APIRoute('/*'),
+    new APIRoute('/me', {
+      GET: async (req) => req.session.user ? await api.user.getOne({ 'user.username': req.session.user.username }) : null,
+    }),
+    new APIRoute('/session-token', {
+      GET: async (req) => {
+        const { insertId } = await api.session.post();
+        await api.session.put({ id: insertId }, { user_id: req.session.user?.id ?? null });
+        const session = await api.session.getOne({ id: insertId }) as Session;
+        return session.hash;
+      },
+    }),
     new APIRoute('/notifications', {}, [
       new APIRoute('/subscribe', { POST: (req) => api.notification.subscribe(req.session.user, req.body) }),
       new APIRoute('/unsubscribe', { POST: (req) => api.notification.unsubscribe(req.session.user, req.body) }),

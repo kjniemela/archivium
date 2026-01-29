@@ -27,7 +27,7 @@ export default function SaveBtn<T>({ data, saveUrl, previewUrl, onSave }: SaveBt
   const [previousData, setPreviousData] = useState<T | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [debounceTimout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
-  
+
   useEffect(() => {
     if (data) {
       setNeedsSaving(true);
@@ -36,7 +36,7 @@ export default function SaveBtn<T>({ data, saveUrl, previewUrl, onSave }: SaveBt
       setDebounceTimeout(newTimeout);
     }
   }, [data]);
-    
+
   async function save(delay: number, callback?: (data?: unknown) => void) {
     if (saveTimeout) {
       clearTimeout(saveTimeout);

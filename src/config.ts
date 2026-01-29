@@ -3,6 +3,7 @@ dotenv.config();
 
 function formatEnv(env) {
   env.PORT = Number(env.PORT);
+  env.HOCUSPOCUS_PORT = Number(env.HOCUSPOCUS_PORT);
   env.DEV_MODE = env.DEV_MODE === 'true';
   env.WEB_PUSH_ENABLED = env.WEB_PUSH_ENABLED === 'true';
   return env;
@@ -10,6 +11,8 @@ function formatEnv(env) {
 
 export const {
   PORT,
+  HOCUSPOCUS_PORT,
+  PROVIDER_ADDRESS,
   DOMAIN,
   ADDR_PREFIX,
   DEV_MODE,

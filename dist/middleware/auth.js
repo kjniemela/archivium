@@ -6,23 +6,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const api_1 = __importDefault(require("../api"));
 const config_1 = require("../config");
 const createSession = async (req, res, next) => {
+    let staleSession = null;
     if (req.cookies['archiviumuid']) {
         const session = await api_1.default.session.getOne({ hash: req.cookies['archiviumuid'] });
         if (session) {
-            req.session = {
-                id: session.id,
-                hash: session.hash,
-                created_at: session.created_at,
-            };
-            if (session.user) {
+            if (new Date().getTime() - session.created_at.getTime() < 1000 * 60 * 60 * 24 * 7) {
                 req.session = {
-                    ...req.session,
-                    user_id: session.user_id,
-                    user: session.user,
+                    id: session.id,
+                    hash: session.hash,
+                    created_at: session.created_at,
                 };
+                if (session.user) {
+                    req.session = {
+                        ...req.session,
+                        user_id: session.user_id,
+                        user: session.user,
+                    };
+                }
+                return next();
             }
-            next();
-            return;
+            else {
+                // Session is older than 7 days, it needs to be replaced
+                staleSession = session;
+            }
         }
     }
     const { insertId } = await api_1.default.session.post();
@@ -38,11 +44,19 @@ const createSession = async (req, res, next) => {
         hash: session.hash,
         created_at: session.created_at,
     };
+    if (staleSession) {
+        if (staleSession.user_id) {
+            await api_1.default.session.put({ id: session.id }, { user_id: staleSession.user_id });
+            req.session = {
+                ...req.session,
+                user_id: staleSession.user_id,
+                user: staleSession.user,
+            };
+        }
+        await api_1.default.session.del({ id: staleSession.id });
+    }
     next();
 };
-/************************************************************/
-// Add additional authentication middleware functions below
-/************************************************************/
 async function refreshSession(user) {
     await api_1.default.user.put(user.id, user.id, { updated_at: new Date() });
 }

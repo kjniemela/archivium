@@ -1,9 +1,10 @@
-import { useCallback } from 'react';
-import { EditorContent, Editor, useEditorState } from '@tiptap/react';
-import { T } from '../helpers';
 import type { SetImageOptions } from '@tiptap/extension-image';
+import { Editor, EditorContent, useEditorState } from '@tiptap/react';
+import { useCallback } from 'react';
+import { T } from '../helpers';
 
 type RichEditorProps = {
+  id: string,
   editor: Editor;
   getLink: (previousUrl: string, type: 'link' | 'image' | 'videoembed') => Promise<[string | null, { [attr: string]: any }?]>;
 };
@@ -327,7 +328,7 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
       </button>
       <button
         onMouseDown={e => e.preventDefault()}
-        onClick={() => editor.chain().focus().undo().run()} 
+        onClick={() => editor.chain().focus().undo().run()}
         disabled={!editorState.canUndo}
         className='material-symbols-outlined'
         title={T('Undo')}
@@ -347,9 +348,14 @@ function MenuBar({ editor, getLink }: RichEditorProps) {
   )
 }
 
-export default function EditorFrame({ editor, getLink }: RichEditorProps) {
-  return <div className='tiptap-editor markdown'>
-    <MenuBar editor={editor} getLink={getLink} />
-    <EditorContent editor={editor} />
+export default function EditorFrame({ id, editor, getLink }: RichEditorProps) {
+  return <div
+    className='tiptap-editor markdown'
+  >
+    <MenuBar id={id} editor={editor} getLink={getLink} />
+    <EditorContent
+      id={id}
+      editor={editor}
+    />
   </div>;
 }

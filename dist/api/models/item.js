@@ -706,7 +706,7 @@ class ItemAPI {
                 }
                 await Promise.all((body.gallery ?? []).map(async (img, i) => {
                     newImages[img.id] = img;
-                    if (img.label && oldImages[img.id] && img.label !== oldImages[img.id].label) {
+                    if (img.label !== undefined && oldImages[img.id] && img.label !== oldImages[img.id].label) {
                         dataChanged = true;
                         await this.image.putLabel(user, img.id, img.label, conn);
                     }
@@ -780,7 +780,7 @@ class ItemAPI {
     async insertMap(itemId, map, conn) {
         const { insertId } = await (0, utils_1.executeQuery)(`
       INSERT INTO map (width, height, image_id, item_id) VALUES (?, ?, ?, ?)
-    `, [map.width, map.height, map.image_id, itemId], conn);
+    `, [map.width, map.height, map.image_id ?? null, itemId], conn);
         return insertId;
     }
     async fetchLocations(mapId) {

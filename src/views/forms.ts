@@ -1,14 +1,12 @@
 import { RouteHandler } from ".";
 
-import { ADDR_PREFIX } from '../config';
 import api from '../api';
-import { universeLink } from '../templates';
 import { perms, Tier } from '../api/utils';
+import { ADDR_PREFIX } from '../config';
+import { ModelError, RateLimitError } from "../errors";
 import logger from '../logger';
+import { universeLink } from '../templates';
 import pages from './pages';
-import { ResultSetHeader } from "mysql2";
-import { ModelError, RateLimitError, RequestError } from "../errors";
-import { HttpStatusCode } from "axios";
 
 export default {
   async notificationSettings(req, res) {

@@ -5,5 +5,10 @@ block append save
   li#preview-btn.navbarBtn
 
 block content
-  #root(data-item-short=itemShort data-universe-short=universeShort data-display-universe=displayUniverse data-addr-prefix=ADDR_PREFIX data-domain=DOMAIN)
+  #root(
+    data-display-universe=displayUniverse
+    data-addr-prefix=ADDR_PREFIX
+    data-domain=DOMAIN
+    data-provider-address=PROVIDER_ADDRESS
+  )
   script(src='/static/editor/bundle.js')

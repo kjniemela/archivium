@@ -1,5 +1,5 @@
+import { InputRule, mergeAttributes } from '@tiptap/core';
 import TiptapLink, { LinkOptions } from '@tiptap/extension-link';
-import { InputRule, mergeAttributes, textInputRule } from '@tiptap/core';
 import { TiptapContext } from '..';
 
 export interface ResolveResult {

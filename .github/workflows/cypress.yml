@@ -68,6 +68,8 @@ jobs:
           wait-on: 'http://localhost:33004'
         env:
           PORT: 33004
+          HOCUSPOCUS_PORT: 31234
+          PROVIDER_ADDRESS: ws://localhost:31234
           DOMAIN: dev.archivium.net
           ADDR_PREFIX: 
           DEV_MODE: true

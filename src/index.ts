@@ -7,7 +7,6 @@ import { render } from './templates';
 
 import CookieParser from './middleware/cookieParser';
 import multer from 'multer';
-// const bodyParser = require('body-parser');
 import Auth from './middleware/auth';
 import * as ReCaptcha from './middleware/reCaptcha';
 
@@ -17,7 +16,12 @@ import backup from './db/backup';
 // Logging
 import logger from './logger';
 
-import { PORT, DOMAIN, ADDR_PREFIX, DEV_MODE } from './config';
+import { PORT, ADDR_PREFIX } from './config';
+
+
+// Hocuspocus Server
+import './hocuspocus';
+
 
 logger.info('Server starting...');
 
@@ -37,8 +41,11 @@ const upload = multer({
 
 // Cron Jobs
 cron.schedule('0 0 * * *', () => {
-    logger.info('Running daily DB export...');
-    backup();
+  logger.info('Purging stale sessions...');
+  api.session.purge().then(({ affectedRows }) => logger.info(`Purged ${affectedRows} sessions`));
+
+  logger.info('Running daily DB export...');
+  backup();
 });
 
 
@@ -79,11 +86,11 @@ import { NotFoundError } from './errors';
 loadRoutes(app, upload);
 
 
-/* 
+/*
   ACCOUNT ROUTES
 */
 async function logout(req: express.Request, res: express.Response) {
-  await api.session.delete({ id: req.session.id });
+  await api.session.del({ id: req.session.id });
   res.clearCookie('archiviumuid');
 }
 
@@ -117,15 +124,13 @@ app.get(`${ADDR_PREFIX}/logout`, async (req, res, next) => {
 });
 
 app.post(`${ADDR_PREFIX}/login`, async (req, res, next) => {
-  try {  
+  try {
     const user = await api.user.getOne({ 'user.username': req.body.username }, true).catch(handleAsNull(NotFoundError));
     if (user) {
       req.loginId = user.id;
       const isCorrectLogin = api.user.validatePassword(req.body.password, user.password, user.salt);
       if (isCorrectLogin) {
         await api.session.put({ id: req.session.id }, { user_id: req.loginId });
-        // // Atypical use of user.put, normally the first argument should be req.session.user.id
-        // await api.user.put(user.id, user.id, { updated_at: new Date() });
         res.status(200);
         res.redirect(`${ADDR_PREFIX}${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
       } else {

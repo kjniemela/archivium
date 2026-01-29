@@ -42,7 +42,6 @@ const api_1 = __importDefault(require("./api"));
 const templates_1 = require("./templates");
 const cookieParser_1 = __importDefault(require("./middleware/cookieParser"));
 const multer_1 = __importDefault(require("multer"));
-// const bodyParser = require('body-parser');
 const auth_1 = __importDefault(require("./middleware/auth"));
 const ReCaptcha = __importStar(require("./middleware/reCaptcha"));
 const node_cron_1 = __importDefault(require("node-cron"));
@@ -50,6 +49,8 @@ const backup_1 = __importDefault(require("./db/backup"));
 // Logging
 const logger_1 = __importDefault(require("./logger"));
 const config_1 = require("./config");
+// Hocuspocus Server
+require("./hocuspocus");
 logger_1.default.info('Server starting...');
 const app = (0, express_1.default)();
 app.use(express_1.default.urlencoded({ extended: true }));
@@ -63,6 +64,8 @@ const upload = (0, multer_1.default)({
 });
 // Cron Jobs
 node_cron_1.default.schedule('0 0 * * *', () => {
+    logger_1.default.info('Purging stale sessions...');
+    api_1.default.session.purge().then(({ affectedRows }) => logger_1.default.info(`Purged ${affectedRows} sessions`));
     logger_1.default.info('Running daily DB export...');
     (0, backup_1.default)();
 });
@@ -99,7 +102,7 @@ const errors_1 = require("./errors");
   ACCOUNT ROUTES
 */
 async function logout(req, res) {
-    await api_1.default.session.delete({ id: req.session.id });
+    await api_1.default.session.del({ id: req.session.id });
     res.clearCookie('archiviumuid');
 }
 app.get(`${config_1.ADDR_PREFIX}/login`, async (req, res, next) => {
@@ -138,8 +141,6 @@ app.post(`${config_1.ADDR_PREFIX}/login`, async (req, res, next) => {
             const isCorrectLogin = api_1.default.user.validatePassword(req.body.password, user.password, user.salt);
             if (isCorrectLogin) {
                 await api_1.default.session.put({ id: req.session.id }, { user_id: req.loginId });
-                // // Atypical use of user.put, normally the first argument should be req.session.user.id
-                // await api.user.put(user.id, user.id, { updated_at: new Date() });
                 res.status(200);
                 res.redirect(`${config_1.ADDR_PREFIX}${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
             }

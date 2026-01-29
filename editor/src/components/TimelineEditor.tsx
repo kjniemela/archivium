@@ -21,35 +21,35 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
   const [importEvent, setImportEvent] = useState<string | null>(null);
   const modalAnchor = document.querySelector('#modal-anchor') as HTMLElement;
 
-  
+
   const sortedEvents = (item.events ?? []).sort((a, b) => a.abstime > b.abstime ? 1 : -1);
 
   const handleEventTitleChange = (i: number, value: string) => {
-    const newEvents = [ ...item.events ];
+    const newEvents = structuredClone(item.events);
     newEvents[i].event_title = value;
     onEventsUpdate(newEvents);
   };
 
   const handleEventTimeChange = (i: number, value: number) => {
-    const newEvents = [ ...item.events ];
+    const newEvents = structuredClone(item.events);
     newEvents[i].abstime = Math.round(Number(value));
     onEventsUpdate(newEvents);
   };
 
   const removeEvent = (i: any) => {
-    const newEvents = [ ...item.events ];
+    const newEvents = structuredClone(item.events);
     newEvents.splice(i, 1);
     onEventsUpdate(newEvents);
   };
 
   const createNewEvent = () => {
-    const newEvents = [ ...item.events ];
-    
+    const newEvents = structuredClone(item.events);
+
     if (!newEventTitle && newEvents?.some(({ event_title }) => !event_title)) {
       alert('Only one untitled event allowed per item!');
       return;
     }
-    
+
     newEvents.push({
       event_title: newEventTitle,
       abstime: newEventTime,
@@ -61,7 +61,7 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
   };
 
   const handleImportEvent = () => {
-    const newEvents = [ ...item.events ];
+    const newEvents = structuredClone(item.events);
 
     if (!(importItem && importEvent !== null)) return;
 
@@ -114,7 +114,7 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
 
   return <>
     <h4>{T('Events')}</h4>
-    
+
     {sortedEvents.map((event: ItemEvent, i: number) => (
       <div key={i}>
         {event.src_id !== item.id ? (
@@ -139,7 +139,7 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
             {createTimePickerModal(i, event.abstime)}
           </>
         )}
-        
+
         <button
           type="button"
           onClick={() => removeEvent(i)}
@@ -148,16 +148,16 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
         </button>
       </div>
     ))}
-    
+
     <br />
-    
+
     <h4>{T('Add Events')}</h4>
     <div className="d-flex flex-col gap-1 pa-1 align-start">
       <div>
         <b>{T('Title')}: </b>
         <input id='new_event_title' value={newEventTitle} onChange={({ target }) => setNewEventTitle(target.value)} />
       </div>
-      
+
       <div>
         <b>{T('Time')}: </b>
         <input
@@ -169,7 +169,7 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
         <button type='button' onClick={() => setTimePickerModal(-1)}>&#x1F4C5;</button>
         {createTimePickerModal(-1, 0)}
       </div>
-      
+
       <button
         type="button"
         onClick={createNewEvent}
@@ -177,9 +177,9 @@ export default function TimelineEditor({ item, onEventsUpdate, eventItemMap }: T
         {T('Create New Event')}
       </button>
     </div>
-    
+
     <br />
-    
+
     <div>
       <button type='button' onClick={() => setImportEventModal(true)}>{T('Import Event')}</button>
       {importEventModal && (

@@ -31,7 +31,7 @@ export default function ChapterEdit({ universeLink }: ItemEditProps) {
     },
     headings: [],
   };
-  
+
   const editor = useEditor({
     extensions: editorExtensions(true, context),
     onUpdate: ({ editor }) => {
@@ -119,8 +119,8 @@ export default function ChapterEdit({ universeLink }: ItemEditProps) {
         </div>
 
         <hr className='w-100 mb-0' />
-        
-        <EditorFrame editor={editor} getLink={async (previousUrl, type) => {
+
+        <EditorFrame id='main-editor' editor={editor} getLink={async (previousUrl, type) => {
           const url = window.prompt('URL', previousUrl);
           if (url?.startsWith('@')) {
             if (type === 'link') {

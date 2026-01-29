@@ -70,13 +70,13 @@ block content
     each notification in unread
       .sheet.d-flex.gap-4.align-start
         img.userIcon(src=notification.icon_url || '/static/assets/icons/archivium-192.png')
-        .d-flex.flex-col.grow-1
+        .d-flex.flex-col.grow-1(style={ 'overflow-x': 'hidden', 'word-wrap': 'break-word' })
           div
             if notification.click_url
-              a.link.link-animated.mr-2(href=notification.click_url) 
+              a.link.link-animated.mr-2(href=notification.click_url)
                 b #{notification.title}
             else
-              b #{notification.title} 
+              b.mr-2 #{notification.title}
             small #{formatDate(notification.sent_at)}
           p #{notification.body}
         a.link.material-symbols-outlined(onclick=`markNotification(true, ${notification.id})` title='Mark as read') drafts
@@ -89,13 +89,13 @@ block content
     each notification in read
       .sheet.d-flex.gap-4.align-start
         img.userIcon(src=notification.icon_url || '/static/assets/icons/archivium-192.png')
-        .d-flex.flex-col.grow-1
+        .d-flex.flex-col.grow-1(style={ 'overflow-x': 'hidden', 'word-wrap': 'break-word' })
           div
             if notification.click_url
               a.link.link-animated.mr-2(href=notification.click_url)
                 b #{notification.title}
             else
-              b #{notification.title} 
+              b.mr-2 #{notification.title}
             small #{formatDate(notification.sent_at)}
           p #{notification.body}
         a.link.material-symbols-outlined(onclick=`markNotification(false, ${notification.id})` title='Mark as unread') mark_email_unread

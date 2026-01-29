@@ -11,7 +11,7 @@ import SearchableSelect from './SearchableSelect';
 type MapEditorProps = {
   item: Item,
   categories: Categories,
-  onUpdate: (newItem: Item) => void,
+  onUpdate: (newItem: Partial<Item>) => void,
   itemMap: Record<string, ItemOptionEntry>,
 };
 
@@ -37,10 +37,9 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
   const keyboardSensor = useSensor(KeyboardSensor, {});
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
 
-  const prepNewItem = (): Item & { map: Map } => {
+  const prepNewItem = (): { map: Map } => {
     return {
-      ...item,
-      map: item.map ?? {
+      map: item.map ? structuredClone(item.map) : {
         id: null,
         width: null,
         height: null,

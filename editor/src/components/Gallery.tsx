@@ -1,7 +1,7 @@
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent, type UniqueIdentifier } from '@dnd-kit/core';
 import { arrayMove, rectSortingStrategy, SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { HttpStatusCode } from 'axios';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { type GalleryImage } from '../../../src/api/models/item';
 import { postFormData, T } from '../helpers';
@@ -34,7 +34,6 @@ export default function Gallery({ universe, item, images, onRemoveImage, onUploa
     }),
   );
 
-  const [localImages, setLocalImages] = useState(images);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
   const handleDragStart = useCallback((event: DragEndEvent) => {
@@ -46,10 +45,9 @@ export default function Gallery({ universe, item, images, onRemoveImage, onUploa
       const { active, over } = event;
       if (!over) return;
       if (active.id !== over.id) {
-        const oldIndex = localImages.findIndex(img => img.id === active.id);
-        const newIndex = localImages.findIndex(img => img.id === over.id);
-        const newOrder = arrayMove(localImages, oldIndex, newIndex);
-        setLocalImages(newOrder);
+        const oldIndex = images.findIndex(img => img.id === active.id);
+        const newIndex = images.findIndex(img => img.id === over.id);
+        const newOrder = arrayMove(images, oldIndex, newIndex);
         onReorderImages(newOrder);
       }
       setActiveId(null);
@@ -68,9 +66,10 @@ export default function Gallery({ universe, item, images, onRemoveImage, onUploa
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
-        <SortableContext items={localImages.map(i => i.id)} strategy={rectSortingStrategy}>
-          {localImages.map((img) => (
+        <SortableContext items={images.map(i => i.id)} strategy={rectSortingStrategy}>
+          {images.map((img) => (
             <GalleryImageCard
+              key={img.id}
               id={img.id}
               src={`/api/universes/${universe}/items/${item}/gallery/images/${img.id}`}
               label={img.label}

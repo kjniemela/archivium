@@ -54,6 +54,7 @@ async function contextData(req) {
         DOMAIN: config_1.DOMAIN,
         ADDR_PREFIX: config_1.ADDR_PREFIX,
         VAPID_PUBLIC_KEY: config_1.VAPID_PUBLIC_KEY,
+        PROVIDER_ADDRESS: config_1.PROVIDER_ADDRESS,
         encodedPath: pageQuery.toString(),
         displayUniverse,
         systemDisplayModes: exports.systemDisplayModes,

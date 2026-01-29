@@ -7,7 +7,7 @@ import type { Categories, ItemOptionEntry } from '../pages/ItemEdit';
 type LineageEditorProps = {
   item: Item,
   categories: Categories,
-  onUpdate: (newItem: Item) => void,
+  onUpdate: (newItem: Partial<Item>) => void,
   itemMap: Record<string, ItemOptionEntry>,
 };
 
@@ -20,13 +20,13 @@ export default function LineageEditor({ item, categories, onUpdate, itemMap }: L
   const [newChildOtherLabel, setNewChildOtherLabel] = useState<string>('');
 
   const deleteParent = (index: number) => {
-    const newState = { ...item };
+    const newState = { parents: structuredClone(item.parents) };
     newState.parents.splice(index, 1);
     onUpdate(newState);
   };
 
   const deleteChild = (index: number) => {
-    const newState = { ...item };
+    const newState = { children: structuredClone(item.children) };
     newState.children.splice(index, 1);
     onUpdate(newState);
   };

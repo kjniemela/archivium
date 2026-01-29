@@ -1,4 +1,4 @@
-import {Express} from 'express-serve-static-core';
+import { Express } from 'express-serve-static-core';
 import { Theme } from './themes';
 import { Session } from './api/models/session';
 

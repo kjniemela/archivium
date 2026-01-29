@@ -3,8 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const extension_link_1 = __importDefault(require("@tiptap/extension-link"));
 const core_1 = require("@tiptap/core");
+const extension_link_1 = __importDefault(require("@tiptap/extension-link"));
 const MD_LINK_RE = /\[([^\]]+)\]\(([^)\s]+)\)$/;
 const Link = extension_link_1.default.configure({
     autolink: true,
