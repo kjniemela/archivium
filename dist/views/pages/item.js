@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const api_1 = __importDefault(require("../../api"));
 const utils_1 = require("../../api/utils");
 const errors_1 = require("../../errors");
+const familyTree_1 = require("../../lib/familyTree");
 const renderContent_1 = require("../../lib/renderContent");
 const templates_1 = require("../../templates");
 exports.default = {
@@ -67,6 +68,12 @@ exports.default = {
         if ('body' in item.obj_data) {
             renderedBody = await (0, renderContent_1.tryRenderContent)(req, item.obj_data.body, universe.shortname);
         }
+        let family = {};
+        let familyLayout = null;
+        if ('lineage' in item.obj_data) {
+            family = await api_1.default.item.getFamilyTree(req.session.user, item, 10);
+            familyLayout = (0, familyTree_1.layoutFamilyTree)(item.shortname, family);
+        }
         const [comments, commentUsers] = await api_1.default.discussion.getCommentsByItem(item.id, true);
         const commenters = {};
         for (const user of commentUsers) {
@@ -85,6 +92,7 @@ exports.default = {
             item, universe, tab: req.query.tab, comments, commenters, notes, noteAuthors, renderedBody,
             commentAction: `${(0, templates_1.universeLink)(req, universe.shortname)}/items/${item.shortname}/comment`,
             noteBaseRoute: `/api/universes/${universe.shortname}/items/${item.shortname}/notes`,
+            family, familyLayout,
         });
     },
     async delete(req, res) {

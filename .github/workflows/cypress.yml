@@ -37,7 +37,10 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
-        run: npm i
+        run: npm ci
+
+      - name: Build project
+        run: npm run build:all
 
       - name: Wait for MySQL
         run: |
@@ -49,11 +52,20 @@ jobs:
             sleep 1
           done
 
-      - name: Start server
-        run: |
-          npm run build:all &
-          nohup npm start &
-          sleep 5
+      - name: Setup database
+        run: yes | npm run db:reset
+        env:
+          DEV_MODE: true
+          ARCHIVIUM_DB_HOST: localhost
+          ARCHIVIUM_DB_USER: testuser
+          ARCHIVIUM_DB_PASSWORD: testpassword
+          ARCHIVIUM_DB: archiviumtest
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          start: npm start
+          wait-on: 'http://localhost:33004'
         env:
           PORT: 33004
           DOMAIN: dev.archivium.net
@@ -67,19 +79,3 @@ jobs:
           ARCHIVIUM_DB_USER: testuser
           ARCHIVIUM_DB_PASSWORD: testpassword
           ARCHIVIUM_DB: archiviumtest
-
-      - name: Setup database
-        run: yes | npm run db:reset
-        env:
-          DEV_MODE: true
-          ARCHIVIUM_DB_HOST: localhost
-          ARCHIVIUM_DB_USER: testuser
-          ARCHIVIUM_DB_PASSWORD: testpassword
-          ARCHIVIUM_DB: archiviumtest
-
-      - name: Run tests
-        run: npm test
-
-      - name: Show server logs
-        if: failure()
-        run: cat logs/current.log

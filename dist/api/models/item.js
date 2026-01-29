@@ -276,24 +276,7 @@ class ItemAPI {
       ORDER BY itemimage.idx
     `, [item.id]);
         item.gallery = gallery;
-        const children = await (0, utils_1.executeQuery)(`
-      SELECT
-        item.shortname AS child_shortname, item.title AS child_title,
-        lineage.child_title AS child_label, lineage.parent_title AS parent_label
-      FROM lineage
-      INNER JOIN item ON item.id = lineage.child_id
-      WHERE lineage.parent_id = ?
-    `, [item.id]);
-        item.children = children;
-        const parents = await (0, utils_1.executeQuery)(`
-      SELECT
-        item.shortname AS parent_shortname, item.title AS parent_title,
-        lineage.child_title AS child_label, lineage.parent_title AS parent_label
-      FROM lineage
-      INNER JOIN item ON item.id = lineage.parent_id
-      WHERE lineage.child_id = ?
-    `, [item.id]);
-        item.parents = parents;
+        [item.parents, item.children] = await this.getLineage(item);
         const links = await (0, utils_1.executeQuery)(`
       SELECT DISTINCT item.id, item.shortname, item.title, universe.shortname AS universe_short
       FROM itemlink
@@ -515,15 +498,15 @@ class ItemAPI {
         const items = await this.getMany(user, conditions, permissionsRequired, options);
         return items;
     }
-    async getByUniverseAndItemShortnames(user, universeShortname, itemShortname, permissionsRequired = utils_1.perms.READ, basicOnly = false) {
+    async getByUniverseAndItemShortnames(user, universeShortname, itemShortname, permissionsRequired = utils_1.perms.READ, basicOnly = false, includeData = true) {
         const conditions = {
             'universe.shortname': universeShortname,
             'item.shortname': itemShortname,
         };
         if (basicOnly)
-            return await this.getOneBasic(user, conditions, permissionsRequired, { includeData: true });
+            return await this.getOneBasic(user, conditions, permissionsRequired, { includeData });
         else
-            return await this.getOne(user, conditions, permissionsRequired, { includeData: true });
+            return await this.getOne(user, conditions, permissionsRequired, { includeData });
     }
     /**
      *
@@ -1001,10 +984,53 @@ class ItemAPI {
         const data = await (0, utils_1.executeQuery)(queryString, [universeShortname, itemShortname]);
         return data.length > 0;
     }
+    async getLineage(item) {
+        const children = await (0, utils_1.executeQuery)(`
+      SELECT
+        item.id, item.shortname AS child_shortname, item.title AS child_title,
+        lineage.child_title AS child_label, lineage.parent_title AS parent_label
+      FROM lineage
+      INNER JOIN item ON item.id = lineage.child_id
+      WHERE lineage.parent_id = ?
+    `, [item.id]);
+        const parents = await (0, utils_1.executeQuery)(`
+      SELECT
+        item.id, item.shortname AS parent_shortname, item.title AS parent_title,
+        lineage.child_title AS child_label, lineage.parent_title AS parent_label
+      FROM lineage
+      INNER JOIN item ON item.id = lineage.parent_id
+      WHERE lineage.child_id = ?
+    `, [item.id]);
+        return [parents, children];
+    }
+    async getFamilyTreeStep(user, item, depth, family = {}) {
+        if (depth < 1) {
+            family[item.shortname] = { title: item.title, parents: [], children: [] };
+            return;
+        }
+        ;
+        const [parents, children] = await this.getLineage(item);
+        family[item.shortname] = { title: item.title, parents, children };
+        for (const { parent_shortname } of parents) {
+            if (parent_shortname in family)
+                continue;
+            const parent = await this.getByUniverseAndItemShortnames(user, item.universe_short, parent_shortname, utils_1.perms.READ, true, false);
+            await this.getFamilyTreeStep(user, parent, depth - 1, family);
+        }
+        for (const { child_shortname } of children) {
+            if (child_shortname in family)
+                continue;
+            const child = await this.getByUniverseAndItemShortnames(user, item.universe_short, child_shortname, utils_1.perms.READ, true, false);
+            await this.getFamilyTreeStep(user, child, depth - 1, family);
+        }
+    }
+    async getFamilyTree(user, item, depth) {
+        const family = {};
+        await this.getFamilyTreeStep(user, item, depth, family);
+        return family;
+    }
     /**
      * NOT safe. Make sure user has permissions to the item in question before calling this!
-     * @param {*} itemShortname
-     * @returns
      */
     async putLineage(parent_id, child_id, parent_title, child_title, conn) {
         const queryString = `
@@ -1016,8 +1042,6 @@ class ItemAPI {
     }
     /**
      * NOT safe. Make sure user has permissions to the item in question before calling this!
-     * @param {*} itemShortname
-     * @returns
      */
     async delLineage(parent_id, child_id, conn) {
         const queryString = `DELETE FROM lineage WHERE parent_id = ? AND child_id = ?;`;

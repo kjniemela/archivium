@@ -16,7 +16,9 @@ describe('Item spec', () => {
 
   it('adds a link from the test character to the test event, then follows it', () => {
     cy.visit('/universes/public-test-universe/items/test-character?tab=body');
+    cy.intercept('GET', '/api/universes/public-test-universe/items/test-character').as('request');
     cy.get('#action-bar').contains('Edit').click();
+    cy.wait('@request');
 
     cy.get('.tiptap-editor .tiptap').should('be.visible');
     cy.window().then((win) => {
@@ -44,7 +46,9 @@ describe('Item spec', () => {
   it('adds an event to the timline, then removes it', () => {
     cy.visit('/universes/public-test-universe/items/test-timeline?tab=timeline');
     cy.get('.timeline>.flex-col').children().should('have.length', timelineEvents);
+    cy.intercept('GET', '/api/universes/public-test-universe/items/test-timeline').as('request');
     cy.get('#action-bar').contains('Edit').click();
+    cy.wait('@request');
 
     cy.get('.tabs-buttons').should('be.visible');
     cy.get('.tabs-buttons').contains('Timeline').click();
@@ -71,7 +75,9 @@ describe('Item spec', () => {
   });
 
   it('adds an event to an item, then imports it to the timeline', () => {
+    cy.intercept('GET', '/api/universes/public-test-universe/items/test-event').as('request');
     cy.visit('/editor/universes/public-test-universe/items/test-event');
+    cy.wait('@request');
 
     cy.get('.tabs-buttons').contains('Timeline').click();
     cy.get('#new_event_title').type('Cypress Event');
@@ -100,7 +106,9 @@ describe('Item spec', () => {
   });
 
   it('deletes the event and sees that it is removed from the timeline that imported it as well', () => {
+    cy.intercept('GET', '/api/universes/public-test-universe/items/test-event').as('request');
     cy.visit('/editor/universes/public-test-universe/items/test-event');
+    cy.wait('@request');
 
     cy.get('.tabs-buttons').contains('Timeline').click();
     cy.get('input').filter((k, el) => el.value === 'Cypress Event').siblings('button').contains('Remove').click();
@@ -127,7 +135,9 @@ describe('Item spec', () => {
   });
 
   it('adds some tags to the new item, confirm they exist', () => {
+    cy.intercept('GET', '/api/universes/public-test-universe/items/cypress-character').as('request');
     cy.visit('/editor/universes/public-test-universe/items/cypress-character');
+    cy.wait('@request');
 
     cy.get('#tags').type('testing cypress');
     cy.get('#preview-btn').click();

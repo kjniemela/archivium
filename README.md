@@ -22,7 +22,7 @@ Images can be uploaded to an item, where they will be displayed in a **Gallery**
 
 ### Lineages
 
-An item can list other items as its Parents or Children. This information is displayed in the **Lineage** tab and is generally used to construct simple family trees for **Character** items. (Full family tree explorer coming soon!)
+An item can list other items as its Parents or Children. This information is displayed in the **Lineage** as a family tree, which can be useful for **Character** items.
 
 ### Timelines
 
@@ -55,11 +55,14 @@ You can draft and publish stories about your universe, which will be collected o
 # Planned Features
 
 - In-universe date/calendar management
-- More extensive family tree tools
-- Dark Mode
 - Improved note boards
 - Direct messaging
 - Stats and admin tools
+- Custom layout plugins
+- Better access control (for items and individual pieces of text)
+- Scriptable "tasks"
+- Multi-user collaborative editor
+- Inline polls
 
 Want a new feature not on this list? Feel free to [open a ticket](https://github.com/HMI-Studios/archivium/issues/new/choose) here on github or shoot us an email at [contact@archivium.net](mailto:contact@archivium.net)!
 

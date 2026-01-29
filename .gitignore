@@ -9,7 +9,6 @@ logs/
 
 cypress/screenshots/
 
-package-lock.json
 dist/static/editor
 
 .vscode/

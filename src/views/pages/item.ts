@@ -1,11 +1,12 @@
 import { RouteHandler } from '..';
 import api from '../../api';
 import { Comment } from '../../api/models/discussion';
-import { Item } from '../../api/models/item';
+import { Family, Item } from '../../api/models/item';
 import { Note } from '../../api/models/note';
 import { User } from '../../api/models/user';
 import { getPfpUrl, perms } from '../../api/utils';
 import { ForbiddenError, NotFoundError } from '../../errors';
+import { FamilyTreeLayout, layoutFamilyTree } from '../../lib/familyTree';
 import { RenderedBody, tryRenderContent } from '../../lib/renderContent';
 import { universeLink } from '../../templates';
 
@@ -73,6 +74,13 @@ export default {
       renderedBody = await tryRenderContent(req, item.obj_data.body, universe.shortname);
     }
 
+    let family: Family = {};
+    let familyLayout: FamilyTreeLayout | null = null;
+    if ('lineage' in item.obj_data) {
+      family = await api.item.getFamilyTree(req.session.user, item, 10);
+      familyLayout = layoutFamilyTree(item.shortname, family);
+    }
+
     const [comments, commentUsers] = await api.discussion.getCommentsByItem(item.id, true) as [Comment[], User[]];
     const commenters = {};
     for (const user of commentUsers) {
@@ -93,6 +101,7 @@ export default {
       item, universe, tab: req.query.tab, comments, commenters, notes, noteAuthors, renderedBody,
       commentAction: `${universeLink(req, universe.shortname)}/items/${item.shortname}/comment`,
       noteBaseRoute: `/api/universes/${universe.shortname}/items/${item.shortname}/notes`,
+      family, familyLayout,
     });
   },
 

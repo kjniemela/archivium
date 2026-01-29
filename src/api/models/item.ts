@@ -84,6 +84,14 @@ export type Parent = {
   parent_label: string,
 };
 
+export type Family = {
+  [shortname: string]: {
+    title: string,
+    parents: Parent[],
+    children: Child[],
+  },
+};
+
 export type ItemLink = {
   id: number,
   title: string,
@@ -411,25 +419,7 @@ export class ItemAPI {
     `, [item.id]) as GalleryImage[];
     item.gallery = gallery;
 
-    const children = await executeQuery(`
-      SELECT
-        item.shortname AS child_shortname, item.title AS child_title,
-        lineage.child_title AS child_label, lineage.parent_title AS parent_label
-      FROM lineage
-      INNER JOIN item ON item.id = lineage.child_id
-      WHERE lineage.parent_id = ?
-    `, [item.id]);
-    item.children = children as Child[];
-
-    const parents = await executeQuery(`
-      SELECT
-        item.shortname AS parent_shortname, item.title AS parent_title,
-        lineage.child_title AS child_label, lineage.parent_title AS parent_label
-      FROM lineage
-      INNER JOIN item ON item.id = lineage.parent_id
-      WHERE lineage.child_id = ?
-    `, [item.id]);
-    item.parents = parents as Parent[];
+    [item.parents, item.children] = await this.getLineage(item);
 
     const links = await executeQuery(`
       SELECT DISTINCT item.id, item.shortname, item.title, universe.shortname AS universe_short
@@ -675,7 +665,8 @@ export class ItemAPI {
     universeShortname: string,
     itemShortname: string,
     permissionsRequired = perms.READ,
-    basicOnly = false
+    basicOnly = false,
+    includeData = true
   ): Promise<Item | BasicItem> {
 
     const conditions = {
@@ -683,8 +674,8 @@ export class ItemAPI {
       'item.shortname': itemShortname,
     };
 
-    if (basicOnly) return await this.getOneBasic(user, conditions, permissionsRequired, { includeData: true });
-    else return await this.getOne(user, conditions, permissionsRequired, { includeData: true });
+    if (basicOnly) return await this.getOneBasic(user, conditions, permissionsRequired, { includeData });
+    else return await this.getOne(user, conditions, permissionsRequired, { includeData });
   }
 
   /**
@@ -1201,11 +1192,56 @@ export class ItemAPI {
     return data.length > 0;
   }
 
+  async getLineage(item: BasicItem): Promise<[Parent[], Child[]]> {
+    const children = await executeQuery(`
+      SELECT
+        item.id, item.shortname AS child_shortname, item.title AS child_title,
+        lineage.child_title AS child_label, lineage.parent_title AS parent_label
+      FROM lineage
+      INNER JOIN item ON item.id = lineage.child_id
+      WHERE lineage.parent_id = ?
+    `, [item.id]) as Child[];
+
+    const parents = await executeQuery(`
+      SELECT
+        item.id, item.shortname AS parent_shortname, item.title AS parent_title,
+        lineage.child_title AS child_label, lineage.parent_title AS parent_label
+      FROM lineage
+      INNER JOIN item ON item.id = lineage.parent_id
+      WHERE lineage.child_id = ?
+    `, [item.id]) as Parent[];
+
+    return [parents, children];
+  }
+
+  private async getFamilyTreeStep(user: User | undefined, item: BasicItem, depth: number, family: Family = {}): Promise<void> {
+    if (depth < 1) {
+      family[item.shortname] = { title: item.title, parents: [], children: [] };
+      return;
+    };
+
+    const [parents, children] = await this.getLineage(item);
+    family[item.shortname] = { title: item.title, parents, children };
+    for (const { parent_shortname } of parents) {
+      if (parent_shortname in family) continue;
+      const parent = await this.getByUniverseAndItemShortnames(user, item.universe_short, parent_shortname, perms.READ, true, false);
+      await this.getFamilyTreeStep(user, parent, depth - 1, family);
+    }
+    for (const { child_shortname } of children) {
+      if (child_shortname in family) continue;
+      const child = await this.getByUniverseAndItemShortnames(user, item.universe_short, child_shortname, perms.READ, true, false);
+      await this.getFamilyTreeStep(user, child, depth - 1, family);
+    }
+  }
+
+  async getFamilyTree(user: User | undefined, item: BasicItem, depth: number): Promise<Family> {
+    const family: Family = {};
+    await this.getFamilyTreeStep(user, item, depth, family);
+    return family;
+  }
 
   /**
    * NOT safe. Make sure user has permissions to the item in question before calling this!
-   * @param {*} itemShortname 
-   * @returns 
    */
   async putLineage(parent_id: number, child_id: number, parent_title: string, child_title: string, conn?: PoolConnection): Promise<ResultSetHeader> {
     const queryString = `
@@ -1216,11 +1252,8 @@ export class ItemAPI {
     return data;
   }
 
-
   /**
    * NOT safe. Make sure user has permissions to the item in question before calling this!
-   * @param {*} itemShortname 
-   * @returns 
    */
   async delLineage(parent_id: number, child_id: number, conn?: PoolConnection): Promise<ResultSetHeader> {
     const queryString = `DELETE FROM lineage WHERE parent_id = ? AND child_id = ?;`;
