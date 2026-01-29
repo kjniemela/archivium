@@ -1,6 +1,6 @@
 import pug from 'pug';
 import { Request } from 'express';
-import { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN } from './config';
+import { ADDR_PREFIX, VAPID_PUBLIC_KEY, DOMAIN, PROVIDER_ADDRESS } from './config';
 import { perms, getPfpUrl, tiers, plans, tierAllowance, handleAsNull } from './api/utils';
 import { locale, lang, sprintf, T } from './locale';
 import api from './api';
@@ -51,6 +51,7 @@ async function contextData(req: Request) {
     DOMAIN,
     ADDR_PREFIX,
     VAPID_PUBLIC_KEY,
+    PROVIDER_ADDRESS,
     encodedPath: pageQuery.toString(),
     displayUniverse,
     systemDisplayModes,

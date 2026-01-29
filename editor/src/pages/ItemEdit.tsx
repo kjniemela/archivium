@@ -44,7 +44,7 @@ type ModalType = 'newTab';
 
 export type ItemEditProps = {
   universeLink: (universe: string) => string,
-  domain: string,
+  providerAddress: string,
 };
 
 function computeTabs(objData: ObjData): Record<string, string> {
@@ -61,7 +61,7 @@ const ydoc = new Y.Doc();
 const yItem = ydoc.getMap('item');
 const yObjData = ydoc.getMap('obj_data');
 
-export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
+export default function ItemEdit({ universeLink, providerAddress }: ItemEditProps) {
   const navigate = useNavigate();
   const { universeShort, itemShort } = useParams();
 
@@ -89,7 +89,7 @@ export default function ItemEdit({ universeLink, domain }: ItemEditProps) {
 
   const [editor, setEditor] = useState<Editor | null>(null);
 
-  const [provider, error, docUsers, docSelectors, setAwareness] = useProvider(`wss://${domain}`, `item/${universeShort}/${itemShort}`, ydoc);
+  const [provider, error, docUsers, docSelectors, setAwareness] = useProvider(providerAddress, `item/${universeShort}/${itemShort}`, ydoc);
 
   useEffect(() => {
     if (provider && !editor) {

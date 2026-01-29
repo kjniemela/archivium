@@ -12,6 +12,7 @@ function formatEnv(env) {
 export const {
   PORT,
   HOCUSPOCUS_PORT,
+  PROVIDER_ADDRESS,
   DOMAIN,
   ADDR_PREFIX,
   DEV_MODE,
