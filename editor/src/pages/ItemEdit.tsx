@@ -61,6 +61,21 @@ const ydoc = new Y.Doc();
 const yItem = ydoc.getMap('item');
 const yObjData = ydoc.getMap('obj_data');
 
+function syncItemExistsCache() {
+  const remoteCache = ydoc.getMap('config').get('itemExistsCache') as typeof itemExistsCache | undefined;
+  console.log(remoteCache)
+  if (remoteCache) {
+    for (const universe in remoteCache) {
+      if (!(universe in itemExistsCache)) {
+        itemExistsCache[universe] = {};
+      }
+      for (const item in remoteCache[universe]) {
+        itemExistsCache[universe][item] = remoteCache[universe][item];
+      }
+    }
+  }
+}
+
 export default function ItemEdit({ universeLink, providerAddress }: ItemEditProps) {
   const navigate = useNavigate();
   const { universeShort, itemShort } = useParams();
@@ -93,15 +108,21 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
 
   useEffect(() => {
     if (provider && !editor) {
-      const editor = new Editor({
-        extensions: editorExtensions(true, context, { ydoc, field: 'main', provider }),
-        onUpdate: ({ editor }) => {
-          const json = editor.getJSON();
-          const indexed = jsonToIndexed(json);
-          changeObjData({ body: indexed });
-        },
-      });
-      setEditor(editor);
+      const handleSync = async () => {
+        syncItemExistsCache();
+        const editor = new Editor({
+          extensions: editorExtensions(true, context, { ydoc, field: 'main', provider }),
+          onUpdate: ({ editor }) => {
+            const json = editor.getJSON();
+            const indexed = jsonToIndexed(json);
+            changeObjData({ body: indexed });
+          },
+        });
+        setEditor(editor);
+      };
+
+      if (provider.isSynced) handleSync();
+      else provider.on('synced', handleSync);
     }
   }, [provider]);
 
@@ -129,46 +150,49 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
         setItemMap(newItemMap);
       });
 
-      Promise.all([categoryPromise, eventItemPromise, itemMapPromise]).then(() => {
-        const handleSync = async () => {
-          if (!ydoc.getMap('config').get('initialContentLoaded') && editor) {
+      Promise.all([categoryPromise, eventItemPromise, itemMapPromise]).then(async () => {
+        // The editor doesn't get created until the provider syncs, so we're guaranteed to be synced here
+        if (!ydoc.getMap('config').get('initialContentLoading') && editor) {
+          ydoc.getMap('config').set('initialContentLoading', true);
+
+          await fetchData(`/api/universes/${universeShort}/items/${itemShort}`, async (data) => {
+            const objData = JSON.parse(data.obj_data) as ObjData;
+            let initialContent: Object | null = null;
+            if (objData.body) {
+              const links: LinkData[] = [];
+              initialContent = indexedToJson(objData.body, (href) => links.push(extractLinkData(href)));
+              const bulkFetcher = new BulkExistsFetcher();
+              const fetchPromises = links.map(async (link) => {
+                if (link.item) {
+                  const universe = link.universe ?? universeShort;
+                  if (!(universe in itemExistsCache)) {
+                    itemExistsCache[universe] = {};
+                  }
+                  if (!(link.item in itemExistsCache[universe])) {
+                    itemExistsCache[universe][link.item] = await bulkFetcher.exists(universe, link.item);
+                  }
+                }
+              });
+              bulkFetcher.fetchAll();
+              await Promise.all(fetchPromises);
+              ydoc.getMap('config').set('itemExistsCache', itemExistsCache);
+            }
+            delete data.obj_data;
+
+            if (ydoc.getMap('config').get('initialContentLoaded')) {
+              // Someone else beat us to loading it first, return
+              return;
+            }
             ydoc.getMap('config').set('initialContentLoaded', true);
 
-            await fetchData(`/api/universes/${universeShort}/items/${itemShort}`, async (data) => {
-              const objData = JSON.parse(data.obj_data) as ObjData;
-              let initialContent: Object | null = null;
-              if (objData.body) {
-                const links: LinkData[] = [];
-                initialContent = indexedToJson(objData.body, (href) => links.push(extractLinkData(href)));
-                const bulkFetcher = new BulkExistsFetcher();
-                const fetchPromises = links.map(async (link) => {
-                  if (link.item) {
-                    const universe = link.universe ?? universeShort;
-                    if (!(universe in itemExistsCache)) {
-                      itemExistsCache[universe] = {};
-                    }
-                    if (!(link.item in itemExistsCache[universe])) {
-                      itemExistsCache[universe][link.item] = await bulkFetcher.exists(universe, link.item);
-                    }
-                  }
-                });
-                bulkFetcher.fetchAll();
-                await Promise.all(fetchPromises);
-              }
-              delete data.obj_data;
-
-              if (initialContent) {
-                editor.commands.setContent(initialContent);
-              }
-              setItem(data);
-              setObjData(objData);
-            });
-          }
-          setLoading(false);
-        };
-
-        if (provider.isSynced) handleSync();
-        else provider.on('synced', handleSync);
+            if (initialContent) {
+              editor.commands.setContent(initialContent);
+            }
+            setItem(data);
+            setObjData(objData);
+          });
+        }
+        setLoading(false);
       });
     }
   }, [itemShort, universeShort, provider, editor]);
