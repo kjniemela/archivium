@@ -283,7 +283,7 @@ block content
     const homePageEdit = homeBodyContainer.querySelector('button');
     let homePageExists = #{homePage !== null};
     homePageSwitch.addEventListener('change', async () => {
-      if (publicPageSwitch.checked && !publicPageExists) {
+      if (homePageSwitch.checked && !homePageExists) {
         await postJSON(`/api/universes/${universe}/items`, {
           skipValidation: true,
           title: T('Home Page'),
