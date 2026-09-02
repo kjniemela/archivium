@@ -110,6 +110,28 @@ CREATE TABLE universe (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE vault (
+  id INT NOT NULL AUTO_INCREMENT,
+  universe_id INT NOT NULL,
+  title VARCHAR(64) NOT NULL,
+  shortname VARCHAR(64) NOT NULL,
+  created_at TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP NOT NULL,
+  UNIQUE(shortname, universe_id),
+  FOREIGN KEY (universe_id) REFERENCES universe (id) ON DELETE CASCADE,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE vaultauthor (
+  id INT NOT NULL AUTO_INCREMENT,
+  vault_id INT NOT NULL,
+  user_id INT NOT NULL,
+  permission_level TINYINT NOT NULL,
+  FOREIGN KEY (vault_id) REFERENCES vault (id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE,
+  PRIMARY KEY (id)
+);
+
 CREATE TABLE usersponsoreduniverse (
   user_id INT NOT NULL,
   universe_id INT UNIQUE NOT NULL,
@@ -233,10 +255,12 @@ CREATE TABLE item (
   updated_at TIMESTAMP NOT NULL,
   last_updated_by INT,
   obj_data JSON NOT NULL,
+  vault_id INT NULL,
   FOREIGN KEY (author_id) REFERENCES user (id),
   FOREIGN KEY (universe_id) REFERENCES universe (id) ON DELETE CASCADE,
   FOREIGN KEY (parent_id) REFERENCES item (id),
   FOREIGN KEY (last_updated_by) REFERENCES user (id),
+  FOREIGN KEY (vault_id) REFERENCES vault (id),
   PRIMARY KEY (id)
 );
 

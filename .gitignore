@@ -3,6 +3,7 @@ qdrant_storage/
 
 .env
 
+backups/
 dist/
 
 logs/
