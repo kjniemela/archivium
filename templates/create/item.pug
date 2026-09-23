@@ -63,10 +63,17 @@ block content
         label(for='shortname') #{T('Shortname')}: 
         input(id='shortname' type='text' name='shortname' value=`${shortname || ''}`)
       div.inputGroup
-        label(for='item_type' ) #{T('Type')}: 
+        label(for='item_type' ) #{T('Type')}:
         select(id='item_type' name='item_type')
           each type, shortname in universe.obj_data.cats
               option(value=(shortname) selected=(item_type === shortname) data-type-pl=capitalize(type[1]))= capitalize(type[0])
+      if vaults && vaults.length
+        div.inputGroup
+          label(for='vault') #{T('Vault')}:
+          select(id='vault' name='vault')
+            option(value='' selected=(!vault)) #{T('None')}
+            each vaultOption in vaults
+              option(value=(vaultOption.shortname) selected=(vault === vaultOption.shortname))= vaultOption.title
       div
         input(type='hidden' name='obj_data' value='{}')
         button(type='submit') #{T('Create Item')}

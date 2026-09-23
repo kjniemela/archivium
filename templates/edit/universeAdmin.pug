@@ -19,6 +19,7 @@ block scripts
   script
     include /static/scripts/tabs.js
     include /static/scripts/fetchUtils.js
+    include /static/scripts/shortname.js
   script.
     const formatDate = !{formatDate};
     const validateUsername = !{validateUsername};
@@ -31,6 +32,8 @@ block content
   ul#tabBtns.navbarBtns.gap-1.mb-2.scroll-x
     li.navbarBtn(data-tab='permissions')
       h3.navbarBtnLink.navbarText.ma-0(onclick=`showTab('permissions')`) #{T('Permissions')}
+    li.navbarBtn(data-tab='vaults')
+      h3.navbarBtnLink.navbarText.ma-0(onclick=`showTab('vaults')`) #{T('Vaults')}
     li.navbarBtn(data-tab='storage')
       h3.navbarBtnLink.navbarText.ma-0(onclick=`showTab('storage')`) #{T('Storage')}
 
@@ -127,6 +130,104 @@ block content
                 '/api/universes/${universe.shortname}/request/${request.username}'
               ).then(() => window.location.reload())`
             ) #{T('Deny')}
+
+    .itemTab.hidden.flex-col(data-tab='vaults')
+      script.
+        window.addEventListener('load', () => {
+          document.querySelectorAll('form .vault_permission_level').forEach((select) => {
+            select.onchange = async () => {
+              const vaultShortname = select.form.dataset.vault;
+              const [response] = await putJSON(`/api/universes/#{universe.shortname}/vaults/${vaultShortname}/perms`, { username: select.form.username.value, permissionLevel: Number(select.value) });
+              if (response.status !== 200) {
+                select.value = select.form.init.value;
+              } else {
+                window.location.reload();
+              }
+            }
+          });
+
+          document.querySelectorAll('form.vault_invite').forEach((form) => {
+            form.onsubmit = async (e) => {
+              e.preventDefault();
+              const vaultShortname = form.dataset.vault;
+              const [response] = await putJSON(`/api/universes/#{universe.shortname}/vaults/${vaultShortname}/perms`, { username: form.username.value, permissionLevel: Number(form.new_permission_level.value) });
+              if (response.status === 200) window.location.reload();
+            }
+          });
+
+          const createVaultForm = document.querySelector('#create_vault');
+          if (createVaultForm) {
+            let hasEditedVaultShortname = false;
+            createVaultForm.title.addEventListener('input', () => {
+              if (!hasEditedVaultShortname) createVaultForm.shortname.value = toShortname(createVaultForm.title.value);
+            });
+            createVaultForm.shortname.addEventListener('input', () => {
+              hasEditedVaultShortname = true;
+            });
+            createVaultForm.onsubmit = async (e) => {
+              e.preventDefault();
+              await postJSON(`/api/universes/#{universe.shortname}/vaults`, {
+                title: createVaultForm.title.value,
+                shortname: createVaultForm.shortname.value,
+              });
+              window.location.reload();
+            }
+          }
+
+          document.querySelectorAll('.delete_vault').forEach((button) => {
+            button.onclick = async () => {
+              const [response] = await deleteJSON(`/api/universes/#{universe.shortname}/vaults/${button.dataset.vault}`);
+              if (response.status === 200) window.location.reload();
+            }
+          });
+        });
+
+      each vault in vaults
+        .d-flex.flex-col.gap-1.mb-2(style={ border: '1px solid var(--color-border)', padding: '0.5rem' })
+          .d-flex.justify-between.align-center
+            h2.ma-0 #{vault.title}
+            if vault.requester_permissions >= perms.OWNER
+              button.delete_vault(data-vault=vault.shortname) #{T('Delete Vault')}
+
+          - const vaultPermLevels = Object.keys(perms).filter((item) => !isNaN(Number(item))).map(Number).sort((a, b) => b - a);
+          - const inheritedOwnerIds = Object.keys(universe.author_permissions).filter((authorId) => universe.author_permissions[authorId] === perms.OWNER);
+          each level in vaultPermLevels
+            - const explicitIds = Object.keys(vault.author_permissions).filter((authorId) => vault.author_permissions[authorId] === level && !inheritedOwnerIds.includes(authorId));
+            - const authorRows = explicitIds.map((authorId) => ({ username: vault.authors[authorId], inherited: false })).concat(level === perms.OWNER ? inheritedOwnerIds.map((authorId) => ({ username: universe.authors[authorId], inherited: true })) : []);
+            if authorRows.length
+              .d-flex.align-baseline.gap-1.mt-1
+                b #{T(`perms_${level}`)} (#{authorRows.length})
+              .grid.align-self-start(style={ 'grid-template-columns': '1fr 1rem 1fr' })
+                each author in authorRows
+                  - const perm = level;
+                  form.grid.grid-inherit.align-center(style={ 'grid-column': '1 / 4' } data-vault=vault.shortname)
+                    input(class='username' name='username' type='hidden' value=author.username)
+                    input(class='init' name='init' type='hidden' value=perm)
+                    span(style={ 'grid-column': '1 / 2' })
+                      | #{author.username}
+                      if author.inherited
+                        span.text-small= ` (${T('universe owner')})`
+                    select(class='vault_permission_level' name='permission_level' style={ 'grid-column': '3 / 4' } disabled=(author.inherited || perm > vault.requester_permissions))
+                      each permission_level in Object.keys(perms).filter((item) => !isNaN(Number(item)))
+                        option(value=permission_level selected=(permission_level == perm) disabled=(permission_level > vault.requester_permissions)) #{T(`perms_${permission_level}`)}
+
+          form.vault_invite(data-vault=vault.shortname)
+            .d-flex.mt-1
+              input(name='username' placeholder=T('Username'))
+              select(name='new_permission_level')
+                each permission_level in Object.keys(perms).filter((item) => !isNaN(Number(item)) && Number(item) > perms.NONE)
+                  option(value=permission_level selected=(permission_level == perms.READ) disabled=(permission_level > vault.requester_permissions)) #{T(`perms_${permission_level}`)}
+              button(type='submit') #{T('Add User')}
+
+        hr
+
+      br
+      h2 #{T('Create Vault')}
+      form#create_vault
+        .d-flex
+          input(name='title' placeholder=T('Title'))
+          input(name='shortname' placeholder=T('Shortname'))
+          button(type='submit') #{T('Create Vault')}
 
     .itemTab.hidden.flex-col(data-tab='storage')
       h2 #{T('Images')}

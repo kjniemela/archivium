@@ -122,9 +122,12 @@ export type BasicItem = {
   created_at: Date,
   updated_at: Date,
   universe_id: number,
+  vault_id: number | null,
   author: string,
   universe: string,
   universe_short: string,
+  vault: string | null,
+  vault_short: string | null,
   notifs_enabled: boolean;
   author_id: number | null,
   tags: string[],
@@ -149,9 +152,12 @@ function getQuery(selects: [string, string?, (string | string[])?][] = [], perms
     .select('item.created_at')
     .select('item.updated_at')
     .select('item.universe_id')
+    .select('item.vault_id')
     .select('user.username', 'author')
     .select('universe.title', 'universe')
-    .select('universe.shortname', 'universe_short');
+    .select('universe.shortname', 'universe_short')
+    .select('vault.title', 'vault')
+    .select('vault.shortname', 'vault_short');
 
   for (const args of selects) {
     query.select(...args);
@@ -162,10 +168,11 @@ function getQuery(selects: [string, string?, (string | string[])?][] = [], perms
     .from('item')
     .leftJoin('user', new Cond('user.id = item.author_id'))
     .innerJoin('universe', new Cond('universe.id = item.universe_id'))
+    .leftJoin('vault', new Cond('vault.id = item.vault_id'))
 
   if (userId) {
     query.leftJoin(['authoruniverse', 'au_filter'], new Cond('universe.id = au_filter.universe_id').and('au_filter.user_id = ?', userId));
-    query.leftJoin(['vaultauthor', 'va_filter'], new Cond('item.vault_id = va_filter.vault_id').and('va_filter.user_id = ?', userId));
+    query.leftJoin(['vaultauthor', 'va_filter'], new Cond('vault.id = va_filter.vault_id').and('va_filter.user_id = ?', userId));
   }
 
   query
@@ -826,6 +833,7 @@ export class ItemAPI {
         item_type: body.item_type,
         obj_data: body.obj_data,
         tags: body.tags ?? [],
+        vault_short: body.vault_short,
       };
       const itemId = await this.put(user, universeShortname, itemShortname, changes, conn);
 
@@ -1221,11 +1229,11 @@ export class ItemAPI {
     user: User | undefined,
     universeShortname: string,
     itemShortname: string,
-    changes: { title?: string, shortname?: string, item_type?: string, obj_data?: ObjData, tags?: string[] },
+    changes: { title?: string, shortname?: string, item_type?: string, obj_data?: ObjData, tags?: string[], vault_short?: string | null },
     conn?: PoolConnection
   ): Promise<number> {
     if (!user) throw new UnauthorizedError();
-    const { title, shortname, item_type, obj_data, tags } = changes;
+    const { title, shortname, item_type, obj_data, tags, vault_short } = changes;
 
     if (!title || !obj_data) throw new ValidationError('Missing required fields');
     const item = await this.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.WRITE);
@@ -1253,6 +1261,12 @@ export class ItemAPI {
       if (shortnameError) throw new ValidationError(shortnameError);
     }
 
+    // TODO - there is an argument to be made that perms.ADMIN on the current and/or target vault
+    // should be required to change vaults, but I'm not sure I buy it myself...
+    const vault = vault_short
+      ? await this.api.vault.getOneByShortnames(user, universeShortname, vault_short, perms.WRITE)
+      : null;
+
     const doUpdate = async (conn: PoolConnection) => {
       if (shortname !== null && shortname !== undefined && shortname !== item.shortname) {
         await conn.execute('UPDATE itemlink SET to_item_short = ? WHERE to_item_short = ?', [shortname, item.shortname]);
@@ -1265,14 +1279,23 @@ export class ItemAPI {
           shortname = ?,
           item_type = ?,
           obj_data = ?,
+          vault_id = ?,
           last_updated_by = ?
         WHERE id = ?;
       `;
 
-      await conn.execute(queryString, [title, shortname ?? item.shortname, item_type ?? item.item_type, JSON.stringify(obj_data), user.id, item.id]);
+      await conn.execute(queryString, [
+        title,
+        shortname ?? item.shortname,
+        item_type ?? item.item_type,
+        JSON.stringify(obj_data),
+        vault_short !== undefined ? vault?.id ?? null : item.vault_id,
+        user.id,
+        item.id
+      ]);
 
       if (
-        title !== item.title || shortname !== item.shortname || item_type !== item.item_type ||
+        title !== item.title || shortname !== item.shortname || item_type !== item.item_type || vault_short !== item.vault_short ||
         !deepCompare(obj_data, item.obj_data) || !deepCompare(tags, item.tags)
       ) {
         this.markUpdated(item.id, conn);

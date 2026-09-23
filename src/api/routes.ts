@@ -378,7 +378,7 @@ export default function (app: Express, upload: Multer) {
           },
         }),
         new APIRoute('/vaults', {
-          GET: (req) => api.vault.getManyByUniverseShortname(req.session.user, req.params.universeShortName),
+          GET: (req) => api.vault.getManyByUniverseShortname(req.session.user, req.params.universeShortName, Math.max(perms.READ, Number(req.query.perms)) || perms.READ),
           POST: (req) => api.vault.post(req.session.user, req.params.universeShortName, req.body),
         }, [
           new APIRoute('/:vaultShortName', {

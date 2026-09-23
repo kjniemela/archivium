@@ -84,7 +84,7 @@ export class VaultAPI {
     }, permissionLevel);
   }
 
-  private getOneByShortnames(user: User | undefined, universeShortname: string, vaultShortname: string, permissionLevel: perms): Promise<Vault> {
+  getOneByShortnames(user: User | undefined, universeShortname: string, vaultShortname: string, permissionLevel = perms.READ): Promise<Vault> {
     return this.getOne(user, {
       strings: ['vault.shortname = ?', 'vault.universe_id = (SELECT id FROM universe WHERE shortname = ?)'],
       values: [vaultShortname, universeShortname],
