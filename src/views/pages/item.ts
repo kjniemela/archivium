@@ -45,7 +45,8 @@ export default {
 
   async create(req, res) {
     const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.WRITE);
-    res.prepareRender('createItem', { universe, item_type: req.query.type, shortname: req.query.shortname });
+    const vaults = await api.vault.getManyByUniverseShortname(req.session.user, universe.shortname, perms.WRITE);
+    res.prepareRender('createItem', { universe, vaults, item_type: req.query.type, shortname: req.query.shortname });
   },
 
   async view(req, res) {

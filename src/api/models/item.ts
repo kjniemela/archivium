@@ -140,7 +140,7 @@ export type Item = BasicItem & {
   links: ItemLink[],
 };
 
-function getQuery(selects: [string, string?, (string | string[])?][] = [], permsCond?: Cond, whereConds?: Cond, options: ItemOptions = {}) {
+function getQuery(selects: [string, string?, (string | string[])?][] = [], permsCond?: Cond, whereConds?: Cond, options: ItemOptions = {}, userId?: number) {
   const query = new QueryBuilder()
     .select('item.id')
     .select('item.title')
@@ -157,17 +157,24 @@ function getQuery(selects: [string, string?, (string | string[])?][] = [], perms
     query.select(...args);
   }
 
-  query.select('IFNULL(tag.tags, JSON_ARRAY()) AS tags')
+  query
+    .select('IFNULL(tag.tags, JSON_ARRAY()) AS tags')
     .from('item')
     .leftJoin('user', new Cond('user.id = item.author_id'))
     .innerJoin('universe', new Cond('universe.id = item.universe_id'))
-    .innerJoin(['authoruniverse', 'au_filter'], new Cond('universe.id = au_filter.universe_id').and(permsCond))
+
+  if (userId) {
+    query.leftJoin(['authoruniverse', 'au_filter'], new Cond('universe.id = au_filter.universe_id').and('au_filter.user_id = ?', userId));
+    query.leftJoin(['vaultauthor', 'va_filter'], new Cond('item.vault_id = va_filter.vault_id').and('va_filter.user_id = ?', userId));
+  }
+
+  query
     .leftJoin(`(
       SELECT item_id, JSON_ARRAYAGG(tag) as tags
       FROM tag
       GROUP BY item_id
     ) tag`, new Cond('tag.item_id = item.id'))
-    .where(whereConds)
+    .where(new Cond().and(whereConds).and(permsCond))
     .groupBy(['item.id', 'user.username', 'universe.title', ...(options.groupBy ?? [])]);
 
   if (options.sort) {
@@ -528,12 +535,25 @@ export class ItemAPI {
       }
     }
 
-    let permsCond = new Cond();
-    if (permissionsRequired <= perms.READ) permsCond = permsCond.or('universe.is_public = ?', 1);
-    if (user) permsCond = permsCond.or(
-      new Cond('au_filter.user_id = ?', user.id)
-        .and('au_filter.permission_level >= ?', permissionsRequired)
+    if (!user && permissionsRequired > perms.READ) throw new ValidationError('User is required to access at above read-only permissions.');
+
+    // Start cond as false by definition so access is denied instead of allowed by default
+    let permsCond = new Cond('item.id IS NULL');
+
+    if (permissionsRequired <= perms.READ) permsCond = permsCond.or(
+      new Cond('item.vault_id IS NULL').and('universe.is_public = ?', 1)
     );
+    if (user) {
+      permsCond = permsCond.or(
+        new Cond('item.vault_id IS NULL').and('au_filter.permission_level >= ?', permissionsRequired)
+      );
+      permsCond = permsCond.or(
+        new Cond('item.vault_id IS NOT NULL').and('va_filter.permission_level >= ?', permissionsRequired)
+      );
+      permsCond = permsCond.or(
+        new Cond('item.vault_id IS NOT NULL').and('au_filter.permission_level >= ?', perms.OWNER)
+      );
+    }
 
     let whereConds = new Cond();
     if (conditions) {
@@ -592,7 +612,7 @@ export class ItemAPI {
         undefined, [options.search, options.search],
       ]);
     }
-    const query = getQuery(selects, permsCond, whereConds, options);
+    const query = getQuery(selects, permsCond, whereConds, options, user?.id);
     for (const join of joins) {
       query.join(...join);
     }
@@ -730,7 +750,7 @@ export class ItemAPI {
 
   async post(user: User | undefined, body, universeShortName: string): Promise<ResultSetHeader> {
     if (!user) throw new UnauthorizedError();
-    const { title, shortname, item_type, parent_id, obj_data, skipValidation } = body;
+    const { title, shortname, item_type, parent_id, obj_data, skipValidation, vault: vaultShortname } = body;
 
     try {
       if (!skipValidation) {
@@ -740,6 +760,10 @@ export class ItemAPI {
 
       const universe = await this.api.universe.getOne(user, { 'universe.shortname': universeShortName }, skipValidation ? perms.ADMIN : perms.WRITE);
       if (!title || !shortname || !item_type || !obj_data) throw new ValidationError('Missing required fields');
+
+      const vault = vaultShortname
+        ? await this.api.vault.getOne(user, { strings: ['vault.shortname = ?', 'vault.universe_id = ?'], values: [vaultShortname, universe.id] }, perms.WRITE)
+        : null;
 
       let data: ResultSetHeader | undefined;
       await withTransaction(async (conn) => {
@@ -753,8 +777,9 @@ export class ItemAPI {
             parent_id,
             obj_data,
             created_at,
-            updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            updated_at,
+            vault_id
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         `;
         [data] = await conn.execute<ResultSetHeader>(queryString, [
           title,
@@ -766,6 +791,7 @@ export class ItemAPI {
           obj_data,
           new Date(),
           new Date(),
+          vault?.id ?? null,
         ]);
 
         await conn.execute(`

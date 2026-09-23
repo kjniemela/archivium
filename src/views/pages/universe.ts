@@ -164,7 +164,9 @@ export default {
     const totalStoredImages = await api.universe.getTotalStoredByShortname(universe.shortname);
     const embeddingStats = await embedder.getStatsForUniverse(universe.id);
 
-    res.prepareRender('universeAdmin', { universe, requests, invites, ownerCount, totalStoredImages, embeddingStats, tierLimits: tierLimits[universe.tier ?? 0] });
+    const vaults = await api.vault.getManyByUniverseShortname(req.session.user, universe.shortname, perms.ADMIN);
+
+    res.prepareRender('universeAdmin', { universe, requests, invites, ownerCount, totalStoredImages, embeddingStats, tierLimits: tierLimits[universe.tier ?? 0], vaults });
   },
 
   async stats(req, res) {

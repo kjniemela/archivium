@@ -378,26 +378,16 @@ export default function (app: Express, upload: Multer) {
           },
         }),
         new APIRoute('/vaults', {
-          GET: async (req) => {
-            const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortName });
-            return await api.vault.getManyByUniverseId(req.session.user, universe.id);
-          },
-          POST: async (req) => {
-            const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortName }, perms.ADMIN);
-            return await api.vault.post(req.session.user, universe.id, req.body);
-          },
+          GET: (req) => api.vault.getManyByUniverseShortname(req.session.user, req.params.universeShortName),
+          POST: (req) => api.vault.post(req.session.user, req.params.universeShortName, req.body),
         }, [
           new APIRoute('/:vaultShortName', {
-            DELETE: async (req) => {
-              const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortName });
-              return await api.vault.del(req.session.user, universe.id, req.params.vaultShortName);
-            },
+            DELETE: (req) => api.vault.del(req.session.user, req.params.universeShortName, req.params.vaultShortName),
           }, [
             new APIRoute('/perms', {
               PUT: async (req) => {
-                const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortName });
                 const user = await api.user.getOne({ 'user.username': req.body.username });
-                return await api.vault.putPermissions(req.session.user, req.params.vaultShortName, universe.id, user, req.body.permissionLevel);
+                return await api.vault.putPermissions(req.session.user, req.params.universeShortName, req.params.vaultShortName, user, req.body.permissionLevel);
               },
             }),
           ]),

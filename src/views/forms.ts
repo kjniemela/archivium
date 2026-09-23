@@ -118,7 +118,8 @@ export default {
     } catch (err) {
       if (err instanceof ModelError) {
         const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
-        res.prepareRender('createItem', { error: err.message, ...req.body, universe });
+        const vaults = await api.vault.getManyByUniverseShortname(req.session.user, universe.shortname, perms.WRITE);
+        res.prepareRender('createItem', { error: err.message, ...req.body, universe, vaults });
         return;
       }
       throw err;

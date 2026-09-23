@@ -13,6 +13,7 @@ export type Vault = {
   updated_at: Date,
   authors: { [id: number]: string },
   author_permissions: { [id: number]: perms },
+  requester_permissions: perms,
 };
 
 export class VaultAPI {
@@ -41,29 +42,52 @@ export class VaultAPI {
   async getMany(user: User | undefined, conditions: any = null, permissionLevel = perms.READ, options: BaseOptions = {}): Promise<Vault[]> {
     if (!user) throw new UnauthorizedError();
 
-    const usrQueryString = `va_filter.user_id = ${user.id} AND va_filter.permission_level >= ${permissionLevel}`;
-    const conditionString = conditions ? `WHERE ${conditions.strings.join(' AND ')}` : '';
+    const permsQueryString = `
+      va_filter.permission_level >= ${permissionLevel}
+      OR au_filter.permission_level >= ${perms.OWNER}
+    `;
+    const conditionString = conditions ? `${conditions.strings.join(' AND ')} AND` : '';
     const queryString = `
       SELECT
         vault.*,
-        JSON_OBJECTAGG(author.id, author.username) AS authors,
-        JSON_OBJECTAGG(author.id, va.permission_level) AS author_permissions
+        JSON_REMOVE(JSON_OBJECTAGG(
+          IFNULL(author.id, 'null__'),
+          IFNULL(author.username, '')
+        ), '$.null__') AS authors,
+        JSON_REMOVE(JSON_OBJECTAGG(
+          IFNULL(author.id, 'null__'),
+          IFNULL(va.permission_level, 0)
+        ), '$.null__') AS author_permissions,
+        GREATEST(
+          IFNULL(MAX(va_filter.permission_level), ${perms.NONE}),
+          IF(IFNULL(MAX(au_filter.permission_level), ${perms.NONE}) >= ${perms.OWNER}, ${perms.OWNER}, ${perms.NONE})
+        ) AS requester_permissions
       FROM vault
-      INNER JOIN vaultauthor AS va_filter
-        ON vault.id = va_filter.vault_id AND (${usrQueryString})
+      LEFT JOIN vaultauthor AS va_filter
+        ON vault.id = va_filter.vault_id AND va_filter.user_id = ${user.id}
+      LEFT JOIN authoruniverse AS au_filter
+        ON vault.universe_id = au_filter.universe_id AND au_filter.user_id = ${user.id}
       LEFT JOIN vaultauthor AS va ON vault.id = va.vault_id
       LEFT JOIN user AS author ON author.id = va.user_id
-      ${conditionString}
+      WHERE ${conditionString} (${permsQueryString})
       GROUP BY vault.id
       ORDER BY vault.title ASC`;
     const data = await executeQuery(queryString, conditions && conditions.values) as Vault[];
     return data;
   }
 
-  async getManyByUniverseId(user: User | undefined, universeId: number, permissionLevel = perms.READ): Promise<Vault[]> {
+  async getManyByUniverseShortname(user: User | undefined, universeShortname: string, permissionLevel = perms.READ): Promise<Vault[]> {
+    const universe = await this.api.universe.getOne(user, { shortname: universeShortname });
     return this.getMany(user, {
       strings: ['vault.universe_id = ?'],
-      values: [universeId],
+      values: [universe.id],
+    }, permissionLevel);
+  }
+
+  private getOneByShortnames(user: User | undefined, universeShortname: string, vaultShortname: string, permissionLevel: perms): Promise<Vault> {
+    return this.getOne(user, {
+      strings: ['vault.shortname = ?', 'vault.universe_id = (SELECT id FROM universe WHERE shortname = ?)'],
+      values: [vaultShortname, universeShortname],
     }, permissionLevel);
   }
 
@@ -71,11 +95,7 @@ export class VaultAPI {
     return this.api.universe.validateShortname(shortname, ['create', 'perms']);
   }
 
-  /**
-   * Inserts a vault and grants the creator OWNER on it. If `conn` is provided, runs on the
-   * caller's transaction (used when creating a universe's Primary vault); otherwise opens its own.
-   */
-  async post(user: User | undefined, universeId: number, body: { title: string, shortname: string }, conn?: PoolConnection): Promise<ResultSetHeader> {
+  async post(user: User | undefined, universeShortname: string, body: { title: string, shortname: string }, conn?: PoolConnection): Promise<ResultSetHeader> {
     if (!user) throw new UnauthorizedError();
     const { title, shortname } = body;
 
@@ -83,11 +103,13 @@ export class VaultAPI {
     const shortnameError = this.validateShortname(shortname);
     if (shortnameError) throw new ValidationError(shortnameError);
 
+    const universe = await this.api.universe.getOne(user, { shortname: universeShortname }, perms.ADMIN);
+
     const insert = async (conn: PoolConnection): Promise<ResultSetHeader> => {
       const [data] = await conn.execute<ResultSetHeader>(`
         INSERT INTO vault (universe_id, title, shortname, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?);
-      `, [universeId, title, shortname, new Date(), new Date()]);
+      `, [universe.id, title, shortname, new Date(), new Date()]);
 
       await conn.execute(
         'INSERT INTO vaultauthor (vault_id, user_id, permission_level) VALUES (?, ?, ?)',
@@ -108,28 +130,18 @@ export class VaultAPI {
     }
   }
 
-  async putPermissions(user: User | undefined, vaultShortname: string, universeId: number, targetUser: User, permission_level: perms): Promise<ResultSetHeader> {
+  async putPermissions(user: User | undefined, universeShortname: string, vaultShortname: string, targetUser: User, permission_level: perms): Promise<ResultSetHeader> {
     if (!user) throw new UnauthorizedError();
 
-    const vault = await this.getOne(
+    const vault = await this.getOneByShortnames(
       user,
-      { strings: ['vault.shortname = ?', 'vault.universe_id = ?'], values: [vaultShortname, universeId] },
+      universeShortname,
+      vaultShortname,
       permission_level === perms.OWNER ? perms.OWNER : Math.max(perms.ADMIN, permission_level + 1),
     );
 
-    if ((vault.author_permissions[targetUser.id] ?? perms.NONE) > (vault.author_permissions[user.id] ?? perms.NONE)) {
+    if ((vault.author_permissions[targetUser.id] ?? perms.NONE) > vault.requester_permissions) {
       throw new ForbiddenError();
-    }
-
-    if (vault.author_permissions[targetUser.id] === perms.OWNER && permission_level < perms.OWNER) {
-      let ownerWouldStillExist = false;
-      for (const userID in vault.author_permissions) {
-        if (Number(userID) !== Number(targetUser.id) && vault.author_permissions[userID] === perms.OWNER) {
-          ownerWouldStillExist = true;
-          break;
-        }
-      }
-      if (!ownerWouldStillExist) throw new ValidationError('Cannot remove the last owner.');
     }
 
     if (targetUser.id in vault.author_permissions) {
@@ -152,12 +164,8 @@ export class VaultAPI {
     }
   }
 
-  async del(user: User | undefined, universeId: number, vaultShortname: string): Promise<void> {
-    const vault = await this.getOne(
-      user,
-      { strings: ['vault.shortname = ?', 'vault.universe_id = ?'], values: [vaultShortname, universeId] },
-      perms.OWNER,
-    );
+  async del(user: User | undefined, universeShortname: string, vaultShortname: string): Promise<void> {
+    const vault = await this.getOneByShortnames(user, universeShortname, vaultShortname, perms.OWNER);
 
     await executeQuery('DELETE FROM vault WHERE id = ?', [vault.id]);
   }
