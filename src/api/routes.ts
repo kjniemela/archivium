@@ -83,11 +83,21 @@ export default function (app: Express, upload: Multer) {
 
   const isAllowedOrigin = (origin?: string): boolean => {
     if (!origin) return true;
-    if (origin.startsWith('http://localhost') && DEV_MODE) return true;
 
-    return CORS_ALLOWED_DOMAINS.some((domain) => {
-      const regex = new RegExp(`^https?:\/\/([a-z0-9-]+\\.)*${domain.replace(/\./g, '\\.')}$`, "i");
-      return regex.test(origin);
+    let url: URL;
+    try {
+      url = new URL(origin);
+    } catch {
+      return false;
+    }
+
+    if (DEV_MODE && url.hostname === 'localhost') return true;
+    if (url.protocol !== 'https:' && !DEV_MODE) return false;
+
+    const host = url.hostname;
+    return CORS_ALLOWED_DOMAINS.some((domain: string) => {
+      const d = domain.toLowerCase();
+      return host === d || host.endsWith(`.${d}`);
     });
   };
 
