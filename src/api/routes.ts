@@ -235,6 +235,9 @@ export default function (app: Express, upload: Multer) {
         GET: (req) => api.universe.getOne(req.session.user, { shortname: req.params.universeShortName }),
         DELETE: (req) => api.universe.del(req.session.user, req.params.universeShortName),
       }, [
+        new APIRoute('/data', {
+          PUT: (req) => api.universe.putData(req.session.user, req.params.universeShortName, req.body),
+        }),
         new APIRoute('/notes', {
           GET: (req) => api.note.getBoardsByUniverseShortname(req.session.user, req.params.universeShortName),
           POST: (req) => api.note.postBoard(req.session.user, req.body, req.params.universeShortName),

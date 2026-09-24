@@ -303,6 +303,17 @@ export class UniverseAPI {
     return universe.id;
   }
 
+  async putData(user: User | undefined, universeShortname: string, changes: Record<string, any>): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
+    if (!changes || typeof changes !== 'object' || Array.isArray(changes)) throw new ValidationError('Data must be an object.');
+
+    const universe = await this.getOne(user, { shortname: universeShortname }, perms.WRITE);
+    const obj_data = { ...universe.obj_data, ...changes };
+
+    const queryString = 'UPDATE universe SET obj_data = ?, updated_at = ? WHERE id = ?';
+    return await executeQuery<ResultSetHeader>(queryString, [JSON.stringify(obj_data), new Date(), universe.id]);
+  }
+
   async putPermissions(user: User | undefined, shortname: string, targetUser: User, permission_level: perms): Promise<ResultSetHeader> {
     if (!user) throw new UnauthorizedError();
 

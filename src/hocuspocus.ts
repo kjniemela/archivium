@@ -18,6 +18,22 @@ const server = new Server({
     if (type === 'item') {
       const [universeShort, itemShort] = args;
       const item = await api.item.getByUniverseAndItemShortnames(user, universeShort, itemShort, perms.WRITE, true);
+    } else if (type === 'room') {
+      // TTRPG room sync
+      const [universeShort] = args;
+      const universe = await api.universe.getOne(user, { shortname: universeShort }, perms.READ);
+      if (!user || !(universe.author_permissions[user.id] >= perms.ADMIN)) {
+        data.connectionConfig.readOnly = true;
+      }
+    } else if (type === 'scene') {
+      // TTRPG scene sync
+      const [universeShort, itemShort] = args;
+      try {
+        await api.item.getByUniverseAndItemShortnames(user, universeShort, itemShort, perms.WRITE, true);
+      } catch {
+        await api.item.getByUniverseAndItemShortnames(user, universeShort, itemShort, perms.READ, true);
+        data.connectionConfig.readOnly = true;
+      }
     } else {
       throw new Error('Not Authorized!');
     }
