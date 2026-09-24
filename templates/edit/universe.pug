@@ -22,10 +22,21 @@ block append styles
       padding: 0.125rem 0;
     }
 
-    #cats td input {
+    #cats td input:not([type='checkbox']) {
       border-radius: 0;
       border: none;
       width: 100%;
+    }
+
+    #cats .type-config td {
+      padding: 0.5rem;
+    }
+
+    .sheet-layout-json {
+      font-family: monospace;
+      width: 100%;
+      min-height: 12rem;
+      box-sizing: border-box;
     }
 
 block append save
@@ -222,6 +233,7 @@ block content
           th #{T('Singular Type Name')}
           th #{T('Plural Type Name')}
           th #{T('Color')}
+          th #{T('Tabs')}
           th
         tr
           td
@@ -234,12 +246,22 @@ block content
               b items
               |  of #{universe.title}")
           td
+          td.center
+            small #{T('What new items start with')}
           td
       tbody#cats
 
     .d-flex.gap-2.mt-2
       button(type='button' onclick='addCat()') #{T('Add Type')}
       button(type='button' onclick='resetCats()') #{T('Reset to default types')}
+
+    if universe.tier >= tiers.PREMIUM
+      h3 #{T('Sheet Layouts')}
+      .mb-2
+        small #{T('Sheet layouts describe structured tabs, like character sheets. Attach one to an item type under "Tabs" above, and every item of that type gets a sheet tab.')}
+      #sheet-layouts.d-flex.flex-col.gap-2
+      .d-flex.gap-2.mt-2
+        button(type='button' onclick='addLayout()') #{T('Add Layout')}
 
     .mt-2
       button(type='submit') #{T('Save Changes')}
@@ -298,12 +320,110 @@ block content
       return `${title}s`;
     }
 
+    const sheetsEnabled = #{universe.tier >= tiers.PREMIUM};
+    const DEFAULT_TAB_KINDS = [
+      ['body', T('Main Text')],
+      ['lineage', T('Lineage')],
+      ['map', T('Map')],
+      ['timeline', T('Timeline')],
+      ['gallery', T('Gallery')],
+    ];
+
+    // Each entry is [shortname, title, titlePl, color, typeConfig].
     let catList;
+    let openConfigs = new Set();
     function resetCatList() {
       catList = [];
+      openConfigs = new Set();
       for (const catShortname in obj_data.cats) {
-        catList.push([catShortname, ...obj_data.cats[catShortname]]);
+        catList.push([catShortname, ...obj_data.cats[catShortname], structuredClone((obj_data.typeConfigs ?? {})[catShortname] ?? {})]);
       }
+    }
+
+    // Sheet layouts are edited as JSON text; the server validates their structure on save.
+    let layoutList = Object.values((obj_data.sheets ?? {}).layouts ?? {}).map(layout => JSON.stringify(layout, null, 2));
+    function layoutIds() {
+      const ids = [];
+      for (const text of layoutList) {
+        try {
+          const { id } = JSON.parse(text);
+          if (id && typeof id === 'string') ids.push(id);
+        } catch {}
+      }
+      return ids;
+    }
+
+    function summarizeConfig(config) {
+      const parts = [
+        ...(config.defaultTabs ?? []).map(kind => (DEFAULT_TAB_KINDS.find(([k]) => k === kind) ?? [, kind])[1]),
+        ...(config.customTabs ?? []),
+        ...(config.sheet ? [T('Sheet: %s', config.sheet)] : []),
+      ];
+      return parts.length > 0 ? parts.join(', ') : T('None');
+    }
+
+    function createConfigRow(i) {
+      const config = catList[i][4];
+      const tabChecks = DEFAULT_TAB_KINDS.map(([kind, label]) => {
+        const checkbox = createElement('input', { attrs: { type: 'checkbox', checked: (config.defaultTabs ?? []).includes(kind) } });
+        checkbox.addEventListener('change', () => {
+          // Keep the tabs in their canonical order.
+          const selected = new Set(config.defaultTabs ?? []);
+          if (checkbox.checked) selected.add(kind);
+          else selected.delete(kind);
+          config.defaultTabs = DEFAULT_TAB_KINDS.map(([k]) => k).filter(k => selected.has(k));
+          if (config.defaultTabs.length === 0) delete config.defaultTabs;
+        });
+        return createElement('label', { classList: ['d-flex', 'align-center', 'gap-1'], children: [checkbox, createElement('span', { attrs: { innerText: label } })] });
+      });
+
+      const customInput = createElement('input', { attrs: {
+        type: 'text',
+        value: (config.customTabs ?? []).join(', '),
+        placeholder: T('e.g. Stats, Inventory'),
+      } });
+      customInput.addEventListener('input', () => {
+        const names = customInput.value.split(',').map(name => name.trim()).filter(Boolean);
+        if (names.length > 0) config.customTabs = [...new Set(names)];
+        else delete config.customTabs;
+      });
+
+      const rows = [
+        createElement('div', { classList: ['d-flex', 'flex-wrap', 'gap-2', 'align-center'], children: [
+          createElement('b', { attrs: { innerText: `${T('Default tabs')}:` } }),
+          ...tabChecks,
+        ] }),
+        createElement('label', { classList: ['d-flex', 'gap-2', 'align-center'], children: [
+          createElement('b', { attrs: { innerText: `${T('Custom data tabs')}:` } }),
+          customInput,
+        ] }),
+      ];
+
+      if (sheetsEnabled) {
+        const ids = layoutIds();
+        const sheetSelect = createElement('select', { children: [
+          createElement('option', { attrs: { value: '', innerText: T('None'), selected: !config.sheet } }),
+          ...ids.map(id => createElement('option', { attrs: { value: id, innerText: id, selected: config.sheet === id } })),
+          // Keep a reference to a layout that's currently broken or being renamed, rather than silently dropping it.
+          ...(config.sheet && !ids.includes(config.sheet) ? [createElement('option', { attrs: { value: config.sheet, innerText: T('%s (missing)', config.sheet), selected: true } })] : []),
+        ] });
+        sheetSelect.addEventListener('change', () => {
+          if (sheetSelect.value) config.sheet = sheetSelect.value;
+          else delete config.sheet;
+        });
+        rows.push(createElement('label', { classList: ['d-flex', 'gap-2', 'align-center'], children: [
+          createElement('b', { attrs: { innerText: `${T('Sheet layout')}:` } }),
+          sheetSelect,
+        ] }));
+      }
+
+      rows.push(createElement('small', { children: [createElement('i', { attrs: {
+        innerText: T('Only affects newly created items. Existing items can add missing tabs from the editor.'),
+      } })] }));
+
+      return createElement('tr', { classList: ['type-config'], children: [
+        createElement('td', { attrs: { colSpan: 6 }, children: [createElement('div', { classList: ['d-flex', 'flex-col', 'gap-1'], children: rows })] }),
+      ] });
     }
 
     function updateCats() {
@@ -344,22 +464,98 @@ block content
           createElement('td', { children: [titlePlInput] }),
           createElement('td', { children: [createElement('div', { classList: ['d-flex'], children: [colorInput] })] }),
           createElement('td', { children: [createElement('button', { attrs: {
+            type: 'button',
+            title: summarizeConfig(catList[i][4]),
+            innerText: openConfigs.has(i) ? T('Done') : T('Configure'),
+            onclick: () => {
+              if (openConfigs.has(i)) openConfigs.delete(i);
+              else openConfigs.add(i);
+              updateCats();
+            },
+          } })] }),
+          createElement('td', { children: [createElement('button', { attrs: {
             innerText: T('Remove'),
             onclick: (e) => {
               e.preventDefault();
               catList.splice(i, 1);
+              openConfigs = new Set([...openConfigs].filter(j => j !== i).map(j => j > i ? j - 1 : j));
               updateCats();
             },
           } })] }),
         ] });
         catsTable.appendChild(catRow);
+        if (openConfigs.has(i)) catsTable.appendChild(createConfigRow(i));
       }
     }
 
     function addCat() {
-      catList.push(['', '', '', '#ffffff']);
+      catList.push(['', '', '', '#ffffff', {}]);
       updateCats();
     }
+
+    const NEW_LAYOUT = {
+      version: 1,
+      id: 'new-sheet',
+      title: 'Sheet',
+      root: 'sheet',
+      rows: [{ sections: [{ title: 'Overview', fields: [{ widget: 'title' }, { widget: 'text', path: 'summary', label: 'Summary', multiline: true }] }] }],
+    };
+
+    function updateLayouts() {
+      const container = document.getElementById('sheet-layouts');
+      if (!container) return;
+      container.innerHTML = '';
+      layoutList.forEach((text, i) => {
+        const error = createElement('small', { classList: ['color-error'] });
+        const textarea = createElement('textarea', { classList: ['sheet-layout-json'], attrs: { value: text, spellcheck: false } });
+        const checkJson = () => {
+          try {
+            JSON.parse(textarea.value);
+            error.innerText = '';
+          } catch (err) {
+            error.innerText = T('Invalid JSON: %s', err.message);
+          }
+        };
+        textarea.addEventListener('input', () => layoutList[i] = textarea.value);
+        // Layout ids feed the per-type sheet selects, so refresh those once an edit is done.
+        textarea.addEventListener('change', () => {
+          checkJson();
+          updateCats();
+        });
+        checkJson();
+        container.appendChild(createElement('div', { classList: ['sheet', 'd-flex', 'flex-col', 'gap-1'], children: [
+          textarea,
+          error,
+          createElement('div', { children: [createElement('button', { attrs: {
+            type: 'button',
+            innerText: T('Remove'),
+            onclick: () => {
+              // Detach the layout from any item types using it.
+              let removedId;
+              try {
+                removedId = JSON.parse(layoutList[i]).id;
+              } catch {}
+              for (const cat of catList) {
+                if (removedId && cat[4].sheet === removedId) delete cat[4].sheet;
+              }
+              layoutList.splice(i, 1);
+              updateLayouts();
+              updateCats();
+            },
+          } })] }),
+        ] }));
+      });
+    }
+
+    function addLayout() {
+      const ids = layoutIds();
+      let id = NEW_LAYOUT.id;
+      for (let n = 2; ids.includes(id); n++) id = `${NEW_LAYOUT.id}-${n}`;
+      layoutList.push(JSON.stringify({ ...NEW_LAYOUT, id }, null, 2));
+      updateLayouts();
+      updateCats();
+    }
+    window.addLayout = addLayout;
 
     function resetCats() {
       setDefaultCats();
@@ -373,14 +569,22 @@ block content
     if (!('cats' in obj_data)) setDefaultCats();
     resetCatList();
     updateCats();
+    updateLayouts();
 
     document.forms.edit.addEventListener('submit', (e) => {
       const formError = document.querySelector('#validation-error');
       formError.classList.add('hidden');
 
+      const showError = (message) => {
+        formError.innerText = message;
+        formError.classList.remove('hidden');
+        e.preventDefault();
+      };
+
       const newCats = {};
+      const newTypeConfigs = {};
       for (let i = 0; i < catList.length; i++) {
-        let [catShortname, catTitle, catTitlePl, catColor] = catList[i];
+        let [catShortname, catTitle, catTitlePl, catColor, catConfig] = catList[i];
 
         if (!catTitle) {
           // Title is missing, error
@@ -400,6 +604,24 @@ block content
         }
 
         newCats[catShortname] = [catTitle.trim(), catTitlePl.trim(), catColor];
+        if (catConfig && Object.keys(catConfig).length > 0) newTypeConfigs[catShortname] = catConfig;
       }
-      updateObjData({ cats: newCats });
+
+      const newObjData = { cats: newCats, typeConfigs: newTypeConfigs };
+      if (sheetsEnabled) {
+        const layouts = {};
+        for (const text of layoutList) {
+          let layout;
+          try {
+            layout = JSON.parse(text);
+          } catch (err) {
+            return showError(T('A sheet layout is not valid JSON: %s', err.message));
+          }
+          if (!layout || typeof layout.id !== 'string' || !layout.id) return showError(T('Every sheet layout needs an "id".'));
+          if (layout.id in layouts) return showError(T('Two sheet layouts have the id "%s".', layout.id));
+          layouts[layout.id] = layout;
+        }
+        newObjData.sheets = { ...obj_data.sheets ?? {}, layouts };
+      }
+      updateObjData(newObjData);
     });

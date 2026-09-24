@@ -8,7 +8,8 @@ import { getPfpUrl, perms } from '../../api/utils';
 import { ForbiddenError, NotFoundError } from '../../errors';
 import { FamilyTreeLayout, layoutFamilyTree } from '../../lib/familyTree';
 import { RenderedBody, tryRenderContent } from '../../lib/renderContent';
-import { buildSheetView, layoutForCategory, SheetView } from '../../lib/sheetLayout';
+import { layoutForType } from '../../lib/itemTypeConfig';
+import { buildSheetView, SheetView } from '../../lib/sheetLayout';
 import { universeLink } from '../../templates';
 import embedder from '../../embedding';
 
@@ -76,10 +77,10 @@ export default {
       renderedBody = await tryRenderContent(req, item.obj_data.body, universe.shortname);
     }
 
-    // A sheet tab is shown when the universe has a sheet layout for this item's
-    // category and the item has data for it.
+    // A sheet tab is shown when the universe's config for this item's type has a
+    // sheet layout and the item has data for it.
     let sheet: SheetView | null = null;
-    const sheetLayout = layoutForCategory(universe.obj_data, item.item_type);
+    const sheetLayout = layoutForType(universe.obj_data, item.item_type);
     if (sheetLayout && item.obj_data[sheetLayout.root] !== undefined) {
       sheet = buildSheetView(sheetLayout, item.obj_data[sheetLayout.root], item.title);
     }

@@ -143,17 +143,131 @@ export type SheetLayout = {
   checks?: SheetCheck[],
 };
 
-// Stored on a universe as obj_data.sheets.
-export type SheetsConfig = {
-  layouts: { [id: string]: SheetLayout },
-  // Item category shortname -> layout id.
-  categories: { [category: string]: string },
+/* Layout validation */
+
+// obj_data keys an item already uses for other things; a sheet can't store its data there.
+const RESERVED_ROOTS = ['body', 'tabs', 'notes', 'comments', 'lineage', 'map', 'timeline', 'gallery'];
+
+const isObject = (value: unknown): value is Record<string, unknown> => (
+  value !== null && typeof value === 'object' && !Array.isArray(value)
+);
+
+function exprProblems(expr: unknown, where: string): string[] {
+  if (!isObject(expr)) return [`${where}: expression must be an object.`];
+  const operands = (key: string, arity?: number): string[] => {
+    const args = expr[key];
+    if (!Array.isArray(args) || (arity !== undefined && args.length !== arity)) {
+      return [`${where}: "${key}" needs ${arity === undefined ? 'a list of' : arity} expressions.`];
+    }
+    return args.flatMap((arg, i) => exprProblems(arg, `${where}.${key}[${i}]`));
+  };
+  if ('const' in expr) return typeof expr.const === 'number' ? [] : [`${where}: "const" must be a number.`];
+  if ('path' in expr) return typeof expr.path === 'string' ? [] : [`${where}: "path" must be a string.`];
+  if ('count' in expr) return typeof expr.count === 'string' ? [] : [`${where}: "count" must be a string.`];
+  if ('add' in expr) return operands('add');
+  if ('max' in expr) return operands('max');
+  if ('min' in expr) return operands('min');
+  if ('sub' in expr) return operands('sub', 2);
+  if ('gte' in expr) return operands('gte', 2);
+  if ('step' in expr) {
+    const problems = exprProblems(expr.step, `${where}.step`);
+    const steps = expr.steps;
+    if (!Array.isArray(steps) || !steps.every(s => Array.isArray(s) && s.length === 2 && s.every(n => typeof n === 'number'))) {
+      problems.push(`${where}: "steps" must be a list of [threshold, value] number pairs.`);
+    }
+    if (typeof expr.else !== 'number') problems.push(`${where}: "else" must be a number.`);
+    return problems;
+  }
+  return [`${where}: unknown expression.`];
+}
+
+const FIELD_REQUIREMENTS: { [widget in SheetField['widget']]: { strings?: string[], numbers?: string[], exprs?: string[], optionalExprs?: string[] } } = {
+  title: {},
+  text: { strings: ['path'] },
+  number: { strings: ['path', 'label'], optionalExprs: ['default'] },
+  computed: { strings: ['label'], exprs: ['value'] },
+  textList: { strings: ['path', 'label'], numbers: ['count'] },
+  entryList: { strings: ['path', 'itemLabel', 'addLabel'] },
+  ratingLadder: { strings: ['path'] },
+  checkTrack: { strings: ['path', 'label'], numbers: ['boxes'], optionalExprs: ['available'] },
+  slot: { strings: ['path', 'badge', 'label'], optionalExprs: ['enabled'] },
 };
 
-export function layoutForCategory(universeObjData: unknown, category: string): SheetLayout | null {
-  const sheets = getPath(universeObjData, 'sheets') as Partial<SheetsConfig> | undefined;
-  const id = sheets?.categories?.[category];
-  return (id && sheets?.layouts?.[id]) || null;
+function layoutFieldProblems(field: unknown, where: string): string[] {
+  if (!isObject(field)) return [`${where}: field must be an object.`];
+  const widget = field.widget as SheetField['widget'];
+  const requirements = FIELD_REQUIREMENTS[widget];
+  if (!requirements) return [`${where}: unknown widget "${String(field.widget)}".`];
+  where = `${where} (${widget})`;
+  const problems: string[] = [];
+  for (const key of requirements.strings ?? []) {
+    if (typeof field[key] !== 'string') problems.push(`${where}: "${key}" must be a string.`);
+  }
+  for (const key of requirements.numbers ?? []) {
+    if (typeof field[key] !== 'number') problems.push(`${where}: "${key}" must be a number.`);
+  }
+  for (const key of requirements.exprs ?? []) problems.push(...exprProblems(field[key], `${where}.${key}`));
+  for (const key of requirements.optionalExprs ?? []) {
+    if (field[key] !== undefined) problems.push(...exprProblems(field[key], `${where}.${key}`));
+  }
+  if (widget === 'entryList') {
+    const fields = field.fields;
+    if (!Array.isArray(fields) || !fields.every(f => isObject(f) && typeof f.key === 'string' && typeof f.placeholder === 'string')) {
+      problems.push(`${where}: "fields" must be a list of { key, placeholder } objects.`);
+    }
+  }
+  if (widget === 'ratingLadder') {
+    if (!Array.isArray(field.options) || !field.options.every(o => typeof o === 'string')) {
+      problems.push(`${where}: "options" must be a list of strings.`);
+    }
+    const ratings = field.ratings;
+    if (!Array.isArray(ratings) || !ratings.every(r => isObject(r) && typeof r.value === 'number' && typeof r.label === 'string')) {
+      problems.push(`${where}: "ratings" must be a list of { value, label } objects.`);
+    }
+  }
+  return problems;
+}
+
+// Structural problems that would stop a layout from rendering. An empty list means the layout is usable.
+export function validateLayout(layout: unknown): string[] {
+  if (!isObject(layout)) return ['Layout must be a JSON object.'];
+  const problems: string[] = [];
+  if (layout.version !== 1) problems.push('"version" must be 1.');
+  for (const key of ['id', 'title', 'root']) {
+    if (typeof layout[key] !== 'string' || !layout[key]) problems.push(`"${key}" must be a non-empty string.`);
+  }
+  if (typeof layout.root === 'string' && RESERVED_ROOTS.includes(layout.root)) {
+    problems.push(`"root" can't be "${layout.root}", that key is already used by items.`);
+  }
+  if (!Array.isArray(layout.rows)) {
+    problems.push('"rows" must be a list.');
+  } else {
+    layout.rows.forEach((row, i) => {
+      if (!isObject(row) || !Array.isArray(row.sections)) {
+        problems.push(`rows[${i}]: "sections" must be a list.`);
+        return;
+      }
+      row.sections.forEach((section, j) => {
+        const where = `rows[${i}].sections[${j}]`;
+        if (!isObject(section) || typeof section.title !== 'string' || !Array.isArray(section.fields)) {
+          problems.push(`${where}: sections need a "title" and a list of "fields".`);
+          return;
+        }
+        section.fields.forEach((field, k) => problems.push(...layoutFieldProblems(field, `${where}.fields[${k}]`)));
+      });
+    });
+  }
+  if (layout.checks !== undefined) {
+    if (!Array.isArray(layout.checks)) {
+      problems.push('"checks" must be a list.');
+    } else {
+      layout.checks.forEach((check, i) => {
+        if (!isObject(check) || typeof check.message !== 'string') problems.push(`checks[${i}]: "message" must be a string.`);
+        else problems.push(...exprProblems(check.unless, `checks[${i}].unless`));
+      });
+    }
+  }
+  return problems;
 }
 
 /* Widget helpers, shared by all renderers */

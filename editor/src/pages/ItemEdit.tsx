@@ -7,7 +7,8 @@ import * as Y from 'yjs';
 import { type BuiltinTab, type Item, type ObjData } from '../../../src/api/models/item';
 import { editorExtensions, extractLinkData, type LinkData, type TiptapContext } from '../../../src/lib/editor';
 import { splitIgnoringQuotes } from '../../../src/lib/markdown';
-import { layoutForCategory, type SheetLayout } from '../../../src/lib/sheetLayout';
+import { DEFAULT_TAB_KINDS, layoutForType, missingDefaultTabs, withDefaultTabs } from '../../../src/lib/itemTypeConfig';
+import { type SheetLayout } from '../../../src/lib/sheetLayout';
 import { indexedToJson, jsonToIndexed } from '../../../src/lib/tiptapHelpers';
 import CustomDataEditor from '../components/CustomDataEditor';
 import EditorFrame from '../components/EditorFrame';
@@ -43,6 +44,11 @@ export type ItemEditProps = {
 };
 
 export const BUILTIN_TABS: BuiltinTab[] = ['lineage', 'map', 'timeline', 'gallery'];
+
+function tabLabel(tab: string): string {
+  if (tab === 'body') return T('Main Text');
+  return (DEFAULT_TAB_KINDS as readonly string[]).includes(tab) ? capitalize(T(tab)) : tab;
+}
 
 function computeTabs(objData: ObjData, sheetLayout: SheetLayout | null): Record<string, string> {
   return {
@@ -232,8 +238,9 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
     }
   }, [itemShort, universeShort, provider, editor]);
 
-  // The universe can attach a sheet layout to the item's category (obj_data.sheets).
-  const sheetLayout = item?.item_type ? layoutForCategory(universeObjData, item.item_type) : null;
+  // The universe's config for the item's type can attach a sheet layout (obj_data.typeConfigs).
+  const sheetLayout = item?.item_type ? layoutForType(universeObjData, item.item_type) : null;
+  const missingTabs = item?.item_type ? missingDefaultTabs(objData, universeObjData, item.item_type) : [];
   const tabNames = computeTabs(objData, sheetLayout);
   if (!(currentTab && tabNames[currentTab])) {
     if (Object.keys(tabNames).length > 0) setCurrentTab(Object.keys(tabNames)[0]);
@@ -499,6 +506,17 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
           setAwareness={setAwareness}
           selectors={docSelectors.selectedElement}
         />
+
+        {missingTabs.length > 0 && (
+          <div className='inputGroup'>
+            <small className='d-flex align-center gap-2' style={{ gridColumn: '2 / 4' }}>
+              <i>{T('This type usually has these tabs: %s.', missingTabs.map(tabLabel).join(', '))}</i>
+              <button type='button' onClick={() => setObjData(withDefaultTabs(objData, universeObjData, item.item_type))}>
+                {T('Add Missing Tabs')}
+              </button>
+            </small>
+          </div>
+        )}
 
         <FormPillList
           id='tags'

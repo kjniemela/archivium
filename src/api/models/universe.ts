@@ -2,7 +2,9 @@ import { PoolConnection, QueryResult, ResultSetHeader } from 'mysql2/promise';
 import { API } from '..';
 import embedder from '../../embedding';
 import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
+import { sheetLayouts, typeConfigProblems } from '../../lib/itemTypeConfig';
 import { IndexedDocument } from '../../lib/tiptapHelpers';
+import { deepCompare } from '../../lib/utils';
 import { BaseOptions, Tier, executeQuery, getPfpUrl, handleAsNull, parseData, perms, tierAllowance, tiers, withTransaction } from '../utils';
 import { Item, ItemEvent } from './item';
 import { User } from './user';
@@ -274,6 +276,18 @@ export class UniverseAPI {
     const mcpItems = isPremium && Boolean(mcp_items_enabled);
     const mcpNotes = isPremium && Boolean(mcp_notes_enabled);
     const mcpDiscussions = isPremium && Boolean(mcp_discussions_enabled);
+
+    let parsedObjData: unknown;
+    try {
+      parsedObjData = typeof obj_data === 'string' ? JSON.parse(obj_data) : obj_data;
+    } catch {
+      throw new ValidationError('Universe data is not valid JSON.');
+    }
+    const typeProblems = typeConfigProblems(parsedObjData);
+    if (typeProblems.length > 0) throw new ValidationError(typeProblems.slice(0, 5).join(' '));
+    if (!isPremium && !deepCompare(sheetLayouts(parsedObjData), sheetLayouts(universe.obj_data))) {
+      throw new ValidationError('Custom sheet layouts require a premium universe.');
+    }
 
     if (shortname !== null && shortname !== undefined && shortname !== universe.shortname) {
       // The item shortname has changed, we need to update all links to it to reflect this

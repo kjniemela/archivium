@@ -5,6 +5,7 @@ import { perms, Tier } from '../api/utils';
 import { ADDR_PREFIX } from '../config';
 import embedder from '../embedding';
 import { ModelError, RateLimitError } from "../errors";
+import { withDefaultTabs } from '../lib/itemTypeConfig';
 import logger from '../logger';
 import { universeLink } from '../templates';
 import pages from './pages';
@@ -108,8 +109,12 @@ export default {
 
   async createItem(req, res) {
     try {
+      // New items start with the tabs configured for their type.
+      const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.WRITE);
+      const objData = withDefaultTabs(JSON.parse(req.body.obj_data || '{}'), universe.obj_data, req.body.item_type);
       await api.item.post(req.session.user, {
         ...req.body,
+        obj_data: JSON.stringify(objData),
       }, req.params.universeShortname);
       return res.redirect(`${universeLink(req, req.params.universeShortname)}/items/${req.body.shortname}`);
     } catch (err) {
