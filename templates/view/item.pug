@@ -32,6 +32,9 @@ block breadcrumbs
     const universeItemsLink = systemDisplayModes.includes(displayUniverse)
       ? `/${displayUniverse}`
       : `${universeLink(universe.shortname)}/items`;
+    const typeItemsLink = item.item_type !== '_special'
+      ? `${universeItemsLink}?type=${item.item_type}${item.vault ? `&vault=${item.vault_short}` : ''}`
+      : universeItemsLink;
   if displayUniverse
     a.link.link-animated(href=`${ADDR_PREFIX}/`) #{systemDisplayModes.includes(displayUniverse) ? T('Home') : universe.title}
   else
@@ -41,8 +44,11 @@ block breadcrumbs
     |  / 
     a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
   |  / 
+  if item.vault
+    a.link.link-animated(href=`${universeItemsLink}?vault=${item.vault_short}`) #{item.vault}
+    |  / 
   if item.item_type !== '_special'
-    a.link.link-animated(href=`${universeItemsLink}?type=${item.item_type}`) #{capitalize(T(`${((universe.obj_data.cats || {})[item.item_type] || [, 'Missing Category'])[1]}`))}
+    a.link.link-animated(href=typeItemsLink) #{capitalize(T(`${((universe.obj_data.cats || {})[item.item_type] || [, 'Missing Category'])[1]}`))}
     |  / 
   span #{item.title}
 
@@ -55,7 +61,13 @@ block content
         if item.item_type !== '_special'
           p.center.ma-0 #{capitalize(T(item.itemTypeName))}
             if !displayUniverse
-              |  of #{item.universe}
+              |  of 
+              if item.vault
+                | #{item.vault}
+              else
+                | #{item.universe}
+          if item.vault
+            p.center.ma-0 (#{item.universe})
         else
           p.center.ma-0 of #{item.universe}
   p.center.mb-2
