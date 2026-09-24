@@ -104,7 +104,7 @@ export default function (app: Express, upload: Multer) {
   app.use('/api', cors({
     origin: function (origin: string, callback: (error: Error | null, isAllowed?: boolean) => void) {
       if (isAllowedOrigin(origin)) return callback(null, true);
-      callback(new ForbiddenError('Not allowed by CORS'));
+      else callback(new ForbiddenError('Not allowed by CORS'));
     },
     credentials: true
   }));
