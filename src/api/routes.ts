@@ -1,9 +1,10 @@
+import cors from 'cors';
 import { Express, Handler, Request, Response } from 'express';
 import { Multer } from 'multer';
 import api from '.';
-import { ADDR_PREFIX } from '../config';
+import { ADDR_PREFIX, CORS_ALLOWED_DOMAINS, DEV_MODE } from '../config';
 import embedder from '../embedding';
-import { NotFoundError } from '../errors';
+import { ForbiddenError, NotFoundError, RequestError } from '../errors';
 import { tryRenderContent } from '../lib/renderContent';
 import logger from '../logger';
 import { Note } from './models/note';
@@ -78,7 +79,41 @@ export default function (app: Express, upload: Multer) {
   app.use('/api', (req, res, next) => {
     res.set('Content-Type', 'application/json; charset=utf-8');
     next();
-  })
+  });
+
+  const isAllowedOrigin = (origin?: string): boolean => {
+    if (!origin) return true;
+
+    let url: URL;
+    try {
+      url = new URL(origin);
+    } catch {
+      return false;
+    }
+
+    if (DEV_MODE && url.hostname === 'localhost') return true;
+    if (url.protocol !== 'https:' && !DEV_MODE) return false;
+
+    const host = url.hostname;
+    return CORS_ALLOWED_DOMAINS.some((domain: string) => {
+      const d = domain.toLowerCase();
+      return host === d || host.endsWith(`.${d}`);
+    });
+  };
+
+  app.use('/api', cors({
+    origin: function (origin: string, callback: (error: Error | null, isAllowed?: boolean) => void) {
+      if (isAllowedOrigin(origin)) return callback(null, true);
+      else callback(new ForbiddenError('Not allowed by CORS'));
+    },
+    credentials: true
+  }));
+
+  app.use('/api', (err: Error, req: Request, res: Response, next: () => void) => {
+    if (!err) return next();
+    const code = err instanceof RequestError ? err.code : 500;
+    res.status(code).json({ error: err.message, code });
+  });
 
   const apiRoutes = new APIRoute('/api', {}, [
     new APIRoute('/*'),
