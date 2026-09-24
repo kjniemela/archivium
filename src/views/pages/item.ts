@@ -9,7 +9,7 @@ import { ForbiddenError, NotFoundError } from '../../errors';
 import { FamilyTreeLayout, layoutFamilyTree } from '../../lib/familyTree';
 import { RenderedBody, tryRenderContent } from '../../lib/renderContent';
 import { itemLayoutTabs, layoutTabKey } from '../../lib/itemTypeConfig';
-import { buildSheetView, SheetView } from '../../lib/sheetLayout';
+import { buildLayoutView, LayoutView } from '../../lib/tabLayout';
 import { universeLink } from '../../templates';
 import embedder from '../../embedding';
 
@@ -77,8 +77,8 @@ export default {
       renderedBody = await tryRenderContent(req, item.obj_data.body, universe.shortname);
     }
 
-    const layoutTabs: (SheetView & { key: string })[] = itemLayoutTabs(item.obj_data, universe.obj_data)
-      .map(({ layout, data }) => ({ ...buildSheetView(layout, data, item.title), key: layoutTabKey(layout.id) }));
+    const layoutTabs: (LayoutView & { key: string })[] = itemLayoutTabs(item.obj_data, universe.obj_data)
+      .map(({ layout, data }) => ({ ...buildLayoutView(layout, data, item.title), key: layoutTabKey(layout.id) }));
 
     let family: Family = {};
     let familyLayout: FamilyTreeLayout | null = null;

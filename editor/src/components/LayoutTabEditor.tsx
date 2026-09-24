@@ -1,8 +1,3 @@
-// Editable React renderer for sheet layouts (see core.ts).
-//
-// Shared between fate.archivium.net (src/layout/SheetRenderer.tsx) and the
-// Archivium editor (editor/src/components/SheetRenderer.tsx); only the import
-// of the core module differs. Keep the copies in sync.
 import type { ReactNode } from 'react';
 import {
   entryListValues,
@@ -16,15 +11,15 @@ import {
   textAt,
   textListValues,
   trackBoxes,
-  validateSheet,
+  validateLayoutData,
   type EntryListField,
   type RatingLadderField,
-  type SheetField,
-  type SheetLayout,
-} from '../../../src/lib/sheetLayout';
+  type LayoutField,
+  type TabLayout,
+} from '../../../src/lib/tabLayout';
 
-type SheetRendererProps = {
-  layout: SheetLayout,
+type LayoutTabEditorProps = {
+  layout: TabLayout,
   data: unknown,
   itemTitle: string,
   onChange: (data: unknown) => void,
@@ -38,7 +33,7 @@ type FieldProps<F> = {
 };
 
 function Caption({ htmlFor, children }: { htmlFor?: string, children: ReactNode }) {
-  return <label htmlFor={htmlFor} className='sheet-layout-caption'>{children}</label>;
+  return <label htmlFor={htmlFor} className='tab-layout-caption'>{children}</label>;
 }
 
 function EntryList({ field, id, data, set }: FieldProps<EntryListField>) {
@@ -60,9 +55,9 @@ function EntryList({ field, id, data, set }: FieldProps<EntryListField>) {
             value: typeof entry[key] === 'string' ? entry[key] : '',
           };
           const input = multiline
-            ? <textarea {...props} className='sheet-layout-textarea' onChange={({ target }) => setEntry(i, key, target.value)} />
+            ? <textarea {...props} className='tab-layout-textarea' onChange={({ target }) => setEntry(i, key, target.value)} />
             : <input {...props} className='grow-1' onChange={({ target }) => setEntry(i, key, target.value)} />;
-          if (j > 0) return <div key={key} className='sheet-layout-field'>{input}</div>;
+          if (j > 0) return <div key={key} className='tab-layout-field'>{input}</div>;
           return <div key={key} className='d-flex gap-1'>
             {input}
             <button type='button' onClick={() => set(field.path, entries.filter((_, k) => k !== i))}>Remove</button>
@@ -91,9 +86,9 @@ function RatingLadder({ field, data, set }: FieldProps<RatingLadderField>) {
 
   return <>
     {ladderRows(field, data).map(({ value, label, entries }) => (
-      <div key={value} className='sheet-layout-line'>
-        <span className='sheet-layout-rating'>{label}</span>
-        <div className='sheet-layout-chips'>
+      <div key={value} className='tab-layout-line'>
+        <span className='tab-layout-rating'>{label}</span>
+        <div className='tab-layout-chips'>
           {entries.map(option => (
             <select key={option} aria-label={`${label}: ${option}`} value={option} onChange={({ target }) => replace(option, target.value, value)}>
               <option value={option}>{option}</option>
@@ -116,10 +111,10 @@ function RatingLadder({ field, data, set }: FieldProps<RatingLadderField>) {
   </>;
 }
 
-function Field({ field, id, data, set, itemTitle }: FieldProps<SheetField> & { itemTitle: string }) {
+function Field({ field, id, data, set, itemTitle }: FieldProps<LayoutField> & { itemTitle: string }) {
   switch (field.widget) {
     case 'title':
-      return <div className='sheet-layout-field'>
+      return <div className='tab-layout-field'>
         <span className='lora big-text'>{itemTitle}</span>
         {field.caption && <Caption>{field.caption}</Caption>}
       </div>;
@@ -130,9 +125,9 @@ function Field({ field, id, data, set, itemTitle }: FieldProps<SheetField> & { i
         'aria-label': field.caption ? undefined : field.label,
         value: textAt(data, field.path),
       };
-      return <div className='sheet-layout-field'>
+      return <div className='tab-layout-field'>
         {field.multiline
-          ? <textarea {...props} className='sheet-layout-textarea' rows={field.rows} onChange={({ target }) => set(field.path, target.value)} />
+          ? <textarea {...props} className='tab-layout-textarea' rows={field.rows} onChange={({ target }) => set(field.path, target.value)} />
           : <input {...props} onChange={({ target }) => set(field.path, target.value)} />}
         {field.caption && <Caption htmlFor={id}>{field.caption}</Caption>}
       </div>;
@@ -151,7 +146,7 @@ function Field({ field, id, data, set, itemTitle }: FieldProps<SheetField> & { i
       />;
 
     case 'computed':
-      return <span className='sheet-layout-stat-value' aria-label={field.label}>{evaluate(field.value, data)}</span>;
+      return <span className='tab-layout-stat-value' aria-label={field.label}>{evaluate(field.value, data)}</span>;
 
     case 'textList': {
       const values = textListValues(field, data);
@@ -180,11 +175,11 @@ function Field({ field, id, data, set, itemTitle }: FieldProps<SheetField> & { i
 
     case 'checkTrack': {
       const boxes = trackBoxes(field, data);
-      return <div className='sheet-layout-line'>
+      return <div className='tab-layout-line'>
         <strong className='lora' style={{ minWidth: '4.5rem' }}>{field.label}</strong>
         <div className='d-flex gap-2'>
           {boxes.map((box, i) => (
-            <label key={i} className={`sheet-layout-box${box.enabled ? '' : ' sheet-layout-locked'}`} title={box.enabled ? undefined : field.lockedHint}>
+            <label key={i} className={`tab-layout-box${box.enabled ? '' : ' tab-layout-locked'}`} title={box.enabled ? undefined : field.lockedHint}>
               <span className='text-small'>{i + 1}</span>
               <input
                 type='checkbox'
@@ -201,8 +196,8 @@ function Field({ field, id, data, set, itemTitle }: FieldProps<SheetField> & { i
 
     case 'slot': {
       const enabled = isEnabled(field.enabled, data);
-      return <div className={`sheet-layout-line${enabled ? '' : ' sheet-layout-locked'}`} title={enabled ? undefined : field.lockedHint}>
-        <span className='sheet-layout-box'><b>{field.badge}</b></span>
+      return <div className={`tab-layout-line${enabled ? '' : ' tab-layout-locked'}`} title={enabled ? undefined : field.lockedHint}>
+        <span className='tab-layout-box'><b>{field.badge}</b></span>
         <label htmlFor={id} style={{ minWidth: '5rem' }}>{field.label}</label>
         <input id={id} className='grow-1' disabled={!enabled} value={textAt(data, field.path)} onChange={({ target }) => set(field.path, target.value)} />
       </div>;
@@ -210,24 +205,24 @@ function Field({ field, id, data, set, itemTitle }: FieldProps<SheetField> & { i
   }
 }
 
-export default function SheetRenderer({ layout, data, itemTitle, onChange }: SheetRendererProps) {
+export default function LayoutTabEditor({ layout, data, itemTitle, onChange }: LayoutTabEditorProps) {
   const set = (path: string, value: unknown) => onChange(setPath(data ?? {}, path, value));
-  const problems = validateSheet(layout, data);
+  const problems = validateLayoutData(layout, data);
 
-  return <div className='sheet-layout'>
-    {problems.length > 0 && <ul className='sheet-layout-problems'>
+  return <div className='tab-layout'>
+    {problems.length > 0 && <ul className='tab-layout-problems'>
       {problems.map(problem => <li key={problem} className='color-error'>{problem}</li>)}
     </ul>}
     {layout.rows.map((row, i) => (
-      <div key={i} className='sheet-layout-row'>
+      <div key={i} className='tab-layout-row'>
         {row.sections.map((section, j) => (
           <section
             key={j}
-            className={`sheet-layout-section${section.variant === 'stat' ? ' sheet-layout-stat' : ''}`}
+            className={`tab-layout-section${section.variant === 'stat' ? ' tab-layout-stat' : ''}`}
             style={{ flex: sectionFlex(section) }}
           >
-            <h2 className='sheet-layout-title'>{section.title}</h2>
-            <div className='sheet-layout-body'>
+            <h2 className='tab-layout-title'>{section.title}</h2>
+            <div className='tab-layout-body'>
               {section.fields.map((field, k) => (
                 <Field
                   key={k}

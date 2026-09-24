@@ -1,0 +1,55 @@
+//- Read-only rendering of a tab layout, from the view model built by
+//- buildLayoutView in src/lib/tabLayout.ts. The editable counterpart is
+//- editor/src/components/LayoutTabEditor.tsx; both share the tab-layout-* styles.
+.tab-layout
+  each row in layoutTab.rows
+    .tab-layout-row
+      each section in row.sections
+        section.tab-layout-section(class={ 'tab-layout-stat': section.variant === 'stat' } style={ flex: section.flex })
+          h2.tab-layout-title #{section.title}
+          .tab-layout-body
+            each field in section.fields
+              case field.widget
+                when 'title'
+                  .tab-layout-field
+                    span.lora.big-text #{field.value}
+                    if field.caption
+                      span.tab-layout-caption #{field.caption}
+                when 'text'
+                  .tab-layout-field
+                    .tab-layout-text(aria-label=(field.caption ? undefined : field.label)) #{field.value}
+                    if field.caption
+                      span.tab-layout-caption #{field.caption}
+                when 'number'
+                when 'computed'
+                  span.tab-layout-stat-value(title=field.label) #{field.value}
+                when 'textList'
+                  each value, i in field.values
+                    .tab-layout-text(aria-label=`${field.label} ${i + 1}`) #{value}
+                when 'entryList'
+                  each entry in field.entries
+                    .tab-layout-field
+                      each part, i in entry
+                        if i === 0
+                          b #{part.value}
+                        else
+                          span(style={ 'white-space': 'pre-wrap' }) #{part.value}
+                when 'ratingLadder'
+                  each ladderRow in field.rows
+                    .tab-layout-line
+                      span.tab-layout-rating #{ladderRow.label}
+                      span #{ladderRow.entries.join(', ')}
+                when 'checkTrack'
+                  .tab-layout-line
+                    strong.lora(style={ 'min-width': '4.5rem' }) #{field.label}
+                    .d-flex.gap-2
+                      each box in field.boxes
+                        span.tab-layout-box(class={ 'tab-layout-locked': !box.enabled } title=(box.enabled ? undefined : field.lockedHint))
+                          span.text-small #{box.number}
+                          input(type='checkbox' disabled checked=box.checked aria-label=`${field.label} ${box.number}`)
+                when 'slot'
+                  .tab-layout-line(class={ 'tab-layout-locked': !field.enabled } title=(field.enabled ? undefined : field.lockedHint))
+                    span.tab-layout-box
+                      b #{field.badge}
+                    span(style={ 'min-width': '5rem' }) #{field.label}
+                    .tab-layout-text.grow-1 #{field.value}

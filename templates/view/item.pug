@@ -142,9 +142,9 @@ block content
     if 'body' in item.obj_data
       li.navbarBtn#bodyBtn(data-tab='body')
         h3.navbarBtnLink.navbarText(onclick=`showTab('body')`) #{T('Main Text')}
-    each sheet in layoutTabs
-      li.navbarBtn(data-tab=sheet.key)
-        h3.navbarBtnLink.navbarText.ma-0(onclick=`showTab('${sheet.key}')`) #{sheet.title}
+    each layoutTab in layoutTabs
+      li.navbarBtn(data-tab=layoutTab.key)
+        h3.navbarBtnLink.navbarText.ma-0(onclick=`showTab('${layoutTab.key}')`) #{layoutTab.title}
     if 'tabs' in item.obj_data
       each tab, name in item.obj_data.tabs
         li.navbarBtn(data-tab=name)
@@ -167,9 +167,9 @@ block content
     universe = JSON.parse(universe);
 
   .tabs
-    each sheet in layoutTabs
-      .hidden(data-tab=sheet.key)
-        include ../components/sheet.pug
+    each layoutTab in layoutTabs
+      .hidden(data-tab=layoutTab.key)
+        include ../components/layoutTab.pug
 
     if 'tabs' in item.obj_data
       each tab, name in item.obj_data.tabs

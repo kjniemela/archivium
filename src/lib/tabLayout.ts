@@ -1,16 +1,3 @@
-// Declarative item sheet layouts.
-//
-// A layout is a JSON document describing how an item's structured data is laid
-// out as a sheet: rows of sections, each holding fields bound to paths in the
-// data. Derived values (e.g. how many stress boxes a character gets) use a
-// small, safe expression language instead of code, so layouts can be stored
-// in Archivium and rendered anywhere.
-//
-// This file is framework-free and shared verbatim between:
-//   - fate.archivium.net: src/layout/core.ts
-//   - archivium:          src/lib/sheetLayout.ts
-// Keep the copies in sync.
-
 /* Expressions */
 
 export type Expr =
@@ -22,8 +9,6 @@ export type Expr =
   | { max: Expr[] }
   | { min: Expr[] }
   | { gte: [Expr, Expr] }            // 1 if a >= b, else 0
-  // Piecewise lookup: the value of the first [threshold, value] pair whose
-  // threshold the input meets (list thresholds highest first), else `else`.
   | { step: Expr, steps: [number, number][], else: number };
 
 export function evaluate(expr: Expr, data: unknown): number {
@@ -55,7 +40,7 @@ export function evaluate(expr: Expr, data: unknown): number {
 
 /* Data paths */
 
-// Paths are dot-separated keys relative to the sheet's data root, e.g. 'stress.physical'.
+// Paths are dot-separated keys relative to the tab's data root, e.g. 'stress.physical'.
 export function getPath(data: unknown, path: string): unknown {
   let current: unknown = data;
   for (const key of path.split('.')) {
@@ -107,7 +92,7 @@ export type CheckTrackField = { widget: 'checkTrack', path: string, label: strin
 // A single labeled text slot with a badge, e.g. a consequence.
 export type SlotField = { widget: 'slot', path: string, badge: string, label: string, enabled?: Expr, lockedHint?: string };
 
-export type SheetField =
+export type LayoutField =
   | TitleField
   | TextField
   | NumberField
@@ -118,30 +103,29 @@ export type SheetField =
   | CheckTrackField
   | SlotField;
 
-export type SheetSection = {
+export type LayoutSection = {
   title: string,
-  fields: SheetField[],
+  fields: LayoutField[],
   // 'stat' sections are small boxes holding a single prominent value.
   variant?: 'stat',
   grow?: number,
   basis?: string,
 };
 
-export type SheetRow = { sections: SheetSection[] };
+export type LayoutRow = { sections: LayoutSection[] };
 
-// Sheet-level advice: `message` is shown whenever `unless` evaluates to 0.
-export type SheetCheck = { unless: Expr, message: string };
+// Layout-level advice: `message` is shown whenever `unless` evaluates to 0.
+export type LayoutCheck = { unless: Expr, message: string };
 
-export type SheetLayout = {
+export type TabLayout = {
   version: 1,
   id: string,
-  // Shown as the tab name.
   title: string,
-  // The item obj_data key holding this sheet's data. Archivium ignores it and
-  // stores sheet data under obj_data.layoutTabs[id] instead.
+  // The item obj_data key holding this tab's data. Archivium ignores it and
+  // stores tab data under obj_data.layoutTabs[id] instead.
   root?: string,
-  rows: SheetRow[],
-  checks?: SheetCheck[],
+  rows: LayoutRow[],
+  checks?: LayoutCheck[],
 };
 
 /* Layout validation */
@@ -179,7 +163,7 @@ function exprProblems(expr: unknown, where: string): string[] {
   return [`${where}: unknown expression.`];
 }
 
-const FIELD_REQUIREMENTS: { [widget in SheetField['widget']]: { strings?: string[], numbers?: string[], exprs?: string[], optionalExprs?: string[] } } = {
+const FIELD_REQUIREMENTS: { [widget in LayoutField['widget']]: { strings?: string[], numbers?: string[], exprs?: string[], optionalExprs?: string[] } } = {
   title: {},
   text: { strings: ['path'] },
   number: { strings: ['path', 'label'], optionalExprs: ['default'] },
@@ -193,7 +177,7 @@ const FIELD_REQUIREMENTS: { [widget in SheetField['widget']]: { strings?: string
 
 function layoutFieldProblems(field: unknown, where: string): string[] {
   if (!isObject(field)) return [`${where}: field must be an object.`];
-  const widget = field.widget as SheetField['widget'];
+  const widget = field.widget as LayoutField['widget'];
   const requirements = FIELD_REQUIREMENTS[widget];
   if (!requirements) return [`${where}: unknown widget "${String(field.widget)}".`];
   where = `${where} (${widget})`;
@@ -268,7 +252,7 @@ export function validateLayout(layout: unknown): string[] {
 
 /* Widget helpers, shared by all renderers */
 
-export function sectionFlex(section: SheetSection): string {
+export function sectionFlex(section: LayoutSection): string {
   if (section.variant === 'stat') return `${section.grow ?? 0} 0 ${section.basis ?? 'auto'}`;
   return `${section.grow ?? 1} 1 ${section.basis ?? '22rem'}`;
 }
@@ -327,7 +311,7 @@ export function trackBoxes(field: CheckTrackField, data: unknown): { checked: bo
 
 /* Validation */
 
-function fieldProblems(field: SheetField, data: unknown): string[] {
+function fieldProblems(field: LayoutField, data: unknown): string[] {
   if (field.widget !== 'ratingLadder' || field.rule !== 'pyramid') return [];
   const problems: string[] = [];
   const rows = ladderRows(field, data);
@@ -345,7 +329,7 @@ function fieldProblems(field: SheetField, data: unknown): string[] {
 }
 
 // Advisory problems with the data; renderers show them but never block saving.
-export function validateSheet(layout: SheetLayout, data: unknown): string[] {
+export function validateLayoutData(layout: TabLayout, data: unknown): string[] {
   const problems: string[] = [];
   for (const row of layout.rows) {
     for (const section of row.sections) {
@@ -372,13 +356,13 @@ export type FieldView =
   | { widget: 'checkTrack', label: string, boxes: { number: number, checked: boolean, enabled: boolean }[], lockedHint?: string }
   | { widget: 'slot', badge: string, label: string, value: string, enabled: boolean, lockedHint?: string };
 
-export type SheetView = {
+export type LayoutView = {
   title: string,
   problems: string[],
   rows: { sections: { title: string, variant?: 'stat', flex: string, fields: FieldView[] }[] }[],
 };
 
-function buildFieldView(field: SheetField, data: unknown, itemTitle: string): FieldView {
+function buildFieldView(field: LayoutField, data: unknown, itemTitle: string): FieldView {
   switch (field.widget) {
     case 'title':
       return { widget: 'title', value: itemTitle, caption: field.caption };
@@ -420,10 +404,10 @@ function buildFieldView(field: SheetField, data: unknown, itemTitle: string): Fi
   }
 }
 
-export function buildSheetView(layout: SheetLayout, data: unknown, itemTitle: string): SheetView {
+export function buildLayoutView(layout: TabLayout, data: unknown, itemTitle: string): LayoutView {
   return {
     title: layout.title,
-    problems: validateSheet(layout, data),
+    problems: validateLayoutData(layout, data),
     rows: layout.rows.map(row => ({
       sections: row.sections.map(section => ({
         title: section.title,

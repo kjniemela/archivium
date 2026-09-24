@@ -32,7 +32,7 @@ block append styles
       padding: 0.5rem;
     }
 
-    .sheet-layout-json {
+    .tab-type-json {
       font-family: monospace;
       width: 100%;
       min-height: 12rem;
@@ -520,7 +520,7 @@ block content
         titleInput.addEventListener('change', () => updateCats());
 
         const error = createElement('small', { classList: ['color-error'] });
-        const textarea = createElement('textarea', { classList: ['sheet-layout-json'], attrs: { value: entry.json, spellcheck: false } });
+        const textarea = createElement('textarea', { classList: ['tab-type-json'], attrs: { value: entry.json, spellcheck: false } });
         const checkJson = () => {
           try {
             JSON.parse(textarea.value);

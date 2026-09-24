@@ -16,7 +16,7 @@ import {
   tabTypesOf,
   withDefaultTabs,
 } from '../../../src/lib/itemTypeConfig';
-import { type SheetLayout } from '../../../src/lib/sheetLayout';
+import { type TabLayout } from '../../../src/lib/tabLayout';
 import { indexedToJson, jsonToIndexed } from '../../../src/lib/tiptapHelpers';
 import CustomDataEditor from '../components/CustomDataEditor';
 import EditorFrame from '../components/EditorFrame';
@@ -35,7 +35,7 @@ const Gallery = lazy(() => import(/* webpackChunkName: "tab-gallery" */ '../comp
 const LineageEditor = lazy(() => import(/* webpackChunkName: "tab-lineage" */ '../components/LineageEditor'));
 const MapEditor = lazy(() => import(/* webpackChunkName: "tab-map" */ '../components/MapEditor'));
 const TimelineEditor = lazy(() => import(/* webpackChunkName: "tab-timeline" */ '../components/TimelineEditor'));
-const SheetRenderer = lazy(() => import(/* webpackChunkName: "tab-sheet" */ '../components/SheetRenderer'));
+const LayoutTabEditor = lazy(() => import(/* webpackChunkName: "tab-layout" */ '../components/LayoutTabEditor'));
 
 export type Categories = {
   [key: string]: [string, string],
@@ -53,14 +53,14 @@ export type ItemEditProps = {
 
 export const BUILTIN_TABS: BuiltinTab[] = ['lineage', 'map', 'timeline', 'gallery'];
 
-function tabLabel(tab: string, tabTypes: { [id: string]: SheetLayout }): string {
+function tabLabel(tab: string, tabTypes: { [id: string]: TabLayout }): string {
   if (tab === 'body') return T('Main Text');
   const tabTypeId = layoutTabId(tab);
   if (tabTypeId) return tabTypes[tabTypeId]?.title ?? tabTypeId;
   return (DEFAULT_TAB_KINDS as readonly string[]).includes(tab) ? capitalize(T(tab)) : tab;
 }
 
-function computeTabs(objData: ObjData, layoutTabs: { layout: SheetLayout }[]): Record<string, string> {
+function computeTabs(objData: ObjData, layoutTabs: { layout: TabLayout }[]): Record<string, string> {
   return {
     ...(objData.body ? { body: T('Main Text') } : {}),
     ...layoutTabs.reduce((acc, { layout }) => ({ ...acc, [layoutTabKey(layout.id)]: layout.title }), {}),
@@ -441,7 +441,7 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
       <LineageEditor item={item} categories={categories} onUpdate={(newItem) => changeItem(newItem)} itemMap={itemMap} />
     ),
     ...layoutTabs.reduce((acc, { layout, data }) => ({ ...acc, [layoutTabKey(layout.id)]: (
-      <SheetRenderer
+      <LayoutTabEditor
         layout={layout}
         data={data}
         itemTitle={item.title}

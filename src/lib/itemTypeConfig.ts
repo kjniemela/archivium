@@ -1,5 +1,5 @@
 import type { BuiltinTab, ObjData } from '../api/models/item';
-import { getPath, validateLayout, type SheetLayout } from './sheetLayout';
+import { getPath, validateLayout, type TabLayout } from './tabLayout';
 
 export const DEFAULT_TAB_KINDS = ['body', 'lineage', 'map', 'timeline', 'gallery'] as const;
 export type DefaultTabKind = typeof DEFAULT_TAB_KINDS[number];
@@ -33,10 +33,10 @@ function storedTabTypes(universeObjData: unknown): { [id: string]: unknown } {
 }
 
 // Malformed tab types are left out, so a bad layout can't break item pages.
-export function tabTypesOf(universeObjData: unknown): { [id: string]: SheetLayout } {
-  const result: { [id: string]: SheetLayout } = {};
+export function tabTypesOf(universeObjData: unknown): { [id: string]: TabLayout } {
+  const result: { [id: string]: TabLayout } = {};
   for (const [id, layout] of Object.entries(storedTabTypes(universeObjData))) {
-    if (validateLayout(layout).length === 0 && (layout as SheetLayout).id === id) result[id] = layout as SheetLayout;
+    if (validateLayout(layout).length === 0 && (layout as TabLayout).id === id) result[id] = layout as TabLayout;
   }
   return result;
 }
@@ -46,7 +46,7 @@ export function layoutTabsOf(objData: ObjData): LayoutTabsData {
 }
 
 // Data for deleted tab types stays on the item but isn't shown, so re-adding the type restores it.
-export function itemLayoutTabs(objData: ObjData, universeObjData: unknown): { layout: SheetLayout, data: unknown }[] {
+export function itemLayoutTabs(objData: ObjData, universeObjData: unknown): { layout: TabLayout, data: unknown }[] {
   const data = layoutTabsOf(objData);
   return Object.values(tabTypesOf(universeObjData))
     .filter(layout => data[layout.id] !== undefined)
@@ -101,7 +101,7 @@ export function typeConfigProblems(universeObjData: unknown): string[] {
     if (!TAB_TYPE_ID_PATTERN.test(id)) problems.push(`Tab type "${id}": ids may only contain lowercase letters, numbers and dashes.`);
     const layoutProblems = validateLayout(layout);
     problems.push(...layoutProblems.map(problem => `Tab type "${id}": ${problem}`));
-    if (layoutProblems.length === 0 && (layout as SheetLayout).id !== id) problems.push(`Tab type "${id}": "id" must match its key.`);
+    if (layoutProblems.length === 0 && (layout as TabLayout).id !== id) problems.push(`Tab type "${id}": "id" must match its key.`);
   }
   const configs = (getPath(universeObjData, 'typeConfigs') ?? {}) as TypeConfigs;
   for (const [type, config] of Object.entries(configs)) {
