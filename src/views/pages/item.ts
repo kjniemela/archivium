@@ -8,6 +8,7 @@ import { getPfpUrl, perms } from '../../api/utils';
 import { ForbiddenError, NotFoundError } from '../../errors';
 import { FamilyTreeLayout, layoutFamilyTree } from '../../lib/familyTree';
 import { RenderedBody, tryRenderContent } from '../../lib/renderContent';
+import { buildSheetView, layoutForCategory, SheetView } from '../../lib/sheetLayout';
 import { universeLink } from '../../templates';
 import embedder from '../../embedding';
 
@@ -75,6 +76,14 @@ export default {
       renderedBody = await tryRenderContent(req, item.obj_data.body, universe.shortname);
     }
 
+    // A sheet tab is shown when the universe has a sheet layout for this item's
+    // category and the item has data for it.
+    let sheet: SheetView | null = null;
+    const sheetLayout = layoutForCategory(universe.obj_data, item.item_type);
+    if (sheetLayout && item.obj_data[sheetLayout.root] !== undefined) {
+      sheet = buildSheetView(sheetLayout, item.obj_data[sheetLayout.root], item.title);
+    }
+
     let family: Family = {};
     let familyLayout: FamilyTreeLayout | null = null;
     if ('lineage' in item.obj_data) {
@@ -109,7 +118,7 @@ export default {
       item, universe, tab: req.query.tab, comments, commenters, notes, noteAuthors, renderedBody,
       commentAction: `${universeLink(req, universe.shortname)}/items/${item.shortname}/comment`,
       noteBaseRoute: `/api/universes/${universe.shortname}/items/${item.shortname}/notes`,
-      family, familyLayout, relatedItems,
+      family, familyLayout, relatedItems, sheet,
     });
   },
 

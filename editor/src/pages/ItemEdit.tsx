@@ -7,6 +7,7 @@ import * as Y from 'yjs';
 import { type BuiltinTab, type Item, type ObjData } from '../../../src/api/models/item';
 import { editorExtensions, extractLinkData, type LinkData, type TiptapContext } from '../../../src/lib/editor';
 import { splitIgnoringQuotes } from '../../../src/lib/markdown';
+import { layoutForCategory, type SheetLayout } from '../../../src/lib/sheetLayout';
 import { indexedToJson, jsonToIndexed } from '../../../src/lib/tiptapHelpers';
 import CustomDataEditor from '../components/CustomDataEditor';
 import EditorFrame from '../components/EditorFrame';
@@ -25,6 +26,7 @@ const Gallery = lazy(() => import(/* webpackChunkName: "tab-gallery" */ '../comp
 const LineageEditor = lazy(() => import(/* webpackChunkName: "tab-lineage" */ '../components/LineageEditor'));
 const MapEditor = lazy(() => import(/* webpackChunkName: "tab-map" */ '../components/MapEditor'));
 const TimelineEditor = lazy(() => import(/* webpackChunkName: "tab-timeline" */ '../components/TimelineEditor'));
+const SheetRenderer = lazy(() => import(/* webpackChunkName: "tab-sheet" */ '../components/SheetRenderer'));
 
 export type Categories = {
   [key: string]: [string, string],
@@ -42,9 +44,10 @@ export type ItemEditProps = {
 
 export const BUILTIN_TABS: BuiltinTab[] = ['lineage', 'map', 'timeline', 'gallery'];
 
-function computeTabs(objData: ObjData): Record<string, string> {
+function computeTabs(objData: ObjData, sheetLayout: SheetLayout | null): Record<string, string> {
   return {
     ...(objData.body ? { body: T('Main Text') } : {}),
+    ...(sheetLayout ? { sheet: sheetLayout.title } : {}),
     ...(objData.tabs ? Object.keys(objData.tabs) : []).reduce((acc, tab) => ({ ...acc, [tab]: tab }), {}),
     ...BUILTIN_TABS.filter(tab => objData[tab] !== undefined).reduce((acc, tab) => ({ ...acc, [tab]: objData[tab].title }), {}),
   };
@@ -93,6 +96,7 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
   const [objData, setObjData, changeObjData] = useYState<ObjData>(yObjData);
 
   const [categories, setCategories] = useState<Categories | null>(null);
+  const [universeObjData, setUniverseObjData] = useState<unknown>(null);
   const [currentModal, setCurrentModal] = useState<ModalType | null>(null);
   const [currentTab, setCurrentTab] = useState<string | null>(null);
   const [eventItemMap, setEventItemMap] = useState<Record<string, EventItem[]>>();
@@ -153,6 +157,7 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
       const loadData = async () => {
         const categoryPromise = fetchData(`/api/universes/${universeShort}`, (data) => {
           setCategories(data.obj_data.cats);
+          setUniverseObjData(data.obj_data);
         });
         const eventItemPromise = fetchData(`/api/universes/${universeShort}/events`, (events) => {
           const newEventItemMap: Record<number, EventItem[]> = {};
@@ -227,7 +232,9 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
     }
   }, [itemShort, universeShort, provider, editor]);
 
-  const tabNames = computeTabs(objData);
+  // The universe can attach a sheet layout to the item's category (obj_data.sheets).
+  const sheetLayout = item?.item_type ? layoutForCategory(universeObjData, item.item_type) : null;
+  const tabNames = computeTabs(objData, sheetLayout);
   if (!(currentTab && tabNames[currentTab])) {
     if (Object.keys(tabNames).length > 0) setCurrentTab(Object.keys(tabNames)[0]);
     else if (currentTab !== null) setCurrentTab(null);
@@ -407,6 +414,14 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
     lineage: (
       <LineageEditor item={item} categories={categories} onUpdate={(newItem) => changeItem(newItem)} itemMap={itemMap} />
     ),
+    sheet: sheetLayout && (
+      <SheetRenderer
+        layout={sheetLayout}
+        data={(objData as Record<string, unknown>)[sheetLayout.root] ?? {}}
+        itemTitle={item.title}
+        onChange={(data) => changeObjData({ [sheetLayout.root]: data } as Partial<ObjData>)}
+      />
+    ),
   };
 
   return (
@@ -537,6 +552,7 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
               onSelectTab={(tab) => setCurrentTab(tab)}
               onRemoveTab={(tab) => removeTab(tab)}
               selectors={docSelectors.tab}
+              fixedTabs={sheetLayout ? ['sheet'] : undefined}
             />
             <ul className='navbarBtns'>
               <li className='navbarBtn badge-anchor'>
