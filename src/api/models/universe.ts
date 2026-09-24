@@ -17,6 +17,18 @@ export type UniverseAccessRequest<T = boolean> = {
   inviter_id: number | null,
 };
 
+export type UniverseAccessRequestListing<T = boolean> = UniverseAccessRequest<T> & {
+  username: string,
+  inviter_username: string | null,
+};
+
+export type UserAccessInvite = {
+  universe_shortname: string,
+  universe_title: string,
+  permission_level: perms,
+  inviter_username: string | null,
+};
+
 export type Universe = {
   id: number,
   title: string,
@@ -457,25 +469,41 @@ export class UniverseAPI {
     return request;
   }
 
-  async getAccessRequests(user: User | undefined, shortname: string): Promise<UniverseAccessRequest<false>[]> {
+  async getAccessRequests(user: User | undefined, shortname: string): Promise<UniverseAccessRequestListing<false>[]> {
     return this._getAccessRequests(user, shortname, false);
   }
 
-  async getAccessInvites(user: User | undefined, shortname: string): Promise<UniverseAccessRequest<true>[]> {
+  async getAccessInvites(user: User | undefined, shortname: string): Promise<UniverseAccessRequestListing<true>[]> {
     return this._getAccessRequests(user, shortname, true);
   }
 
-  private async _getAccessRequests<T extends boolean>(user: User | undefined, shortname: string, getInvites: T): Promise<UniverseAccessRequest<T>[]> {
+  private async _getAccessRequests<T extends boolean>(user: User | undefined, shortname: string, getInvites: T): Promise<UniverseAccessRequestListing<T>[]> {
     if (!user) throw new UnauthorizedError();
 
     const universe = await this.getOne(user, { shortname }, perms.ADMIN);
 
-    const requests = await executeQuery(
-      'SELECT ua.*, user.username FROM universeaccessrequest AS ua INNER JOIN user ON user.id = ua.user_id WHERE ua.universe_id = ? AND ua.is_invite = ?',
-      [universe.id, getInvites],
-    ) as UniverseAccessRequest<T>[];
+    const requests = await executeQuery(`
+      SELECT ua.*, user.username, inviter.username AS inviter_username
+      FROM universeaccessrequest AS ua
+      INNER JOIN user ON user.id = ua.user_id
+      LEFT JOIN user AS inviter ON inviter.id = ua.inviter_id
+      WHERE ua.universe_id = ? AND ua.is_invite = ?
+    `, [universe.id, getInvites]) as UniverseAccessRequestListing<T>[];
 
     return requests;
+  }
+
+  async getUserAccessInvites(user: User | undefined): Promise<UserAccessInvite[]> {
+    if (!user) throw new UnauthorizedError();
+
+    return await executeQuery(`
+      SELECT universe.shortname AS universe_shortname, universe.title AS universe_title, ua.permission_level, inviter.username AS inviter_username
+      FROM universeaccessrequest AS ua
+      INNER JOIN universe ON universe.id = ua.universe_id
+      LEFT JOIN user AS inviter ON inviter.id = ua.inviter_id
+      WHERE ua.user_id = ? AND ua.is_invite = TRUE
+      ORDER BY universe.title
+    `, [user.id]) as UserAccessInvite[];
   }
 
   async putAccessRequest(user: User | undefined, shortname: string, permissionLevel: perms): Promise<void> {
