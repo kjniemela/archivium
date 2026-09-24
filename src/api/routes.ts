@@ -268,6 +268,7 @@ export default function (app: Express, upload: Multer) {
             type: req.getQueryParam('type'),
             tag: req.getQueryParam('tag'),
             author: req.getQueryParam('author'),
+            vault: req.getQueryParam('vault'),
           }),
           POST: (req) => api.item.post(req.session.user, req.body, req.params.universeShortName),
         }, [

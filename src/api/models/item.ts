@@ -14,6 +14,7 @@ export type ItemOptions = BaseOptions & {
   type?: string,
   tag?: string,
   universe?: string,
+  vault?: string,
   author?: string,
   includeData?: boolean,
 };
@@ -527,6 +528,12 @@ export class ItemAPI {
       if (!conditions) conditions = { strings: [], values: [] };
       conditions.strings.push('universe.shortname = ?');
       conditions.values.push(options.universe);
+    }
+
+    if (options.vault) {
+      if (!conditions) conditions = { strings: [], values: [] };
+      conditions.strings.push('vault.shortname = ?');
+      conditions.values.push(options.vault);
     }
 
     if (options.author) {

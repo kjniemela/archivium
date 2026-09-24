@@ -16,6 +16,10 @@ export type Vault = {
   requester_permissions: perms,
 };
 
+type VaultOptions = BaseOptions & {
+  itemCounts?: boolean,
+};
+
 export class VaultAPI {
   readonly api: API;
 
@@ -39,7 +43,7 @@ export class VaultAPI {
     return vault;
   }
 
-  async getMany(user: User | undefined, conditions: any = null, permissionLevel = perms.READ, options: BaseOptions = {}): Promise<Vault[]> {
+  async getMany(user: User | undefined, conditions: any = null, permissionLevel = perms.READ, options: VaultOptions = {}): Promise<Vault[]> {
     if (!user) throw new UnauthorizedError();
 
     const permsQueryString = `
@@ -50,6 +54,7 @@ export class VaultAPI {
     const queryString = `
       SELECT
         vault.*,
+        ${options.itemCounts ? 'COUNT(item.id) AS items,' : ''}
         JSON_REMOVE(JSON_OBJECTAGG(
           IFNULL(author.id, 'null__'),
           IFNULL(author.username, '')
@@ -69,6 +74,7 @@ export class VaultAPI {
         ON vault.universe_id = au_filter.universe_id AND au_filter.user_id = ${user.id}
       LEFT JOIN vaultauthor AS va ON vault.id = va.vault_id
       LEFT JOIN user AS author ON author.id = va.user_id
+      ${options.itemCounts ? 'LEFT JOIN item ON item.vault_id = vault.id' : ''}
       WHERE ${conditionString} (${permsQueryString})
       GROUP BY vault.id
       ORDER BY vault.title ASC`;
@@ -76,12 +82,17 @@ export class VaultAPI {
     return data;
   }
 
-  async getManyByUniverseShortname(user: User | undefined, universeShortname: string, permissionLevel = perms.READ): Promise<Vault[]> {
+  async getManyByUniverseShortname(
+    user: User | undefined,
+    universeShortname: string,
+    permissionLevel = perms.READ,
+    options: VaultOptions = {}
+  ): Promise<Vault[]> {
     const universe = await this.api.universe.getOne(user, { shortname: universeShortname });
     return this.getMany(user, {
       strings: ['vault.universe_id = ?'],
       values: [universe.id],
-    }, permissionLevel);
+    }, permissionLevel, options);
   }
 
   getOneByShortnames(user: User | undefined, universeShortname: string, vaultShortname: string, permissionLevel = perms.READ): Promise<Vault> {

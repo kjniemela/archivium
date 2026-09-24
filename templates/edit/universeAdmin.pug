@@ -185,7 +185,10 @@ block content
       each vault in vaults
         .d-flex.flex-col.gap-1.mb-2(style={ border: '1px solid var(--color-border)', padding: '0.5rem' })
           .d-flex.justify-between.align-center
-            h2.ma-0 #{vault.title}
+            .d-flex.align-center.gap-2
+              h2.ma-0 #{vault.title}
+              a.link.link-animated(href=`${universeLink(universe.shortname)}/items?vault=${vault.shortname}`)
+                small (#{T(vault.items === 1 ? '%s item' : '%s items', vault.items)})
             if vault.requester_permissions >= perms.OWNER
               button.delete_vault(data-vault=vault.shortname) #{T('Delete Vault')}
 
