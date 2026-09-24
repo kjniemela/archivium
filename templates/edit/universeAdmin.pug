@@ -176,8 +176,13 @@ block content
 
           document.querySelectorAll('.delete_vault').forEach((button) => {
             button.onclick = async () => {
-              const [response] = await deleteJSON(`/api/universes/#{universe.shortname}/vaults/${button.dataset.vault}`);
-              if (response.status === 200) window.location.reload();
+              const vaultShortname = button.dataset.vault;
+              const [response, body] = await deleteJSON(`/api/universes/#{universe.shortname}/vaults/${vaultShortname}`);
+              if (response.status === 200) {
+                window.location.reload();
+              } else {
+                document.querySelector(`.vault_error[data-vault="${vaultShortname}"]`).innerText = body;
+              }
             }
           });
         });
@@ -191,6 +196,7 @@ block content
                 small (#{T(vault.items === 1 ? '%s item' : '%s items', vault.items)})
             if vault.requester_permissions >= perms.OWNER
               button.delete_vault(data-vault=vault.shortname) #{T('Delete Vault')}
+          span.vault_error.text-small.color-error(data-vault=vault.shortname)
 
           - const vaultPermLevels = Object.keys(perms).filter((item) => !isNaN(Number(item))).map(Number).sort((a, b) => b - a);
           - const inheritedOwnerIds = Object.keys(universe.author_permissions).filter((authorId) => universe.author_permissions[authorId] === perms.OWNER);

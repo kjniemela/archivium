@@ -1,6 +1,6 @@
 import { PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { API } from '..';
-import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
+import { ForbiddenError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
 import { BaseOptions, executeQuery, perms, withTransaction } from '../utils';
 import { User } from './user';
 
@@ -14,6 +14,7 @@ export type Vault = {
   authors: { [id: number]: string },
   author_permissions: { [id: number]: perms },
   requester_permissions: perms,
+  items?: number,
 };
 
 type VaultOptions = BaseOptions & {
@@ -27,9 +28,9 @@ export class VaultAPI {
     this.api = api;
   }
 
-  async getOne(user: User | undefined, conditions, permissionLevel = perms.READ): Promise<Vault> {
+  async getOne(user: User | undefined, conditions, permissionLevel = perms.READ, options: VaultOptions = {}): Promise<Vault> {
     if (!conditions) throw new ValidationError('Conditions are required.');
-    const data = await this.getMany(user, conditions, permissionLevel);
+    const data = await this.getMany(user, conditions, permissionLevel, options);
     const vault = data[0];
     if (!vault) {
       const exists = (await executeQuery(`SELECT 1 FROM vault WHERE ${conditions.strings.join(' AND ')}`, conditions.values)).length > 0;
@@ -95,11 +96,17 @@ export class VaultAPI {
     }, permissionLevel, options);
   }
 
-  getOneByShortnames(user: User | undefined, universeShortname: string, vaultShortname: string, permissionLevel = perms.READ): Promise<Vault> {
+  getOneByShortnames(
+    user: User | undefined,
+    universeShortname: string,
+    vaultShortname: string,
+    permissionLevel = perms.READ,
+    options: VaultOptions = {}
+  ): Promise<Vault> {
     return this.getOne(user, {
       strings: ['vault.shortname = ?', 'vault.universe_id = (SELECT id FROM universe WHERE shortname = ?)'],
       values: [vaultShortname, universeShortname],
-    }, permissionLevel);
+    }, permissionLevel, options);
   }
 
   validateShortname(shortname: string): string | null {
@@ -176,7 +183,19 @@ export class VaultAPI {
   }
 
   async del(user: User | undefined, universeShortname: string, vaultShortname: string): Promise<void> {
-    const vault = await this.getOneByShortnames(user, universeShortname, vaultShortname, perms.OWNER);
+    const vault = await this.getOneByShortnames(user, universeShortname, vaultShortname, perms.OWNER, { itemCounts: true });
+
+    if (vault.items === undefined) {
+      // We requested an item count but got none - abort.
+      throw new ModelError('Internal server error while validating that vault is empty, aborting.');
+    }
+
+    if (vault.items > 0) {
+      throw new ValidationError(
+        `Cannot delete ${vault.title} while it still contains ${vault.items === 1 ? '1 item' : `${vault.items} items`}. `
+        + 'Move them to another vault or out of the vault first.',
+      );
+    }
 
     await executeQuery('DELETE FROM vault WHERE id = ?', [vault.id]);
   }
