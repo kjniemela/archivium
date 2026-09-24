@@ -6,11 +6,9 @@ type TabsBarProps = {
   onSelectTab: (tab: string) => void,
   onRemoveTab: (tab: string) => void,
   selectors: { [el: string]: DocUser[] },
-  // Tabs that can't be removed, e.g. a sheet tab that comes from the item's category.
-  fixedTabs?: string[],
 };
 
-export default function TabsBar({ tabs, selectedTab, onSelectTab, onRemoveTab, selectors, fixedTabs }: TabsBarProps) {
+export default function TabsBar({ tabs, selectedTab, onSelectTab, onRemoveTab, selectors }: TabsBarProps) {
   return (
     <ul className='tabs-buttons navbarBtns gap-1 grow-1 flex-wrap'>
       {Object.entries(tabs).map(([tab, name]) => (
@@ -27,7 +25,7 @@ export default function TabsBar({ tabs, selectedTab, onSelectTab, onRemoveTab, s
             }} />
           ))}
           <h3 className='navbarBtnLink navbarText ma-0'>{name}</h3>
-          {tab === selectedTab && !fixedTabs?.includes(tab) && <div className='material-symbols-outlined badge badge-large' onClick={(e) => {
+          {tab === selectedTab && <div className='material-symbols-outlined badge badge-large' onClick={(e) => {
             e.stopPropagation();
             onRemoveTab(tab);
           }}>delete</div>}

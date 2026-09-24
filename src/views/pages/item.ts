@@ -8,7 +8,7 @@ import { getPfpUrl, perms } from '../../api/utils';
 import { ForbiddenError, NotFoundError } from '../../errors';
 import { FamilyTreeLayout, layoutFamilyTree } from '../../lib/familyTree';
 import { RenderedBody, tryRenderContent } from '../../lib/renderContent';
-import { layoutForType } from '../../lib/itemTypeConfig';
+import { itemLayoutTabs, layoutTabKey } from '../../lib/itemTypeConfig';
 import { buildSheetView, SheetView } from '../../lib/sheetLayout';
 import { universeLink } from '../../templates';
 import embedder from '../../embedding';
@@ -77,13 +77,8 @@ export default {
       renderedBody = await tryRenderContent(req, item.obj_data.body, universe.shortname);
     }
 
-    // A sheet tab is shown when the universe's config for this item's type has a
-    // sheet layout and the item has data for it.
-    let sheet: SheetView | null = null;
-    const sheetLayout = layoutForType(universe.obj_data, item.item_type);
-    if (sheetLayout && item.obj_data[sheetLayout.root] !== undefined) {
-      sheet = buildSheetView(sheetLayout, item.obj_data[sheetLayout.root], item.title);
-    }
+    const layoutTabs: (SheetView & { key: string })[] = itemLayoutTabs(item.obj_data, universe.obj_data)
+      .map(({ layout, data }) => ({ ...buildSheetView(layout, data, item.title), key: layoutTabKey(layout.id) }));
 
     let family: Family = {};
     let familyLayout: FamilyTreeLayout | null = null;
@@ -119,7 +114,7 @@ export default {
       item, universe, tab: req.query.tab, comments, commenters, notes, noteAuthors, renderedBody,
       commentAction: `${universeLink(req, universe.shortname)}/items/${item.shortname}/comment`,
       noteBaseRoute: `/api/universes/${universe.shortname}/items/${item.shortname}/notes`,
-      family, familyLayout, relatedItems, sheet,
+      family, familyLayout, relatedItems, layoutTabs,
     });
   },
 

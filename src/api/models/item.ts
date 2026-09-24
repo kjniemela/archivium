@@ -111,6 +111,7 @@ export type ObjData = {
   comments?: boolean,
   body?: IndexedDocument,
   tabs?: { [key: string]: any }, // TODO remove these any types at some point
+  layoutTabs?: { [tabTypeId: string]: unknown },
 } & { [K in BuiltinTab]?: any };
 
 export type BasicItem = {
@@ -664,6 +665,18 @@ export class ItemAPI {
 
     const items = await this.getMany(user, conditions, permissionsRequired, options);
     return items;
+  }
+
+  // Number of items in the universe with a tab of each tab type (obj_data.layoutTabs keys).
+  async getLayoutTabUsage(universeId: number): Promise<{ [tabTypeId: string]: number }> {
+    const rows = await executeQuery(`
+      SELECT tab.id, COUNT(*) AS count
+      FROM item,
+      JSON_TABLE(JSON_KEYS(item.obj_data, '$.layoutTabs'), '$[*]' COLUMNS (id VARCHAR(255) PATH '$')) AS tab
+      WHERE item.universe_id = ?
+      GROUP BY tab.id
+    `, [universeId]) as { id: string, count: number }[];
+    return rows.reduce((acc, { id, count }) => ({ ...acc, [id]: Number(count) }), {});
   }
 
   async getByUniverseAndItemShortnames(

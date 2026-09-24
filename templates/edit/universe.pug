@@ -256,17 +256,17 @@ block content
       button(type='button' onclick='resetCats()') #{T('Reset to default types')}
 
     if universe.tier >= tiers.PREMIUM
-      h3 #{T('Sheet Layouts')}
+      h3 #{T('Tab Types')}
       .mb-2
-        small #{T('Sheet layouts describe structured tabs, like character sheets. Attach one to an item type under "Tabs" above, and every item of that type gets a sheet tab.')}
-      #sheet-layouts.d-flex.flex-col.gap-2
+        small #{T('Tab types are structured tabs, like character sheets, that any item can add. Items of the types that list them under "Tabs" above start with them.')}
+      #tab-types.d-flex.flex-col.gap-2
       .d-flex.gap-2.mt-2
-        button(type='button' onclick='addLayout()') #{T('Add Layout')}
+        button(type='button' onclick='addTabType()') #{T('Add Tab Type')}
 
     .mt-2
       button(type='submit') #{T('Save Changes')}
 
-  #data(data-universe=universe)
+  #data(data-universe=universe data-tab-type-usage=tabTypeUsage)
   script.
     updateObjData(JSON.parse(document.querySelector('#data').dataset.universe).obj_data);
 
@@ -320,7 +320,7 @@ block content
       return `${title}s`;
     }
 
-    const sheetsEnabled = #{universe.tier >= tiers.PREMIUM};
+    const tabTypesEnabled = #{universe.tier >= tiers.PREMIUM};
     const DEFAULT_TAB_KINDS = [
       ['body', T('Main Text')],
       ['lineage', T('Lineage')],
@@ -340,24 +340,25 @@ block content
       }
     }
 
-    // Sheet layouts are edited as JSON text; the server validates their structure on save.
-    let layoutList = Object.values((obj_data.sheets ?? {}).layouts ?? {}).map(layout => JSON.stringify(layout, null, 2));
-    function layoutIds() {
-      const ids = [];
-      for (const text of layoutList) {
-        try {
-          const { id } = JSON.parse(text);
-          if (id && typeof id === 'string') ids.push(id);
-        } catch {}
-      }
-      return ids;
+    // Each entry is { id, title, json, isNew }. The layout itself is edited as JSON text (minus id and title),
+    // and the server validates its structure on save. Ids key item data, so they're fixed once saved.
+    const tabTypeUsage = JSON.parse(document.querySelector('#data').dataset.tabTypeUsage || '{}');
+    let tabTypeList = Object.values(obj_data.tabTypes ?? {}).map(({ id, title, version, ...layout }) => ({
+      id, title, json: JSON.stringify(layout, null, 2), isNew: false,
+    }));
+    function uniqueTabTypeId(title, entry) {
+      const base = toShortname(title) || 'tab';
+      const taken = tabTypeList.filter(other => other !== entry).map(other => other.id);
+      let id = base;
+      for (let n = 2; taken.includes(id); n++) id = `${base}-${n}`;
+      return id;
     }
 
     function summarizeConfig(config) {
       const parts = [
         ...(config.defaultTabs ?? []).map(kind => (DEFAULT_TAB_KINDS.find(([k]) => k === kind) ?? [, kind])[1]),
         ...(config.customTabs ?? []),
-        ...(config.sheet ? [T('Sheet: %s', config.sheet)] : []),
+        ...(config.tabTypes ?? []).map(id => (tabTypeList.find(entry => entry.id === id) ?? { title: id }).title),
       ];
       return parts.length > 0 ? parts.join(', ') : T('None');
     }
@@ -399,21 +400,21 @@ block content
         ] }),
       ];
 
-      if (sheetsEnabled) {
-        const ids = layoutIds();
-        const sheetSelect = createElement('select', { children: [
-          createElement('option', { attrs: { value: '', innerText: T('None'), selected: !config.sheet } }),
-          ...ids.map(id => createElement('option', { attrs: { value: id, innerText: id, selected: config.sheet === id } })),
-          // Keep a reference to a layout that's currently broken or being renamed, rather than silently dropping it.
-          ...(config.sheet && !ids.includes(config.sheet) ? [createElement('option', { attrs: { value: config.sheet, innerText: T('%s (missing)', config.sheet), selected: true } })] : []),
-        ] });
-        sheetSelect.addEventListener('change', () => {
-          if (sheetSelect.value) config.sheet = sheetSelect.value;
-          else delete config.sheet;
+      if (tabTypeList.length > 0) {
+        const tabTypeChecks = tabTypeList.map(entry => {
+          const checkbox = createElement('input', { attrs: { type: 'checkbox', checked: (config.tabTypes ?? []).includes(entry.id) } });
+          checkbox.addEventListener('change', () => {
+            const selected = new Set(config.tabTypes ?? []);
+            if (checkbox.checked) selected.add(entry.id);
+            else selected.delete(entry.id);
+            config.tabTypes = tabTypeList.map(other => other.id).filter(id => selected.has(id));
+            if (config.tabTypes.length === 0) delete config.tabTypes;
+          });
+          return createElement('label', { classList: ['d-flex', 'align-center', 'gap-1'], children: [checkbox, createElement('span', { attrs: { innerText: entry.title || entry.id } })] });
         });
-        rows.push(createElement('label', { classList: ['d-flex', 'gap-2', 'align-center'], children: [
-          createElement('b', { attrs: { innerText: `${T('Sheet layout')}:` } }),
-          sheetSelect,
+        rows.push(createElement('div', { classList: ['d-flex', 'flex-wrap', 'gap-2', 'align-center'], children: [
+          createElement('b', { attrs: { innerText: `${T('Tab types')}:` } }),
+          ...tabTypeChecks,
         ] }));
       }
 
@@ -494,20 +495,32 @@ block content
     }
 
     const NEW_LAYOUT = {
-      version: 1,
-      id: 'new-sheet',
-      title: 'Sheet',
-      root: 'sheet',
       rows: [{ sections: [{ title: 'Overview', fields: [{ widget: 'title' }, { widget: 'text', path: 'summary', label: 'Summary', multiline: true }] }] }],
     };
 
-    function updateLayouts() {
-      const container = document.getElementById('sheet-layouts');
+    function updateTabTypes() {
+      const container = document.getElementById('tab-types');
       if (!container) return;
       container.innerHTML = '';
-      layoutList.forEach((text, i) => {
+      tabTypeList.forEach((entry, i) => {
+        const idLabel = createElement('small', { attrs: { innerText: T('ID: %s', entry.id) } });
+        const titleInput = createElement('input', { attrs: { type: 'text', value: entry.title, placeholder: T('Tab Title') } });
+        titleInput.addEventListener('input', () => {
+          entry.title = titleInput.value;
+          if (entry.isNew) {
+            const oldId = entry.id;
+            entry.id = uniqueTabTypeId(entry.title, entry);
+            idLabel.innerText = T('ID: %s', entry.id);
+            for (const cat of catList) {
+              if (cat[4].tabTypes) cat[4].tabTypes = cat[4].tabTypes.map(id => id === oldId ? entry.id : id);
+            }
+          }
+        });
+        // Titles and ids show up in the per-type tab checkboxes, so refresh those once an edit is done.
+        titleInput.addEventListener('change', () => updateCats());
+
         const error = createElement('small', { classList: ['color-error'] });
-        const textarea = createElement('textarea', { classList: ['sheet-layout-json'], attrs: { value: text, spellcheck: false } });
+        const textarea = createElement('textarea', { classList: ['sheet-layout-json'], attrs: { value: entry.json, spellcheck: false } });
         const checkJson = () => {
           try {
             JSON.parse(textarea.value);
@@ -516,30 +529,28 @@ block content
             error.innerText = T('Invalid JSON: %s', err.message);
           }
         };
-        textarea.addEventListener('input', () => layoutList[i] = textarea.value);
-        // Layout ids feed the per-type sheet selects, so refresh those once an edit is done.
-        textarea.addEventListener('change', () => {
-          checkJson();
-          updateCats();
-        });
+        textarea.addEventListener('input', () => entry.json = textarea.value);
+        textarea.addEventListener('change', checkJson);
         checkJson();
+
         container.appendChild(createElement('div', { classList: ['sheet', 'd-flex', 'flex-col', 'gap-1'], children: [
+          createElement('div', { classList: ['d-flex', 'gap-2', 'align-center'], children: [titleInput, idLabel] }),
           textarea,
           error,
           createElement('div', { children: [createElement('button', { attrs: {
             type: 'button',
             innerText: T('Remove'),
             onclick: () => {
-              // Detach the layout from any item types using it.
-              let removedId;
-              try {
-                removedId = JSON.parse(layoutList[i]).id;
-              } catch {}
+              const usage = tabTypeUsage[entry.id] ?? 0;
+              if (usage > 0 && !confirm(T('%s items have a "%s" tab. Their data will be kept but hidden, and comes back if you re-add a tab type with the id "%s". Remove it?', usage, entry.title || entry.id, entry.id))) return;
               for (const cat of catList) {
-                if (removedId && cat[4].sheet === removedId) delete cat[4].sheet;
+                const config = cat[4];
+                if (!config.tabTypes) continue;
+                config.tabTypes = config.tabTypes.filter(id => id !== entry.id);
+                if (config.tabTypes.length === 0) delete config.tabTypes;
               }
-              layoutList.splice(i, 1);
-              updateLayouts();
+              tabTypeList.splice(i, 1);
+              updateTabTypes();
               updateCats();
             },
           } })] }),
@@ -547,15 +558,14 @@ block content
       });
     }
 
-    function addLayout() {
-      const ids = layoutIds();
-      let id = NEW_LAYOUT.id;
-      for (let n = 2; ids.includes(id); n++) id = `${NEW_LAYOUT.id}-${n}`;
-      layoutList.push(JSON.stringify({ ...NEW_LAYOUT, id }, null, 2));
-      updateLayouts();
+    function addTabType() {
+      const entry = { id: '', title: '', json: JSON.stringify(NEW_LAYOUT, null, 2), isNew: true };
+      entry.id = uniqueTabTypeId(entry.title, entry);
+      tabTypeList.push(entry);
+      updateTabTypes();
       updateCats();
     }
-    window.addLayout = addLayout;
+    window.addTabType = addTabType;
 
     function resetCats() {
       setDefaultCats();
@@ -569,7 +579,7 @@ block content
     if (!('cats' in obj_data)) setDefaultCats();
     resetCatList();
     updateCats();
-    updateLayouts();
+    updateTabTypes();
 
     document.forms.edit.addEventListener('submit', (e) => {
       const formError = document.querySelector('#validation-error');
@@ -608,20 +618,19 @@ block content
       }
 
       const newObjData = { cats: newCats, typeConfigs: newTypeConfigs };
-      if (sheetsEnabled) {
-        const layouts = {};
-        for (const text of layoutList) {
+      if (tabTypesEnabled) {
+        const tabTypes = {};
+        for (const entry of tabTypeList) {
+          if (!entry.title.trim()) return showError(T('Every tab type needs a title.'));
           let layout;
           try {
-            layout = JSON.parse(text);
+            layout = JSON.parse(entry.json);
           } catch (err) {
-            return showError(T('A sheet layout is not valid JSON: %s', err.message));
+            return showError(T('The layout for "%s" is not valid JSON: %s', entry.title, err.message));
           }
-          if (!layout || typeof layout.id !== 'string' || !layout.id) return showError(T('Every sheet layout needs an "id".'));
-          if (layout.id in layouts) return showError(T('Two sheet layouts have the id "%s".', layout.id));
-          layouts[layout.id] = layout;
+          tabTypes[entry.id] = { ...layout, version: 1, id: entry.id, title: entry.title.trim() };
         }
-        newObjData.sheets = { ...obj_data.sheets ?? {}, layouts };
+        newObjData.tabTypes = tabTypes;
       }
       updateObjData(newObjData);
     });

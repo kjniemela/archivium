@@ -137,16 +137,14 @@ export type SheetLayout = {
   id: string,
   // Shown as the tab name.
   title: string,
-  // The item obj_data key holding this sheet's data.
-  root: string,
+  // The item obj_data key holding this sheet's data. Archivium ignores it and
+  // stores sheet data under obj_data.layoutTabs[id] instead.
+  root?: string,
   rows: SheetRow[],
   checks?: SheetCheck[],
 };
 
 /* Layout validation */
-
-// obj_data keys an item already uses for other things; a sheet can't store its data there.
-const RESERVED_ROOTS = ['body', 'tabs', 'notes', 'comments', 'lineage', 'map', 'timeline', 'gallery'];
 
 const isObject = (value: unknown): value is Record<string, unknown> => (
   value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -233,12 +231,10 @@ export function validateLayout(layout: unknown): string[] {
   if (!isObject(layout)) return ['Layout must be a JSON object.'];
   const problems: string[] = [];
   if (layout.version !== 1) problems.push('"version" must be 1.');
-  for (const key of ['id', 'title', 'root']) {
+  for (const key of ['id', 'title']) {
     if (typeof layout[key] !== 'string' || !layout[key]) problems.push(`"${key}" must be a non-empty string.`);
   }
-  if (typeof layout.root === 'string' && RESERVED_ROOTS.includes(layout.root)) {
-    problems.push(`"root" can't be "${layout.root}", that key is already used by items.`);
-  }
+  if (layout.root !== undefined && typeof layout.root !== 'string') problems.push('"root" must be a string.');
   if (!Array.isArray(layout.rows)) {
     problems.push('"rows" must be a list.');
   } else {

@@ -1,8 +1,8 @@
 function showTab(tab) {
   document.querySelectorAll('.tabs [data-tab]').forEach(tab => tab.classList.add('hidden'));
   document.querySelectorAll('.navbarBtn[data-tab]').forEach(btn => btn.classList.remove('selected'));
-  document.querySelector(`.tabs [data-tab=${tab}]`)?.classList.remove('hidden');
-  document.querySelector(`.navbarBtn[data-tab=${tab}]`)?.classList.add('selected');
+  document.querySelector(`.tabs [data-tab="${CSS.escape(tab)}"]`)?.classList.remove('hidden');
+  document.querySelector(`.navbarBtn[data-tab="${CSS.escape(tab)}"]`)?.classList.add('selected');
   const query = new URLSearchParams(window.location.search);
   query.set('tab', tab);
   const { protocol, host, pathname, hash } = window.location;

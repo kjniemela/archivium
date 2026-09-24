@@ -2,7 +2,7 @@ import { PoolConnection, QueryResult, ResultSetHeader } from 'mysql2/promise';
 import { API } from '..';
 import embedder from '../../embedding';
 import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
-import { sheetLayouts, typeConfigProblems } from '../../lib/itemTypeConfig';
+import { typeConfigProblems } from '../../lib/itemTypeConfig';
 import { IndexedDocument } from '../../lib/tiptapHelpers';
 import { deepCompare } from '../../lib/utils';
 import { BaseOptions, Tier, executeQuery, getPfpUrl, handleAsNull, parseData, perms, tierAllowance, tiers, withTransaction } from '../utils';
@@ -285,8 +285,8 @@ export class UniverseAPI {
     }
     const typeProblems = typeConfigProblems(parsedObjData);
     if (typeProblems.length > 0) throw new ValidationError(typeProblems.slice(0, 5).join(' '));
-    if (!isPremium && !deepCompare(sheetLayouts(parsedObjData), sheetLayouts(universe.obj_data))) {
-      throw new ValidationError('Custom sheet layouts require a premium universe.');
+    if (!isPremium && !deepCompare((parsedObjData as any)?.tabTypes ?? {}, universe.obj_data.tabTypes ?? {})) {
+      throw new ValidationError('Custom tab types require a premium universe.');
     }
 
     if (shortname !== null && shortname !== undefined && shortname !== universe.shortname) {

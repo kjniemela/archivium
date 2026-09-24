@@ -7,7 +7,15 @@ import * as Y from 'yjs';
 import { type BuiltinTab, type Item, type ObjData } from '../../../src/api/models/item';
 import { editorExtensions, extractLinkData, type LinkData, type TiptapContext } from '../../../src/lib/editor';
 import { splitIgnoringQuotes } from '../../../src/lib/markdown';
-import { DEFAULT_TAB_KINDS, layoutForType, missingDefaultTabs, withDefaultTabs } from '../../../src/lib/itemTypeConfig';
+import {
+  DEFAULT_TAB_KINDS,
+  itemLayoutTabs,
+  layoutTabId,
+  layoutTabKey,
+  missingDefaultTabs,
+  tabTypesOf,
+  withDefaultTabs,
+} from '../../../src/lib/itemTypeConfig';
 import { type SheetLayout } from '../../../src/lib/sheetLayout';
 import { indexedToJson, jsonToIndexed } from '../../../src/lib/tiptapHelpers';
 import CustomDataEditor from '../components/CustomDataEditor';
@@ -45,15 +53,17 @@ export type ItemEditProps = {
 
 export const BUILTIN_TABS: BuiltinTab[] = ['lineage', 'map', 'timeline', 'gallery'];
 
-function tabLabel(tab: string): string {
+function tabLabel(tab: string, tabTypes: { [id: string]: SheetLayout }): string {
   if (tab === 'body') return T('Main Text');
+  const tabTypeId = layoutTabId(tab);
+  if (tabTypeId) return tabTypes[tabTypeId]?.title ?? tabTypeId;
   return (DEFAULT_TAB_KINDS as readonly string[]).includes(tab) ? capitalize(T(tab)) : tab;
 }
 
-function computeTabs(objData: ObjData, sheetLayout: SheetLayout | null): Record<string, string> {
+function computeTabs(objData: ObjData, layoutTabs: { layout: SheetLayout }[]): Record<string, string> {
   return {
     ...(objData.body ? { body: T('Main Text') } : {}),
-    ...(sheetLayout ? { sheet: sheetLayout.title } : {}),
+    ...layoutTabs.reduce((acc, { layout }) => ({ ...acc, [layoutTabKey(layout.id)]: layout.title }), {}),
     ...(objData.tabs ? Object.keys(objData.tabs) : []).reduce((acc, tab) => ({ ...acc, [tab]: tab }), {}),
     ...BUILTIN_TABS.filter(tab => objData[tab] !== undefined).reduce((acc, tab) => ({ ...acc, [tab]: objData[tab].title }), {}),
   };
@@ -238,10 +248,10 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
     }
   }, [itemShort, universeShort, provider, editor]);
 
-  // The universe's config for the item's type can attach a sheet layout (obj_data.typeConfigs).
-  const sheetLayout = item?.item_type ? layoutForType(universeObjData, item.item_type) : null;
+  const tabTypes = tabTypesOf(universeObjData);
+  const layoutTabs = itemLayoutTabs(objData, universeObjData);
   const missingTabs = item?.item_type ? missingDefaultTabs(objData, universeObjData, item.item_type) : [];
-  const tabNames = computeTabs(objData, sheetLayout);
+  const tabNames = computeTabs(objData, layoutTabs);
   if (!(currentTab && tabNames[currentTab])) {
     if (Object.keys(tabNames).length > 0) setCurrentTab(Object.keys(tabNames)[0]);
     else if (currentTab !== null) setCurrentTab(null);
@@ -264,7 +274,10 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
   function addTabByType() {
     if (newTabType === undefined) return;
     const newObjData = structuredClone(objData);
-    if (BUILTIN_TABS.includes(newTabType as typeof BUILTIN_TABS[number])) {
+    const tabTypeId = layoutTabId(newTabType);
+    if (tabTypeId) {
+      newObjData.layoutTabs = { ...newObjData.layoutTabs, [tabTypeId]: {} };
+    } else if (BUILTIN_TABS.includes(newTabType as typeof BUILTIN_TABS[number])) {
       newObjData[newTabType as typeof BUILTIN_TABS[number]] = { title: capitalize(T(newTabType)) };
     } else if (newTabType === 'body') {
       newObjData.body = { text: '', structure: [] };
@@ -278,7 +291,10 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
   }
   function removeTab(tab: string) {
     const newObjData = structuredClone(objData);
-    if (BUILTIN_TABS.includes(tab as typeof BUILTIN_TABS[number])) {
+    const tabTypeId = layoutTabId(tab);
+    if (tabTypeId) {
+      if (newObjData.layoutTabs) delete newObjData.layoutTabs[tabTypeId];
+    } else if (BUILTIN_TABS.includes(tab as typeof BUILTIN_TABS[number])) {
       delete newObjData[tab as typeof BUILTIN_TABS[number]];
     } else if (tab === 'body') {
       delete newObjData.body;
@@ -318,6 +334,9 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
           <option value='body' disabled={'body' in objData}>{T('Main Text')}</option>
           {BUILTIN_TABS.map(type => (
             <option key={type} value={type} disabled={type in tabNames}>{capitalize(T(type))}</option>
+          ))}
+          {Object.values(tabTypes).map(({ id, title }) => (
+            <option key={id} value={layoutTabKey(id)} disabled={layoutTabKey(id) in tabNames}>{title}</option>
           ))}
           <option value='custom'>{T('Custom Data')}</option>
         </select>
@@ -421,14 +440,14 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
     lineage: (
       <LineageEditor item={item} categories={categories} onUpdate={(newItem) => changeItem(newItem)} itemMap={itemMap} />
     ),
-    sheet: sheetLayout && (
+    ...layoutTabs.reduce((acc, { layout, data }) => ({ ...acc, [layoutTabKey(layout.id)]: (
       <SheetRenderer
-        layout={sheetLayout}
-        data={(objData as Record<string, unknown>)[sheetLayout.root] ?? {}}
+        layout={layout}
+        data={data}
         itemTitle={item.title}
-        onChange={(data) => changeObjData({ [sheetLayout.root]: data } as Partial<ObjData>)}
+        onChange={(newData) => changeObjData({ layoutTabs: { ...structuredClone(objData.layoutTabs), [layout.id]: newData } })}
       />
-    ),
+    ) }), {}),
   };
 
   return (
@@ -510,7 +529,7 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
         {missingTabs.length > 0 && (
           <div className='inputGroup'>
             <small className='d-flex align-center gap-2' style={{ gridColumn: '2 / 4' }}>
-              <i>{T('This type usually has these tabs: %s.', missingTabs.map(tabLabel).join(', '))}</i>
+              <i>{T('This type usually has these tabs: %s.', missingTabs.map(tab => tabLabel(tab, tabTypes)).join(', '))}</i>
               <button type='button' onClick={() => setObjData(withDefaultTabs(objData, universeObjData, item.item_type))}>
                 {T('Add Missing Tabs')}
               </button>
@@ -570,7 +589,6 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
               onSelectTab={(tab) => setCurrentTab(tab)}
               onRemoveTab={(tab) => removeTab(tab)}
               selectors={docSelectors.tab}
-              fixedTabs={sheetLayout ? ['sheet'] : undefined}
             />
             <ul className='navbarBtns'>
               <li className='navbarBtn badge-anchor'>
