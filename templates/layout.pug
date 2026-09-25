@@ -39,13 +39,22 @@ html(lang='en')
     block styles
 
     script.
+      const storyIsPublic = !{JSON.stringify(typeof chapter !== 'undefined' && chapter ? !!chapter.is_published : (typeof story !== 'undefined' && story ? !!story.is_published : false))};
+
       function umamiBeforeSend(type, payload) {
-        const redactPath = (path) => path
-          .replace(/(\/(?:verify|reset-password)\/)[^/?#]+/, '$1[redacted]')
-          .replace(/(\/universes\/)[^/?#]+/, '$1[id]')
-          .replace(/(\/items\/)[^/?#]+/, '$1[id]')
-          .replace(/(\/discuss\/)[^/?#]+/, '$1[id]')
-          .replace(/(\/stories\/)[^/?#]+/, '$1[id]');
+        const redactPath = (path) => {
+          let out = path
+            .replace(/(\/(?:verify|reset-password)\/)[^/?#]+/, '$1[redacted]')
+            .replace(/(\/universes\/)[^/?#]+/, '$1[id]')
+            .replace(/(\/items\/)[^/?#]+/, '$1[id]')
+            .replace(/(\/discuss\/)[^/?#]+/, '$1[id]');
+          if (!storyIsPublic) {
+            out = out
+              .replace(/(\/stories\/)[^/?#]+/, '$1[id]')
+              .replace(/(\/stories\/\[id\]\/)\d+/, '$1[id]');
+          }
+          return out;
+        };
 
         const TITLES = [
           [/^\/(?:verify|reset-password)\//, 'Account'],
