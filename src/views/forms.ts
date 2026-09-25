@@ -59,16 +59,15 @@ export default {
       mcp_discussions_enabled: req.body.mcp_discussions_enabled === 'on',
     }
     try {
-      // TODO we need to fix this type nonsense...
       const prevUniverse = await api.universe.getOne(req.session.user, { 'universe.shortname': req.params.universeShortname }, perms.READ);
-      const prevSemanticSearchSetting = (prevUniverse.obj_data as any).semanticSearchEnabled;
+      const prevSemanticSearchSetting = prevUniverse.obj_data.semanticSearchEnabled;
 
       const id = await api.universe.put(req.session.user, req.params.universeShortname, req.body);
       const universe = await api.universe.getOne(req.session.user, { 'universe.id': id }, perms.READ);
 
-      if ((universe.obj_data as any).semanticSearchEnabled && !prevSemanticSearchSetting) {
+      if (universe.obj_data.semanticSearchEnabled && !prevSemanticSearchSetting) {
         embedder.enableEmbed(universe);
-      } else if (!(universe.obj_data as any).semanticSearchEnabled && prevSemanticSearchSetting) {
+      } else if (!universe.obj_data.semanticSearchEnabled && prevSemanticSearchSetting) {
         embedder.deleteForUniverse(universe.id);
       }
       if (req.body.next) {

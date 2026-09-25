@@ -1,4 +1,5 @@
 import type { BuiltinTab, ObjData } from '../api/models/item';
+import type { UniverseObjData } from '../api/models/universe';
 import { getPath, validateLayout, type TabLayout } from './tabLayout';
 
 export const DEFAULT_TAB_KINDS = ['body', 'lineage', 'map', 'timeline', 'gallery'] as const;
@@ -21,10 +22,8 @@ const LAYOUT_TAB_PREFIX = 'layout:';
 export const layoutTabKey = (id: string) => `${LAYOUT_TAB_PREFIX}${id}`;
 export const layoutTabId = (key: string) => key.startsWith(LAYOUT_TAB_PREFIX) ? key.slice(LAYOUT_TAB_PREFIX.length) : null;
 
-export function typeConfigFor(universeObjData: unknown, itemType: string): ItemTypeConfig {
-  const config = getPath(universeObjData, 'typeConfigs') as TypeConfigs | undefined;
-  const typeConfig = config?.[itemType];
-  return typeConfig && typeof typeConfig === 'object' ? typeConfig : {};
+export function typeConfigFor(universeObjData: UniverseObjData | null, itemType: string): ItemTypeConfig {
+  return universeObjData?.typeConfigs?.[itemType] ?? {};
 }
 
 function storedTabTypes(universeObjData: unknown): { [id: string]: unknown } {
@@ -33,7 +32,7 @@ function storedTabTypes(universeObjData: unknown): { [id: string]: unknown } {
 }
 
 // Malformed tab types are left out, so a bad layout can't break item pages.
-export function tabTypesOf(universeObjData: unknown): { [id: string]: TabLayout } {
+export function tabTypesOf(universeObjData: UniverseObjData | null): { [id: string]: TabLayout } {
   const result: { [id: string]: TabLayout } = {};
   for (const [id, layout] of Object.entries(storedTabTypes(universeObjData))) {
     if (validateLayout(layout).length === 0 && (layout as TabLayout).id === id) result[id] = layout as TabLayout;
@@ -46,7 +45,7 @@ export function layoutTabsOf(objData: ObjData): LayoutTabsData {
 }
 
 // Data for deleted tab types stays on the item but isn't shown, so re-adding the type restores it.
-export function itemLayoutTabs(objData: ObjData, universeObjData: unknown): { layout: TabLayout, data: unknown }[] {
+export function itemLayoutTabs(objData: ObjData, universeObjData: UniverseObjData | null): { layout: TabLayout, data: unknown }[] {
   const data = layoutTabsOf(objData);
   return Object.values(tabTypesOf(universeObjData))
     .filter(layout => data[layout.id] !== undefined)
@@ -61,7 +60,7 @@ function emptyTab(kind: DefaultTabKind): unknown {
 
 // Returns obj_data with any of the type's default tabs that are missing added.
 // Existing tabs and data are never touched.
-export function withDefaultTabs(objData: ObjData, universeObjData: unknown, itemType: string): ObjData {
+export function withDefaultTabs(objData: ObjData, universeObjData: UniverseObjData | null, itemType: string): ObjData {
   const config = typeConfigFor(universeObjData, itemType);
   const result: ObjData = { ...objData };
   for (const kind of config.defaultTabs ?? []) {
@@ -82,7 +81,7 @@ export function withDefaultTabs(objData: ObjData, universeObjData: unknown, item
 }
 
 // Built-in tabs are returned by kind, custom data tabs by name, and layout tabs by layoutTabKey(id).
-export function missingDefaultTabs(objData: ObjData, universeObjData: unknown, itemType: string): string[] {
+export function missingDefaultTabs(objData: ObjData, universeObjData: UniverseObjData | null, itemType: string): string[] {
   const config = typeConfigFor(universeObjData, itemType);
   const tabTypes = tabTypesOf(universeObjData);
   const layoutTabs = layoutTabsOf(objData);

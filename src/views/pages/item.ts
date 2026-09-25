@@ -103,7 +103,7 @@ export default {
       noteAuthors[user.id] = user;
     }
 
-    const relatedItems = (universe.obj_data as any).semanticSearchEnabled
+    const relatedItems = universe.obj_data.semanticSearchEnabled
       ? (await embedder.getRelatedItems(req.session.user, item.id, universe.id)).map(relatedItem => ({
         ...relatedItem,
         itemTypeName: ((universe.obj_data['cats'] ?? {})[relatedItem.item_type] ?? ['Missing Category'])[0],

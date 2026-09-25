@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate, useParams } from 'react-router';
 import * as Y from 'yjs';
 import { type BuiltinTab, type Item, type ObjData } from '../../../src/api/models/item';
+import type { UniverseObjData } from '../../../src/api/models/universe';
 import { editorExtensions, extractLinkData, type LinkData, type TiptapContext } from '../../../src/lib/editor';
 import { splitIgnoringQuotes } from '../../../src/lib/markdown';
 import {
@@ -112,7 +113,7 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
   const [objData, setObjData, changeObjData] = useYState<ObjData>(yObjData);
 
   const [categories, setCategories] = useState<Categories | null>(null);
-  const [universeObjData, setUniverseObjData] = useState<unknown>(null);
+  const [universeObjData, setUniverseObjData] = useState<UniverseObjData | null>(null);
   const [currentModal, setCurrentModal] = useState<ModalType | null>(null);
   const [currentTab, setCurrentTab] = useState<string | null>(null);
   const [eventItemMap, setEventItemMap] = useState<Record<string, EventItem[]>>();

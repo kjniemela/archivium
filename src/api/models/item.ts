@@ -779,8 +779,7 @@ export class ItemAPI {
         throw new ModelError('Failed to insert item');
       }
 
-      // TODO more type nonsense
-      if ((universe.obj_data as any).semanticSearchEnabled) {
+      if (universe.obj_data.semanticSearchEnabled) {
         embedder.addJob({ type: 'check', itemId: data.insertId });
       }
 
@@ -986,8 +985,7 @@ export class ItemAPI {
     });
 
     const universe = await this.api.universe.getOne(user, { 'universe.shortname': universeShortname });
-    // TODO more type nonsense
-    if ((universe.obj_data as any).semanticSearchEnabled) {
+    if (universe.obj_data.semanticSearchEnabled) {
       embedder.addJob({
         type: 'check',
         itemId: item.id,

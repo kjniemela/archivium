@@ -2,7 +2,8 @@ import { PoolConnection, QueryResult, ResultSetHeader } from 'mysql2/promise';
 import { API } from '..';
 import embedder from '../../embedding';
 import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
-import { typeConfigProblems } from '../../lib/itemTypeConfig';
+import { typeConfigProblems, type TypeConfigs } from '../../lib/itemTypeConfig';
+import type { TabLayout } from '../../lib/tabLayout';
 import { IndexedDocument } from '../../lib/tiptapHelpers';
 import { deepCompare } from '../../lib/utils';
 import { BaseOptions, Tier, executeQuery, getPfpUrl, handleAsNull, parseData, perms, tierAllowance, tiers, withTransaction } from '../utils';
@@ -29,6 +30,19 @@ export type UserAccessInvite = {
   inviter_username: string | null,
 };
 
+export type UniverseObjData = {
+  cats?: { [shortname: string]: [title: string, titlePl: string, color: string] },
+  typeConfigs?: TypeConfigs,
+  tabTypes?: { [id: string]: TabLayout },
+  storiesEnabled?: boolean,
+  semanticSearchEnabled?: boolean,
+  theme?: string,
+  customTheme?: { glass?: boolean, backgroundImage?: string },
+  homePage?: boolean,
+  publicPage?: boolean,
+  [key: string]: unknown,
+};
+
 export type Universe = {
   id: number,
   title: string,
@@ -42,7 +56,7 @@ export type Universe = {
   mcp_items_enabled: boolean,
   mcp_notes_enabled: boolean,
   mcp_discussions_enabled: boolean,
-  obj_data: Record<string, any>,
+  obj_data: UniverseObjData,
   authors: { [id: number]: string },
   author_permissions: { [id: number]: perms },
   owner: string,
@@ -297,7 +311,7 @@ export class UniverseAPI {
     }
     const typeProblems = typeConfigProblems(parsedObjData);
     if (typeProblems.length > 0) throw new ValidationError(typeProblems.slice(0, 5).join(' '));
-    if (!isPremium && !deepCompare((parsedObjData as any)?.tabTypes ?? {}, universe.obj_data.tabTypes ?? {})) {
+    if (!isPremium && !deepCompare((parsedObjData as UniverseObjData | null)?.tabTypes ?? {}, universe.obj_data.tabTypes ?? {})) {
       throw new ValidationError('Custom tab types require a premium universe.');
     }
 
