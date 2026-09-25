@@ -329,8 +329,7 @@ block content
       ['gallery', T('Gallery')],
     ];
 
-    // Each entry is [shortname, title, titlePl, color, typeConfig].
-    let catList;
+    let catList; //: [shortname, title, titlePl, color, typeConfig][]
     let openConfigs = new Set();
     function resetCatList() {
       catList = [];
@@ -340,8 +339,6 @@ block content
       }
     }
 
-    // Each entry is { id, title, json, isNew }. The layout itself is edited as JSON text (minus id and title),
-    // and the server validates its structure on save. Ids key item data, so they're fixed once saved.
     const tabTypeUsage = JSON.parse(document.querySelector('#data').dataset.tabTypeUsage || '{}');
     let tabTypeList = Object.values(obj_data.tabTypes ?? {}).map(({ id, title, version, ...layout }) => ({
       id, title, json: JSON.stringify(layout, null, 2), isNew: false,
@@ -368,7 +365,6 @@ block content
       const tabChecks = DEFAULT_TAB_KINDS.map(([kind, label]) => {
         const checkbox = createElement('input', { attrs: { type: 'checkbox', checked: (config.defaultTabs ?? []).includes(kind) } });
         checkbox.addEventListener('change', () => {
-          // Keep the tabs in their canonical order.
           const selected = new Set(config.defaultTabs ?? []);
           if (checkbox.checked) selected.add(kind);
           else selected.delete(kind);
@@ -381,7 +377,7 @@ block content
       const customInput = createElement('input', { attrs: {
         type: 'text',
         value: (config.customTabs ?? []).join(', '),
-        placeholder: T('e.g. Stats, Inventory'),
+        placeholder: T('e.g. Stats, Bio'),
       } });
       customInput.addEventListener('input', () => {
         const names = customInput.value.split(',').map(name => name.trim()).filter(Boolean);
@@ -516,7 +512,6 @@ block content
             }
           }
         });
-        // Titles and ids show up in the per-type tab checkboxes, so refresh those once an edit is done.
         titleInput.addEventListener('change', () => updateCats());
 
         const error = createElement('small', { classList: ['color-error'] });

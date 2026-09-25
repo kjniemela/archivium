@@ -15,7 +15,7 @@ import {
   layoutTabKey,
   missingDefaultTabs,
   tabTypesOf,
-  withDefaultTabs,
+  addDefaultTabs,
 } from '../../../src/lib/itemTypeConfig';
 import { type TabLayout } from '../../../src/lib/tabLayout';
 import { indexedToJson, jsonToIndexed } from '../../../src/lib/tiptapHelpers';
@@ -531,7 +531,7 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
           <div className='inputGroup'>
             <small className='d-flex align-center gap-2' style={{ gridColumn: '2 / 4' }}>
               <i>{T('This type usually has these tabs: %s.', missingTabs.map(tab => tabLabel(tab, tabTypes)).join(', '))}</i>
-              <button type='button' onClick={() => setObjData(withDefaultTabs(objData, universeObjData, item.item_type))}>
+              <button type='button' onClick={() => setObjData(addDefaultTabs(objData, universeObjData, item.item_type))}>
                 {T('Add Missing Tabs')}
               </button>
             </small>

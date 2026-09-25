@@ -667,7 +667,7 @@ export class ItemAPI {
     return items;
   }
 
-  // Number of items in the universe with a tab of each tab type (obj_data.layoutTabs keys).
+  // TODO if we decide not to premium-gate custom tabs, this will no longer be needed
   async getLayoutTabUsage(universeId: number): Promise<{ [tabTypeId: string]: number }> {
     const rows = await executeQuery(`
       SELECT tab.id, COUNT(*) AS count

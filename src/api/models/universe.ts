@@ -312,6 +312,7 @@ export class UniverseAPI {
     const typeProblems = typeConfigProblems(parsedObjData);
     if (typeProblems.length > 0) throw new ValidationError(typeProblems.slice(0, 5).join(' '));
     if (!isPremium && !deepCompare((parsedObjData as UniverseObjData | null)?.tabTypes ?? {}, universe.obj_data.tabTypes ?? {})) {
+      // TODO might change our minds on this
       throw new ValidationError('Custom tab types require a premium universe.');
     }
 

@@ -15,7 +15,6 @@ export type TypeConfigs = { [itemType: string]: ItemTypeConfig };
 
 export type LayoutTabsData = { [tabTypeId: string]: unknown };
 
-// Tab type ids key item data (obj_data.layoutTabs), so they're fixed once created.
 export const TAB_TYPE_ID_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 const LAYOUT_TAB_PREFIX = 'layout:';
@@ -31,10 +30,10 @@ function storedTabTypes(universeObjData: unknown): { [id: string]: unknown } {
   return tabTypes && typeof tabTypes === 'object' ? tabTypes as { [id: string]: unknown } : {};
 }
 
-// Malformed tab types are left out, so a bad layout can't break item pages.
 export function tabTypesOf(universeObjData: UniverseObjData | null): { [id: string]: TabLayout } {
   const result: { [id: string]: TabLayout } = {};
   for (const [id, layout] of Object.entries(storedTabTypes(universeObjData))) {
+    // Ignore invalid tab types
     if (validateLayout(layout).length === 0 && (layout as TabLayout).id === id) result[id] = layout as TabLayout;
   }
   return result;
@@ -44,7 +43,6 @@ export function layoutTabsOf(objData: ObjData): LayoutTabsData {
   return objData.layoutTabs && typeof objData.layoutTabs === 'object' ? objData.layoutTabs : {};
 }
 
-// Data for deleted tab types stays on the item but isn't shown, so re-adding the type restores it.
 export function itemLayoutTabs(objData: ObjData, universeObjData: UniverseObjData | null): { layout: TabLayout, data: unknown }[] {
   const data = layoutTabsOf(objData);
   return Object.values(tabTypesOf(universeObjData))
@@ -54,13 +52,11 @@ export function itemLayoutTabs(objData: ObjData, universeObjData: UniverseObjDat
 
 function emptyTab(kind: DefaultTabKind): unknown {
   if (kind === 'body') return { text: '', structure: [] };
-  // Built-in tabs only need a title to show up; their editors fill in the rest.
   return { title: kind.charAt(0).toUpperCase() + kind.slice(1) };
 }
 
-// Returns obj_data with any of the type's default tabs that are missing added.
-// Existing tabs and data are never touched.
-export function withDefaultTabs(objData: ObjData, universeObjData: UniverseObjData | null, itemType: string): ObjData {
+/** Does **not** mutate obj_data, instead returns copy with missing default tabs added. */
+export function addDefaultTabs(objData: ObjData, universeObjData: UniverseObjData | null, itemType: string): ObjData {
   const config = typeConfigFor(universeObjData, itemType);
   const result: ObjData = { ...objData };
   for (const kind of config.defaultTabs ?? []) {
@@ -80,7 +76,6 @@ export function withDefaultTabs(objData: ObjData, universeObjData: UniverseObjDa
   return result;
 }
 
-// Built-in tabs are returned by kind, custom data tabs by name, and layout tabs by layoutTabKey(id).
 export function missingDefaultTabs(objData: ObjData, universeObjData: UniverseObjData | null, itemType: string): string[] {
   const config = typeConfigFor(universeObjData, itemType);
   const tabTypes = tabTypesOf(universeObjData);
@@ -92,7 +87,6 @@ export function missingDefaultTabs(objData: ObjData, universeObjData: UniverseOb
   ];
 }
 
-// Problems with a universe's type configs and tab types that should stop it from being saved.
 export function typeConfigProblems(universeObjData: unknown): string[] {
   const problems: string[] = [];
   const tabTypes = storedTabTypes(universeObjData);

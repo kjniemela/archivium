@@ -1,14 +1,13 @@
-/* Expressions */
-
+/** For doing **numerical** logic on item data */
 export type Expr =
   | { const: number }
-  | { path: string }                 // Numeric value at a path (missing -> 0)
-  | { count: string }                // Length of the array / number of keys at a path
+  | { path: string }
+  | { count: string }
   | { add: Expr[] }
   | { sub: [Expr, Expr] }
   | { max: Expr[] }
   | { min: Expr[] }
-  | { gte: [Expr, Expr] }            // 1 if a >= b, else 0
+  | { gte: [Expr, Expr] }
   | { step: Expr, steps: [number, number][], else: number };
 
 export function evaluate(expr: Expr, data: unknown): number {
@@ -38,9 +37,6 @@ export function evaluate(expr: Expr, data: unknown): number {
   return 0;
 }
 
-/* Data paths */
-
-// Paths are dot-separated keys relative to the tab's data root, e.g. 'stress.physical'.
 export function getPath(data: unknown, path: string): unknown {
   let current: unknown = data;
   for (const key of path.split('.')) {
@@ -50,7 +46,7 @@ export function getPath(data: unknown, path: string): unknown {
   return current;
 }
 
-// Returns a copy of `data` with the value at `path` replaced.
+/** Does not mutate, returns a modified copy. */
 export function setPath<T>(data: T, path: string, value: unknown): T {
   const [key, ...rest] = path.split('.');
   const source = (data !== null && typeof data === 'object' ? data : {}) as Record<string, unknown>;
@@ -64,7 +60,6 @@ export function textAt(data: unknown, path: string): string {
   return typeof value === 'string' ? value : '';
 }
 
-/* Layout schema */
 
 export type TitleField = { widget: 'title', caption?: string };
 export type TextField = { widget: 'text', path: string, caption?: string, label?: string, multiline?: boolean, rows?: number };
@@ -78,7 +73,8 @@ export type EntryListField = {
   addLabel: string,
   fields: { key: string, placeholder: string, multiline?: boolean }[],
 };
-// A map of option -> rating, shown as a ladder: one row per rating.
+
+// TODO this is some bespoke FATE stuff, should probably generalize this a bit better...
 export type RatingLadderField = {
   widget: 'ratingLadder',
   path: string,
@@ -87,9 +83,8 @@ export type RatingLadderField = {
   // 'pyramid': each rating may hold no more entries than the one below it.
   rule?: 'pyramid',
 };
-// A row of numbered checkboxes, stored as a boolean array.
+
 export type CheckTrackField = { widget: 'checkTrack', path: string, label: string, boxes: number, available?: Expr, lockedHint?: string };
-// A single labeled text slot with a badge, e.g. a consequence.
 export type SlotField = { widget: 'slot', path: string, badge: string, label: string, enabled?: Expr, lockedHint?: string };
 
 export type LayoutField =
@@ -106,30 +101,26 @@ export type LayoutField =
 export type LayoutSection = {
   title: string,
   fields: LayoutField[],
-  // 'stat' sections are small boxes holding a single prominent value.
-  variant?: 'stat',
+  variant?: 'stat', // TODO this specifies rendering style, we might either expand the possible options here or generalize further...
   grow?: number,
   basis?: string,
 };
 
 export type LayoutRow = { sections: LayoutSection[] };
 
-// Layout-level advice: `message` is shown whenever `unless` evaluates to 0.
+/** `message` is rendered within the layout whenever `unless` evaluates to 0 */
 export type LayoutCheck = { unless: Expr, message: string };
 
 export type TabLayout = {
   version: 1,
   id: string,
   title: string,
-  // The item obj_data key holding this tab's data. Archivium ignores it and
-  // stores tab data under obj_data.layoutTabs[id] instead.
-  root?: string,
   rows: LayoutRow[],
   checks?: LayoutCheck[],
 };
 
-/* Layout validation */
 
+/* Layout validation */
 const isObject = (value: unknown): value is Record<string, unknown> => (
   value !== null && typeof value === 'object' && !Array.isArray(value)
 );
@@ -210,7 +201,7 @@ function layoutFieldProblems(field: unknown, where: string): string[] {
   return problems;
 }
 
-// Structural problems that would stop a layout from rendering. An empty list means the layout is usable.
+/** @returns a list of structural problems that would stop a layout from rendering */
 export function validateLayout(layout: unknown): string[] {
   if (!isObject(layout)) return ['Layout must be a JSON object.'];
   const problems: string[] = [];
@@ -250,8 +241,8 @@ export function validateLayout(layout: unknown): string[] {
   return problems;
 }
 
-/* Widget helpers, shared by all renderers */
 
+/* Widget helpers, shared by all renderers */
 export function sectionFlex(section: LayoutSection): string {
   if (section.variant === 'stat') return `${section.grow ?? 0} 0 ${section.basis ?? 'auto'}`;
   return `${section.grow ?? 1} 1 ${section.basis ?? '22rem'}`;
@@ -309,13 +300,12 @@ export function trackBoxes(field: CheckTrackField, data: unknown): { checked: bo
   }));
 }
 
-/* Validation */
 
+/* Validation */
 function fieldProblems(field: LayoutField, data: unknown): string[] {
   if (field.widget !== 'ratingLadder' || field.rule !== 'pyramid') return [];
   const problems: string[] = [];
   const rows = ladderRows(field, data);
-  // Only check from the highest occupied rating down.
   const top = rows.findIndex(row => row.entries.length > 0);
   if (top < 0) return problems;
   for (let i = top; i < rows.length - 1; i++) {
@@ -328,7 +318,7 @@ function fieldProblems(field: LayoutField, data: unknown): string[] {
   return problems;
 }
 
-// Advisory problems with the data; renderers show them but never block saving.
+/** @returns a list of advisory problems with the data; renderers show them but never block saving */
 export function validateLayoutData(layout: TabLayout, data: unknown): string[] {
   const problems: string[] = [];
   for (const row of layout.rows) {
@@ -344,8 +334,8 @@ export function validateLayoutData(layout: TabLayout, data: unknown): string[] {
   return problems;
 }
 
-/* Read-only view model, for renderers that can't evaluate layouts themselves (e.g. templates) */
 
+/* Read-only view model */
 export type FieldView =
   | { widget: 'title', value: string, caption?: string }
   | { widget: 'text', value: string, caption?: string, label?: string, multiline: boolean }
