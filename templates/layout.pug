@@ -38,58 +38,59 @@ html(lang='en')
     include theme.pug
     block styles
 
-    script.
-      const storyIsPublic = !{JSON.stringify(typeof chapter !== 'undefined' && chapter ? !!chapter.is_published : (typeof story !== 'undefined' && story ? !!story.is_published : false))};
+    if !DEV_MODE
+      script.
+        const storyIsPublic = !{JSON.stringify(typeof chapter !== 'undefined' && chapter ? !!chapter.is_published : (typeof story !== 'undefined' && story ? !!story.is_published : false))};
 
-      function umamiBeforeSend(type, payload) {
-        const redactPath = (path) => {
-          let out = path
-            .replace(/(\/(?:verify|reset-password)\/)[^/?#]+/, '$1[redacted]')
-            .replace(/(\/universes\/)[^/?#]+/, '$1[id]')
-            .replace(/(\/items\/)[^/?#]+/, '$1[id]')
-            .replace(/(\/discuss\/)[^/?#]+/, '$1[id]');
-          if (!storyIsPublic) {
-            out = out
-              .replace(/(\/stories\/)[^/?#]+/, '$1[id]')
-              .replace(/(\/stories\/\[id\]\/)\d+/, '$1[id]');
+        function umamiBeforeSend(type, payload) {
+          const redactPath = (path) => {
+            let out = path
+              .replace(/(\/(?:verify|reset-password)\/)[^/?#]+/, '$1[redacted]')
+              .replace(/(\/universes\/)[^/?#]+/, '$1[id]')
+              .replace(/(\/items\/)[^/?#]+/, '$1[id]')
+              .replace(/(\/discuss\/)[^/?#]+/, '$1[id]');
+            if (!storyIsPublic) {
+              out = out
+                .replace(/(\/stories\/)[^/?#]+/, '$1[id]')
+                .replace(/(\/stories\/\[id\]\/)\d+/, '$1[id]');
+            }
+            return out;
+          };
+
+          const TITLES = [
+            [/^\/(?:verify|reset-password)\//, 'Account'],
+            [/^\/universes\/\[id\]\/items\/\[id\]/, 'Item'],
+            [/^\/universes\/\[id\]\/discuss\/\[id\]/, 'Discussion'],
+            [/^\/universes\/\[id\]\/items/, 'Universe items'],
+            [/^\/universes\/\[id\]/, 'Universe'],
+            [/^\/items\/\[id\]/, 'Item'],
+            [/^\/discuss\/\[id\]/, 'Discussion'],
+            [/^\/stories\/\[id\]/, 'Story'],
+          ];
+
+          if (payload.url) {
+            const redactedUrl = redactPath(payload.url);
+            if (redactedUrl !== payload.url && payload.title) {
+              const match = TITLES.find(([re]) => re.test(redactedUrl));
+              payload.title = match ? match[1] : 'Archivium';
+            }
+            payload.url = redactedUrl;
           }
-          return out;
-        };
-
-        const TITLES = [
-          [/^\/(?:verify|reset-password)\//, 'Account'],
-          [/^\/universes\/\[id\]\/items\/\[id\]/, 'Item'],
-          [/^\/universes\/\[id\]\/discuss\/\[id\]/, 'Discussion'],
-          [/^\/universes\/\[id\]\/items/, 'Universe items'],
-          [/^\/universes\/\[id\]/, 'Universe'],
-          [/^\/items\/\[id\]/, 'Item'],
-          [/^\/discuss\/\[id\]/, 'Discussion'],
-          [/^\/stories\/\[id\]/, 'Story'],
-        ];
-
-        if (payload.url) {
-          const redactedUrl = redactPath(payload.url);
-          if (redactedUrl !== payload.url && payload.title) {
-            const match = TITLES.find(([re]) => re.test(redactedUrl));
-            payload.title = match ? match[1] : 'Archivium';
+          if (payload.referrer) {
+            try {
+              const ref = new URL(payload.referrer);
+              ref.pathname = redactPath(ref.pathname);
+              payload.referrer = ref.toString();
+            } catch { /* not an absolute URL, leave as-is */ }
           }
-          payload.url = redactedUrl;
+          const displayUniverse = '#{displayUniverse}';
+          const domain = '#{DOMAIN}';
+          if (displayUniverse && domain && payload.hostname && payload.hostname.endsWith(domain)) {
+            payload.hostname = `redacted.${domain}`;
+          }
+          return payload;
         }
-        if (payload.referrer) {
-          try {
-            const ref = new URL(payload.referrer);
-            ref.pathname = redactPath(ref.pathname);
-            payload.referrer = ref.toString();
-          } catch { /* not an absolute URL, leave as-is */ }
-        }
-        const displayUniverse = '#{displayUniverse}';
-        const domain = '#{DOMAIN}';
-        if (displayUniverse && domain && payload.hostname && payload.hostname.endsWith(domain)) {
-          payload.hostname = `redacted.${domain}`;
-        }
-        return payload;
-      }
-    script(defer src="https://analytics.hmi.dynu.net/script.js" data-website-id="5044d69d-2212-43a4-9648-87d8eac4c52a" data-before-send="umamiBeforeSend")
+      script(defer src="https://analytics.hmi.dynu.net/script.js" data-website-id="5044d69d-2212-43a4-9648-87d8eac4c52a" data-before-send="umamiBeforeSend")
     script.
       const locale = JSON.parse('!{JSON.stringify(locale)}');
       const sprintf = !{sprintf};

@@ -2,7 +2,7 @@ import { Request } from 'express';
 import pug from 'pug';
 import api from './api';
 import { getPfpUrl, handleAsNull, perms, plans, tierAllowance, tiers } from './api/utils';
-import { ADDR_PREFIX, DOMAIN, PROVIDER_ADDRESS, VAPID_PUBLIC_KEY } from './config';
+import { ADDR_PREFIX, DEV_MODE, DOMAIN, PROVIDER_ADDRESS, VAPID_PUBLIC_KEY } from './config';
 import { ForbiddenError, NotFoundError, UnauthorizedError } from './errors';
 import { lang, locale, sprintf, T } from './locale';
 import logger from './logger';
@@ -50,6 +50,7 @@ async function contextData(req: Request) {
     contextUniverse,
     DOMAIN,
     ADDR_PREFIX,
+    DEV_MODE,
     VAPID_PUBLIC_KEY,
     PROVIDER_ADDRESS,
     encodedPath: pageQuery.toString(),
