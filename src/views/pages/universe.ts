@@ -130,20 +130,25 @@ export default {
   },
 
   async itemList(req, res) {
+    const { universeShortname } = req.params;
     const search = req.getQueryParam('search');
-    const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
-    const items = (await api.item.getByUniverseShortname(req.session.user, req.params.universeShortname, perms.READ, {
+    const vaultFilter = req.getQueryParam('vault');
+    const vault = vaultFilter ? await api.vault.getOneByShortnames(req.session.user, universeShortname, vaultFilter) : null;
+    const universe = await api.universe.getOne(req.session.user, { shortname: universeShortname });
+    const items = (await api.item.getByUniverseShortname(req.session.user, universeShortname, perms.READ, {
       sort: req.getQueryParam('sort'),
       sortDesc: req.getQueryParam('sort_order') === 'desc',
       limit: req.getQueryParamAsNumber('limit'),
       type: req.getQueryParam('type'),
       tag: req.getQueryParam('tag'),
       author: req.getQueryParam('author'),
+      vault: vaultFilter,
       search,
     })).filter(item => !item.shortname.startsWith('_'));
     res.prepareRender('universeItemList', {
       items: items.map(item => ({ ...item, itemTypeName: ((universe.obj_data['cats'] ?? {})[item.item_type] ?? ['Missing Category'])[0] })),
       universe,
+      vault,
       type: req.query.type,
       tag: req.query.tag,
       search,
@@ -164,7 +169,9 @@ export default {
     const totalStoredImages = await api.universe.getTotalStoredByShortname(universe.shortname);
     const embeddingStats = await embedder.getStatsForUniverse(universe.id);
 
-    res.prepareRender('universeAdmin', { universe, requests, invites, ownerCount, totalStoredImages, embeddingStats, tierLimits: tierLimits[universe.tier ?? 0] });
+    const vaults = await api.vault.getManyByUniverseShortname(req.session.user, universe.shortname, perms.ADMIN, { itemCounts: true });
+
+    res.prepareRender('universeAdmin', { universe, requests, invites, ownerCount, totalStoredImages, embeddingStats, tierLimits: tierLimits[universe.tier ?? 0], vaults });
   },
 
   async stats(req, res) {

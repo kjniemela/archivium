@@ -45,7 +45,8 @@ export default {
 
   async create(req, res) {
     const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.WRITE);
-    res.prepareRender('createItem', { universe, item_type: req.query.type, shortname: req.query.shortname });
+    const vaults = await api.vault.getManyByUniverseShortname(req.session.user, universe.shortname, perms.WRITE);
+    res.prepareRender('createItem', { universe, vaults, item_type: req.query.type, shortname: req.query.shortname });
   },
 
   async view(req, res) {
@@ -57,11 +58,17 @@ export default {
     } catch (err) {
       if (err instanceof ForbiddenError) {
         if (req.session.user && universe.author_permissions[req.session.user.id] >= perms.READ) {
+          let hint: string | undefined = undefined;
+          let hintLink: string | undefined = undefined;
+          if (universe.author_permissions[req.session.user.id] >= perms.WRITE) {
+            hint = 'Looks like this item doesn\'t exist yet. Follow the link below to create it:';
+            hintLink = `${universeLink(req, req.params.universeShortname)}/items/create?shortname=${req.params.itemShortname}`;
+          }
           res.status(404);
           res.prepareRender('error', {
             code: 404,
-            hint: 'Looks like this item doesn\'t exist yet. Follow the link below to create it:',
-            hintLink: `${universeLink(req, req.params.universeShortname)}/items/create?shortname=${req.params.itemShortname}`,
+            hint,
+            hintLink,
           });
           return;
         }

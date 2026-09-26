@@ -248,38 +248,45 @@ export class UniverseAPI {
       if (shortnameError) throw new ValidationError(shortnameError);
       if (!title) throw new ValidationError('Title is required.');
 
-      const queryString1 = `
-        INSERT INTO universe (
+      let data!: ResultSetHeader;
+      let authorData!: ResultSetHeader;
+      await withTransaction(async (conn) => {
+        const queryString1 = `
+          INSERT INTO universe (
+            title,
+            shortname,
+            author_id,
+            is_public,
+            discussion_enabled,
+            discussion_open,
+            mcp_items_enabled,
+            mcp_notes_enabled,
+            mcp_discussions_enabled,
+            obj_data,
+            created_at,
+            updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        `;
+        [data] = await conn.execute<ResultSetHeader>(queryString1, [
           title,
           shortname,
-          author_id,
+          user.id,
           is_public,
           discussion_enabled,
           discussion_open,
-          mcp_items_enabled,
-          mcp_notes_enabled,
-          mcp_discussions_enabled,
+          Boolean(mcp_items_enabled),
+          Boolean(mcp_notes_enabled),
+          Boolean(mcp_discussions_enabled),
           obj_data,
-          created_at,
-          updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      `;
-      const data = await executeQuery<ResultSetHeader>(queryString1, [
-        title,
-        shortname,
-        user.id,
-        is_public,
-        discussion_enabled,
-        discussion_open,
-        Boolean(mcp_items_enabled),
-        Boolean(mcp_notes_enabled),
-        Boolean(mcp_discussions_enabled),
-        obj_data,
-        new Date(),
-        new Date(),
-      ]);
-      const queryString2 = `INSERT INTO authoruniverse (universe_id, user_id, permission_level) VALUES (?, ?, ?)`;
-      return [data, await executeQuery<ResultSetHeader>(queryString2, [data.insertId, user.id, perms.OWNER])];
+          new Date(),
+          new Date(),
+        ]);
+
+        const queryString2 = `INSERT INTO authoruniverse (universe_id, user_id, permission_level) VALUES (?, ?, ?)`;
+        [authorData] = await conn.execute<ResultSetHeader>(queryString2, [data.insertId, user.id, perms.OWNER]);
+      });
+
+      return [data, authorData];
     } catch (err) {
       if (err.code === 'ER_DUP_ENTRY') throw new ValidationError('Universe shortname must be unique.');
       if (err.code === 'ER_BAD_NULL_ERROR') throw new ValidationError('Missing parameters.');

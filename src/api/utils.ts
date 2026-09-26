@@ -7,14 +7,7 @@ import { PoolConnection, QueryResult, RowDataPacket } from 'mysql2/promise';
 import { ForbiddenError, NotFoundError, RequestError } from '../errors';
 import { User } from './models/user';
 
-export enum perms {
-  NONE,
-  READ,
-  COMMENT,
-  WRITE,
-  ADMIN,
-  OWNER,
-}
+export { perms } from '../lib/perms';
 
 export enum plans {
   FREE,

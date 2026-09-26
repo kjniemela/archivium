@@ -1,14 +1,14 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
-import { Item } from './api/models/item';
+import { ResultSetHeader } from 'mysql2';
+import api from './api';
+import { BasicItem, Item } from './api/models/item';
 import { Universe } from './api/models/universe';
+import { User } from './api/models/user';
 import { executeQuery, perms } from './api/utils';
+import { EMBEDDING_API_URL, LMSTER_KEY, QDRANT_URL } from './config';
 import { createHash } from './lib/hashUtils';
 import { getTextContent, IndexedDocument, indexedToJson } from './lib/tiptapHelpers';
 import logger from './logger';
-import { EMBEDDING_API_URL, LMSTER_KEY, QDRANT_URL } from './config';
-import { ResultSetHeader } from 'mysql2';
-import { User } from './api/models/user';
-import api from './api';
 
 const COLLECTION_NAME = 'archivium-embeds';
 const EMBEDDING_MODEL = 'text-embedding-nomic-embed-text-v1.5';
@@ -283,7 +283,7 @@ class Embedder {
         );
       }
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       logger.error(`Bad job: ${JSON.stringify(job)}`);
       const reject = job.data?.reject as ((err: unknown) => void) | undefined;
       reject?.(err);
@@ -291,9 +291,8 @@ class Embedder {
   }
 
   private async checkItem(id: number) {
-    const item = (await executeQuery('SELECT * FROM item WHERE id = ?', [id]))[0] as Item; // TODO...
+    const item = (await executeQuery('SELECT * FROM item WHERE id = ?', [id]))[0] as BasicItem;
     if (!item || !item.obj_data) return;
-    item.obj_data = JSON.parse(item.obj_data as string);
     if (!item.obj_data.body) return;
     const chunks = this.calculateChunks(item.obj_data.body);
     const existingChunks: Record<string, any> = (

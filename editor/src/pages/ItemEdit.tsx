@@ -6,17 +6,19 @@ import { useNavigate, useParams } from 'react-router';
 import * as Y from 'yjs';
 import { type BuiltinTab, type Item, type ObjData } from '../../../src/api/models/item';
 import type { UniverseObjData } from '../../../src/api/models/universe';
+import type { Vault } from '../../../src/api/models/vault';
 import { editorExtensions, extractLinkData, type LinkData, type TiptapContext } from '../../../src/lib/editor';
-import { splitIgnoringQuotes } from '../../../src/lib/markdown';
 import {
+  addDefaultTabs,
   DEFAULT_TAB_KINDS,
   itemLayoutTabs,
   layoutTabId,
   layoutTabKey,
   missingDefaultTabs,
   tabTypesOf,
-  addDefaultTabs,
 } from '../../../src/lib/itemTypeConfig';
+import { splitIgnoringQuotes } from '../../../src/lib/markdown';
+import { perms } from '../../../src/lib/perms';
 import { type TabLayout } from '../../../src/lib/tabLayout';
 import { indexedToJson, jsonToIndexed } from '../../../src/lib/tiptapHelpers';
 import CustomDataEditor from '../components/CustomDataEditor';
@@ -118,6 +120,7 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
   const [currentTab, setCurrentTab] = useState<string | null>(null);
   const [eventItemMap, setEventItemMap] = useState<Record<string, EventItem[]>>();
   const [itemMap, setItemMap] = useState<Record<string, ItemOptionEntry>>();
+  const [vaults, setVaults] = useState<Vault[]>([]);
   const itemMapRef = useRef<Record<string, ItemOptionEntry>>({});
 
   const [loading, setLoading] = useState(true);
@@ -186,6 +189,7 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
           }
           setEventItemMap(newEventItemMap);
         });
+        const vaultPromise = fetchData(`/api/universes/${universeShort}/vaults?perms=${perms.WRITE}`, setVaults);
         const itemMapPromise = fetchData(`/api/universes/${universeShort}/items`, (items) => {
           const newItemMap: Record<number, ItemOptionEntry> = {};
           for (const { shortname, title, item_type, tags } of items) {
@@ -196,7 +200,7 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
           setItemMap(newItemMap);
         });
 
-        await Promise.all([categoryPromise, eventItemPromise, itemMapPromise]).then(async () => {
+        await Promise.all([categoryPromise, eventItemPromise, itemMapPromise, vaultPromise]).then(async () => {
           // The editor doesn't get created until the provider syncs, so we're guaranteed to be synced here
           if (!ydoc.getMap('config').get('initialContentLoading')) {
             ydoc.getMap('config').set('initialContentLoading', true);
@@ -546,6 +550,16 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
           setAwareness={setAwareness}
           selectors={docSelectors.selectedElement}
           uniqueValues={true}
+        />
+
+        <FormSelect
+          id='vault_short'
+          title={T('Vault')}
+          value={item.vault_short ?? ''}
+          options={vaults.reduce((acc, vault) => ({ ...acc, [vault.shortname]: vault.title }), { '': T('None') })}
+          onChange={({ target }) => changeItem({ vault_short: target.value || null })}
+          setAwareness={setAwareness}
+          selectors={docSelectors.selectedElement}
         />
 
         <FormSwitch

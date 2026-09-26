@@ -10,6 +10,7 @@ import { SessionAPI } from './models/session';
 import { StoryAPI } from './models/story';
 import { UniverseAPI } from './models/universe';
 import { UserAPI } from './models/user';
+import { VaultAPI } from './models/vault';
 
 export class API {
   readonly contact: ContactAPI;
@@ -24,6 +25,7 @@ export class API {
   readonly story: StoryAPI;
   readonly universe: UniverseAPI;
   readonly user: UserAPI;
+  readonly vault: VaultAPI;
 
   constructor() {
     this.contact = new ContactAPI(this);
@@ -38,6 +40,7 @@ export class API {
     this.story = new StoryAPI(this);
     this.universe = new UniverseAPI(this);
     this.user = new UserAPI(this);
+    this.vault = new VaultAPI(this);
   }
 }
 

@@ -268,6 +268,7 @@ export default function (app: Express, upload: Multer) {
             type: req.getQueryParam('type'),
             tag: req.getQueryParam('tag'),
             author: req.getQueryParam('author'),
+            vault: req.getQueryParam('vault'),
           }),
           POST: (req) => api.item.post(req.session.user, req.body, req.params.universeShortName),
         }, [
@@ -377,6 +378,21 @@ export default function (app: Express, upload: Multer) {
             return await api.universe.putPermissions(req.session.user, req.params.universeShortName, user, req.body.permissionLevel);
           },
         }),
+        new APIRoute('/vaults', {
+          GET: (req) => api.vault.getManyByUniverseShortname(req.session.user, req.params.universeShortName, Math.max(perms.READ, Number(req.query.perms)) || perms.READ),
+          POST: (req) => api.vault.post(req.session.user, req.params.universeShortName, req.body),
+        }, [
+          new APIRoute('/:vaultShortName', {
+            DELETE: (req) => api.vault.del(req.session.user, req.params.universeShortName, req.params.vaultShortName),
+          }, [
+            new APIRoute('/perms', {
+              PUT: async (req) => {
+                const user = await api.user.getOne({ 'user.username': req.body.username });
+                return await api.vault.putPermissions(req.session.user, req.params.universeShortName, req.params.vaultShortName, user, req.body.permissionLevel);
+              },
+            }),
+          ]),
+        ]),
         new APIRoute('/requests', {
           GET: (req) => api.universe.getAccessRequests(req.session.user, req.params.universeShortName),
         }),
