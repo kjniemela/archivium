@@ -5,8 +5,19 @@ import { createPortal } from 'react-dom';
 import { useNavigate, useParams } from 'react-router';
 import * as Y from 'yjs';
 import { type BuiltinTab, type Item, type ObjData } from '../../../src/api/models/item';
+import type { UniverseObjData } from '../../../src/api/models/universe';
 import { editorExtensions, extractLinkData, type LinkData, type TiptapContext } from '../../../src/lib/editor';
 import { splitIgnoringQuotes } from '../../../src/lib/markdown';
+import {
+  DEFAULT_TAB_KINDS,
+  itemLayoutTabs,
+  layoutTabId,
+  layoutTabKey,
+  missingDefaultTabs,
+  tabTypesOf,
+  addDefaultTabs,
+} from '../../../src/lib/itemTypeConfig';
+import { type TabLayout } from '../../../src/lib/tabLayout';
 import { indexedToJson, jsonToIndexed } from '../../../src/lib/tiptapHelpers';
 import CustomDataEditor from '../components/CustomDataEditor';
 import EditorFrame from '../components/EditorFrame';
@@ -25,6 +36,7 @@ const Gallery = lazy(() => import(/* webpackChunkName: "tab-gallery" */ '../comp
 const LineageEditor = lazy(() => import(/* webpackChunkName: "tab-lineage" */ '../components/LineageEditor'));
 const MapEditor = lazy(() => import(/* webpackChunkName: "tab-map" */ '../components/MapEditor'));
 const TimelineEditor = lazy(() => import(/* webpackChunkName: "tab-timeline" */ '../components/TimelineEditor'));
+const LayoutTabEditor = lazy(() => import(/* webpackChunkName: "tab-layout" */ '../components/LayoutTabEditor'));
 
 export type Categories = {
   [key: string]: [string, string],
@@ -42,9 +54,17 @@ export type ItemEditProps = {
 
 export const BUILTIN_TABS: BuiltinTab[] = ['lineage', 'map', 'timeline', 'gallery'];
 
-function computeTabs(objData: ObjData): Record<string, string> {
+function tabLabel(tab: string, tabTypes: { [id: string]: TabLayout }): string {
+  if (tab === 'body') return T('Main Text');
+  const tabTypeId = layoutTabId(tab);
+  if (tabTypeId) return tabTypes[tabTypeId]?.title ?? tabTypeId;
+  return (DEFAULT_TAB_KINDS as readonly string[]).includes(tab) ? capitalize(T(tab)) : tab;
+}
+
+function computeTabs(objData: ObjData, layoutTabs: { layout: TabLayout }[]): Record<string, string> {
   return {
     ...(objData.body ? { body: T('Main Text') } : {}),
+    ...layoutTabs.reduce((acc, { layout }) => ({ ...acc, [layoutTabKey(layout.id)]: layout.title }), {}),
     ...(objData.tabs ? Object.keys(objData.tabs) : []).reduce((acc, tab) => ({ ...acc, [tab]: tab }), {}),
     ...BUILTIN_TABS.filter(tab => objData[tab] !== undefined).reduce((acc, tab) => ({ ...acc, [tab]: objData[tab].title }), {}),
   };
@@ -93,6 +113,7 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
   const [objData, setObjData, changeObjData] = useYState<ObjData>(yObjData);
 
   const [categories, setCategories] = useState<Categories | null>(null);
+  const [universeObjData, setUniverseObjData] = useState<UniverseObjData | null>(null);
   const [currentModal, setCurrentModal] = useState<ModalType | null>(null);
   const [currentTab, setCurrentTab] = useState<string | null>(null);
   const [eventItemMap, setEventItemMap] = useState<Record<string, EventItem[]>>();
@@ -153,6 +174,7 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
       const loadData = async () => {
         const categoryPromise = fetchData(`/api/universes/${universeShort}`, (data) => {
           setCategories(data.obj_data.cats);
+          setUniverseObjData(data.obj_data);
         });
         const eventItemPromise = fetchData(`/api/universes/${universeShort}/events`, (events) => {
           const newEventItemMap: Record<number, EventItem[]> = {};
@@ -227,7 +249,10 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
     }
   }, [itemShort, universeShort, provider, editor]);
 
-  const tabNames = computeTabs(objData);
+  const tabTypes = tabTypesOf(universeObjData);
+  const layoutTabs = itemLayoutTabs(objData, universeObjData);
+  const missingTabs = item?.item_type ? missingDefaultTabs(objData, universeObjData, item.item_type) : [];
+  const tabNames = computeTabs(objData, layoutTabs);
   if (!(currentTab && tabNames[currentTab])) {
     if (Object.keys(tabNames).length > 0) setCurrentTab(Object.keys(tabNames)[0]);
     else if (currentTab !== null) setCurrentTab(null);
@@ -250,7 +275,10 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
   function addTabByType() {
     if (newTabType === undefined) return;
     const newObjData = structuredClone(objData);
-    if (BUILTIN_TABS.includes(newTabType as typeof BUILTIN_TABS[number])) {
+    const tabTypeId = layoutTabId(newTabType);
+    if (tabTypeId) {
+      newObjData.layoutTabs = { ...newObjData.layoutTabs, [tabTypeId]: {} };
+    } else if (BUILTIN_TABS.includes(newTabType as typeof BUILTIN_TABS[number])) {
       newObjData[newTabType as typeof BUILTIN_TABS[number]] = { title: capitalize(T(newTabType)) };
     } else if (newTabType === 'body') {
       newObjData.body = { text: '', structure: [] };
@@ -264,7 +292,10 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
   }
   function removeTab(tab: string) {
     const newObjData = structuredClone(objData);
-    if (BUILTIN_TABS.includes(tab as typeof BUILTIN_TABS[number])) {
+    const tabTypeId = layoutTabId(tab);
+    if (tabTypeId) {
+      if (newObjData.layoutTabs) delete newObjData.layoutTabs[tabTypeId];
+    } else if (BUILTIN_TABS.includes(tab as typeof BUILTIN_TABS[number])) {
       delete newObjData[tab as typeof BUILTIN_TABS[number]];
     } else if (tab === 'body') {
       delete newObjData.body;
@@ -304,6 +335,9 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
           <option value='body' disabled={'body' in objData}>{T('Main Text')}</option>
           {BUILTIN_TABS.map(type => (
             <option key={type} value={type} disabled={type in tabNames}>{capitalize(T(type))}</option>
+          ))}
+          {Object.values(tabTypes).map(({ id, title }) => (
+            <option key={id} value={layoutTabKey(id)} disabled={layoutTabKey(id) in tabNames}>{title}</option>
           ))}
           <option value='custom'>{T('Custom Data')}</option>
         </select>
@@ -407,6 +441,14 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
     lineage: (
       <LineageEditor item={item} categories={categories} onUpdate={(newItem) => changeItem(newItem)} itemMap={itemMap} />
     ),
+    ...layoutTabs.reduce((acc, { layout, data }) => ({ ...acc, [layoutTabKey(layout.id)]: (
+      <LayoutTabEditor
+        layout={layout}
+        data={data}
+        itemTitle={item.title}
+        onChange={(newData) => changeObjData({ layoutTabs: { ...structuredClone(objData.layoutTabs), [layout.id]: newData } })}
+      />
+    ) }), {}),
   };
 
   return (
@@ -484,6 +526,17 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
           setAwareness={setAwareness}
           selectors={docSelectors.selectedElement}
         />
+
+        {missingTabs.length > 0 && (
+          <div className='inputGroup'>
+            <small className='d-flex align-center gap-2' style={{ gridColumn: '2 / 4' }}>
+              <i>{T('This type usually has these tabs: %s.', missingTabs.map(tab => tabLabel(tab, tabTypes)).join(', '))}</i>
+              <button type='button' onClick={() => setObjData(addDefaultTabs(objData, universeObjData, item.item_type))}>
+                {T('Add Missing Tabs')}
+              </button>
+            </small>
+          </div>
+        )}
 
         <FormPillList
           id='tags'

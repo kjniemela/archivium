@@ -119,7 +119,9 @@ export default function (app: Express, upload: Multer) {
     new APIRoute('/*'),
     new APIRoute('/me', {
       GET: async (req) => req.session.user ? await api.user.getOne({ 'user.username': req.session.user.username }) : null,
-    }),
+    }, [
+      new APIRoute('/invites', { GET: (req) => api.universe.getUserAccessInvites(req.session.user) }),
+    ]),
     new APIRoute('/session-token', {
       GET: async (req) => {
         const { insertId } = await api.session.post();
@@ -235,6 +237,9 @@ export default function (app: Express, upload: Multer) {
         GET: (req) => api.universe.getOne(req.session.user, { shortname: req.params.universeShortName }),
         DELETE: (req) => api.universe.del(req.session.user, req.params.universeShortName),
       }, [
+        new APIRoute('/data', {
+          PUT: (req) => api.universe.putData(req.session.user, req.params.universeShortName, req.body),
+        }),
         new APIRoute('/notes', {
           GET: (req) => api.note.getBoardsByUniverseShortname(req.session.user, req.params.universeShortName),
           POST: (req) => api.note.postBoard(req.session.user, req.body, req.params.universeShortName),
@@ -371,6 +376,12 @@ export default function (app: Express, upload: Multer) {
             const user = await api.user.getOne({ 'user.username': req.body.username });
             return await api.universe.putPermissions(req.session.user, req.params.universeShortName, user, req.body.permissionLevel);
           },
+        }),
+        new APIRoute('/requests', {
+          GET: (req) => api.universe.getAccessRequests(req.session.user, req.params.universeShortName),
+        }),
+        new APIRoute('/invites', {
+          GET: (req) => api.universe.getAccessInvites(req.session.user, req.params.universeShortName),
         }),
         new APIRoute('/request', {
           PUT: (req) => api.universe.putAccessRequest(req.session.user, req.params.universeShortName, req.body.permissionLevel),

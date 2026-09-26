@@ -84,9 +84,18 @@ export default {
   async edit(req, res) {
     const fetchedUniverse = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.ADMIN);
     const universe = {...fetchedUniverse, ...(req.body ?? {}), shortname: fetchedUniverse.shortname, newShort: req.body?.shortname ?? fetchedUniverse.shortname};
+    // When re-rendering after a failed save, keep the submitted (still encoded as a string) obj_data.
+    if (typeof universe.obj_data === 'string') {
+      try {
+        universe.obj_data = JSON.parse(universe.obj_data);
+      } catch {
+        universe.obj_data = fetchedUniverse.obj_data;
+      }
+    }
     const homePage = await api.item.getByUniverseAndItemShortnames(req.session.user, universe.shortname, '_home', perms.READ, true).catch(handleAsNull(ForbiddenError));
     const publicPage = await api.item.getByUniverseAndItemShortnames(req.session.user, universe.shortname, '_public', perms.READ, true).catch(handleAsNull(ForbiddenError));
-    res.prepareRender('editUniverse', { universe, error: res.error, homePage, publicPage });
+    const tabTypeUsage = await api.item.getLayoutTabUsage(fetchedUniverse.id);
+    res.prepareRender('editUniverse', { universe, error: res.error, homePage, publicPage, tabTypeUsage });
   },
 
   async createDiscussionThread(req, res) {

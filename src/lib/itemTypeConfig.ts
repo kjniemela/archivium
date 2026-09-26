@@ -1,0 +1,117 @@
+import type { BuiltinTab, ObjData } from '../api/models/item';
+import type { UniverseObjData } from '../api/models/universe';
+import { getPath, validateLayout, type TabLayout } from './tabLayout';
+
+export const DEFAULT_TAB_KINDS = ['body', 'lineage', 'map', 'timeline', 'gallery'] as const;
+export type DefaultTabKind = typeof DEFAULT_TAB_KINDS[number];
+
+export type ItemTypeConfig = {
+  defaultTabs?: DefaultTabKind[],
+  customTabs?: string[],
+  tabTypes?: string[],
+};
+
+export type TypeConfigs = { [itemType: string]: ItemTypeConfig };
+
+export type LayoutTabsData = { [tabTypeId: string]: unknown };
+
+export const TAB_TYPE_ID_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+const LAYOUT_TAB_PREFIX = 'layout:';
+export const layoutTabKey = (id: string) => `${LAYOUT_TAB_PREFIX}${id}`;
+export const layoutTabId = (key: string) => key.startsWith(LAYOUT_TAB_PREFIX) ? key.slice(LAYOUT_TAB_PREFIX.length) : null;
+
+export function typeConfigFor(universeObjData: UniverseObjData | null, itemType: string): ItemTypeConfig {
+  return universeObjData?.typeConfigs?.[itemType] ?? {};
+}
+
+function storedTabTypes(universeObjData: unknown): { [id: string]: unknown } {
+  const tabTypes = getPath(universeObjData, 'tabTypes');
+  return tabTypes && typeof tabTypes === 'object' ? tabTypes as { [id: string]: unknown } : {};
+}
+
+export function tabTypesOf(universeObjData: UniverseObjData | null): { [id: string]: TabLayout } {
+  const result: { [id: string]: TabLayout } = {};
+  for (const [id, layout] of Object.entries(storedTabTypes(universeObjData))) {
+    // Ignore invalid tab types
+    if (validateLayout(layout).length === 0 && (layout as TabLayout).id === id) result[id] = layout as TabLayout;
+  }
+  return result;
+}
+
+export function layoutTabsOf(objData: ObjData): LayoutTabsData {
+  return objData.layoutTabs && typeof objData.layoutTabs === 'object' ? objData.layoutTabs : {};
+}
+
+export function itemLayoutTabs(objData: ObjData, universeObjData: UniverseObjData | null): { layout: TabLayout, data: unknown }[] {
+  const data = layoutTabsOf(objData);
+  return Object.values(tabTypesOf(universeObjData))
+    .filter(layout => data[layout.id] !== undefined)
+    .map(layout => ({ layout, data: data[layout.id] }));
+}
+
+function emptyTab(kind: DefaultTabKind): unknown {
+  if (kind === 'body') return { text: '', structure: [] };
+  return { title: kind.charAt(0).toUpperCase() + kind.slice(1) };
+}
+
+/** Does **not** mutate obj_data, instead returns copy with missing default tabs added. */
+export function addDefaultTabs(objData: ObjData, universeObjData: UniverseObjData | null, itemType: string): ObjData {
+  const config = typeConfigFor(universeObjData, itemType);
+  const result: ObjData = { ...objData };
+  for (const kind of config.defaultTabs ?? []) {
+    if (!DEFAULT_TAB_KINDS.includes(kind) || result[kind] !== undefined) continue;
+    if (kind === 'body') result.body = emptyTab(kind) as ObjData['body'];
+    else result[kind as BuiltinTab] = emptyTab(kind);
+  }
+  for (const name of config.customTabs ?? []) {
+    if (!name || result.tabs?.[name] !== undefined) continue;
+    result.tabs = { ...result.tabs, [name]: {} };
+  }
+  const tabTypes = tabTypesOf(universeObjData);
+  for (const id of config.tabTypes ?? []) {
+    if (!(id in tabTypes) || layoutTabsOf(result)[id] !== undefined) continue;
+    result.layoutTabs = { ...result.layoutTabs, [id]: {} };
+  }
+  return result;
+}
+
+export function missingDefaultTabs(objData: ObjData, universeObjData: UniverseObjData | null, itemType: string): string[] {
+  const config = typeConfigFor(universeObjData, itemType);
+  const tabTypes = tabTypesOf(universeObjData);
+  const layoutTabs = layoutTabsOf(objData);
+  return [
+    ...(config.defaultTabs ?? []).filter(kind => DEFAULT_TAB_KINDS.includes(kind) && objData[kind] === undefined),
+    ...(config.customTabs ?? []).filter(name => name && objData.tabs?.[name] === undefined),
+    ...(config.tabTypes ?? []).filter(id => id in tabTypes && layoutTabs[id] === undefined).map(layoutTabKey),
+  ];
+}
+
+export function typeConfigProblems(universeObjData: unknown): string[] {
+  const problems: string[] = [];
+  const tabTypes = storedTabTypes(universeObjData);
+  for (const [id, layout] of Object.entries(tabTypes)) {
+    if (!TAB_TYPE_ID_PATTERN.test(id)) problems.push(`Tab type "${id}": ids may only contain lowercase letters, numbers and dashes.`);
+    const layoutProblems = validateLayout(layout);
+    problems.push(...layoutProblems.map(problem => `Tab type "${id}": ${problem}`));
+    if (layoutProblems.length === 0 && (layout as TabLayout).id !== id) problems.push(`Tab type "${id}": "id" must match its key.`);
+  }
+  const configs = (getPath(universeObjData, 'typeConfigs') ?? {}) as TypeConfigs;
+  for (const [type, config] of Object.entries(configs)) {
+    if (!config || typeof config !== 'object') {
+      problems.push(`Item type "${type}": config must be an object.`);
+      continue;
+    }
+    if (config.defaultTabs !== undefined && !(Array.isArray(config.defaultTabs) && config.defaultTabs.every(tab => DEFAULT_TAB_KINDS.includes(tab)))) {
+      problems.push(`Item type "${type}": unknown default tab.`);
+    }
+    if (config.customTabs !== undefined && !(Array.isArray(config.customTabs) && config.customTabs.every(tab => typeof tab === 'string' && tab))) {
+      problems.push(`Item type "${type}": custom tab names must be non-empty strings.`);
+    }
+    if (config.tabTypes !== undefined) {
+      if (!Array.isArray(config.tabTypes)) problems.push(`Item type "${type}": "tabTypes" must be a list.`);
+      else for (const id of config.tabTypes.filter(id => !(id in tabTypes))) problems.push(`Item type "${type}": tab type "${id}" doesn't exist.`);
+    }
+  }
+  return problems;
+}

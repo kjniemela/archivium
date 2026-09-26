@@ -5,6 +5,7 @@ import { perms, Tier } from '../api/utils';
 import { ADDR_PREFIX } from '../config';
 import embedder from '../embedding';
 import { ModelError, RateLimitError } from "../errors";
+import { addDefaultTabs } from '../lib/itemTypeConfig';
 import logger from '../logger';
 import { universeLink } from '../templates';
 import pages from './pages';
@@ -58,16 +59,15 @@ export default {
       mcp_discussions_enabled: req.body.mcp_discussions_enabled === 'on',
     }
     try {
-      // TODO we need to fix this type nonsense...
       const prevUniverse = await api.universe.getOne(req.session.user, { 'universe.shortname': req.params.universeShortname }, perms.READ);
-      const prevSemanticSearchSetting = (prevUniverse.obj_data as any).semanticSearchEnabled;
+      const prevSemanticSearchSetting = prevUniverse.obj_data.semanticSearchEnabled;
 
       const id = await api.universe.put(req.session.user, req.params.universeShortname, req.body);
       const universe = await api.universe.getOne(req.session.user, { 'universe.id': id }, perms.READ);
 
-      if ((universe.obj_data as any).semanticSearchEnabled && !prevSemanticSearchSetting) {
+      if (universe.obj_data.semanticSearchEnabled && !prevSemanticSearchSetting) {
         embedder.enableEmbed(universe);
-      } else if (!(universe.obj_data as any).semanticSearchEnabled && prevSemanticSearchSetting) {
+      } else if (!universe.obj_data.semanticSearchEnabled && prevSemanticSearchSetting) {
         embedder.deleteForUniverse(universe.id);
       }
       if (req.body.next) {
@@ -108,8 +108,11 @@ export default {
 
   async createItem(req, res) {
     try {
+      const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname }, perms.WRITE);
+      const objData = addDefaultTabs(JSON.parse(req.body.obj_data || '{}'), universe.obj_data, req.body.item_type);
       await api.item.post(req.session.user, {
         ...req.body,
+        obj_data: JSON.stringify(objData),
       }, req.params.universeShortname);
       return res.redirect(`${universeLink(req, req.params.universeShortname)}/items/${req.body.shortname}`);
     } catch (err) {

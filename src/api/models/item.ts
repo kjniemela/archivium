@@ -111,6 +111,7 @@ export type ObjData = {
   comments?: boolean,
   body?: IndexedDocument,
   tabs?: { [key: string]: any }, // TODO remove these any types at some point
+  layoutTabs?: { [tabTypeId: string]: unknown },
 } & { [K in BuiltinTab]?: any };
 
 export type BasicItem = {
@@ -666,6 +667,18 @@ export class ItemAPI {
     return items;
   }
 
+  // TODO if we decide not to premium-gate custom tabs, this will no longer be needed
+  async getLayoutTabUsage(universeId: number): Promise<{ [tabTypeId: string]: number }> {
+    const rows = await executeQuery(`
+      SELECT tab.id, COUNT(*) AS count
+      FROM item,
+      JSON_TABLE(JSON_KEYS(item.obj_data, '$.layoutTabs'), '$[*]' COLUMNS (id VARCHAR(255) PATH '$')) AS tab
+      WHERE item.universe_id = ?
+      GROUP BY tab.id
+    `, [universeId]) as { id: string, count: number }[];
+    return rows.reduce((acc, { id, count }) => ({ ...acc, [id]: Number(count) }), {});
+  }
+
   async getByUniverseAndItemShortnames(
     user: User | undefined,
     universeShortname: string,
@@ -766,8 +779,7 @@ export class ItemAPI {
         throw new ModelError('Failed to insert item');
       }
 
-      // TODO more type nonsense
-      if ((universe.obj_data as any).semanticSearchEnabled) {
+      if (universe.obj_data.semanticSearchEnabled) {
         embedder.addJob({ type: 'check', itemId: data.insertId });
       }
 
@@ -973,8 +985,7 @@ export class ItemAPI {
     });
 
     const universe = await this.api.universe.getOne(user, { 'universe.shortname': universeShortname });
-    // TODO more type nonsense
-    if ((universe.obj_data as any).semanticSearchEnabled) {
+    if (universe.obj_data.semanticSearchEnabled) {
       embedder.addJob({
         type: 'check',
         itemId: item.id,

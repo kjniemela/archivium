@@ -2,7 +2,10 @@ import { PoolConnection, QueryResult, ResultSetHeader } from 'mysql2/promise';
 import { API } from '..';
 import embedder from '../../embedding';
 import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
+import { typeConfigProblems, type TypeConfigs } from '../../lib/itemTypeConfig';
+import type { TabLayout } from '../../lib/tabLayout';
 import { IndexedDocument } from '../../lib/tiptapHelpers';
+import { deepCompare } from '../../lib/utils';
 import { BaseOptions, Tier, executeQuery, getPfpUrl, handleAsNull, parseData, perms, tierAllowance, tiers, withTransaction } from '../utils';
 import { Item, ItemEvent } from './item';
 import { User } from './user';
@@ -13,6 +16,31 @@ export type UniverseAccessRequest<T = boolean> = {
   permission_level: perms,
   is_invite: T,
   inviter_id: number | null,
+};
+
+export type UniverseAccessRequestListing<T = boolean> = UniverseAccessRequest<T> & {
+  username: string,
+  inviter_username: string | null,
+};
+
+export type UserAccessInvite = {
+  universe_shortname: string,
+  universe_title: string,
+  permission_level: perms,
+  inviter_username: string | null,
+};
+
+export type UniverseObjData = {
+  cats?: { [shortname: string]: [title: string, titlePl: string, color: string] },
+  typeConfigs?: TypeConfigs,
+  tabTypes?: { [id: string]: TabLayout },
+  storiesEnabled?: boolean,
+  semanticSearchEnabled?: boolean,
+  theme?: string,
+  customTheme?: { glass?: boolean, backgroundImage?: string },
+  homePage?: boolean,
+  publicPage?: boolean,
+  [key: string]: unknown,
 };
 
 export type Universe = {
@@ -28,7 +56,7 @@ export type Universe = {
   mcp_items_enabled: boolean,
   mcp_notes_enabled: boolean,
   mcp_discussions_enabled: boolean,
-  obj_data: Record<string, any>,
+  obj_data: UniverseObjData,
   authors: { [id: number]: string },
   author_permissions: { [id: number]: perms },
   owner: string,
@@ -275,6 +303,19 @@ export class UniverseAPI {
     const mcpNotes = isPremium && Boolean(mcp_notes_enabled);
     const mcpDiscussions = isPremium && Boolean(mcp_discussions_enabled);
 
+    let parsedObjData: unknown;
+    try {
+      parsedObjData = typeof obj_data === 'string' ? JSON.parse(obj_data) : obj_data;
+    } catch {
+      throw new ValidationError('Universe data is not valid JSON.');
+    }
+    const typeProblems = typeConfigProblems(parsedObjData);
+    if (typeProblems.length > 0) throw new ValidationError(typeProblems.slice(0, 5).join(' '));
+    if (!isPremium && !deepCompare((parsedObjData as UniverseObjData | null)?.tabTypes ?? {}, universe.obj_data.tabTypes ?? {})) {
+      // TODO might change our minds on this
+      throw new ValidationError('Custom tab types require a premium universe.');
+    }
+
     if (shortname !== null && shortname !== undefined && shortname !== universe.shortname) {
       // The item shortname has changed, we need to update all links to it to reflect this
       const shortnameError = this.validateShortname(shortname);
@@ -301,6 +342,17 @@ export class UniverseAPI {
     `;
     await executeQuery(queryString, [title, shortname ?? universe.shortname, is_public, discussion_enabled, discussion_open, mcpItems, mcpNotes, mcpDiscussions, obj_data, new Date(), universe.id]);
     return universe.id;
+  }
+
+  async putData(user: User | undefined, universeShortname: string, changes: Record<string, any>): Promise<ResultSetHeader> {
+    if (!user) throw new UnauthorizedError();
+    if (!changes || typeof changes !== 'object' || Array.isArray(changes)) throw new ValidationError('Data must be an object.');
+
+    const universe = await this.getOne(user, { shortname: universeShortname }, perms.WRITE);
+    const obj_data = { ...universe.obj_data, ...changes };
+
+    const queryString = 'UPDATE universe SET obj_data = ?, updated_at = ? WHERE id = ?';
+    return await executeQuery<ResultSetHeader>(queryString, [JSON.stringify(obj_data), new Date(), universe.id]);
   }
 
   async putPermissions(user: User | undefined, shortname: string, targetUser: User, permission_level: perms): Promise<ResultSetHeader> {
@@ -432,25 +484,41 @@ export class UniverseAPI {
     return request;
   }
 
-  async getAccessRequests(user: User | undefined, shortname: string): Promise<UniverseAccessRequest<false>[]> {
+  async getAccessRequests(user: User | undefined, shortname: string): Promise<UniverseAccessRequestListing<false>[]> {
     return this._getAccessRequests(user, shortname, false);
   }
 
-  async getAccessInvites(user: User | undefined, shortname: string): Promise<UniverseAccessRequest<true>[]> {
+  async getAccessInvites(user: User | undefined, shortname: string): Promise<UniverseAccessRequestListing<true>[]> {
     return this._getAccessRequests(user, shortname, true);
   }
 
-  private async _getAccessRequests<T extends boolean>(user: User | undefined, shortname: string, getInvites: T): Promise<UniverseAccessRequest<T>[]> {
+  private async _getAccessRequests<T extends boolean>(user: User | undefined, shortname: string, getInvites: T): Promise<UniverseAccessRequestListing<T>[]> {
     if (!user) throw new UnauthorizedError();
 
     const universe = await this.getOne(user, { shortname }, perms.ADMIN);
 
-    const requests = await executeQuery(
-      'SELECT ua.*, user.username FROM universeaccessrequest AS ua INNER JOIN user ON user.id = ua.user_id WHERE ua.universe_id = ? AND ua.is_invite = ?',
-      [universe.id, getInvites],
-    ) as UniverseAccessRequest<T>[];
+    const requests = await executeQuery(`
+      SELECT ua.*, user.username, inviter.username AS inviter_username
+      FROM universeaccessrequest AS ua
+      INNER JOIN user ON user.id = ua.user_id
+      LEFT JOIN user AS inviter ON inviter.id = ua.inviter_id
+      WHERE ua.universe_id = ? AND ua.is_invite = ?
+    `, [universe.id, getInvites]) as UniverseAccessRequestListing<T>[];
 
     return requests;
+  }
+
+  async getUserAccessInvites(user: User | undefined): Promise<UserAccessInvite[]> {
+    if (!user) throw new UnauthorizedError();
+
+    return await executeQuery(`
+      SELECT universe.shortname AS universe_shortname, universe.title AS universe_title, ua.permission_level, inviter.username AS inviter_username
+      FROM universeaccessrequest AS ua
+      INNER JOIN universe ON universe.id = ua.universe_id
+      LEFT JOIN user AS inviter ON inviter.id = ua.inviter_id
+      WHERE ua.user_id = ? AND ua.is_invite = TRUE
+      ORDER BY universe.title
+    `, [user.id]) as UserAccessInvite[];
   }
 
   async putAccessRequest(user: User | undefined, shortname: string, permissionLevel: perms): Promise<void> {

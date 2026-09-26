@@ -8,6 +8,8 @@ import { getPfpUrl, perms } from '../../api/utils';
 import { ForbiddenError, NotFoundError } from '../../errors';
 import { FamilyTreeLayout, layoutFamilyTree } from '../../lib/familyTree';
 import { RenderedBody, tryRenderContent } from '../../lib/renderContent';
+import { itemLayoutTabs, layoutTabKey } from '../../lib/itemTypeConfig';
+import { buildLayoutView, LayoutView } from '../../lib/tabLayout';
 import { universeLink } from '../../templates';
 import embedder from '../../embedding';
 
@@ -75,6 +77,9 @@ export default {
       renderedBody = await tryRenderContent(req, item.obj_data.body, universe.shortname);
     }
 
+    const layoutTabs: (LayoutView & { key: string })[] = itemLayoutTabs(item.obj_data, universe.obj_data)
+      .map(({ layout, data }) => ({ ...buildLayoutView(layout, data, item.title), key: layoutTabKey(layout.id) }));
+
     let family: Family = {};
     let familyLayout: FamilyTreeLayout | null = null;
     if ('lineage' in item.obj_data) {
@@ -98,7 +103,7 @@ export default {
       noteAuthors[user.id] = user;
     }
 
-    const relatedItems = (universe.obj_data as any).semanticSearchEnabled
+    const relatedItems = universe.obj_data.semanticSearchEnabled
       ? (await embedder.getRelatedItems(req.session.user, item.id, universe.id)).map(relatedItem => ({
         ...relatedItem,
         itemTypeName: ((universe.obj_data['cats'] ?? {})[relatedItem.item_type] ?? ['Missing Category'])[0],
@@ -109,7 +114,7 @@ export default {
       item, universe, tab: req.query.tab, comments, commenters, notes, noteAuthors, renderedBody,
       commentAction: `${universeLink(req, universe.shortname)}/items/${item.shortname}/comment`,
       noteBaseRoute: `/api/universes/${universe.shortname}/items/${item.shortname}/notes`,
-      family, familyLayout, relatedItems,
+      family, familyLayout, relatedItems, layoutTabs,
     });
   },
 
