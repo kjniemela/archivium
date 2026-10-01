@@ -3,6 +3,9 @@
  * Please do not edit it manually.
  */
 
+import type { ObjData } from "../api/models/item";
+import type { UniverseObjData } from "../api/models/universe";
+import type { perms } from "../lib/perms";
 import type { ColumnType } from "kysely";
 
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
@@ -78,7 +81,7 @@ export interface Item {
   id: Generated<number>;
   item_type: string;
   last_updated_by: number | null;
-  obj_data: Json;
+  obj_data: ColumnType<ObjData, string, string>;
   parent_id: number | null;
   shortname: string;
   title: string;
@@ -155,8 +158,8 @@ export interface Maplocation {
   item_id: number | null;
   map_id: number;
   title: string | null;
-  x: number | null;
-  y: number | null;
+  x: number;
+  y: number;
 }
 
 export interface Note {
@@ -167,7 +170,7 @@ export interface Note {
   is_public: boolean | null;
   title: string | null;
   updated_at: Date;
-  uuid: string | null;
+  uuid: string;
 }
 
 export interface Noteboard {
@@ -347,7 +350,7 @@ export interface Universe {
   mcp_discussions_enabled: Generated<boolean>;
   mcp_items_enabled: Generated<boolean>;
   mcp_notes_enabled: Generated<boolean>;
-  obj_data: Json;
+  obj_data: ColumnType<UniverseObjData, string, string>;
   shortname: string;
   title: string;
   updated_at: Date;
@@ -355,8 +358,8 @@ export interface Universe {
 
 export interface Universeaccessrequest {
   inviter_id: number | null;
-  is_invite: Generated<boolean | null>;
-  permission_level: number;
+  is_invite: Generated<boolean>;
+  permission_level: perms;
   universe_id: number;
   user_id: number;
 }
