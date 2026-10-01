@@ -77,7 +77,7 @@ export default function CalendarLab() {
       const ticks = Number(ticksInput);
       if (Number.isNaN(ticks)) throw new Error('Timestamp must be a number');
       const data = calendar.timestampToCalendar(ticks);
-      const formatted = calendar.formatCalendar(data, format);
+      const formatted = calendar.formatCalendar(data);
       const roundTripDiff = calendar.calendarToTimestamp(data) - ticks;
       const resolution = calendar.getResolution();
       decodeResult = { data, formatted, roundTripDiff, resolution };
@@ -124,7 +124,7 @@ export default function CalendarLab() {
           {mode === 'visual' ? (
             builderState ? (
               <div style={styles.builderBox}>
-                <CalendarBuilderForm state={builderState} onChange={handleBuilderChange} />
+                <CalendarBuilderForm state={builderState} onChange={handleBuilderChange} formatPreview={decodeResult?.formatted} />
               </div>
             ) : (
               <div style={styles.builderBox}>

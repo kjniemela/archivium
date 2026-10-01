@@ -2,8 +2,17 @@
 // library with executable demo/test code, so it can't be imported directly here.
 // Keep changes to the core algorithm in sync between the two copies until they're unified.
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export type CalendarDefinition = any;
+import { sprintf } from "../helpers";
+
+export type CalendarFormat = { str: string, keys: (string | number)[] };
+export type CalendarDefinition = {
+  name: string,
+  epoch: { timestamp: number },
+  format?: CalendarFormat,
+  functions?: { [fn: string]: any },
+  cycles: any[],
+  independent_cycles?: any[],
+};
 export type CalendarData = { [key: string]: any };
 
 export class CalendarSystem {
@@ -430,19 +439,36 @@ export class CalendarSystem {
     return 0;
   }
 
-  formatCalendar(calendarData: CalendarData, format = 'full'): string {
-    if (format === 'gregorian' && calendarData.year !== undefined) {
-      const month = calendarData.year_subdivision || 'January';
-      const day = (calendarData.day || 0) + 1;
-      const year = (calendarData.year || 0);
-      const hour = calendarData.hour || 0;
-      const minute = calendarData.minute || 0;
-      const second = calendarData.second || 0;
+  formatCalendar(calendarData: CalendarData, format?: CalendarFormat): string {
+    if (!format) format = this.def.format;
+    if (!format) return JSON.stringify(calendarData, null, 2);
 
-      return `${year}-${month}-${day} ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
+    const values: (number | string)[] = [];
+    for (const key of format.keys) {
+      if (key === 'add') {
+        const [a, b] = values.splice(values.length - 2);
+        values.push(Number(a) + Number(b));
+      } else if (key === 'zero_pad') {
+        const [v, width] = values.splice(values.length - 2);
+        const n = Number(v);
+        if (Number.isNaN(n)) values.push(v);
+        else values.push((n < 0 ? '-' : '') + String(Math.abs(n)).padStart(Number(width), '0'));
+      } else if (key === 'ordinal_suff') {
+        const n = Math.abs(Number(values[values.length - 1]));
+        const lastTwo = n % 100;
+        if (lastTwo >= 11 && lastTwo <= 13) values.push('th');
+        else if (n % 10 === 1) values.push('st');
+        else if (n % 10 === 2) values.push('nd');
+        else if (n % 10 === 3) values.push('rd');
+        else values.push('th');
+      } else if (key in calendarData) {
+        values.push(calendarData[key]);
+      } else {
+        values.push(key);
+      }
     }
 
-    return JSON.stringify(calendarData, null, 2);
+    return sprintf(format.str, ...values.map(x => x?.toString()));
   }
 
   // The smallest number of ticks this calendar can actually distinguish - i.e. its finest
@@ -474,6 +500,18 @@ export const gregorianCalendar: CalendarDefinition = {
   "name": "Gregorian Calendar",
   "epoch": {
     "timestamp": 621672192000
+  },
+  "format": {
+    "str": "%s %s %s%s %s %s:%s:%s",
+    "keys": [
+      "weekday",
+      "year_subdivision",
+      "day", 1, "add", "ordinal_suff",
+      "year",
+      "hour", 2, "zero_pad",
+      "minute", 2, "zero_pad",
+      "second", 2, "zero_pad",
+    ],
   },
   "functions": {
     "is_leap_year": {
@@ -556,17 +594,44 @@ export const gregorianCalendar: CalendarDefinition = {
     { "id": "hour", "duration_ticks": 36000 },
     { "id": "minute", "duration_ticks": 600 },
     { "id": "second", "duration_ticks": 10 }
-  ]
+  ],
+  "independent_cycles": [
+    {
+      "id": "weekday",
+      "duration_ticks": 864000,
+      "period": 7,
+      "names": [
+        "Saturday",
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ]
+    }
+  ],
 };
 
 export const decimalCalendar: CalendarDefinition = {
   "name": "Decimal Calendar",
   "epoch": { "timestamp": 621672192000 },
+  "format": {
+    "str": "%s:%s:%s:%s:%s",
+    "keys": [
+      "megaday", 3, "zero_pad",
+      "kiloday", 3, "zero_pad",
+      "day", 3, "zero_pad",
+      "milliday", 3, "zero_pad",
+      "microday", 3, "zero_pad",
+    ]
+  },
   "cycles": [
     { "id": "megaday", "duration_ticks": 864000000000 },
     { "id": "kiloday", "duration_ticks": 864000000 },
     { "id": "day", "duration_ticks": 864000 },
-    { "id": "milliday", "duration_ticks": 864 }
+    { "id": "milliday", "duration_ticks": 864 },
+    { "id": "microday", "duration_ticks": 0.864 },
   ]
 };
 

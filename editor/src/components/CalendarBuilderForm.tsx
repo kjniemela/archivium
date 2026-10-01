@@ -1,8 +1,10 @@
+import CalendarFormatBuilder from './CalendarFormatBuilder';
 import type { BuilderCycle, BuilderIndependentCycle, BuilderState, BuilderUnit, LeapRule } from '../lib/calendarBuilder';
 
 type Props = {
   state: BuilderState;
   onChange: (state: BuilderState) => void;
+  formatPreview?: string | null;
 };
 
 function replaceAt<T>(arr: T[], i: number, item: T): T[] {
@@ -14,7 +16,7 @@ function removeAt<T>(arr: T[], i: number): T[] {
   return arr.filter((_, idx) => idx !== i);
 }
 
-export default function CalendarBuilderForm({ state, onChange }: Props) {
+export default function CalendarBuilderForm({ state, onChange, formatPreview }: Props) {
   function updateCycle(i: number, cycle: BuilderCycle) {
     onChange({ ...state, cycles: replaceAt(state.cycles, i, cycle) });
   }
@@ -65,6 +67,9 @@ export default function CalendarBuilderForm({ state, onChange }: Props) {
         <IndependentCycleCard key={i} cycle={ic} onChange={c => updateIndependent(i, c)} onRemove={() => removeIndependent(i)} />
       ))}
       <button onClick={addIndependent}>+ Add Independent Cycle</button>
+
+      <h3>Date Format</h3>
+      <CalendarFormatBuilder state={state} onChange={onChange} preview={formatPreview} />
     </div>
   );
 }
