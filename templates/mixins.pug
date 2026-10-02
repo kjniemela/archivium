@@ -99,7 +99,7 @@ mixin themeSwatches(selectId)
       const varNames = JSON.parse(box.dataset.varNames);
       const sync = () => box.querySelectorAll('.theme-swatch').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === select.value)));
 
-      function applyTheme({ classes, vars }) {
+      function applyTheme({ classes, vars, credit }) {
         for (const cls of [...root.classList]) {
           if (cls === 'palette' || cls === 'palette-accent' || cls.startsWith('theme-')) root.classList.remove(cls);
         }
@@ -108,6 +108,13 @@ mixin themeSwatches(selectId)
         Object.entries(vars).forEach(([name, value]) => root.style.setProperty(name, value));
         const glassPane = document.getElementById('glassPane');
         if (glassPane) glassPane.classList.toggle('glass-pane', classes.includes('theme-glass'));
+        const creditBox = document.getElementById('themeCredit');
+        if (creditBox) {
+          creditBox.classList.toggle('hidden', !credit);
+          const link = creditBox.querySelector('a');
+          link.textContent = credit ? credit.text : '';
+          link.href = credit ? credit.url : '#';
+        }
       }
 
       function customAttrs() {
@@ -128,7 +135,7 @@ mixin themeSwatches(selectId)
           if (palette.light.accent) classes.push('palette-accent');
           vars['color-scheme'] = 'light dark';
         }
-        return { classes, vars };
+        return { classes, vars, credit: null };
       }
 
       function preview() {

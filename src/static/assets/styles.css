@@ -58,7 +58,7 @@
 }
 
 /* Theme backgrounds and glass (set via classes and --theme-* properties on <html>, see themes.ts). */
-.theme-bg header, .theme-bg body::before { background: var(--theme-background); }
+.theme-bg header, .theme-bg body::before { background-image: var(--theme-background); }
 .theme-bg-image header, .theme-bg-image body { background-image: var(--theme-background-image); }
 .theme-glass .error { margin-bottom: -1rem; }
 :is(.theme-bg, .theme-bg-image).theme-glass .card.item-type {

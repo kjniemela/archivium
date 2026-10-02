@@ -234,8 +234,8 @@ html(lang='en' class=themeHtmlAttrs.class style=themeHtmlAttrs.style)
           | .
         span #{T('Open source on ')}
           a.link.link-animated(href='https://github.com/HMI-Studios/archivium' target='_blank') GitHub.
-        if theme.backgroundImage === '/static/assets/themes/space.jpg'
-          span
-            | Background by 
-            a.link.link-animated(href='https://www.vecteezy.com/free-photos/earth' target='_blank') Vecteezy
-            | .
+        - const themeCredit = themeAttrs(theme).credit
+        span#themeCredit(class={ hidden: !themeCredit })
+          | #{T('Background by ')}
+          a.link.link-animated(href=themeCredit ? themeCredit.url : '#' target='_blank' rel='noopener noreferrer') #{themeCredit ? themeCredit.text : ''}
+          | .
