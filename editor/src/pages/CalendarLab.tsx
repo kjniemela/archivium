@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { CalendarSystem, gregorianCalendar, decimalCalendar, thessianCalendar } from '../lib/calendars';
 import type { BuilderState } from '../lib/calendarBuilder';
-import { blankBuilderState, buildDefinition, tryParseIntoBuilderState } from '../lib/calendarBuilder';
+import { blankBuilderState, buildDefinition, parseDefinition } from '../lib/calendarBuilder';
 import CalendarBuilderForm from '../components/CalendarBuilderForm';
 
 const PRESETS: { [name: string]: any } = {
@@ -20,7 +20,9 @@ export default function CalendarLab() {
   const [parseError, setParseError] = useState<string | null>(null);
 
   const [mode, setMode] = useState<'visual' | 'json'>('visual');
-  const [builderState, setBuilderState] = useState<BuilderState | null>(() => tryParseIntoBuilderState(gregorianCalendar));
+  const [builderState, setBuilderState] = useState<BuilderState | null>(() => parseDefinition(gregorianCalendar).state ?? null);
+  // Why the current definition can't be shown in the Visual Builder (a JSON path), if it can't.
+  const [builderError, setBuilderError] = useState<string | null>(null);
 
   const [ticksInput, setTicksInput] = useState(() => String(Math.floor(Date.now() * TICKS_PER_MS)));
   const [format, setFormat] = useState<'full' | 'gregorian'>('gregorian');
@@ -47,14 +49,20 @@ export default function CalendarLab() {
     }
   }, [calendarDef]);
 
+  function loadIntoBuilder(def: any) {
+    const result = def ? parseDefinition(def) : { error: 'the JSON is invalid' };
+    setBuilderState(result.state ?? null);
+    setBuilderError(result.error ?? null);
+  }
+
   function loadPreset(name: string) {
     const preset = PRESETS[name];
     setDefText(JSON.stringify(preset, null, 2));
-    setBuilderState(tryParseIntoBuilderState(preset));
+    loadIntoBuilder(preset);
   }
 
   function switchToVisual() {
-    setBuilderState(tryParseIntoBuilderState(calendarDef));
+    loadIntoBuilder(calendarDef);
     setMode('visual');
   }
 
@@ -66,6 +74,7 @@ export default function CalendarLab() {
   function startBlankVisual() {
     const blank = blankBuilderState();
     setBuilderState(blank);
+    setBuilderError(null);
     setDefText(JSON.stringify(buildDefinition(blank), null, 2));
   }
 
@@ -129,9 +138,9 @@ export default function CalendarLab() {
             ) : (
               <div style={styles.builderBox}>
                 <p style={styles.error}>
-                  This calendar definition uses features the Visual Builder doesn't support yet
-                  (e.g. era/reform comparisons, exceptions, or custom and/or/not logic) - edit it as Raw JSON instead,
-                  or start a new calendar here:
+                  The Visual Builder can't represent this definition without changing it
+                  {builderError ? <> (first problem: <code>{builderError}</code>)</> : null}
+                  {' '}- edit it as Raw JSON instead, or start a new calendar here:
                 </p>
                 <button onClick={startBlankVisual}>Start blank calendar in Visual Builder</button>
               </div>

@@ -1,5 +1,11 @@
+import { useMemo } from 'react';
+import type { BuilderCycle, BuilderFunction, BuilderIndependentCycle, BuilderState, BuilderSubdivision, BuilderUnit, LeapRule } from '../lib/calendarBuilder';
+import { autoEstimate, availableVariables, makeLeapStyle, renameFunction } from '../lib/calendarBuilder';
 import CalendarFormatBuilder from './CalendarFormatBuilder';
-import type { BuilderCycle, BuilderIndependentCycle, BuilderState, BuilderUnit, LeapRule } from '../lib/calendarBuilder';
+import {
+  BuilderContext, DurationEditor, ExceptionsEditor, NumberListInput, ValueEditor, VARIABLES_LIST_ID,
+  moveAt, removeAt, replaceAt, styles,
+} from './CalendarExpressionEditors';
 
 type Props = {
   state: BuilderState;
@@ -7,23 +13,21 @@ type Props = {
   formatPreview?: string | null;
 };
 
-function replaceAt<T>(arr: T[], i: number, item: T): T[] {
-  const copy = arr.slice();
-  copy[i] = item;
-  return copy;
-}
-function removeAt<T>(arr: T[], i: number): T[] {
-  return arr.filter((_, idx) => idx !== i);
-}
-
 export default function CalendarBuilderForm({ state, onChange, formatPreview }: Props) {
+  const ctx = useMemo(() => ({
+    functionNames: state.functions.map(f => f.name),
+    variables: availableVariables(state),
+  }), [state]);
+
   function updateCycle(i: number, cycle: BuilderCycle) {
     onChange({ ...state, cycles: replaceAt(state.cycles, i, cycle) });
   }
   function addCycle() {
     onChange({
       ...state,
-      cycles: [...state.cycles, { id: `cycle${state.cycles.length}`, kind: 'fixed', durationTicks: 1, leapBonusTicks: 0, leapRules: [], subdivisions: [] }],
+      cycles: [...state.cycles, {
+        id: `cycle${state.cycles.length}`, duration: { kind: 'fixed', ticks: 1 }, estimatedTicks: null, exceptions: [], subdivisions: [],
+      }],
     });
   }
   function removeCycle(i: number) {
@@ -43,56 +47,147 @@ export default function CalendarBuilderForm({ state, onChange, formatPreview }: 
     onChange({ ...state, independentCycles: removeAt(state.independentCycles, i) });
   }
 
+  function updateFunction(i: number, fn: BuilderFunction) {
+    onChange({ ...state, functions: replaceAt(state.functions, i, fn) });
+  }
+  function addFunction(kind: BuilderFunction['kind']) {
+    const name = `fn${state.functions.length + 1}`;
+    const fn: BuilderFunction = kind === 'leap_year'
+      ? { name, kind, rules: [{ divisor: 4, equals: 0, value: { type: 'variable', name: 'year_index' }, result: true }] }
+      : { name, kind, cycleLength: 7, positions: [0] };
+    onChange({ ...state, functions: [...state.functions, fn] });
+  }
+
   return (
-    <div>
-      <div style={styles.row}>
-        <label style={styles.label}>Name</label>
-        <input style={styles.input} value={state.name} onChange={e => onChange({ ...state, name: e.target.value })} />
+    <BuilderContext.Provider value={ctx}>
+      <datalist id={VARIABLES_LIST_ID}>
+        {ctx.variables.map(v => <option key={v} value={v} />)}
+      </datalist>
+
+      <div>
+        <div style={styles.row}>
+          <label style={styles.label}>Name</label>
+          <input style={styles.input} value={state.name} onChange={e => onChange({ ...state, name: e.target.value })} />
+        </div>
+        <div style={styles.row}>
+          <label style={styles.label}>Epoch timestamp</label>
+          <input style={styles.input} type="number" value={state.epochTimestamp}
+            onChange={e => onChange({ ...state, epochTimestamp: Number(e.target.value) })} />
+        </div>
+
+        <h3>Functions</h3>
+        <p style={styles.note}>Named tests (e.g. "is this a leap year?") that conditions below can call.</p>
+        {state.functions.map((fn, i) => (
+          <FunctionCard key={i} fn={fn} duplicate={state.functions.some((o, j) => j !== i && o.name === fn.name)}
+            onChange={f => updateFunction(i, f)} onRename={name => onChange(renameFunction(state, i, name))}
+            onRemove={() => onChange({ ...state, functions: removeAt(state.functions, i) })} />
+        ))}
+        <div style={styles.row}>
+          <button onClick={() => addFunction('leap_year')}>+ Add leap-year function</button>
+          <button onClick={() => addFunction('cycle_position')}>+ Add cycle-position function</button>
+        </div>
+
+        <h3>Cycles</h3>
+        <p style={styles.note}>The largest cycle (by estimated duration) is counted first, then the next largest within what's left, and so on.</p>
+        {state.cycles.map((cycle, i) => (
+          <CycleCard key={i} cycle={cycle} onChange={c => updateCycle(i, c)} onRemove={() => removeCycle(i)}
+            onMakeLeap={() => onChange(makeLeapStyle(state, i))} />
+        ))}
+        <button onClick={addCycle}>+ Add Cycle</button>
+
+        <h3>Independent Cycles</h3>
+        <p style={styles.note}>Cycles that tick continuously regardless of the cycles above (e.g. a weekday).</p>
+        {state.independentCycles.map((ic, i) => (
+          <IndependentCycleCard key={i} cycle={ic} onChange={c => updateIndependent(i, c)} onRemove={() => removeIndependent(i)} />
+        ))}
+        <button onClick={addIndependent}>+ Add Independent Cycle</button>
+
+        <h3>Date Format</h3>
+        <CalendarFormatBuilder state={state} onChange={onChange} preview={formatPreview} />
       </div>
+    </BuilderContext.Provider>
+  );
+}
+
+function FunctionCard({ fn, duplicate, onChange, onRename, onRemove }: {
+  fn: BuilderFunction; duplicate: boolean;
+  onChange: (f: BuilderFunction) => void; onRename: (name: string) => void; onRemove: () => void;
+}) {
+  return (
+    <div style={styles.card}>
       <div style={styles.row}>
-        <label style={styles.label}>Epoch timestamp</label>
-        <input style={styles.input} type="number" value={state.epochTimestamp}
-          onChange={e => onChange({ ...state, epochTimestamp: Number(e.target.value) })} />
+        <label style={styles.label}>name</label>
+        <input style={styles.input} value={fn.name} spellCheck={false} onChange={e => onRename(e.target.value)} />
+        <span style={styles.note}>{fn.kind === 'leap_year' ? 'leap-year rules' : 'cycle position'}</span>
+        <button onClick={onRemove}>Remove</button>
       </div>
+      {duplicate && <div style={{ color: '#c0392b', fontSize: '0.85rem' }}>Another function has this name - only one will be kept.</div>}
 
-      <h3>Cycles</h3>
-      {state.cycles.map((cycle, i) => (
-        <CycleCard key={i} cycle={cycle} onChange={c => updateCycle(i, c)} onRemove={() => removeCycle(i)} />
-      ))}
-      <button onClick={addCycle}>+ Add Cycle</button>
-
-      <h3>Independent Cycles</h3>
-      <p style={styles.note}>Cycles that tick continuously regardless of the cycles above (e.g. a weekday).</p>
-      {state.independentCycles.map((ic, i) => (
-        <IndependentCycleCard key={i} cycle={ic} onChange={c => updateIndependent(i, c)} onRemove={() => removeIndependent(i)} />
-      ))}
-      <button onClick={addIndependent}>+ Add Independent Cycle</button>
-
-      <h3>Date Format</h3>
-      <CalendarFormatBuilder state={state} onChange={onChange} preview={formatPreview} />
+      {fn.kind === 'leap_year' ? (
+        <LeapRules rules={fn.rules} onChange={rules => onChange({ ...fn, rules })} />
+      ) : (
+        <>
+          <div style={styles.row}>
+            <label style={styles.label}>cycle length</label>
+            <input style={styles.smallInput} type="number" value={fn.cycleLength}
+              onChange={e => onChange({ ...fn, cycleLength: Number(e.target.value) })} />
+          </div>
+          <div style={styles.row}>
+            <label style={styles.label}>true at positions (comma-separated, 0-based)</label>
+            <NumberListInput value={fn.positions} onChange={positions => onChange({ ...fn, positions })} />
+          </div>
+          <div style={styles.note}>True when (argument mod cycle length) is one of the positions.</div>
+        </>
+      )}
     </div>
   );
 }
 
-function CycleCard({ cycle, onChange, onRemove }: { cycle: BuilderCycle; onChange: (c: BuilderCycle) => void; onRemove: () => void }) {
-  function updateRule(i: number, rule: LeapRule) {
-    onChange({ ...cycle, leapRules: replaceAt(cycle.leapRules, i, rule) });
+function LeapRules({ rules, onChange }: { rules: LeapRule[]; onChange: (r: LeapRule[]) => void }) {
+  function update(i: number, rule: LeapRule) {
+    onChange(replaceAt(rules, i, rule));
   }
-  function addRule() {
-    onChange({ ...cycle, leapRules: [...cycle.leapRules, { divisor: 4, equals: 0, result: true }] });
-  }
-  function removeRule(i: number) {
-    onChange({ ...cycle, leapRules: removeAt(cycle.leapRules, i) });
-  }
+  return (
+    <div style={styles.nested}>
+      <strong>Rules</strong> (evaluated in order; first match wins; no match = false)
+      {rules.map((rule, i) => (
+        <div key={i} style={styles.row}>
+          <span>if</span>
+          <ValueEditor value={rule.value} onChange={value => update(i, { ...rule, value })} />
+          <span>%</span>
+          <input style={styles.smallInput} type="number" value={rule.divisor}
+            onChange={e => update(i, { ...rule, divisor: Number(e.target.value) })} />
+          <span>==</span>
+          <input style={styles.smallInput} type="number" value={rule.equals}
+            onChange={e => update(i, { ...rule, equals: Number(e.target.value) })} />
+          <span>then</span>
+          <select value={String(rule.result)} onChange={e => update(i, { ...rule, result: e.target.value === 'true' })}>
+            <option value="true">true</option>
+            <option value="false">false</option>
+          </select>
+          <button title="Earlier" disabled={i === 0} onClick={() => onChange(moveAt(rules, i, i - 1))}>&uarr;</button>
+          <button title="Later" disabled={i === rules.length - 1} onClick={() => onChange(moveAt(rules, i, i + 1))}>&darr;</button>
+          <button onClick={() => onChange(removeAt(rules, i))}>Remove</button>
+        </div>
+      ))}
+      <button onClick={() => onChange([...rules, { divisor: 4, equals: 0, value: { type: 'variable', name: 'year_index' }, result: true }])}>+ Add Rule</button>
+    </div>
+  );
+}
 
-  function updateUnit(i: number, unit: BuilderUnit) {
-    onChange({ ...cycle, subdivisions: replaceAt(cycle.subdivisions, i, unit) });
+function CycleCard({ cycle, onChange, onRemove, onMakeLeap }: {
+  cycle: BuilderCycle; onChange: (c: BuilderCycle) => void; onRemove: () => void; onMakeLeap: () => void;
+}) {
+  const variable = `${cycle.id}_index`;
+
+  function updateSub(i: number, sub: BuilderSubdivision) {
+    onChange({ ...cycle, subdivisions: replaceAt(cycle.subdivisions, i, sub) });
   }
-  function addUnit() {
-    onChange({ ...cycle, subdivisions: [...cycle.subdivisions, { name: `Unit ${cycle.subdivisions.length + 1}`, durationTicks: 1, leapBonusTicks: 0 }] });
-  }
-  function removeUnit(i: number) {
-    onChange({ ...cycle, subdivisions: removeAt(cycle.subdivisions, i) });
+  function addSub(type: BuilderSubdivision['type']) {
+    const sub: BuilderSubdivision = type === 'named_sequence'
+      ? { type, units: [{ name: 'Unit 1', duration: { kind: 'fixed', ticks: 1 }, exceptions: [] }] }
+      : { type, id: `${cycle.id}_part${cycle.subdivisions.length + 1}`, durationTicks: 1 };
+    onChange({ ...cycle, subdivisions: [...cycle.subdivisions, sub] });
   }
 
   return (
@@ -100,68 +195,90 @@ function CycleCard({ cycle, onChange, onRemove }: { cycle: BuilderCycle; onChang
       <div style={styles.row}>
         <label style={styles.label}>id</label>
         <input style={styles.input} value={cycle.id} onChange={e => onChange({ ...cycle, id: e.target.value })} />
-        <label style={styles.label}>type</label>
-        <select value={cycle.kind} onChange={e => onChange({ ...cycle, kind: e.target.value as 'fixed' | 'leap' })}>
-          <option value="fixed">Fixed duration</option>
-          <option value="leap">Variable (leap-year style)</option>
-        </select>
+        {cycle.duration.kind === 'fixed' && <button title="Different lengths in different iterations, e.g. leap years" onClick={onMakeLeap}>Make leap-style</button>}
         <button onClick={onRemove}>Remove</button>
       </div>
 
-      <div style={styles.row}>
-        <label style={styles.label}>{cycle.kind === 'leap' ? 'base duration (ticks)' : 'duration (ticks)'}</label>
-        <input style={styles.input} type="number" value={cycle.durationTicks}
-          onChange={e => onChange({ ...cycle, durationTicks: Number(e.target.value) })} />
-      </div>
+      <DurationEditor duration={cycle.duration} variable={variable}
+        onChange={duration => onChange({ ...cycle, duration, estimatedTicks: duration.kind === 'fixed' ? null : cycle.estimatedTicks })} />
 
-      {cycle.kind === 'leap' && (
-        <>
-          <div style={styles.row}>
-            <label style={styles.label}>leap bonus (ticks)</label>
-            <input style={styles.input} type="number" value={cycle.leapBonusTicks}
-              onChange={e => onChange({ ...cycle, leapBonusTicks: Number(e.target.value) })} />
-          </div>
-
-          <div style={styles.nested}>
-            <strong>Leap rules</strong> (evaluated in order; first match wins; no match = not a leap iteration)
-            {cycle.leapRules.map((rule, i) => (
-              <div key={i} style={styles.row}>
-                <span>if index %</span>
-                <input style={styles.smallInput} type="number" value={rule.divisor}
-                  onChange={e => updateRule(i, { ...rule, divisor: Number(e.target.value) })} />
-                <span>==</span>
-                <input style={styles.smallInput} type="number" value={rule.equals}
-                  onChange={e => updateRule(i, { ...rule, equals: Number(e.target.value) })} />
-                <span>then leap =</span>
-                <select value={String(rule.result)} onChange={e => updateRule(i, { ...rule, result: e.target.value === 'true' })}>
-                  <option value="true">true</option>
-                  <option value="false">false</option>
-                </select>
-                <button onClick={() => removeRule(i)}>Remove</button>
-              </div>
-            ))}
-            <button onClick={addRule}>+ Add Rule</button>
-          </div>
-
-          <div style={styles.nested}>
-            <strong>Subdivisions</strong> (e.g. months/seasons within this cycle)
-            {cycle.subdivisions.map((unit, i) => (
-              <div key={i} style={styles.row}>
-                <input style={styles.input} value={unit.name} placeholder="name"
-                  onChange={e => updateUnit(i, { ...unit, name: e.target.value })} />
-                <label style={styles.label}>duration</label>
-                <input style={styles.smallInput} type="number" value={unit.durationTicks}
-                  onChange={e => updateUnit(i, { ...unit, durationTicks: Number(e.target.value) })} />
-                <label style={styles.label}>leap bonus</label>
-                <input style={styles.smallInput} type="number" value={unit.leapBonusTicks}
-                  onChange={e => updateUnit(i, { ...unit, leapBonusTicks: Number(e.target.value) })} />
-                <button onClick={() => removeUnit(i)}>Remove</button>
-              </div>
-            ))}
-            <button onClick={addUnit}>+ Add Subdivision</button>
-          </div>
-        </>
+      {cycle.duration.kind !== 'fixed' && (
+        <div style={styles.row}>
+          <label style={styles.small}>
+            <input type="checkbox" checked={cycle.estimatedTicks !== null}
+              onChange={e => onChange({ ...cycle, estimatedTicks: e.target.checked ? autoEstimate(cycle.duration) : null })} /> override estimated duration
+          </label>
+          {cycle.estimatedTicks !== null
+            ? <input style={styles.ticksInput} type="number" value={cycle.estimatedTicks}
+              onChange={e => onChange({ ...cycle, estimatedTicks: Number(e.target.value) })} />
+            : <span style={styles.note}>{autoEstimate(cycle.duration)} ticks (from the default / else length)</span>}
+          <span style={styles.note}>decides which cycle is counted first</span>
+        </div>
       )}
+
+      <ExceptionsEditor exceptions={cycle.exceptions} indexLabel={cycle.id} onChange={exceptions => onChange({ ...cycle, exceptions })} />
+
+      <div style={styles.nested}>
+        <strong>Subdivisions</strong> <span style={styles.note}>(e.g. months within a year)</span>
+        {cycle.subdivisions.map((sub, i) => (
+          <SubdivisionCard key={i} sub={sub} parentId={cycle.id}
+            onChange={s => updateSub(i, s)} onRemove={() => onChange({ ...cycle, subdivisions: removeAt(cycle.subdivisions, i) })} />
+        ))}
+        <div style={styles.row}>
+          <button onClick={() => addSub('named_sequence')}>+ Named sequence (months...)</button>
+          <button onClick={() => addSub('uniform')}>+ Uniform (equal parts)</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SubdivisionCard({ sub, parentId, onChange, onRemove }: {
+  sub: BuilderSubdivision; parentId: string; onChange: (s: BuilderSubdivision) => void; onRemove: () => void;
+}) {
+  if (sub.type === 'uniform') {
+    return (
+      <div style={styles.branch}>
+        <div style={styles.row}>
+          <strong>Uniform</strong>
+          <label style={styles.label}>id</label>
+          <input style={styles.input} value={sub.id} onChange={e => onChange({ ...sub, id: e.target.value })} />
+          <label style={styles.label}>duration (ticks)</label>
+          <input style={styles.ticksInput} type="number" value={sub.durationTicks}
+            onChange={e => onChange({ ...sub, durationTicks: Number(e.target.value) })} />
+          <button onClick={onRemove}>Remove</button>
+        </div>
+      </div>
+    );
+  }
+
+  const seq = sub; // const keeps the named_sequence narrowing inside the closures below
+  function updateUnit(i: number, unit: BuilderUnit) {
+    onChange({ ...seq, units: replaceAt(seq.units, i, unit) });
+  }
+  return (
+    <div style={styles.branch}>
+      <div style={styles.row}>
+        <strong>Named sequence</strong>
+        <span style={styles.note}>units are walked in order; the last one absorbs any remainder</span>
+        <button onClick={onRemove}>Remove</button>
+      </div>
+      {seq.units.map((unit, i) => (
+        <div key={i} style={styles.branch}>
+          <div style={styles.row}>
+            <input style={styles.input} value={unit.name} placeholder="name" onChange={e => updateUnit(i, { ...unit, name: e.target.value })} />
+            <button title="Earlier" disabled={i === 0} onClick={() => onChange({ ...seq, units: moveAt(seq.units, i, i - 1) })}>&uarr;</button>
+            <button title="Later" disabled={i === seq.units.length - 1} onClick={() => onChange({ ...seq, units: moveAt(seq.units, i, i + 1) })}>&darr;</button>
+            <button onClick={() => onChange({ ...seq, units: removeAt(seq.units, i) })}>Remove</button>
+          </div>
+          <DurationEditor duration={unit.duration} variable={`${parentId}_index`} onChange={duration => updateUnit(i, { ...unit, duration })} />
+          <ExceptionsEditor exceptions={unit.exceptions} indexLabel={parentId} onChange={exceptions => updateUnit(i, { ...unit, exceptions })} />
+        </div>
+      ))}
+      <button onClick={() => onChange({
+        ...seq,
+        units: [...seq.units, { name: `Unit ${seq.units.length + 1}`, duration: { kind: 'fixed', ticks: 1 }, exceptions: [] }],
+      })}>+ Add Unit</button>
     </div>
   );
 }
@@ -185,19 +302,9 @@ function IndependentCycleCard({ cycle, onChange, onRemove }: { cycle: BuilderInd
         <input style={styles.input} value={cycle.names.join(',')}
           onChange={e => onChange({
             ...cycle,
-            names: e.target.value.split(',').map(s => s.trim()).filter((v, i, { length }) => v || i === length-1)
+            names: e.target.value.split(',').map(s => s.trim()).filter((v, i, { length }) => v || i === length - 1),
           })} />
       </div>
     </div>
   );
 }
-
-const styles: { [key: string]: React.CSSProperties } = {
-  row: { display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.4rem', flexWrap: 'wrap' },
-  label: { fontSize: '0.85rem', whiteSpace: 'nowrap' },
-  input: { flex: 1, minWidth: 80, padding: '0.3rem', fontFamily: 'monospace' },
-  smallInput: { width: 70, padding: '0.3rem', fontFamily: 'monospace' },
-  card: { border: '1px solid #ccc', borderRadius: 6, padding: '0.75rem', marginBottom: '0.75rem' },
-  nested: { marginTop: '0.5rem', paddingLeft: '0.75rem', borderLeft: '2px solid #ddd' },
-  note: { color: '#888', fontSize: '0.85rem' },
-};
