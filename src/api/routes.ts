@@ -32,7 +32,7 @@ export default function (app: Express, upload: Multer) {
       this.children = children ?? [];
     }
 
-    setup(parentPath: string) {
+    setup(parentPath = '') {
       const path = parentPath + this.path;
       app.options(path, async (req, res, next) => {
         res.setHeader('Access-Control-Allow-Methods', Object.keys(this.methodFuncs).join(','));
@@ -464,5 +464,5 @@ export default function (app: Express, upload: Multer) {
     }),
   ]);
 
-  apiRoutes.setup('/');
+  apiRoutes.setup();
 }

@@ -83,7 +83,7 @@ export default function(app: Express) {
   };
 
   function use(method: Method, path: string, site: SiteCheck, middleware: Handler[], handler: RouteHandler): void {
-    app[method](`${path}`, ...middleware, async (req: Request<{ [key: string]: string }>, res, next) => {
+    app[method](path, ...middleware, async (req: Request<{ [key: string]: string }>, res, next) => {
       if (site(req) && !res.headersSent) {
         try {
           await handler(req, res);
