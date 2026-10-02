@@ -18,9 +18,9 @@ block scripts
     include /static/scripts/searchableSelect.js
 
 block breadcrumbs
-  a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+  a.link.link-animated(href='/') #{T('Home')}
   |  / 
-  a.link.link-animated(href=`${ADDR_PREFIX}/notes`) #{T('Notes')}
+  a.link.link-animated(href='/notes') #{T('Notes')}
 
 block content
   h1.center #{T('Notes')}

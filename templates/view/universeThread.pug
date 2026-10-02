@@ -5,15 +5,15 @@ block title
 
 block breadcrumbs
   if displayUniverse
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{universe.title}
+    a.link.link-animated(href='/') #{universe.title}
   else
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    a.link.link-animated(href='/') #{T('Home')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    a.link.link-animated(href='/universes') #{T('Universes')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+    a.link.link-animated(href=`/universes/${universe.shortname}`) #{universe.title}
   |  / 
-  a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}?tab=discuss`) #{T('Discuss')}
+  a.link.link-animated(href=`/universes/${universe.shortname}?tab=discuss`) #{T('Discuss')}
   |  / 
   span #{thread.title}
 

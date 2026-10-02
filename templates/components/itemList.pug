@@ -53,7 +53,7 @@
               td(data-sort=item.author)
                 small
                   if item.author
-                    a.link.link-animated(href=`${ADDR_PREFIX}/users/${item.author}`) #{item.author}
+                    a.link.link-animated(href=`/users/${item.author}`) #{item.author}
                   else
                     | #{T('Deleted User')}
               td(data-sort=item.created_at)
@@ -98,7 +98,7 @@
             span
               b #{T('Author')}: 
               if item.author
-                a.link.link-animated(href=`${ADDR_PREFIX}/users/${item.author}`) #{item.author}
+                a.link.link-animated(href=`/users/${item.author}`) #{item.author}
               else
                 | #{T('Deleted User')}
             span

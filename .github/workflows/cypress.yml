@@ -71,7 +71,6 @@ jobs:
           HOCUSPOCUS_PORT: 31234
           PROVIDER_ADDRESS: ws://localhost:31234
           DOMAIN: dev.archivium.net
-          ADDR_PREFIX: 
           DEV_MODE: true
           SENDGRID_API_KEY: 
           OPENAI_API_KEY: 

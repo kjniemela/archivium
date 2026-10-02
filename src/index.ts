@@ -17,7 +17,7 @@ import backup from './db/backup';
 // Logging
 import logger from './logger';
 
-import { PORT, ADDR_PREFIX } from './config';
+import { PORT } from './config';
 
 
 // Hocuspocus Server
@@ -45,7 +45,7 @@ const upload = multer({
 // Cron Jobs
 cron.schedule('0 0 * * *', () => {
   logger.info('Purging stale sessions...');
-  api.session.purge().then(({ affectedRows }) => logger.info(`Purged ${affectedRows} sessions`));
+  api.session.purge().then(({ affectedRows }) => logger.info('Purged ${affectedRows} sessions'));
 
   logger.info('Purging expired OAuth codes/tokens...');
   api.oauth.purge();
@@ -75,11 +75,11 @@ app.use('/', (req, res, next) => {
 
 
 // Workers
-app.use(`${ADDR_PREFIX}/notifworker.js`, express.static(path.join(__dirname, 'static/workers/notifworker.js')));
+app.use('/notifworker.js', express.static(path.join(__dirname, 'static/workers/notifworker.js')));
 
 
 // Serve static assets
-app.use(`${ADDR_PREFIX}/static`, express.static(path.join(__dirname, 'static/')));
+app.use('/static', express.static(path.join(__dirname, 'static/')));
 
 // Load MCP server
 import loadMcp from './mcp';
@@ -104,7 +104,7 @@ async function logout(req: express.Request, res: express.Response) {
   res.clearCookie('archiviumuid');
 }
 
-app.get(`${ADDR_PREFIX}/login`, async (req, res, next) => {
+app.get('/login', async (req, res, next) => {
   if (req.session.user) {
     try {
       await logout(req, res);
@@ -117,15 +117,15 @@ app.get(`${ADDR_PREFIX}/login`, async (req, res, next) => {
   next();
 });
 
-app.get(`${ADDR_PREFIX}/signup`, async (req, res, next) => {
+app.get('/signup', async (req, res, next) => {
   res.end(await render(req, 'signup'));
   next();
 });
 
-app.get(`${ADDR_PREFIX}/logout`, async (req, res, next) => {
+app.get('/logout', async (req, res, next) => {
   try {
     await logout(req, res);
-    res.redirect(`${ADDR_PREFIX}/`);
+    res.redirect('/');
   } catch (err) {
     logger.error(err);
     res.sendStatus(500);
@@ -133,7 +133,7 @@ app.get(`${ADDR_PREFIX}/logout`, async (req, res, next) => {
   next();
 });
 
-app.post(`${ADDR_PREFIX}/login`, async (req, res, next) => {
+app.post('/login', async (req, res, next) => {
   try {
     const user = await api.user.getOneWithAuth({ 'user.username': req.body.username }).catch(handleAsNull(NotFoundError));
     if (user) {
@@ -142,7 +142,7 @@ app.post(`${ADDR_PREFIX}/login`, async (req, res, next) => {
       if (isCorrectLogin) {
         await api.session.put({ id: req.session.id }, { user_id: req.loginId });
         res.status(200);
-        res.redirect(`${ADDR_PREFIX}${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
+        res.redirect(`${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
       } else {
         res.status(401);
         res.end(await render(req, 'login', { error: 'Username or password incorrect.' }));
@@ -158,7 +158,7 @@ app.post(`${ADDR_PREFIX}/login`, async (req, res, next) => {
   next();
 });
 
-app.post(`${ADDR_PREFIX}/signup`, ReCaptcha.verifyReCaptcha, async (req, res, next) => {
+app.post('/signup', ReCaptcha.verifyReCaptcha, async (req, res, next) => {
   try {
     const data = await api.user.post( req.body ) as ResultSetHeader;
     try {
@@ -175,7 +175,7 @@ app.post(`${ADDR_PREFIX}/signup`, ReCaptcha.verifyReCaptcha, async (req, res, ne
         // api.email.unsubscribeUser([req.body.email], api.email.groups.NEWSLETTER);
       }
 
-      res.redirect(`${ADDR_PREFIX}${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
+      res.redirect(`${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
     } catch (err) {
       logger.error(err);
       res.sendStatus(500);
@@ -211,7 +211,7 @@ const errorLogger: express.ErrorRequestHandler = async (err, req, res, next) => 
   if (res.headersSent) return next(err);
   const status = err.status || err.statusCode || 500;
   res.status(status);
-  if (req.path.startsWith(`${ADDR_PREFIX}/api`)) {
+  if (req.path.startsWith('/api')) {
     res.json({ error: status === 413 ? 'Request entity too large.' : 'Internal Server Error.', code: status });
   } else {
     res.send(await render(req, 'error', { code: status }));
@@ -220,5 +220,5 @@ const errorLogger: express.ErrorRequestHandler = async (err, req, res, next) => 
 app.use(errorLogger);
 
 app.listen(PORT, () => {
-  logger.info(`Server listening at http://localhost:${PORT}`);
+  logger.info('Server listening at http://localhost:${PORT}');
 });

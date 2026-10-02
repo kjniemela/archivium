@@ -6,7 +6,6 @@ import { AccessDeniedError, InvalidGrantError, InvalidTokenError } from '@modelc
 import { OAuthClientInformationFull, OAuthTokenRevocationRequest, OAuthTokens } from '@modelcontextprotocol/sdk/shared/auth.js';
 import api from '../api';
 import { render } from '../templates';
-import { ADDR_PREFIX } from '../config';
 
 class ArchiviumClientsStore implements OAuthRegisteredClientsStore {
   async getClient(clientId: string): Promise<OAuthClientInformationFull | undefined> {
@@ -29,7 +28,7 @@ export class ArchiviumOAuthProvider implements OAuthServerProvider {
       const pageQuery = new URLSearchParams();
       pageQuery.append('page', '/authorize');
       if (search) pageQuery.append('search', search);
-      res.redirect(`${ADDR_PREFIX}/login?${pageQuery.toString()}`);
+      res.redirect(`/login?${pageQuery.toString()}`);
       return;
     }
 

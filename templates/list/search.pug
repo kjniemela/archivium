@@ -4,7 +4,7 @@ block title
   title #{T('Search')} — #{T('Archivium')}
 
 block breadcrumbs
-  a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+  a.link.link-animated(href='/') #{T('Home')}
   |  / 
   span #{T('Search')}
 
@@ -59,7 +59,7 @@ block content
         .d-flex.flex-col.grow-3
             span 
               b #{T('Author')}: 
-              a.link.link-animated(href=`${ADDR_PREFIX}/users/${item.author}`) #{item.author}
+              a.link.link-animated(href=`/users/${item.author}`) #{item.author}
             span 
               b #{T('Created')}: 
               | #{formatDate(item.created_at)}

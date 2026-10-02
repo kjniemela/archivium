@@ -14,13 +14,13 @@ block title
 
 block breadcrumbs
   if displayUniverse
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{systemDisplayModes.includes(displayUniverse) ? T('Home') : universe.title}
+    a.link.link-animated(href='/') #{systemDisplayModes.includes(displayUniverse) ? T('Home') : universe.title}
   else
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    a.link.link-animated(href='/') #{T('Home')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    a.link.link-animated(href='/universes') #{T('Universes')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+    a.link.link-animated(href=`/universes/${universe.shortname}`) #{universe.title}
   |  / 
   if vault
     | #{vault.title}

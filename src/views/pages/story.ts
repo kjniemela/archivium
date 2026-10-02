@@ -3,7 +3,6 @@ import api from '../../api';
 import { Comment } from '../../api/models/discussion';
 import { BasicUser, User } from '../../api/models/user';
 import { getPfpUrl, perms } from '../../api/utils';
-import { ADDR_PREFIX } from '../../config';
 import { NotFoundError } from '../../errors';
 import { RenderedBody, tryRenderContent } from '../../lib/renderContent';
 import { T } from '../../locale';
@@ -40,7 +39,7 @@ export default {
       res.prepareRender('deleteStory', { story });
     } catch (err) {
       if (err instanceof NotFoundError) {
-        return res.redirect(`${ADDR_PREFIX}/stories`);
+        return res.redirect('/stories');
       }
       throw err;
     }
@@ -57,7 +56,7 @@ export default {
 
     const title = `${T('Untitled Chapter')} ${story.chapter_count + 1}`;
     const [, index] = await api.story.postChapter(req.session.user, story.shortname, { title });
-    return res.redirect(`${ADDR_PREFIX}/editor/stories/${story.shortname}/${index}`);
+    return res.redirect(`/editor/stories/${story.shortname}/${index}`);
   },
   
   async viewChapter(req, res) {
@@ -74,7 +73,7 @@ export default {
 
     res.prepareRender('chapter', {
       story, chapter, comments, commenters, renderedBody,
-      commentAction: `${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}/comment`,
+      commentAction: `/stories/${story.shortname}/${chapter.chapter_number}/comment`,
     });
   },
 
@@ -84,7 +83,7 @@ export default {
       res.prepareRender('deleteChapter', { chapter, storyShort: req.params.shortname });
     } catch (err) {
       if (err instanceof NotFoundError) {
-        return res.redirect(`${ADDR_PREFIX}/stories/${req.params.shortname}`);
+        return res.redirect(`/stories/${req.params.shortname}`);
       }
       throw err;
     }

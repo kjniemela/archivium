@@ -2,7 +2,7 @@ import cors from 'cors';
 import { Express, Handler, Request, Response } from 'express';
 import { Multer } from 'multer';
 import api from '.';
-import { ADDR_PREFIX, CORS_ALLOWED_DOMAINS, DEV_MODE } from '../config';
+import { CORS_ALLOWED_DOMAINS, DEV_MODE } from '../config';
 import embedder from '../embedding';
 import { ForbiddenError, NotFoundError, RequestError } from '../errors';
 import { tryRenderContent } from '../lib/renderContent';
@@ -464,5 +464,5 @@ export default function (app: Express, upload: Multer) {
     }),
   ]);
 
-  apiRoutes.setup(ADDR_PREFIX);
+  apiRoutes.setup('/');
 }

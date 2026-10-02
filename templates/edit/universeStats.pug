@@ -5,13 +5,13 @@ block title
 
 block breadcrumbs
   if displayUniverse
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{universe.title}
+    a.link.link-animated(href='/') #{universe.title}
   else
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    a.link.link-animated(href='/') #{T('Home')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    a.link.link-animated(href='/universes') #{T('Universes')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+    a.link.link-animated(href=`/universes/${universe.shortname}`) #{universe.title}
   |  / 
   span #{T('Stats')}
 
@@ -51,7 +51,7 @@ block scripts
 block content
   .d-flex.justify-between.align-baseline
     h2 #{universe.title} #{T('Stats')}
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{T('Go back')}
+    a.link.link-animated(href=`/universes/${universe.shortname}`) #{T('Go back')}
 
   ul#tabBtns.navbarBtns.gap-1.mb-2.scroll-x
     li.navbarBtn(data-tab='links')
@@ -154,7 +154,7 @@ block content
             each item in tabPresence
               tr
                 td
-                  a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}/items/${item.shortname}`) #{item.title}
+                  a.link.link-animated(href=`/universes/${universe.shortname}/items/${item.shortname}`) #{item.title}
                 each tabType in tabTypes
                   - const state = item.tabs[tabType];
                   td.tab-cell(data-sort=state class=(state === 'active' ? 'has-tab' : (state === 'hidden' ? 'hidden-tab' : 'no-tab')))
@@ -210,7 +210,7 @@ block content
         .linkDirectionalArrowLength(6)
         .linkDirectionalArrowRelPos(1)
         .onNodeClick((node) => {
-          window.location.href = `#{ADDR_PREFIX}/universes/#{universe.shortname}/items/${node.id}`;
+          window.location.href = `/universes/#{universe.shortname}/items/${node.id}`;
         })
         .width(elem.clientWidth)
         .height(elem.clientHeight);

@@ -9,8 +9,8 @@ html(lang='en')
       title #{T('Archivium')}
     meta(name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0')
     link(rel='manifest' href='/static/manifest.json')
-    link(rel='stylesheet' href=`${ADDR_PREFIX}/static/assets/styles.css`)
-    link(rel='icon' type='image/x-icon' href=`${ADDR_PREFIX}/static/assets/icons/archivium.ico`)
+    link(rel='stylesheet' href='/static/assets/styles.css')
+    link(rel='icon' type='image/x-icon' href='/static/assets/icons/archivium.ico')
 
     -
       const icons  = [
@@ -103,10 +103,10 @@ html(lang='en')
       function universeLink(uniShort) {
         const displayUniverse = '#{displayUniverse}';
         if (displayUniverse) {
-          if (displayUniverse === uniShort) return '#{ADDR_PREFIX}';
-          else return `https://#{DOMAIN}#{ADDR_PREFIX}/universes/${uniShort}`;
+          if (displayUniverse === uniShort) return '/';
+          else return `https://#{DOMAIN}/universes/${uniShort}`;
         } else {
-          return `#{ADDR_PREFIX}/universes/${uniShort}`;
+          return `/universes/${uniShort}`;
         }
       }
       const VAPID_PUBLIC_KEY = '#{VAPID_PUBLIC_KEY}';
@@ -121,24 +121,24 @@ html(lang='en')
           span.material-symbols-outlined menu
         ul#mainNavList.navbarBtns.shrink-1.scroll-x
           li.navbarBtn
-            a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/`) #{T('Home')}
+            a.navbarBtnLink.navbarText(href='/') #{T('Home')}
           li.navbarBtn
-            a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/search`) #{T('Search')}
+            a.navbarBtnLink.navbarText(href='/search') #{T('Search')}
           li.navbarBtn
-            a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/contacts`) #{T('Contacts')}
+            a.navbarBtnLink.navbarText(href='/contacts') #{T('Contacts')}
           if !displayUniverse || systemDisplayModes.includes(displayUniverse)
             li.navbarBtn
-              a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+              a.navbarBtnLink.navbarText(href='/universes') #{T('Universes')}
           else
             li.navbarBtn
-              a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/items`) #{T('Items')}
+              a.navbarBtnLink.navbarText(href='/items') #{T('Items')}
           if !contextUniverse || contextUniverse.obj_data.storiesEnabled
             li.navbarBtn
-              a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/stories`) #{T('Stories')}
+              a.navbarBtnLink.navbarText(href='/stories') #{T('Stories')}
           li.navbarBtn
-            a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/notes`) #{T('Notes')}
+            a.navbarBtnLink.navbarText(href='/notes') #{T('Notes')}
           li.navbarBtn
-            a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/news`) #{T('News')}
+            a.navbarBtnLink.navbarText(href='/news') #{T('News')}
           li.navbarBtn
             a.navbarBtnLink.navbarText(href=`https://github.com/HMI-Studios/archivium/wiki` target='_blank') #{T('Help')}
         ul.navbarBtns
@@ -155,15 +155,15 @@ html(lang='en')
               .user-dropdown.hidden
                 ul.navbarBtns.flex-col
                   li.navbarBtn
-                    a.navbarBtnLink.navbarText.text-start.d-flex.align-center.gap-2(href=`${ADDR_PREFIX}/users/${contextUser.username}`)
+                    a.navbarBtnLink.navbarText.text-start.d-flex.align-center.gap-2(href=`/users/${contextUser.username}`)
                       span.material-symbols-outlined person
                       | #{T('Profile')}
                   li.navbarBtn
-                    a.navbarBtnLink.navbarText.text-start.d-flex.align-center.gap-2(href=`${ADDR_PREFIX}/settings`)
+                    a.navbarBtnLink.navbarText.text-start.d-flex.align-center.gap-2(href='/settings')
                       span.material-symbols-outlined settings
                       | #{T('Settings')}
                   li.navbarBtn
-                    a.navbarBtnLink.navbarText.text-start.d-flex.align-center.gap-2(href=`${ADDR_PREFIX}/notifications`)
+                    a.navbarBtnLink.navbarText.text-start.d-flex.align-center.gap-2(href='/notifications')
                       .badge-anchor
                         span.material-symbols-outlined notifications
                         if contextUser.notifications > 0
@@ -171,7 +171,7 @@ html(lang='en')
                             b #{contextUser.notifications}
                       | #{T('Notifications')}
                   li.navbarBtn
-                    a.navbarBtnLink.navbarText.text-start.d-flex.align-center.gap-2(href=`${ADDR_PREFIX}/logout`)
+                    a.navbarBtnLink.navbarText.text-start.d-flex.align-center.gap-2(href='/logout')
                       span.material-symbols-outlined logout
                       | #{T('Log Out')}
               script.
@@ -191,10 +191,10 @@ html(lang='en')
             ul.navbarBtns
               if curTemplate !== 'login'
                 li.navbarBtn
-                  a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/login${curTemplate === 'signup' ? '' : `?${encodedPath}`}`) #{T('Login')}
+                  a.navbarBtnLink.navbarText(href=`/login${curTemplate === 'signup' ? '' : `?${encodedPath}`}`) #{T('Login')}
               if curTemplate !== 'signup'
                 li.navbarBtn
-                  a.navbarBtnLink.navbarText(href=`${ADDR_PREFIX}/signup${curTemplate === 'login' ? '' : `?${encodedPath}`}`) #{T('Create Account')}
+                  a.navbarBtnLink.navbarText(href=`/signup${curTemplate === 'login' ? '' : `?${encodedPath}`}`) #{T('Create Account')}
       .nav-overlay.hidden#navOverlay
       script.
         function setNavOpen(open) {
@@ -223,11 +223,11 @@ html(lang='en')
     footer
       small.d-flex.justify-center.gap-4.flex-wrap
         .d-flex.justify-center.gap-1.flex-wrap
-          a.link.link-animated(href=`${ADDR_PREFIX}/privacy-policy`) #{T('Privacy Policy')}
+          a.link.link-animated(href='/privacy-policy') #{T('Privacy Policy')}
           span —
-          a.link.link-animated(href=`${ADDR_PREFIX}/terms-of-service`) #{T('Terms of Service')}
+          a.link.link-animated(href='/terms-of-service') #{T('Terms of Service')}
           span —
-          a.link.link-animated(href=`${ADDR_PREFIX}/code-of-conduct`) #{T('Code of Conduct')}
+          a.link.link-animated(href='/code-of-conduct') #{T('Code of Conduct')}
         span &copy; 2024 Archivium. #{T('Developed by ')}
           a.link.link-animated(href='https://github.com/kjniemela' target='_blank') kjniemela
           |  &amp; 

@@ -1,5 +1,5 @@
 import { post } from 'axios';
-import { ADDR_PREFIX, RECAPTCHA_KEY } from '../config';
+import { RECAPTCHA_KEY } from '../config';
 import { render } from '../templates';
 import { info, warn } from '../logger';
 

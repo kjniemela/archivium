@@ -4,11 +4,11 @@ block title
   title #{T('Edit %s', story.title)}
 
 block breadcrumbs
-  a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+  a.link.link-animated(href='/') #{T('Home')}
   |  / 
-  a.link.link-animated(href=`${ADDR_PREFIX}/stories`) #{T('Stories')}
+  a.link.link-animated(href='/stories') #{T('Stories')}
   |  / 
-  a.link.link-animated(href=`${ADDR_PREFIX}/stories/${story.shortname}`) #{story.title}
+  a.link.link-animated(href=`/stories/${story.shortname}`) #{story.title}
   |  / 
   span #{T('Edit')}
 
@@ -39,7 +39,7 @@ block append save
 block content
   .d-flex.justify-between.align-baseline
     h2 #{T('Edit %s', story.title)}
-    a.link.link-animated.color-error(href=`${ADDR_PREFIX}/stories/${story.shortname}`) #{T('Discard Changes')}
+    a.link.link-animated.color-error(href=`/stories/${story.shortname}`) #{T('Discard Changes')}
   form#edit(method='POST')
 
     .inputGroup

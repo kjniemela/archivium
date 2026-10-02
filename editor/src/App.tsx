@@ -7,18 +7,17 @@ const NoteEdit = lazy(() => import(/* webpackChunkName: "note-edit" */ './pages/
 
 export type AppProps = {
   displayUniverse: string,
-  addrPrefix: string,
   domain: string,
   providerAddress: string,
 };
 
-export default function App({ displayUniverse, addrPrefix, domain, providerAddress }: AppProps) {
+export default function App({ displayUniverse, domain, providerAddress }: AppProps) {
   function universeLink(universe: string): string {
     if (displayUniverse) {
-      if (displayUniverse === universe) return addrPrefix;
-      else return `https://${domain}${addrPrefix}/universes/${universe}`;
+      if (displayUniverse === universe) return '/';
+      else return `https://${domain}/universes/${universe}`;
     } else {
-      return `${addrPrefix}/universes/${universe}`;
+      return `/universes/${universe}`;
     }
   }
 

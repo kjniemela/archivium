@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import api from '../api';
-import { ADDR_PREFIX, DEV_MODE } from '../config';
+import { DEV_MODE } from '../config';
 import logger from '../logger';
 import { ResultSetHeader } from 'mysql2/promise';
 import { Session } from '../api/models/session';
@@ -88,9 +88,9 @@ const verifySessionOrRedirect = async (req: Request, res: Response, next: NextFu
     pageQuery.append('page', req.path);
     if (searchQueries.toString()) pageQuery.append('search', searchQueries.toString());
     if (user && !user.verified) {
-      res.redirect(`${ADDR_PREFIX}/verify?${pageQuery.toString()}`);
+      res.redirect(`/verify?${pageQuery.toString()}`);
     } else {
-      res.redirect(`${ADDR_PREFIX}/login?${pageQuery.toString()}`);
+      res.redirect(`/login?${pageQuery.toString()}`);
     }
   }
 }

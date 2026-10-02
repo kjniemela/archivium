@@ -4,7 +4,7 @@ block title
   title #{T('Notifications')} — #{T('Archivium')}
 
 block breadcrumbs
-  a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+  a.link.link-animated(href='/') #{T('Home')}
   |  / 
   span #{T('Notifications')}
 
@@ -15,7 +15,7 @@ block scripts
       window.location.reload();
     }
     async function markAllRead() {
-      await putJSON(`/api/notifications/mark-all`);
+      await putJSON('/api/notifications/mark-all');
       window.location.reload();
     }
 
@@ -29,7 +29,7 @@ block content
     h1 #{T('Notifications')}
     small
       i #{T('You can decide which things you will receive notifications for on the ')}
-        a.link.link-animated(href=`${ADDR_PREFIX}/settings`) #{T('settings')}
+        a.link.link-animated(href='/settings') #{T('settings')}
         | #{T(' page.')}
   hr
   .d-flex.align-center.gap-4.my-4

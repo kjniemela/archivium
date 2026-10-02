@@ -2,7 +2,7 @@ import { Request } from 'express';
 import pug from 'pug';
 import api from './api';
 import { getPfpUrl, handleAsNull, perms, plans, tierAllowance, tiers } from './api/utils';
-import { ADDR_PREFIX, DEV_MODE, DOMAIN, PROVIDER_ADDRESS, VAPID_PUBLIC_KEY } from './config';
+import { DEV_MODE, DOMAIN, PROVIDER_ADDRESS, VAPID_PUBLIC_KEY } from './config';
 import { ForbiddenError, NotFoundError, UnauthorizedError } from './errors';
 import { lang, locale, sprintf, T } from './locale';
 import logger from './logger';
@@ -12,10 +12,10 @@ import { Universe } from './api/models/universe';
 export function universeLink(req: Request, uniShort) {
   const displayUniverse = req.headers['x-subdomain'];
   if (displayUniverse) {
-    if (displayUniverse === uniShort) return ADDR_PREFIX;
-    else return `https://${DOMAIN}${ADDR_PREFIX}/universes/${uniShort}`;
+    if (displayUniverse === uniShort) return '/';
+    else return `https://${DOMAIN}/universes/${uniShort}`;
   } else {
-    return `${ADDR_PREFIX}/universes/${uniShort}`;
+    return `/universes/${uniShort}`;
   }
 }
 
@@ -49,7 +49,6 @@ async function contextData(req: Request) {
     contextUser,
     contextUniverse,
     DOMAIN,
-    ADDR_PREFIX,
     DEV_MODE,
     VAPID_PUBLIC_KEY,
     PROVIDER_ADDRESS,
