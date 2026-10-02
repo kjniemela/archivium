@@ -93,3 +93,62 @@ mixin themeSwatches(selectId)
       select.addEventListener('change', sync);
       sync();
     })();
+
+mixin paletteRow(palette, key, label)
+  - const paletteDefaults = { light: { page: '#e9e9e9', sheet: '#fefefe', text: '#000000', link: '#006699', accent: '#006699' }, dark: { page: '#444444', sheet: '#333333', text: '#f5f5f5', link: '#46b9f2', accent: '#46b9f2' } };
+  .inputGroup
+    label #{label}:
+    .palette-pair
+      each mode in ['light', 'dark']
+        input(type='color' data-palette-mode=mode data-palette-key=key title=T(mode === 'light' ? 'Light' : 'Dark') aria-label=`${label} (${mode})` value=((palette[mode] || {})[key] || paletteDefaults[mode][key]))
+
+mixin paletteEditor(savedPalette)
+  - const palette = savedPalette || {};
+  #paletteEditor
+    .inputGroup
+      label #{T('Use custom color palette')}:
+      label.switch
+        input#usePalette(type='checkbox' checked=Boolean(palette.light || palette.dark))
+        span.slider
+
+    #paletteFields.hidden(style='display: grid; gap: inherit;')
+      .inputGroup
+        span
+        .palette-pair
+          strong #{T('Light')}
+          strong #{T('Dark')}
+      +paletteRow(palette, 'page', T('Page Color'))
+      +paletteRow(palette, 'sheet', T('Sheet Color'))
+      +paletteRow(palette, 'text', T('Text Color'))
+      +paletteRow(palette, 'link', T('Link Color'))
+      .inputGroup
+        label #{T('Use accent color')}:
+        label.switch
+          input#useAccent(type='checkbox' checked=Boolean((palette.light || {}).accent || (palette.dark || {}).accent))
+          span.slider
+      #accentRow.hidden
+        +paletteRow(palette, 'accent', T('Accent Color'))
+  script.
+    (() => {
+      const editor = document.getElementById('paletteEditor');
+      const usePalette = editor.querySelector('#usePalette');
+      const useAccent = editor.querySelector('#useAccent');
+      const sync = () => {
+        editor.querySelector('#paletteFields').classList.toggle('hidden', !usePalette.checked);
+        editor.querySelector('#accentRow').classList.toggle('hidden', !useAccent.checked);
+      };
+      editor.readPalette = () => {
+        if (!usePalette.checked) return undefined;
+        const result = { light: {}, dark: {} };
+        for (const input of editor.querySelectorAll('input[type=color]')) {
+          if (input.dataset.paletteKey === 'accent' && !useAccent.checked) continue;
+          result[input.dataset.paletteMode][input.dataset.paletteKey] = input.value;
+        }
+        return result;
+      };
+      editor.addEventListener('change', () => {
+        sync();
+        editor.dispatchEvent(new CustomEvent('palettechange', { bubbles: true }));
+      });
+      sync();
+    })();

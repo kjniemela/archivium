@@ -137,6 +137,8 @@ block content
           label #{T('Background Image URL')}:
           input#backgroundImage(type='text' value=(universe.obj_data.customTheme || {}).backgroundImage)
 
+        +paletteEditor((universe.obj_data.customTheme || {}).palette)
+
     #home-body.inputGroup
       label #{T('Home Page')}:
       .d-flex.align-center.gap-2
@@ -226,6 +228,11 @@ block content
             ...obj_data.customTheme ?? {},
             backgroundImage: backgroundImage.value
           } });
+        });
+        document.querySelector('#paletteEditor').addEventListener('palettechange', (e) => {
+          const { palette: _, ...customTheme } = obj_data.customTheme ?? {};
+          const palette = e.currentTarget.readPalette();
+          updateObjData({ customTheme: palette ? { ...customTheme, palette } : customTheme });
         });
         handleThemeChange();
 

@@ -126,14 +126,16 @@ block content
 
           #customTheme.hidden.form-row-group
             .inputGroup
-              label #{T('Use "Glass Pane" theme')}: 
+              label #{T('Use "Glass Pane" theme')}:
               label.switch
                 input#glass(type='checkbox' checked=Boolean((user.custom_theme || {}).glass))
                 span.slider
 
             .inputGroup
-              label #{T('Background Image URL')}: 
+              label #{T('Background Image URL')}:
               input#backgroundImage(type='text' value=(user.custom_theme || {}).backgroundImage)
+
+            +paletteEditor((user.custom_theme || {}).palette)
 
           .inputGroup
             .d-flex.col-2
@@ -149,6 +151,7 @@ block content
               const glass = document.querySelector('#glass');
               const backgroundImage = document.querySelector('#backgroundImage');
               const customThemeDiv = document.querySelector('#customTheme');
+              const paletteEditor = document.querySelector('#paletteEditor');
               function handleThemeChange() {
                 customThemeDiv.classList.toggle('hidden', theme.value !== 'custom');
               }
@@ -161,8 +164,9 @@ block content
                 const [response, data] = await putJSON(`/api/users/#{user.username}/preferences`, {
                   preferred_theme: theme.value,
                   custom_theme: {
-                    glass: glass.value,
+                    glass: glass.checked,
                     backgroundImage: backgroundImage.value,
+                    palette: paletteEditor.readPalette(),
                   },
                 });
                 if (response.status === 200) {
