@@ -6,7 +6,7 @@ import { DEV_MODE, DOMAIN, PROVIDER_ADDRESS, VAPID_PUBLIC_KEY } from './config';
 import { ForbiddenError, NotFoundError, UnauthorizedError } from './errors';
 import { lang, locale, sprintf, T } from './locale';
 import logger from './logger';
-import themes from './themes';
+import themes, { themeAttrs, themeHtmlAttrs, themePreview, THEME_VAR_NAMES } from './themes';
 import { Universe } from './api/models/universe';
 
 export function universeLink(req: Request, uniShort) {
@@ -61,6 +61,10 @@ async function contextData(req: Request) {
     locale: locale[lang],
     themes,
     theme: req.theme ?? themes.default,
+    themePreview,
+    themeHtmlAttrs: themeHtmlAttrs(req.theme ?? themes.default),
+    themeAttrs,
+    THEME_VAR_NAMES,
     plans,
     tiers,
     tierAllowance,

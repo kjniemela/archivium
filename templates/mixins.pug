@@ -61,11 +61,11 @@ mixin themeSwatches(selectId)
       border: 0.0625rem solid var(--input-border-color); border-radius: 0.25rem; background-size: cover;
     }
     .theme-swatch-preview i { display: block; height: 0.375rem; border-radius: 0.1875rem; }
-  .theme-swatches(data-select=selectId)
+  .theme-swatches(data-select=selectId data-var-names=JSON.stringify(THEME_VAR_NAMES))
     each theme, key in themes
       if key !== 'custom'
         - const p = themePreview(theme);
-        button.theme-swatch(type='button' data-theme=key aria-pressed='false' title=T(`theme_${key}`))
+        button.theme-swatch(type='button' data-theme=key data-attrs=JSON.stringify(themeAttrs(theme)) aria-pressed='false' title=T(`theme_${key}`))
           .theme-swatch-preview(style=`background: ${p.background || p.page}; background-color: ${p.page};`)
             i(style=`background: ${p.sheet}; width: 100%;`)
             i(style=`background: ${p.link}; width: 60%;`)
@@ -83,14 +83,59 @@ mixin themeSwatches(selectId)
     (() => {
       const box = document.currentScript.previousElementSibling;
       const select = document.getElementById(box.dataset.select);
+      const root = document.documentElement;
+      const varNames = JSON.parse(box.dataset.varNames);
       const sync = () => box.querySelectorAll('.theme-swatch').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === select.value)));
+
+      function applyTheme({ classes, vars }) {
+        for (const cls of [...root.classList]) {
+          if (cls === 'palette' || cls === 'palette-accent' || cls.startsWith('theme-')) root.classList.remove(cls);
+        }
+        root.classList.add(...classes);
+        varNames.forEach(name => root.style.removeProperty(name));
+        Object.entries(vars).forEach(([name, value]) => root.style.setProperty(name, value));
+        const glassPane = document.getElementById('glassPane');
+        if (glassPane) glassPane.classList.toggle('glass-pane', classes.includes('theme-glass'));
+      }
+
+      function customAttrs() {
+        const classes = [];
+        const vars = {};
+        if (document.getElementById('glass')?.checked) classes.push('theme-glass');
+        const image = document.getElementById('backgroundImage')?.value.trim();
+        if (image) {
+          classes.push('theme-bg-image');
+          vars['--theme-background-image'] = `url("${image.replace(/["\\\n]/g, encodeURIComponent)}")`;
+        }
+        const palette = document.getElementById('paletteEditor')?.readPalette();
+        if (palette) {
+          classes.push('palette');
+          for (const key of Object.keys(palette.light)) {
+            vars[`--${key}-color`] = `light-dark(${palette.light[key]}, ${palette.dark[key]})`;
+          }
+          if (palette.light.accent) classes.push('palette-accent');
+          vars['color-scheme'] = 'light dark';
+        }
+        return { classes, vars };
+      }
+
+      function preview() {
+        const btn = box.querySelector(`.theme-swatch[data-theme="${select.value}"]`);
+        if (!btn) return;
+        applyTheme(btn.dataset.attrs ? JSON.parse(btn.dataset.attrs) : customAttrs());
+      }
+
       box.addEventListener('click', (e) => {
         const btn = e.target.closest('.theme-swatch');
         if (!btn) return;
         select.value = btn.dataset.theme;
         select.dispatchEvent(new Event('change'));
       });
-      select.addEventListener('change', sync);
+      select.addEventListener('change', () => { sync(); preview(); });
+      // Keep the preview up to date while editing the custom theme.
+      document.addEventListener('change', (e) => {
+        if (select.value === 'custom' && e.target.closest('#customTheme, #paletteEditor')) preview();
+      });
       sync();
     })();
 

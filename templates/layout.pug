@@ -3,7 +3,7 @@ include helpers.pug
 include mixins.pug
 
 doctype html
-html(lang='en')
+html(lang='en' class=themeHtmlAttrs.class style=themeHtmlAttrs.style)
   head
     block title
       title #{T('Archivium')}
@@ -35,7 +35,6 @@ html(lang='en')
       .material-symbols-outlined.heavy {
         font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 200, 'opsz' 16
       }
-    include theme.pug
     block styles
 
     if !DEV_MODE
@@ -215,7 +214,7 @@ html(lang='en')
 
     main
       .page
-        div(class={ 'glass-pane': theme.glass })
+        #glassPane(class={ 'glass-pane': theme.glass })
           #breadcrumbs
             block breadcrumbs
           block content
