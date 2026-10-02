@@ -10,7 +10,7 @@ export type Theme = {
   glass: boolean,
   background?: string,
   backgroundImage?: string,
-  palette?: { light?: Palette, dark?: Palette },
+  palette?: { light: Palette, dark: Palette },
 };
 
 export type ThemeName = keyof typeof themes;
@@ -24,11 +24,9 @@ const PALETTE_KEYS: [Exclude<keyof Palette, 'accent'>, string][] = [
   ['link', '--link-color'],
 ];
 
-function accentOf(light?: Palette, dark?: Palette): string | null {
-  if (!light?.accent && !dark?.accent) return null;
-  const l = light && (light.accent ?? light.link);
-  const d = dark && (dark.accent ?? dark.link);
-  return l && d ? `light-dark(${l}, ${d})` : (l ?? d)!;
+function accentOf(light: Palette, dark: Palette): string | null {
+  if (!light.accent && !dark.accent) return null;
+  return `light-dark(${light.accent ?? light.link}, ${dark.accent ?? dark.link})`;
 }
 
 export type ThemeAttrs = { classes: string[], vars: Record<string, string> };
@@ -60,17 +58,17 @@ export function themeAttrs(theme: Theme): ThemeAttrs {
     vars['--theme-background-image'] = cssUrl(theme.backgroundImage);
   }
 
-  const { light, dark } = theme.palette ?? {};
-  const valid = (p?: Palette) => !!p
+  const { light, dark }: Partial<NonNullable<Theme['palette']>> = theme.palette ?? {};
+  const valid = (p?: Palette): p is Palette => !!p
     && PALETTE_KEYS.every(([key]) => typeof p[key] === 'string' && HEX_COLOR.test(p[key]))
     && (p.accent === undefined || (typeof p.accent === 'string' && HEX_COLOR.test(p.accent)));
-  if ((light || dark) && !(light && !valid(light)) && !(dark && !valid(dark))) {
+  if (valid(light) && valid(dark)) {
     for (const [key, cssVar] of PALETTE_KEYS) {
-      vars[cssVar] = light && dark ? `light-dark(${light[key]}, ${dark[key]})` : (light ?? dark)![key];
+      vars[cssVar] = `light-dark(${light[key]}, ${dark[key]})`;
     }
     const accent = accentOf(light, dark);
     if (accent) vars['--accent-color'] = accent;
-    vars['color-scheme'] = light && dark ? 'light dark' : light ? 'light' : 'dark';
+    vars['color-scheme'] = 'light dark';
     classes.push('palette');
     if (accent) classes.push('palette-accent');
   }
@@ -96,15 +94,15 @@ const DEFAULT_PREVIEW: ThemePreview = {
 };
 
 export function themePreview(theme: Theme): ThemePreview {
-  const { light, dark } = theme.palette ?? {};
   const preview = { ...DEFAULT_PREVIEW };
-  if (light || dark) {
+  if (theme.palette) {
+    const { light, dark } = theme.palette;
     for (const [key] of PALETTE_KEYS) {
-      preview[key] = light && dark ? `light-dark(${light[key]}, ${dark[key]})` : (light ?? dark)![key];
-    }
+      preview[key] = `light-dark(${light[key]}, ${dark[key]})`;
   }
   const accent = accentOf(light, dark);
   if (accent) preview.accent = accent;
+  }
   if (theme.background) preview.background = theme.background;
   else if (theme.backgroundImage) preview.background = `url('${theme.backgroundImage}') center / cover`;
   return preview;
