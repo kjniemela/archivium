@@ -113,10 +113,11 @@ block content
 
       .inputGroup
         label #{T('Theme')}:
-        select#theme
+        select.hidden#theme
           option(value=null selected=(!universe.obj_data.theme)) #{T('None')}
           each _, themeKey in themes
             option(value=themeKey selected=(universe.obj_data.theme === themeKey)) #{T(`theme_${themeKey}`)}
+        +themeSwatches('theme')
 
       .inputGroup
         small(style={ 'grid-column': '2 / 4' })

@@ -47,3 +47,49 @@ mixin userIcon(user)
         .badge.user-badge
           span.material-symbols-outlined security
           b #{T('Site Admin')}
+
+mixin themeSwatches(selectId)
+  style.
+    .theme-swatches { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; justify-content: center; }
+    .theme-swatch {
+      display: flex; flex-direction: column; gap: 0.25rem; width: 5.75rem; padding: 0.25rem;
+      font-size: 0.75rem; text-align: center; cursor: pointer;
+    }
+    .theme-swatch[aria-pressed="true"] { outline: 0.125rem solid var(--link-color); outline-offset: 0.0625rem; }
+    .theme-swatch-preview {
+      display: flex; flex-direction: column; justify-content: center; gap: 0.25rem; height: 3rem; padding: 0.25rem;
+      border: 0.0625rem solid var(--input-border-color); border-radius: 0.25rem; background-size: cover;
+    }
+    .theme-swatch-preview i { display: block; height: 0.375rem; border-radius: 0.1875rem; }
+  .theme-swatches(data-select=selectId)
+    each theme, key in themes
+      if key !== 'custom'
+        - const p = themePreview(theme);
+        button.theme-swatch(type='button' data-theme=key aria-pressed='false' title=T(`theme_${key}`))
+          .theme-swatch-preview(style=`background: ${p.background || p.page}; background-color: ${p.page};`)
+            i(style=`background: ${p.sheet}; width: 100%;`)
+            i(style=`background: ${p.link}; width: 60%;`)
+            if p.accent
+              i(style=`background: ${p.accent}; width: 40%;`)
+            i(style=`background: ${p.text}; width: 80%;`)
+          span #{T(`theme_${key}`)}
+      else
+        button.theme-swatch(type='button' data-theme=key aria-pressed='false' title=T(`theme_${key}`))
+          .theme-swatch-preview
+            p(style='font-size: 1.875rem;') ?
+          span #{T(`theme_${key}`)}
+
+  script.
+    (() => {
+      const box = document.currentScript.previousElementSibling;
+      const select = document.getElementById(box.dataset.select);
+      const sync = () => box.querySelectorAll('.theme-swatch').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === select.value)));
+      box.addEventListener('click', (e) => {
+        const btn = e.target.closest('.theme-swatch');
+        if (!btn) return;
+        select.value = btn.dataset.theme;
+        select.dispatchEvent(new Event('change'));
+      });
+      select.addEventListener('change', sync);
+      sync();
+    })();
