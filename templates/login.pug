@@ -23,6 +23,6 @@ block content
       div
         span.text-small.color-error #{T(error)}
   p
-    a.link.link-animated(href=`${ADDR_PREFIX}/forgot-password`) #{T('Forgot password?')}
+    a.link.link-animated(href='/forgot-password') #{T('Forgot password?')}
   p
-    a.link.link-animated(href=`${ADDR_PREFIX}/signup${searchQueries ? `?${searchQueries}`: ''}`) #{T('Create an Account')}
+    a.link.link-animated(href=`/signup${searchQueries ? `?${searchQueries}`: ''}`) #{T('Create an Account')}

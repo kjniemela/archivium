@@ -5,7 +5,7 @@ import { ResultSetHeader } from "mysql2";
 import { ForbiddenError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from "../../errors";
 
 const { executeQuery, parseData } = require('../utils');
-const { WEB_PUSH_ENABLED, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, ADDR_PREFIX, DOMAIN } = require('../../config');
+const { WEB_PUSH_ENABLED, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, DOMAIN } = require('../../config');
 const logger = require('../../logger');
 const md5 = require('md5');
 const webpush = require('web-push');
@@ -205,7 +205,7 @@ export class NotificationAPI {
         await this.api.email.sendTemplateEmail(
           this.api.email.templates.NOTIFY,
           target.email,
-          { title, body: actualBody, icon, clickUrl: `https://${DOMAIN}${ADDR_PREFIX}${clickUrl}` },
+          { title, body: actualBody, icon, clickUrl: `https://${DOMAIN}${clickUrl}` },
         );
       }
     }

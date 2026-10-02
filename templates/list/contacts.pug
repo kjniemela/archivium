@@ -4,7 +4,7 @@ block title
   title #{T('Contacts')} — #{T('Archivium')}
 
 block breadcrumbs
-  a.link.link-animated( href=`${ADDR_PREFIX}/` ) #{T('Home')}
+  a.link.link-animated( href='/' ) #{T('Home')}
   |  / 
   span #{T('Contacts')}
 
@@ -21,11 +21,11 @@ block content
   h2 #{T('All (%s)', contacts.length)}
   .card-list
     each user in contacts
-      .card.sheet.gap-4.align-start(data-goto=`${ADDR_PREFIX}/users/${user.username}`)
+      .card.sheet.gap-4.align-start(data-goto=`/users/${user.username}`)
         +userIcon(user)
         .d-flex.flex-col.grow-1
           h2.ma-0
-            a.link.link-animated(href=`${ADDR_PREFIX}/users/${user.username}`) #{user.username}
+            a.link.link-animated(href=`/users/${user.username}`) #{user.username}
           span
             b #{T('Joined')}: 
             | #{formatDate(user.created_at)}
@@ -38,11 +38,11 @@ block content
   h2 #{T('Pending (%s)', pending.length)}
   .card-list
     each user in pending
-      .card.sheet.gap-4.align-start(data-goto=`${ADDR_PREFIX}/users/${user.username}`)
+      .card.sheet.gap-4.align-start(data-goto=`/users/${user.username}`)
         +userIcon(user)
         .d-flex.flex-col
           h2.ma-0
-            a.link.link-animated(href=`${ADDR_PREFIX}/users/${user.username}`) #{user.username}
+            a.link.link-animated(href=`/users/${user.username}`) #{user.username}
           span
             b #{T('Joined')}: 
             | #{formatDate(user.created_at)}

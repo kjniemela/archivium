@@ -2,7 +2,6 @@ import { RouteHandler } from ".";
 
 import api from '../api';
 import { perms, Tier } from '../api/utils';
-import { ADDR_PREFIX } from '../config';
 import embedder from '../embedding';
 import { ModelError, RateLimitError } from "../errors";
 import { addDefaultTabs } from '../lib/itemTypeConfig';
@@ -21,7 +20,7 @@ export default {
       }
     }
     await api.notification.putSettings(session.user, body);
-    return res.redirect(`${ADDR_PREFIX}/settings`);
+    return res.redirect('/settings');
   },
 
   async createUniverse(req, res) {
@@ -154,7 +153,7 @@ export default {
       await api.note.linkToBoard(session.user, body.note_board, uuid);
       nextPage = nextPage || `${universeLink(req, body.note_universe)}/notes/${body.note_board}?note=${uuid}`;
     }
-    return res.redirect(nextPage || `${ADDR_PREFIX}/notes?note=${uuid}`);
+    return res.redirect(nextPage || `/notes?note=${uuid}`);
   },
 
   async editNote(req, res) {
@@ -174,7 +173,7 @@ export default {
     if (body.note_board && body.note_universe) {
       nextPage = nextPage || `${universeLink(req, body.note_universe)}/notes/${body.note_board}?note=${body.note_uuid}`;
     }
-    res.redirect(nextPage || `${ADDR_PREFIX}/notes?note=${body.note_uuid}`);
+    res.redirect(nextPage || `/notes?note=${body.note_uuid}`);
   },
 
   async createStory(req, res) {
@@ -183,7 +182,7 @@ export default {
         ...req.body,
         is_public: req.body.drafts_public === 'public',
       });
-      return res.redirect(`${ADDR_PREFIX}/stories/${req.body.shortname}`);
+      return res.redirect(`/stories/${req.body.shortname}`);
     } catch (err) {
       if (err instanceof ModelError) {
         res.error = err.message;
@@ -202,7 +201,7 @@ export default {
     }
     try {
       const shortname = await api.story.put(req.session.user, req.params.shortname, req.body);
-      res.redirect(`${ADDR_PREFIX}/stories/${shortname}`);
+      res.redirect(`/stories/${shortname}`);
     } catch (err) {
       if (err instanceof ModelError) {
         res.error = err.message;
@@ -215,7 +214,7 @@ export default {
 
   async commentOnChapter(req, res) {
     await api.discussion.postCommentToChapter(req.session.user, req.params.shortname, Number(req.params.index), req.body);
-    res.redirect(`${ADDR_PREFIX}/stories/${req.params.shortname}/${req.params.index}#post-comment`);
+    res.redirect(`/stories/${req.params.shortname}/${req.params.index}#post-comment`);
   },
 
   async passwordResetRequest(req, res) {
@@ -246,7 +245,7 @@ export default {
     try {
       const userId = await api.user.resetPassword(req.params.key, body.newPassword);
       const user = await api.user.getOne({ id: userId });
-      res.redirect(`${ADDR_PREFIX}/users/${user.username}`);
+      res.redirect(`/users/${user.username}`);
     } catch (err) {
       logger.error(err);
       if (err instanceof ModelError) {

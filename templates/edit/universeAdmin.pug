@@ -5,13 +5,13 @@ block title
 
 block breadcrumbs
   if displayUniverse
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{universe.title}
+    a.link.link-animated(href='/') #{universe.title}
   else
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    a.link.link-animated(href='/') #{T('Home')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    a.link.link-animated(href='/universes') #{T('Universes')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+    a.link.link-animated(href=`/universes/${universe.shortname}`) #{universe.title}
   |  / 
   span #{T('Admin Menu')}
 
@@ -27,7 +27,7 @@ block scripts
 block content
   .d-flex.justify-between.align-baseline
     h2 #{universe.title} Admin Menu
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{T('Go back')}
+    a.link.link-animated(href=`/universes/${universe.shortname}`) #{T('Go back')}
 
   ul#tabBtns.navbarBtns.gap-1.mb-2.scroll-x
     li.navbarBtn(data-tab='permissions')
@@ -98,7 +98,7 @@ block content
         each invite in invites
           .d-flex.nowrap.gap-1.align-center(data-user=invite.username)
             span
-              a.link.link-animated(href=`${ADDR_PREFIX}/users/${invite.username}`) #{invite.username}
+              a.link.link-animated(href=`/users/${invite.username}`) #{invite.username}
               |  was invited with 
               b #{T(`perms_${invite.permission_level}`).toLowerCase()}
               |  permissions.
@@ -116,7 +116,7 @@ block content
         each request in requests
           .d-flex.nowrap.gap-1.align-center
             span
-              a.link.link-animated(href=`${ADDR_PREFIX}/users/${request.username}`) #{request.username}
+              a.link.link-animated(href=`/users/${request.username}`) #{request.username}
               |  is requesting 
               b #{T(`perms_${request.permission_level}`).toLowerCase()}
               |  permissions.

@@ -1,4 +1,3 @@
-import { ADDR_PREFIX } from '../../config';
 import api from '../../api';
 import md5 from 'md5';
 import { render } from '../../templates';
@@ -75,12 +74,12 @@ export default {
   async requestVerify(req, res) {
     if (!req.session.user) throw new UnauthorizedError();
     if (req.session.user.verified) {
-      res.redirect(`${ADDR_PREFIX}/`);
+      res.redirect('/');
       return;
     }
     const data = await api.email.trySendVerifyLink(req.session.user, req.session.user.username).catch(handleErrorWithData);
     if (data && !(data instanceof Date) && data.alreadyVerified) {
-      res.redirect(`${ADDR_PREFIX}${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
+      res.redirect(`${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
       return;
     }
     res.prepareRender('verify', { 
@@ -97,10 +96,10 @@ export default {
     try {
       // TODO should we send a welcome email?
       // api.email.sendTemplateEmail(api.email.templates.WELCOME, req.body.email, { username: user.username });
-      return res.redirect(`${ADDR_PREFIX}/`);
+      return res.redirect('/');
     } catch (e) {
       if (e instanceof NotFoundError) {
-        return res.redirect(`${ADDR_PREFIX}/verify?reason=bad_key`);
+        return res.redirect('/verify?reason=bad_key');
       }
       throw e;
     }

@@ -36,13 +36,13 @@ block breadcrumbs
       ? `${universeItemsLink}?type=${item.item_type}${item.vault ? `&vault=${item.vault_short}` : ''}`
       : universeItemsLink;
   if displayUniverse
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{systemDisplayModes.includes(displayUniverse) ? T('Home') : universe.title}
+    a.link.link-animated(href='/') #{systemDisplayModes.includes(displayUniverse) ? T('Home') : universe.title}
   else
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    a.link.link-animated(href='/') #{T('Home')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    a.link.link-animated(href='/universes') #{T('Universes')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+    a.link.link-animated(href=`/universes/${universe.shortname}`) #{universe.title}
   |  / 
   if item.vault
     a.link.link-animated(href=`${universeItemsLink}?vault=${item.vault_short}`) #{item.vault}
@@ -73,7 +73,7 @@ block content
   p.center.mb-2
     small #{T('Created by ')}
       if item.author
-        a.link.link-animated(href=`${ADDR_PREFIX}/users/${item.author}`) #{item.author}
+        a.link.link-animated(href=`/users/${item.author}`) #{item.author}
       else
         | #{T('Deleted User')}
       |  #{formatDate(new Date(item.created_at))}
@@ -108,7 +108,7 @@ block content
           });
         })();
       if universe.author_permissions[contextUser.id] >= perms.WRITE
-        a.link.link-animated.d-flex.align-center(href=`${ADDR_PREFIX}/editor/universes/${universe.shortname}/items/${item.shortname}`)
+        a.link.link-animated.d-flex.align-center(href=`/editor/universes/${universe.shortname}/items/${item.shortname}`)
           span.material-symbols-outlined edit
           |  #{T('Edit')}
       if universe.author_permissions[contextUser.id] >= perms.OWNER

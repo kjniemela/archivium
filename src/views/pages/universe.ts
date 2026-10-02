@@ -3,7 +3,6 @@ import api from '../../api';
 import { Comment } from '../../api/models/discussion';
 import { BasicUser, User } from '../../api/models/user';
 import { getPfpUrl, handleAsNull, perms, tierLimits } from '../../api/utils';
-import { ADDR_PREFIX } from '../../config';
 import embedder from '../../embedding';
 import { ForbiddenError, NotFoundError, UnauthorizedError } from '../../errors';
 import { tryRenderContent } from '../../lib/renderContent';
@@ -75,7 +74,7 @@ export default {
       res.prepareRender('deleteUniverse', { universe });
     } catch (err) {
       if (err instanceof NotFoundError) {
-        return res.redirect(`${ADDR_PREFIX}/universes`);
+        return res.redirect('/universes');
       }
       throw err;
     }

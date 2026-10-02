@@ -1,4 +1,4 @@
-import { ADDR_PREFIX, DEV_MODE } from '../../config';
+import { DEV_MODE } from '../../config';
 import Auth from '../../middleware/auth';
 import api from '../../api';
 import md5 from 'md5';

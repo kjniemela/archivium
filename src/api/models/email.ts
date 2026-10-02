@@ -1,5 +1,5 @@
 import { MailerSend, EmailParams, Recipient, Sender } from 'mailersend';
-import { DOMAIN, ADDR_PREFIX, DEV_MODE, MAILERSEND_API_KEY } from '../../config';
+import { DOMAIN, DEV_MODE, MAILERSEND_API_KEY } from '../../config';
 import logger from '../../logger';
 import { executeQuery } from '../utils';
 import fs from 'fs';
@@ -94,7 +94,7 @@ export class EmailAPI {
       return true;
     }
     
-    const verifyEmailLink = `https://${DOMAIN}${ADDR_PREFIX}/verify/${verificationKey}`;
+    const verifyEmailLink = `https://${DOMAIN}/verify/${verificationKey}`;
     await this.sendTemplateEmail(this.templates.VERIFY, email, { username, verifyEmailLink });
     return false;
   }
@@ -122,7 +122,7 @@ export class EmailAPI {
   async sendPasswordReset({ id, username, email }) {
     const resetKey = await this.api.user.preparePasswordReset(id);
     
-    const resetPasswordLink = `https://${DOMAIN}${ADDR_PREFIX}/reset-password/${resetKey}`;
+    const resetPasswordLink = `https://${DOMAIN}/reset-password/${resetKey}`;
     await this.sendTemplateEmail(this.templates.RESET, email, { username, resetPasswordLink });
   }
 

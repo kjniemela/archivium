@@ -270,7 +270,7 @@ block content
           })();
 
     .itemTab.hidden.flex-col(data-tab='notifications')
-      form#notificationSettings(method='POST' action=`${ADDR_PREFIX}/settings/notifications`)
+      form#notificationSettings(method='POST' action='/settings/notifications')
         .inputGroup
           label(for='push_notifs') #{T('Push notifications')}: 
           label.switch

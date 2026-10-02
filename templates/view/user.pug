@@ -4,7 +4,7 @@ block title
   title #{T('%s on Archivium', user.username)}
 
 block breadcrumbs
-  a.link.link-animated( href=`${ADDR_PREFIX}/` ) #{T('Home')}
+  a.link.link-animated( href='/' ) #{T('Home')}
   |  / 
   span #{T('Users')}
   |  / 
@@ -119,7 +119,7 @@ block content
 
   h3 #{T('%s\'s items', user.username)}
     small (
-      a.link.link-animated(href=`${ADDR_PREFIX}/items?author=${user.username}`) #{T('see all')}
+      a.link.link-animated(href=`/items?author=${user.username}`) #{T('see all')}
     | )
   table.sheet.w-100
     thead

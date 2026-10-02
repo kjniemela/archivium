@@ -11,11 +11,11 @@ block scripts
     include /static/scripts/markdown/render.js
 
 block breadcrumbs
-  a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+  a.link.link-animated(href='/') #{T('Home')}
   |  / 
-  a.link.link-animated(href=`${ADDR_PREFIX}/stories`) #{T('Stories')}
+  a.link.link-animated(href='/stories') #{T('Stories')}
   |  / 
-  a.link.link-animated(href=`${ADDR_PREFIX}/stories/${story.shortname}`) #{story.title}
+  a.link.link-animated(href=`/stories/${story.shortname}`) #{story.title}
   |  / 
   span #{chapter.title}
 
@@ -29,17 +29,17 @@ block content
       | #{T('Chapter %s of %s ', chapter.chapter_number, story.title)}
       |  - #{T('Created by ')}
       if story.author
-        a.link.link-animated(href=`${ADDR_PREFIX}/users/${story.author}`) #{story.author}
+        a.link.link-animated(href=`/users/${story.author}`) #{story.author}
       else
         | #{T('Deleted User')}
       |  #{formatDate(new Date(story.created_at))}
       |  - #{T('Last updated %s', formatDate(new Date(story.updated_at)))}
   #action-bar.d-flex.justify-center.align-center.gap-2.mb-1
       if contextUser && contextUser.id === story.author_id
-        a.link.link-animated.d-flex.align-center(href=`${ADDR_PREFIX}/editor/stories/${story.shortname}/${chapter.chapter_number}`)
+        a.link.link-animated.d-flex.align-center(href=`/editor/stories/${story.shortname}/${chapter.chapter_number}`)
           span.material-symbols-outlined edit
           |  #{T('Edit')}
-        a.link.link-animated.d-flex.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number}/delete`)
+        a.link.link-animated.d-flex.align-center(href=`/stories/${story.shortname}/${chapter.chapter_number}/delete`)
           span.material-symbols-outlined delete
           |  #{T('Delete')}
           
@@ -52,11 +52,11 @@ block content
       .markdown #{renderedBody.content}
   #chapter-buttons.d-flex.mt-2
     if story.chapters[chapter.chapter_number - 1] && story.chapters[chapter.chapter_number - 1].title
-      a.button.col-1.d-flex.justify-center.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number - 1}`)
+      a.button.col-1.d-flex.justify-center.align-center(href=`/stories/${story.shortname}/${chapter.chapter_number - 1}`)
         span.material-symbols-outlined(style={ 'font-size': '1rem' }) arrow_back_ios
         |  #{T('Previous Chapter')}
     if story.chapters[chapter.chapter_number + 1] && story.chapters[chapter.chapter_number + 1].title
-      a.button.col-2.d-flex.justify-center.align-center(href=`${ADDR_PREFIX}/stories/${story.shortname}/${chapter.chapter_number + 1}`)
+      a.button.col-2.d-flex.justify-center.align-center(href=`/stories/${story.shortname}/${chapter.chapter_number + 1}`)
         |  #{T('Next Chapter')}
         span.material-symbols-outlined(style={ 'font-size': '1rem' }) arrow_forward_ios
 

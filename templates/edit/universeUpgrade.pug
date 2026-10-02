@@ -5,13 +5,13 @@ block title
 
 block breadcrumbs
   if displayUniverse
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{universe.title}
+    a.link.link-animated(href='/') #{universe.title}
   else
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    a.link.link-animated(href='/') #{T('Home')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    a.link.link-animated(href='/universes') #{T('Universes')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+    a.link.link-animated(href=`/universes/${universe.shortname}`) #{universe.title}
   |  / 
   span #{T('Upgrade')}
 
@@ -45,7 +45,7 @@ block content
 
   .d-flex.justify-between.align-baseline
     h2 Upgrade #{universe.title}
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{T('Go back')}
+    a.link.link-animated(href=`/universes/${universe.shortname}`) #{T('Go back')}
 
   form(method='POST')
     .tier-grid

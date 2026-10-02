@@ -12,7 +12,7 @@ block breadcrumbs
     each crumb, i in breadcrumbs
       - const [title, href] = crumb;
       if href
-        a.link.link-animated(href=`${ADDR_PREFIX}${href}`) #{T(title)}
+        a.link.link-animated(href=href) #{T(title)}
       else
         span #{T(title)}
       if i < breadcrumbs.length

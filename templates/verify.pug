@@ -8,7 +8,7 @@ block scripts
     let updateRetryAfterInterval;
     async function sendVerifyLink() {
       clearInterval(updateRetryAfterInterval);
-      const [response, data] = await getJSON('#{ADDR_PREFIX}/api/users/#{user.username}/send-verify-link');
+      const [response, data] = await getJSON('/api/users/#{user.username}/send-verify-link');
       const retryAfterText = document.querySelector('#retry-after');
       if (response.status === 429) {
         const retryAfter = new Date(data);
@@ -26,7 +26,7 @@ block scripts
       } else {
         retryAfterText.classList.add('hidden');
         if (data && data.alreadyVerified) {
-          window.location.href = '#{ADDR_PREFIX}#{nextPage}';
+          window.location.href = '#{nextPage}';
         }
       }
     }
@@ -43,5 +43,5 @@ block content
       button(onclick='sendVerifyLink()') #{T('Request a new verification link')}
       small.hidden.color-error#retry-after
     p #{T('Once you have verified your account you can ')}
-      a.link.link-animated(href=`${ADDR_PREFIX}${nextPage}`) #{T('continue to Archivium')}
+      a.link.link-animated(href=nextPage) #{T('continue to Archivium')}
       | .

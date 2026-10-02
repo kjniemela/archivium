@@ -5,15 +5,15 @@ block title
 
 block breadcrumbs
   if displayUniverse
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{universe.title}
+    a.link.link-animated(href='/') #{universe.title}
   else
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    a.link.link-animated(href='/') #{T('Home')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    a.link.link-animated(href='/universes') #{T('Universes')}
     |  / 
-    a.link.link-animated#uni-breadcrumb(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+    a.link.link-animated#uni-breadcrumb(href=`/universes/${universe.shortname}`) #{universe.title}
   |  / 
-  a.link.link-animated#type-breadcrumb(href=`${ADDR_PREFIX}/universes/${universe.shortname}/items${item_type ? `?type=${item_type}` : ''}`)
+  a.link.link-animated#type-breadcrumb(href=`/universes/${universe.shortname}/items${item_type ? `?type=${item_type}` : ''}`)
     if item_type
       | #{capitalize(T(`${((universe.obj_data.cats || {})[item_type] || [, 'Missing Category'])[1]}`))}
     else

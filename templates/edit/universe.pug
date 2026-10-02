@@ -5,13 +5,13 @@ block title
 
 block breadcrumbs
   if displayUniverse
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{universe.title}
+    a.link.link-animated(href='/') #{universe.title}
   else
-    a.link.link-animated(href=`${ADDR_PREFIX}/`) #{T('Home')}
+    a.link.link-animated(href='/') #{T('Home')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes`) #{T('Universes')}
+    a.link.link-animated(href='/universes') #{T('Universes')}
     |  / 
-    a.link.link-animated(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{universe.title}
+    a.link.link-animated(href=`/universes/${universe.shortname}`) #{universe.title}
   |  / 
   span #{T('Edit')}
 
@@ -54,7 +54,7 @@ block content
 
   .d-flex.justify-between.align-baseline
     h2 #{T('Edit %s', universe.title)}
-    a.link.link-animated.color-error(href=`${ADDR_PREFIX}/universes/${universe.shortname}`) #{T('Discard Changes')}
+    a.link.link-animated.color-error(href=`/universes/${universe.shortname}`) #{T('Discard Changes')}
   form#edit(method='POST')
 
     .inputGroup
