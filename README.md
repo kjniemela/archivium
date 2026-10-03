@@ -52,16 +52,24 @@ You can create discussion threads for a universe which will be collected in the 
 
 You can draft and publish stories about your universe, which will be collected on the **Stories** page. Published stories can be seen by anyone, even if the universe they're tied to are private.
 
+### Collaborative Editing
+
+Multiple people can edit an item's rich text body at the same time, with live cursors and indicators showing which tab each collaborator is on.
+
+### Vaults
+
+Vaults group items within a universe and let you control who can view or edit them, giving you finer-grained access control than whole-universe permissions.
+
 # Planned Features
 
 - In-universe date/calendar management
 - Improved note boards
 - Direct messaging
-- Stats and admin tools
+- More stats and admin tools
 - Custom layout plugins
-- Better access control (for items and individual pieces of text)
+- Better access control (for individual pieces of text)
 - Scriptable "tasks"
-- Multi-user collaborative editor
+- Collaborative editing for more than item bodies (e.g. notes and stories)
 - Inline polls
 
 Want a new feature not on this list? Feel free to [open a ticket](https://github.com/HMI-Studios/archivium/issues/new/choose) here on github or shoot us an email at [contact@archivium.net](mailto:contact@archivium.net)!
