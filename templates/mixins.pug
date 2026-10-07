@@ -47,6 +47,7 @@ mixin userIcon(user)
         .badge.user-badge
           span.material-symbols-outlined security
           b #{T('Site Admin')}
+      .badge.online-badge.badge-success.hidden(style='top: 0.125rem; right: 0.125rem;')
 
 mixin themeSwatches(selectId, availableTier, allowNone)
   style.

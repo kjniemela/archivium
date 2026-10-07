@@ -19,9 +19,9 @@ block content
     input(id='username' name='username' placeholder=T('Username'))
     button(onclick="addContact(document.getElementById('username').value)") #{T('Add Contact')}
   h2 #{T('All (%s)', contacts.length)}
-  .card-list
+  #contacts-list.card-list
     each user in contacts
-      .card.sheet.gap-4.align-start(data-goto=`/users/${user.username}`)
+      .card.sheet.gap-4.align-start(data-goto=`/users/${user.username}` data-username=user.username)
         +userIcon(user)
         .d-flex.flex-col.grow-1
           h2.ma-0
