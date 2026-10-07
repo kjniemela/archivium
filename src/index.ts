@@ -3,11 +3,14 @@ import compression from 'compression';
 import path from 'path';
 import api from './api';
 import { render } from './templates';
+import { WebSocket, WebSocketServer } from 'ws';
+import { IncomingMessage } from 'http';
+import { Duplex } from 'stream';
 
 
-import CookieParser from './middleware/cookieParser';
+import CookieParser, { parseCookies } from './middleware/cookieParser';
 import multer from 'multer';
-import Auth from './middleware/auth';
+import Auth, { getSessionFromHash } from './middleware/auth';
 import * as ReCaptcha from './middleware/reCaptcha';
 
 import cron from 'node-cron';
@@ -92,7 +95,54 @@ loadViews(app);
 import loadRoutes from './api/routes';
 import { handleAsNull } from './api/utils';
 import { NotFoundError } from './errors';
+import { User } from './api/models/user';
+import { handleMessage } from './chat';
 loadRoutes(app, upload);
+
+const server = require('http').createServer(app);
+
+
+logger.info('Starting websocket server...');
+
+// Attach WebSocketServer
+const wss = new WebSocketServer({ noServer: true });
+
+server.on('upgrade', async (req: IncomingMessage, socket: Duplex, head: Buffer) => {
+  try {
+    if (req.url !== '/ws') return socket.destroy();
+
+    const cookies = parseCookies(req.headers.cookie);
+    const session = await getSessionFromHash(cookies['archiviumuid']);
+    if (!session?.user) {
+      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+      return socket.destroy();
+    }
+
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.emit('connection', ws, req, session.user);
+    });
+  } catch (err) {
+    logger.error(err);
+    socket.destroy();
+  }
+});
+
+wss.on('connection', (ws: WebSocket, _req: IncomingMessage, user: User) => {
+  ws.on('error', logger.error);
+
+  ws.on('message', (msg) => {
+    try {
+      const data = JSON.parse(msg.toString());
+      handleMessage(data, ws, user);
+    } catch (err) {
+      logger.error('Error processing socket message:');
+      logger.error(msg.toString());
+      logger.error(err);
+      ws.close();
+    }
+  });
+});
+
 
 
 /*
@@ -218,6 +268,6 @@ const errorLogger: express.ErrorRequestHandler = async (err, req, res, next) => 
 };
 app.use(errorLogger);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   logger.info(`Server listening at http://localhost:${PORT}`);
 });

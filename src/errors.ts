@@ -1,5 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
+export class AssertionError extends Error {}
+
 export class RequestError extends Error {
   readonly code: number = HttpStatusCode.InternalServerError;
   readonly data: unknown;
