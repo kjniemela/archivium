@@ -2,13 +2,14 @@ import { RouteHandler } from '..';
 import api from '../../api';
 import { CommenterUserBasic } from '../../api/models/discussion';
 import { Family, Item } from '../../api/models/item';
-import { getPfpUrl, perms } from '../../api/utils';
+import { perms } from '../../api/utils';
 import embedder from '../../embedding';
 import { ForbiddenError, NotFoundError } from '../../errors';
 import { FamilyTreeLayout, layoutFamilyTree } from '../../lib/familyTree';
 import { itemLayoutTabs, layoutTabKey } from '../../lib/itemTypeConfig';
 import { RenderedBody, tryRenderContent } from '../../lib/renderContent';
 import { buildLayoutView, LayoutView } from '../../lib/tabLayout';
+import { getPfpUrl } from '../../lib/utils';
 import { universeLink } from '../../templates';
 
 export default {

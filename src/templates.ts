@@ -2,9 +2,10 @@ import { Request } from 'express';
 import pug from 'pug';
 import api from './api';
 import { Universe } from './api/models/universe';
-import { getPfpUrl, handleAsNull, perms, plans, planTier, tierAllowance, tiers } from './api/utils';
+import { handleAsNull, perms, plans, planTier, tierAllowance, tiers } from './api/utils';
 import { DEV_MODE, DOMAIN, PROVIDER_ADDRESS, VAPID_PUBLIC_KEY } from './config';
 import { ForbiddenError, NotFoundError, UnauthorizedError } from './errors';
+import { getPfpUrl } from './lib/utils';
 import { lang, locale, sprintf, T } from './locale';
 import logger from './logger';
 import themes, { THEME_VAR_NAMES, themeAttrs, themeHtmlAttrs, themePreview } from './themes';
@@ -123,7 +124,6 @@ const templates = {
   universeItemList: compile('templates/list/universeItems.pug'),
 
   user: compile('templates/view/user.pug'),
-  contactList: compile('templates/list/contacts.pug'),
 
   search: compile('templates/list/search.pug'),
   notes: compile('templates/list/notes.pug'),

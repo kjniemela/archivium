@@ -1,9 +1,10 @@
 import { SqlBool } from 'kysely';
-import { kysely } from '../../db/kysely';
-import { getPfpUrl, handleAsNull } from '../utils';
 import { API } from '..';
-import { User } from './user';
+import { kysely } from '../../db/kysely';
 import { NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
+import { getPfpUrl } from '../../lib/utils';
+import { handleAsNull } from '../utils';
+import { User } from './user';
 
 export type ContactUser = Pick<User, 'id' | 'username' | 'email' | 'created_at' | 'updated_at'> & {
   hasPfp: SqlBool,

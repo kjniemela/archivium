@@ -1,9 +1,10 @@
 import { SqlBool } from 'kysely';
-import { kysely } from '../../db/kysely';
-import { perms, getPfpUrl } from '../utils';
 import { API } from '..';
-import { User } from './user';
+import { kysely } from '../../db/kysely';
 import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
+import { perms } from '../utils';
+import { User } from './user';
+import { getPfpUrl } from '../../lib/utils';
 
 export type Thread = {
   id: number,

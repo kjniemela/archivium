@@ -1,17 +1,17 @@
 import { sql } from 'kysely';
 import { API } from '..';
+import { Trx, kysely } from '../../db/kysely';
+import { toRawSql } from '../../db/legacyCond';
 import embedder from '../../embedding';
 import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
 import { typeConfigProblems, type TypeConfigs } from '../../lib/itemTypeConfig';
 import type { TabLayout } from '../../lib/tabLayout';
 import { IndexedDocument } from '../../lib/tiptapHelpers';
-import { deepCompare } from '../../lib/utils';
-import { BaseOptions, LegacyConditions, Tier, getPfpUrl, handleAsNull, parseData, perms, tierAllowance, tiers, withTransaction } from '../utils';
-import { kysely, Trx } from '../../db/kysely';
-import { toRawSql } from '../../db/legacyCond';
+import { deepCompare, getPfpUrl } from '../../lib/utils';
+import themes, { themeAvailable } from '../../themes';
+import { BaseOptions, LegacyConditions, Tier, handleAsNull, parseData, perms, tierAllowance, tiers, withTransaction } from '../utils';
 import { Item, ItemEvent } from './item';
 import { User } from './user';
-import themes, { themeAvailable } from '../../themes';
 
 export type UniverseAccessRequest<T = boolean> = {
   universe_id: number,

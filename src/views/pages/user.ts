@@ -1,23 +1,12 @@
 import md5 from 'md5';
 import { RouteHandler } from '..';
 import api from '../../api';
-import { Cond, getPfpUrl, handleAsNull, handleErrorWithData, perms } from '../../api/utils';
+import { Cond, handleAsNull, handleErrorWithData, perms } from '../../api/utils';
 import { NotFoundError, UnauthorizedError } from '../../errors';
+import { getPfpUrl } from '../../lib/utils';
 
 export default {
   /* User Pages */
-  async contactList(req, res) {
-    const contacts = await api.contact.getAll(req.session.user);
-    const gravatarContacts = contacts.map(user => ({
-      ...user,
-      pfpUrl: getPfpUrl(user),
-    }));
-    res.prepareRender('contactList', {
-      contacts: gravatarContacts.filter(contact => contact.accepted),
-      pending: gravatarContacts.filter(contact => !contact.accepted),
-    });
-  },
-
   async profilePage(req, res) {
     const user = await api.user.getOne({ 'user.username': req.params.username });
     const universes = await api.universe.getManyByAuthorId(req.session.user, user.id);
