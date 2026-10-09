@@ -98,6 +98,12 @@ block content
         input#stories-enabled(type='checkbox' checked=Boolean(universe.obj_data.storiesEnabled))
         span.slider
 
+    .inputGroup
+      label #{T('Show "All Items" Card')}:
+      label.switch
+        input#show-all-items-card(type='checkbox' checked=(universe.obj_data.showAllItemsCard != false))
+        span.slider
+
     if universe.tier >= tiers.PREMIUM
       .inputGroup
         label #{T('Semantic search enabled')}:
@@ -185,6 +191,11 @@ block content
       const storiesEnabled = document.querySelector('#stories-enabled');
       storiesEnabled.addEventListener('change', () => {
         updateObjData({ storiesEnabled: storiesEnabled.checked });
+      });
+
+      const showAllItemsCard = document.querySelector('#show-all-items-card');
+      showAllItemsCard.addEventListener('change', () => {
+        updateObjData({ showAllItemsCard: showAllItemsCard.checked });
       });
 
     if universe.tier >= tiers.PREMIUM
