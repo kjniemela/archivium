@@ -111,30 +111,23 @@ html(lang='en' class=themeHtmlAttrs.class style=themeHtmlAttrs.style)
       }
       const VAPID_PUBLIC_KEY = '#{VAPID_PUBLIC_KEY}';
     script.
+      window.presence = {};
+
       const socket = new WebSocket('/ws');
-      socket.onopen = () => {
-        socket.send(JSON.stringify({ action: 'connect' }));
-      };
-      socket.onmessage = (msg) => {
+      socket.addEventListener('message', (msg) => {
         const data = JSON.parse(msg.data);
         if (data.onlineUsers) {
+          window.presence.onlineUsers = data.onlineUsers;
+          window.dispatchEvent(new CustomEvent('presence'));
+
           const onlineUsersBadge = document.querySelector('#contacts-link .badge');
           const badgeText = onlineUsersBadge.querySelector('b');
           if (onlineUsersBadge && badgeText) {
             onlineUsersBadge.classList.toggle('hidden', data.onlineUsers.length === 0);
             badgeText.textContent = data.onlineUsers.length.toString();
           }
-
-          const contactsList = document.querySelector('#contacts-list');
-          if (contactsList) {
-            for (const card of contactsList.querySelectorAll('.card')) {
-              const username = card.dataset.username;
-              const badge = card.querySelector('.online-badge');
-              badge.classList.toggle('hidden', !data.onlineUsers.includes(username));
-            }
-          }
         }
-      };
+      });
     script
       include /static/scripts/notifications.js
     block scripts

@@ -3,9 +3,11 @@ import { fetchAsync, fetchData, T } from '../helpers';
 import type { ContactUser } from '../../../src/api/models/contact';
 import type { User } from '../../../src/api/models/user';
 import ContactCard from '../components/ContactCard';
+import { useOnlineUsers } from '../hooks/useOnlineUsers';
 
 function contactsList(
   contacts: ContactUser[] | null,
+  onlineUsers: string[],
   deleteContact: (usr: string) => Promise<void>,
   respond: (usr: string, acc: boolean) => Promise<void>,
 ) {
@@ -21,13 +23,29 @@ function contactsList(
     return <>
       <h2>{T('All (%s)', accepted.length.toString())}</h2>
       <div id='contacts-list' className='d-flex flex-col gap-2'>
-        {accepted.map((contact) => <ContactCard key={contact.id} contact={contact} remove={deleteContact} respond={respond} />)}
+        {accepted.map((contact) => (
+          <ContactCard
+            key={contact.id}
+            contact={contact}
+            online={onlineUsers.includes(contact.username)}
+            remove={deleteContact}
+            respond={respond}
+          />
+        ))}
       </div>
       {pending.length > 0 && (
         <>
           <h2>{T('Pending (%s)', pending.length.toString())}</h2>
           <div className='d-flex flex-col gap-2'>
-            {pending.map((contact) => <ContactCard key={contact.id} contact={contact} remove={deleteContact} respond={respond} />)}
+            {pending.map((contact) => (
+              <ContactCard
+                key={contact.id}
+                contact={contact}
+                online={onlineUsers.includes(contact.username)}
+                remove={deleteContact}
+                respond={respond}
+              />
+            ))}
           </div>
         </>
       )}
@@ -38,6 +56,8 @@ function contactsList(
 export default function Contacts() {
   const [, setSelf] = useState<User | null>(null);
   const [contacts, setContacts] = useState<ContactUser[] | null>(null);
+
+  const onlineUsers = useOnlineUsers();
 
   async function refetchContacts() {
     const contactsData = await fetchAsync(`/api/contacts`) as ContactUser[];
@@ -86,7 +106,7 @@ export default function Contacts() {
           <input id='username' name='username' placeholder={T('Username')} value={newUser} onChange={(e) => setNewUser(e.target.value)} />
           <button onClick={() => addContact(newUser)}>{T('Add Contact')}</button>
         </div>
-        {contactsList(contacts, deleteContact, respond)}
+        {contactsList(contacts, onlineUsers, deleteContact, respond)}
       </div>
       <div className='col-2'></div>
     </div>

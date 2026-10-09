@@ -5,17 +5,21 @@ import { T } from "../helpers";
 
 type ContactCardProps = {
   contact: ContactUser,
+  online: boolean,
   remove: (usr: string) => Promise<void>,
   respond: (usr: string, acc: boolean) => Promise<void>,
 };
 
-export default function ContactCard({ contact, remove, respond }: ContactCardProps) {
+export default function ContactCard({ contact, online, remove, respond }: ContactCardProps) {
   return (
     <div className='contact-card sheet d-flex gap-4 align-start pa-2 badge-anchor' data-user={contact.username}>
       <div style={{ fontSize: '0.75rem' }}>
         <div className='badge-anchor mb-auto'>
           <img className='userIcon' alt={contact.username} src={getPfpUrl(contact)} />
-          <div className='badge online-badge badge-success hidden' style={{ top: '0.125em', right: '0.125em' }} />
+          <div
+            className={`badge online-badge badge-success${online ? '' : ' hidden'}`}
+            style={{ top: 'unset', bottom: '0.25em', right: '0.25em', border: '0.125rem solid var(--sheet-color)' }}
+          />
         </div>
       </div>
       <div className='d-flex flex-col grow-1'>

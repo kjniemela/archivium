@@ -1,56 +1,122 @@
-import WebSocket from "ws";
+import WebSocket, { WebSocketServer } from "ws";
 import { User } from "./api/models/user";
 import { AssertionError } from "./errors";
+import { IncomingMessage } from "http";
+import logger from "./logger";
+import api from "./api";
 
 type SocketMsg = { action?: string };
 type SocketResponse = { onlineUsers?: string[] };
 
 function assert(condition: any, msg?: string): asserts condition {
   if (!condition) {
-    throw new AssertionError(msg);
+	throw new AssertionError(msg);
   }
 }
 
 function validateMessage(data: unknown): asserts data is SocketMsg {
-    assert(data !== null);
-    assert(typeof data === 'object');
-    assert(!('action' in data) || typeof data.action === 'string');
+	assert(data !== null);
+	assert(typeof data === 'object');
+	assert(!('action' in data) || typeof data.action === 'string');
 }
 
 function sendJSON(ws: WebSocket, data: SocketResponse) {
-    ws.send(JSON.stringify(data));
+	ws.send(JSON.stringify(data));
 }
 
-const connectedUsernames: { [id: number]: string } = {};
-const userConnections: { [id: number]: WebSocket[] } = {};
+type Connection = { user: User, sockets: Set<WebSocket>, disconnectTimeout?: NodeJS.Timeout };
+const connections = new Map<number, Connection>();
+const userBySocket = new WeakMap<WebSocket, number>();
 
-function refreshOnlineListForAll() {
-    for (const userId in userConnections) {
-        const connetions = userConnections[userId];
-        const myUsername = connectedUsernames[userId];
-        const otherConnectedUsernames = Object.values(connectedUsernames).filter(username => username !== myUsername);
-        for (const conn of connetions) {
-            if (!conn) continue;
-            sendJSON(conn, { onlineUsers: otherConnectedUsernames });
+async function refreshOnlineListFor(user: User) {
+  const contacts = await api.contact.getAll(user, false, true);
+  const usernames = contacts.filter((contact) => connections.has(contact.id)).map((contact) => contact.username);
+  for (const socket of connections.get(user.id)?.sockets ?? []) {
+    sendJSON(socket, { onlineUsers: usernames });
+  }
+}
+
+function handleMessage(data: unknown, ws: WebSocket, user: User) {
+	validateMessage(data);
+
+  if (user.id !== userBySocket.get(ws)) ws.close(); // We're not who the server thinks we are, abort
+
+	if (data.action === 'sync') {
+    refreshOnlineListFor(user);
+  }
+}
+
+function handleClose(ws: WebSocket, user: User) {
+  userBySocket.delete(ws);
+  const conn = connections.get(user.id);
+  if (!conn) {
+    logger.error('Fatal: No such connection!');
+    return;
+  }
+
+  conn.sockets.delete(ws);
+
+  // Check if this would mean the user is no longer connected at all
+  if (conn.sockets.size === 0) {
+    // Wait a bit, the user might reconnect
+    if (conn.disconnectTimeout) clearTimeout(conn.disconnectTimeout);
+    conn.disconnectTimeout = setTimeout(async () => {
+      // If no one has reconnected, declare user offline
+      if (conn.sockets.size === 0) {
+        connections.delete(user.id);
+
+        const contacts = await api.contact.getAll(user, false, true);
+        for (const contact of contacts) {
+          refreshOnlineListFor(contact);
         }
-    }
+      }
+    }, 5000);
+  }
 }
 
-export function handleMessage(data: unknown, ws: WebSocket, user: User) {
-    validateMessage(data);
-    if (data.action === 'connect') {
-        connectedUsernames[user.id] = user.username;
-        if (!(user.id in userConnections)) userConnections[user.id] = [];
-        const index = userConnections[user.id].push(ws) - 1;
-        ws.on('close', () => {
-            delete userConnections[user.id][index];
-            if (userConnections[user.id].filter(row => row !== undefined).length === 0) {
-                delete connectedUsernames[user.id];
-                delete userConnections[user.id];
-            }
-            refreshOnlineListForAll();
-        });
+async function handleConnect(ws: WebSocket, user: User) {
+  userBySocket.set(ws, user.id);
 
-        refreshOnlineListForAll();
+  let firstConnection = false;
+  if (!connections.has(user.id)) {
+    connections.set(user.id, { user, sockets: new Set() });
+    firstConnection = true;
+  }
+
+  const conn = connections.get(user.id);
+  conn!.sockets.add(ws);
+
+  if (firstConnection) {
+    const contacts = await api.contact.getAll(user, false, true);
+    for (const contact of contacts) {
+      refreshOnlineListFor(contact);
     }
+  }
+  refreshOnlineListFor(user);
+}
+
+export default function listenSockets(wss: WebSocketServer) {
+  wss.on('connection', (ws: WebSocket, _req: IncomingMessage, user: User) => {
+    try {
+      handleConnect(ws, user);
+    } catch (err) {
+      logger.error("Failed to connect socket!");
+      logger.error(err);
+      ws.close();
+    }
+
+    ws.on('error', logger.error);
+    ws.on('message', (msg) => {
+      try {
+        const data = JSON.parse(msg.toString());
+        handleMessage(data, ws, user);
+      } catch (err) {
+        logger.error('Error processing socket message:');
+        logger.error(msg.toString());
+        logger.error(err);
+        ws.close();
+      }
+    });
+		ws.on('close', () => handleClose(ws, user));
+  });
 }

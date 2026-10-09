@@ -96,7 +96,7 @@ import loadRoutes from './api/routes';
 import { handleAsNull } from './api/utils';
 import { NotFoundError } from './errors';
 import { User } from './api/models/user';
-import { handleMessage } from './chat';
+import listenSockets from './chat';
 loadRoutes(app, upload);
 
 const server = require('http').createServer(app);
@@ -104,8 +104,8 @@ const server = require('http').createServer(app);
 
 logger.info('Starting websocket server...');
 
-// Attach WebSocketServer
 const wss = new WebSocketServer({ noServer: true });
+listenSockets(wss);
 
 server.on('upgrade', async (req: IncomingMessage, socket: Duplex, head: Buffer) => {
   try {
@@ -126,23 +126,6 @@ server.on('upgrade', async (req: IncomingMessage, socket: Duplex, head: Buffer) 
     socket.destroy();
   }
 });
-
-wss.on('connection', (ws: WebSocket, _req: IncomingMessage, user: User) => {
-  ws.on('error', logger.error);
-
-  ws.on('message', (msg) => {
-    try {
-      const data = JSON.parse(msg.toString());
-      handleMessage(data, ws, user);
-    } catch (err) {
-      logger.error('Error processing socket message:');
-      logger.error(msg.toString());
-      logger.error(err);
-      ws.close();
-    }
-  });
-});
-
 
 
 /*
