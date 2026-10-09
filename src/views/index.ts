@@ -6,7 +6,7 @@ import Auth from '../middleware/auth';
 import * as ReCaptcha from '../middleware/reCaptcha';
 import Theme from '../middleware/theme';
 import { render, universeLink } from '../templates';
-import themes from '../themes';
+import themes, { themeAvailable } from '../themes';
 
 import { HttpStatusCode } from 'axios';
 import { RequestError } from '../errors';
@@ -200,8 +200,8 @@ export default function(app: Express) {
   renderContext((req, res) => {
     if (res.templateData?.data?.universe) {
       const universe = res.templateData.data.universe;
-      if (universe.tier < tiers.PREMIUM) return;
       const themeName = universe.obj_data.theme;
+      if (!themeAvailable(themeName, universe.tier ?? tiers.FREE)) return;
       const customTheme = universe.obj_data.customTheme ?? {};
       const baseTheme = themes[themeName] ?? req.theme;
       req.theme = themeName === 'custom' ? customTheme : baseTheme;

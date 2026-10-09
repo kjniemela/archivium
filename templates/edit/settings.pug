@@ -113,72 +113,72 @@ block content
 
       hr.mt-4
 
-      if user.plan >= plans.BETA
-        h3 #{T('Change Preferences')}
-        form#changePreferences
+      h3 #{T('Change Preferences')}
+      form#changePreferences
+        .inputGroup
+          label(for='theme') #{T('Preferred Theme')}:
+          select.hidden#theme(name='theme' type='text')
+            - const userTier = planTier(user.plan);
+            each theme, key in themes
+              - const locked = (theme.tier || 0) > userTier;
+              option(value=key selected=(user.preferred_theme === key && !locked) disabled=locked) #{T(`theme_${key}`)}
+          +themeSwatches('theme', userTier)
+
+        #customTheme.hidden.form-row-group
           .inputGroup
-            label(for='theme') #{T('Preferred Theme')}:
-            select.hidden#theme(name='theme' type='text')
-              each _, key in themes
-                if key !== 'custom' || user.plan >= plans.PREMIUM_BETA
-                  option(value=key selected=(user.preferred_theme === key)) #{T(`theme_${key}`)}
-            +themeSwatches('theme')
-
-          #customTheme.hidden.form-row-group
-            .inputGroup
-              label #{T('Use "Glass Pane" theme')}:
-              label.switch
-                input#glass(type='checkbox' checked=Boolean((user.custom_theme || {}).glass))
-                span.slider
-
-            .inputGroup
-              label #{T('Background Image URL')}:
-              input#backgroundImage(type='text' value=(user.custom_theme || {}).backgroundImage)
-
-            +paletteEditor((user.custom_theme || {}).palette)
+            label #{T('Use "Glass Pane" theme')}:
+            label.switch
+              input#glass(type='checkbox' checked=Boolean((user.custom_theme || {}).glass))
+              span.slider
 
           .inputGroup
-            .d-flex.col-2
-              button(type='submit') #{T('Update Preferences')}
+            label #{T('Background Image URL')}:
+            input#backgroundImage(type='text' value=(user.custom_theme || {}).backgroundImage)
 
-          small.color-error.hidden#preferences-error
+          +paletteEditor((user.custom_theme || {}).palette)
 
-          script.
-            (() => {
-              const form = document.forms.changePreferences;
-              const formError = document.querySelector('#preferences-error');
-              const theme = document.querySelector('#theme');
-              const glass = document.querySelector('#glass');
-              const backgroundImage = document.querySelector('#backgroundImage');
-              const customThemeDiv = document.querySelector('#customTheme');
-              const paletteEditor = document.querySelector('#paletteEditor');
-              function handleThemeChange() {
-                customThemeDiv.classList.toggle('hidden', theme.value !== 'custom');
-              }
-              theme.addEventListener('change', handleThemeChange);
-              handleThemeChange();
-              form.addEventListener('submit', async (e) => {
-                formError.classList.add('hidden');
-                e.preventDefault();
+        .inputGroup
+          .d-flex.col-2
+            button(type='submit') #{T('Update Preferences')}
 
-                const [response, data] = await putJSON(`/api/users/#{user.username}/preferences`, {
-                  preferred_theme: theme.value,
-                  custom_theme: {
-                    glass: glass.checked,
-                    backgroundImage: backgroundImage.value,
-                    palette: paletteEditor.readPalette(),
-                  },
-                });
-                if (response.status === 200) {
-                  window.location.reload();
-                } else {
-                  formError.innerText = data;
-                  formError.classList.remove('hidden');
-                }
+        small.color-error.hidden#preferences-error
+
+        script.
+          (() => {
+            const form = document.forms.changePreferences;
+            const formError = document.querySelector('#preferences-error');
+            const theme = document.querySelector('#theme');
+            const glass = document.querySelector('#glass');
+            const backgroundImage = document.querySelector('#backgroundImage');
+            const customThemeDiv = document.querySelector('#customTheme');
+            const paletteEditor = document.querySelector('#paletteEditor');
+            function handleThemeChange() {
+              customThemeDiv.classList.toggle('hidden', theme.value !== 'custom');
+            }
+            theme.addEventListener('change', handleThemeChange);
+            handleThemeChange();
+            form.addEventListener('submit', async (e) => {
+              formError.classList.add('hidden');
+              e.preventDefault();
+
+              const [response, data] = await putJSON(`/api/users/#{user.username}/preferences`, {
+                preferred_theme: theme.value,
+                custom_theme: {
+                  glass: glass.checked,
+                  backgroundImage: backgroundImage.value,
+                  palette: paletteEditor.readPalette(),
+                },
               });
-            })();
+              if (response.status === 200) {
+                window.location.reload();
+              } else {
+                formError.innerText = data;
+                formError.classList.remove('hidden');
+              }
+            });
+          })();
 
-        hr.mt-4
+      hr.mt-4
 
       h3 #{T('Change Password')}
       form#changePassword

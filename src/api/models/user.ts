@@ -1,4 +1,4 @@
-import { executeQuery, parseData, withTransaction, perms, plans } from '../utils';
+import { executeQuery, parseData, withTransaction, perms, plans, planTier } from '../utils';
 import utils from '../../lib/hashUtils';
 import logger from '../../logger';
 import { SITE_OWNER_EMAIL } from '../../config';
@@ -6,7 +6,7 @@ import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { API } from '..';
 import { RequestError, ModelError, ValidationError, UnauthorizedError, ForbiddenError, NotFoundError } from '../../errors';
 import { HttpStatusCode } from 'axios';
-import { Theme, ThemeName } from '../../themes';
+import themes, { Theme, ThemeName, themeAvailable } from '../../themes';
 
 export type UserSponsoredUniverses = { tier: number, universes: string[], universe_shorts: string[] }[];
 
@@ -334,6 +334,10 @@ export class UserAPI {
     const { preferred_theme, custom_theme } = body;
     const user = await this.getOne({ 'user.username': username });
     if (Number(sessionUser.id) !== Number(user.id)) throw new ForbiddenError();
+    if (preferred_theme) {
+      if (!Object.hasOwn(themes, preferred_theme)) throw new ValidationError('Unknown theme.');
+      if (!themeAvailable(preferred_theme, planTier(user.plan))) throw new ForbiddenError('This theme requires a premium plan.');
+    }
     const changes = { preferred_theme, custom_theme };
     const keys = Object.keys(changes).filter(key => changes[key] !== undefined);
     if (keys.length === 0) throw new ValidationError('No changes provided');
