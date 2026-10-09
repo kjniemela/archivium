@@ -11,7 +11,7 @@ import { Chapter, Story } from '../../api/models/story';
 import { BasicItem, Item } from '../../api/models/item';
 import { Thread } from '../../api/models/discussion';
 import { Note } from '../../api/models/note';
-import { IndexedDocument } from '../../lib/tiptapHelpers';
+import { IndexedDocument, jsonToIndexed } from '../../lib/tiptapHelpers';
 
 async function createUser(username: string, email?: string, password?: string): Promise<User> {
   if (!email) email = `${username}@archivium.net`;
@@ -59,8 +59,8 @@ async function setUniversePerms(owner: User, universe: Universe, user: User, per
   await api.universe.putPermissions(owner, universe.shortname, user, permsLvl);
 }
 
-async function createItem(owner: User, universe: Universe, title: string, shortname: string, item_type: string, obj_data: any, tags: string[] = ['testing'], parent_id: number | null = null): Promise<Item> {
-  const data = await api.item.post(owner, { title, shortname, item_type, parent_id, obj_data: {} }, universe.shortname);
+async function createItem(owner: User, universe: Universe, title: string, shortname: string, item_type: string, obj_data: any, tags: string[] = ['testing'], parent_id: number | null = null, skipValidation = false): Promise<Item> {
+  const data = await api.item.post(owner, { skipValidation, title, shortname, item_type, parent_id, obj_data: {} }, universe.shortname);
   const _item = await api.item.getOne(owner, { 'item.id' : data.insertId });
   const _tables = obj_data._tables ? obj_data._tables(_item) : {};
   delete obj_data._tables;
@@ -211,8 +211,11 @@ async function main(): Promise<void> {
   await createNote(users.testwriter, 'Private Article Note', unformattedTiptapDocument(loremIpsum), false, ['article', 'private'], [testArticle]);
 
   console.log('Posting newsletters...');
-  const archivum = await createUniverse(sysadmin, 'Archivium', 'archivium', true, true, true, { cats: { newsletter: ['newsletter', 'newsletters', '#deddca'] } });
-  const newsletter = await createItem(sysadmin, archivum, 'Test Newsletter', 'test-newsletter', 'newsletter', { body: unformattedTiptapDocument(loremIpsum) });
+  const archivium = await createUniverse(sysadmin, 'Archivium', 'archivium', true, true, true, { cats: {
+    newsletter: ['newsletter', 'newsletters', '#deddca'],
+    guide: ['guide', 'guides', '#b0d7f3'],
+  }});
+  const newsletter = await createItem(sysadmin, archivium, 'Test Newsletter', 'test-newsletter', 'newsletter', { body: unformattedTiptapDocument(loremIpsum) });
   for (const username in users) {
     const user = users[username];
     await api.notification.notify(user, api.notification.types.FEATURES, {
@@ -221,6 +224,20 @@ async function main(): Promise<void> {
       clickUrl: `/news/${newsletter.shortname}`,
     });
   }
+
+  console.log('Creating help pages...');
+  await createItem(sysadmin, archivium, 'Archivium Wiki', '_home', 'guide', { body: jsonToIndexed({
+    type: 'doc',
+    content: [{
+      type: 'paragraph',
+      content: [
+        { type: 'text', text: 'New here? Start with ' },
+        { type: 'text', text: 'Getting Started', marks: [{ type: 'link', attrs: { href: '/help/getting-started' } }] },
+        { type: 'text', text: '.' },
+      ],
+    }],
+  }) }, [], null, true);
+  await createItem(sysadmin, archivium, 'Getting Started', 'getting-started', 'guide', { body: unformattedTiptapDocument(loremIpsum) }, []);
 
   schemaConn.end();
   db.end();
