@@ -8,6 +8,9 @@ git pull
 echo "Stopping server..."
 pm2 stop archivium
 
+echo "Updating packages..."
+npm install
+
 echo "Rebuilding..."
 npm run build:all
 
