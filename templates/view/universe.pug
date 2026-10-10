@@ -143,8 +143,7 @@ block content
     .container.hidden( data-tab='items' )
       if universe.obj_data.cats && Object.keys(universe.obj_data.cats).length
         .type-card-container
-          // TODO - default to showing the card, to avoid having to do a migration. maybe change later?
-          if universe.obj_data.showAllItemsCard != false
+          if  universe.obj_data.showAllItemsCard || !('showAllItemsCard' in universe.obj_data)
             +typeCard(null, null)
           each category, shortname in universe.obj_data.cats
             +typeCard(shortname, category)

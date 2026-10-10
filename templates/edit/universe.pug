@@ -101,7 +101,7 @@ block content
     .inputGroup
       label #{T('Show "All Items" Card')}:
       label.switch
-        input#show-all-items-card(type='checkbox' checked=(universe.obj_data.showAllItemsCard != false))
+        input#show-all-items-card(type='checkbox' checked=(universe.obj_data.showAllItemsCard || !('showAllItemsCard' in universe.obj_data)))
         span.slider
 
     if universe.tier >= tiers.PREMIUM
