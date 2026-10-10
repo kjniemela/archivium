@@ -1,0 +1,373 @@
+{
+  "default": {
+    "tier": "FREE",
+    "glass": false
+  },
+  "glass": {
+    "tier": "FREE",
+    "glass": true,
+    "background": "radial-gradient(ellipse at 30% 0%, light-dark(#e6eef6, #3b4b5d) 0%, light-dark(#93abc3, #1f3347) 55%, light-dark(#7d97b2, #121d2a) 100%)",
+    "palette": {
+      "light": {
+        "page": "#d9e3ee",
+        "sheet": "#f4f8fc",
+        "text": "#13202c",
+        "link": "#154a7d"
+      },
+      "dark": {
+        "page": "#2a3949",
+        "sheet": "#1d2935",
+        "text": "#e6edf4",
+        "link": "#7db6ee"
+      }
+    }
+  },
+  "sepia": {
+    "tier": "FREE",
+    "glass": false,
+    "palette": {
+      "light": {
+        "page": "#e4d6bd",
+        "sheet": "#f5eddd",
+        "text": "#43341f",
+        "link": "#7a4a1e"
+      },
+      "dark": {
+        "page": "#2e261c",
+        "sheet": "#241d15",
+        "text": "#dccdb0",
+        "link": "#d6a574"
+      }
+    }
+  },
+  "mono": {
+    "tier": "FREE",
+    "glass": false,
+    "palette": {
+      "light": {
+        "page": "#e4e4e4",
+        "sheet": "#ffffff",
+        "text": "#111111",
+        "link": "#111111",
+        "accent": "#555555"
+      },
+      "dark": {
+        "page": "#111111",
+        "sheet": "#1a1a1a",
+        "text": "#eeeeee",
+        "link": "#ffffff",
+        "accent": "#bbbbbb"
+      }
+    }
+  },
+  "highcontrast": {
+    "tier": "FREE",
+    "glass": false,
+    "palette": {
+      "light": {
+        "page": "#ffffff",
+        "sheet": "#ffffff",
+        "text": "#000000",
+        "link": "#0000cc",
+        "accent": "#b00020"
+      },
+      "dark": {
+        "page": "#000000",
+        "sheet": "#000000",
+        "text": "#ffffff",
+        "link": "#ffff00",
+        "accent": "#00ffff"
+      }
+    }
+  },
+  "forest": {
+    "tier": "PREMIUM",
+    "glass": false,
+    "palette": {
+      "light": {
+        "page": "#dce8d5",
+        "sheet": "#f3f8ef",
+        "text": "#1f3321",
+        "link": "#2b7034",
+        "accent": "#946016"
+      },
+      "dark": {
+        "page": "#1b2a1e",
+        "sheet": "#142018",
+        "text": "#dcebd9",
+        "link": "#7fd38a",
+        "accent": "#e6b450"
+      }
+    }
+  },
+  "lavender": {
+    "tier": "PREMIUM",
+    "glass": false,
+    "palette": {
+      "light": {
+        "page": "#e6e0f5",
+        "sheet": "#f7f4ff",
+        "text": "#2d2547",
+        "link": "#6d4bc4",
+        "accent": "#c22a5f"
+      },
+      "dark": {
+        "page": "#261f3d",
+        "sheet": "#1c162e",
+        "text": "#ece6ff",
+        "link": "#b79bff",
+        "accent": "#ff7eb6"
+      }
+    }
+  },
+  "aurora": {
+    "tier": "PREMIUM",
+    "glass": true,
+    "background": "linear-gradient(135deg, light-dark(#b9e6dc, #0b1d2e) 0%, light-dark(#8fd3c0, #0f4c4a) 45%, light-dark(#c9b8f0, #3b2a6e) 100%)",
+    "palette": {
+      "light": {
+        "page": "#d6ece6",
+        "sheet": "#f0faf7",
+        "text": "#0d2b33",
+        "link": "#09705b",
+        "accent": "#6b46c1"
+      },
+      "dark": {
+        "page": "#12222e",
+        "sheet": "#0d1822",
+        "text": "#e3f6f1",
+        "link": "#6ee7c8",
+        "accent": "#b794f6"
+      }
+    }
+  },
+  "lagoon": {
+    "tier": "PREMIUM",
+    "glass": true,
+    "background": "linear-gradient(150deg, light-dark(#c8f0f0, #062a35) 0%, light-dark(#8fd0e8, #0b4a63) 55%, light-dark(#a8b8f0, #1d2f6b) 100%)",
+    "palette": {
+      "light": {
+        "page": "#cfeef0",
+        "sheet": "#f1fbfc",
+        "text": "#0a2e38",
+        "link": "#0a6e8a",
+        "accent": "#b4472f"
+      },
+      "dark": {
+        "page": "#0b3442",
+        "sheet": "#072430",
+        "text": "#dff4f7",
+        "link": "#5fd3e6",
+        "accent": "#ff9a7a"
+      }
+    }
+  },
+  "meadow": {
+    "tier": "PREMIUM",
+    "glass": true,
+    "background": "linear-gradient(160deg, light-dark(#e6f4c8, #10261a) 0%, light-dark(#bfe3a0, #1b4d2e) 60%, light-dark(#f4e3a1, #4a4a1a) 100%)",
+    "palette": {
+      "light": {
+        "page": "#e4f0c8",
+        "sheet": "#f8fbec",
+        "text": "#22300f",
+        "link": "#3a6f1a",
+        "accent": "#a35a00"
+      },
+      "dark": {
+        "page": "#1a3322",
+        "sheet": "#11261a",
+        "text": "#e4f2da",
+        "link": "#9be37a",
+        "accent": "#f2c14e"
+      }
+    }
+  },
+  "space": {
+    "tier": "PREMIUM",
+    "glass": true,
+    "backgroundImage": "/static/assets/themes/space.jpg",
+    "credit": {
+      "text": "Vecteezy",
+      "url": "https://www.vecteezy.com/free-photos/earth"
+    }
+  },
+  "city": {
+    "tier": "PREMIUM",
+    "glass": true,
+    "backgroundImage": "/static/assets/themes/chicago.jpg",
+    "credit": {
+      "text": "Stephan Cassara",
+      "url": "https://unsplash.com/@smsee?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+    },
+    "palette": {
+      "light": {
+        "page": "#d4dbec",
+        "sheet": "#f2f5fb",
+        "text": "#16203a",
+        "link": "#2d58b8",
+        "accent": "#a85d00"
+      },
+      "dark": {
+        "page": "#1d2540",
+        "sheet": "#141a30",
+        "text": "#eaeefa",
+        "link": "#8fb4ff",
+        "accent": "#ffb347"
+      }
+    }
+  },
+  "italy": {
+    "tier": "PREMIUM",
+    "glass": true,
+    "backgroundImage": "/static/assets/themes/italy.jpg",
+    "credit": {
+      "text": "Jonatan",
+      "url": "https://archivium.net/users/jonatan"
+    },
+    "palette": {
+      "light": {
+        "page": "#dfe5d0",
+        "sheet": "#f5f8ee",
+        "text": "#232c1b",
+        "link": "#3e6b2a",
+        "accent": "#9a4f22"
+      },
+      "dark": {
+        "page": "#26301f",
+        "sheet": "#1a2116",
+        "text": "#e8eddc",
+        "link": "#a8d08a",
+        "accent": "#d9a066"
+      }
+    }
+  },
+  "fall": {
+    "tier": "PREMIUM",
+    "glass": true,
+    "backgroundImage": "/static/assets/themes/fall.jpg",
+    "credit": {
+      "text": "Lyndon Li",
+      "url": "https://unsplash.com/@dynastywind?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+    },
+    "palette": {
+      "light": {
+        "page": "#f2d9c4",
+        "sheet": "#fff4ea",
+        "text": "#3b1a0c",
+        "link": "#a23608",
+        "accent": "#1d7a78"
+      },
+      "dark": {
+        "page": "#3a1e12",
+        "sheet": "#2a140b",
+        "text": "#fbe9dc",
+        "link": "#ffa766",
+        "accent": "#6fc9c0"
+      }
+    }
+  },
+  "pink": {
+    "tier": "PREMIUM",
+    "glass": true,
+    "backgroundImage": "/static/assets/themes/pink.jpg",
+    "credit": {
+      "text": "simon",
+      "url": "https://unsplash.com/@simon_berger?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+    },
+    "palette": {
+      "light": {
+        "page": "#f6dbd6",
+        "sheet": "#fff5f2",
+        "text": "#3c1f33",
+        "link": "#b3265f",
+        "accent": "#0e6e8c"
+      },
+      "dark": {
+        "page": "#3a2340",
+        "sheet": "#281830",
+        "text": "#fff0ea",
+        "link": "#ffa98a",
+        "accent": "#7fd0e8"
+      }
+    }
+  },
+  "rain": {
+    "tier": "PREMIUM",
+    "glass": true,
+    "backgroundImage": "/static/assets/themes/rain.jpg",
+    "credit": {
+      "text": "Sreenivas",
+      "url": "https://unsplash.com/@sree97?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+    },
+    "palette": {
+      "light": {
+        "page": "#d3e6d5",
+        "sheet": "#f2faf3",
+        "text": "#0e2415",
+        "link": "#1f6b32",
+        "accent": "#684420"
+      },
+      "dark": {
+        "page": "#0f2417",
+        "sheet": "#08150e",
+        "text": "#e3f3e5",
+        "link": "#7fe08f",
+        "accent": "#f0b27a"
+      }
+    }
+  },
+  "yellow": {
+    "tier": "PREMIUM",
+    "glass": true,
+    "backgroundImage": "/static/assets/themes/yellow.jpg",
+    "credit": {
+      "text": "Sergey Shmidt",
+      "url": "https://unsplash.com/@monstercritic?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+    },
+    "palette": {
+      "light": {
+        "page": "#cfeaf0",
+        "sheet": "#f0fafc",
+        "text": "#0b2f3b",
+        "link": "#8c4600",
+        "accent": "#087a96"
+      },
+      "dark": {
+        "page": "#0e3a4a",
+        "sheet": "#082a36",
+        "text": "#e8f6fa",
+        "link": "#ffc43d",
+        "accent": "#5fd3e6"
+      }
+    }
+  },
+  "polaris": {
+    "tier": "PREMIUM",
+    "glass": true,
+    "backgroundImage": "/static/assets/themes/polaris.jpg",
+    "credit": {
+      "text": "Benjamin Voros",
+      "url": "https://unsplash.com/@vorosbenisop?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+    },
+    "palette": {
+      "light": {
+        "page": "#b6c3c7",
+        "sheet": "#d3e0f4",
+        "text": "#1c3b45",
+        "link": "#7c068c"
+      },
+      "dark": {
+        "page": "#172c34",
+        "sheet": "#47595f",
+        "text": "#f2f9fd",
+        "link": "#df92c8"
+      }
+    }
+  },
+  "custom": {
+    "tier": "PREMIUM",
+    "glass": false
+  }
+}
+
