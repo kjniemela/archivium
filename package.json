@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "test": "npx cypress run",
+    "lint": "npx eslint src/",
     "build": "npx tsc",
     "postbuild": "node dev/copy-static-to-dist.js",
     "clean": "npx tsc --build --clean",
@@ -92,7 +93,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@eslint/js": "^9.25.0",
+    "@eslint/js": "^9.39.5",
     "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
@@ -107,16 +108,17 @@
     "@types/sanitize-html": "^2.16.0",
     "cross-env": "^10.1.0",
     "cypress": "^15.13.1",
-    "eslint": "^9.39.2",
+    "eslint": "^9.39.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^16.0.0",
+    "globals": "^16.5.0",
     "html-webpack-plugin": "^5.6.3",
+    "jiti": "^2.7.0",
     "kysely-codegen": "^0.20.0",
     "nodemon": "^3.1.11",
     "swc-loader": "^0.2.7",
     "ts-loader": "^9.5.2",
-    "typescript-eslint": "^8.30.1",
+    "typescript-eslint": "^8.71.1",
     "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.2"
