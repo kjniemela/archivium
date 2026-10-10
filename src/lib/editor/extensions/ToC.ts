@@ -55,7 +55,7 @@ function generateToCDOM(headings: { title: string, level: number }[]): any {
   if (!headings.length) return ['p', { style: 'margin-top: -1rem; margin-bottom: 0;' }, '. . .'];
 
   const root: any[] = ['ol', {}];
-  let stack: any[][] = [root];
+  const stack: any[][] = [root];
   let currentLevel = headings[0].level;
 
   for (const { title, level } of headings) {

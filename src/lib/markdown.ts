@@ -333,11 +333,11 @@ export function splitIgnoringQuotes(str) {
 export function parseMarkdown(text) {
   const root = new MarkdownNode('div', '', { class: 'markdown' });
   let toc: MarkdownNode | null = null;
-  let maxTocDepth: number | null = null;
+  const maxTocDepth: number | null = null;
   let curParagraph = new MarkdownNode('p');
   let curList: [MarkdownNode | null, number] = [null, -1];
   let rootList: MarkdownNode | null = null;
-  let curTocList: [MarkdownNode | null, number] = [null, -1];
+  const curTocList: [MarkdownNode | null, number] = [null, -1];
   let asideStart: number | null = null;
 
   const lines = text.split('\n');
