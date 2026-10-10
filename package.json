@@ -73,7 +73,7 @@
     "mongoose": "^6.13.8",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.11.3",
-    "node-cron": "^3.0.3",
+    "node-cron": "^4.6.0",
     "pug": "^3.0.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -81,7 +81,7 @@
     "react-yjs": "^2.0.1",
     "sanitize-html": "^2.17.0",
     "serve-favicon": "^2.5.0",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.5",
     "tippy.js": "^6.3.7",
     "typescript": "^5.8.3",
     "web-push": "^3.6.7",
@@ -120,5 +120,12 @@
     "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.2"
+  },
+  "overrides": {
+    "minimatch@<3.1.4": "3.1.5",
+    "uuid": "^11.1.1",
+    "picomatch@^2.2.1": "2.3.2",
+    "picomatch@^2.0.4": "2.3.2",
+    "picomatch@^2.3.1": "2.3.2"
   }
 }
