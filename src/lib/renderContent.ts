@@ -8,6 +8,14 @@ import { annotateTocScopes, IndexedDocument, indexedToJson } from './tiptapHelpe
 import logger from '../logger';
 
 
+// TipTap doesn't actually make the header a `thead`, so this ugly mess does it instead...
+function wrapTableHeaders(html: string): string {
+  return html.replace(
+    /<tbody>((?:<tr>(?:<th\b[^>]*>(?:(?!<\/?t[dhr]\b)[\s\S])*<\/th>)+<\/tr>)+)/g,
+    '<thead>$1</thead><tbody>',
+  );
+}
+
 export type RenderedBody = { type: string, content: any };
 export async function tryRenderContent(req: Request, content: unknown, universeShortname: string | null): Promise<RenderedBody> {
   try {
@@ -39,7 +47,7 @@ export async function tryRenderContent(req: Request, content: unknown, universeS
       itemExists: (universe, item) => (universe in itemsPerUniverse) && itemsPerUniverse[universe][item],
       headings,
     };
-    const htmlBody = renderToHTMLString({ extensions: editorExtensions(false, renderContext), content: jsonBody });
+    const htmlBody = wrapTableHeaders(renderToHTMLString({ extensions: editorExtensions(false, renderContext), content: jsonBody }));
     const sanitizedHtml = sanitizeHtml(htmlBody, {
       allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'iframe']),
       allowedAttributes: {
@@ -49,6 +57,7 @@ export async function tryRenderContent(req: Request, content: unknown, universeS
         h1: ['id', 'style'], h2: ['id', 'style'], h3: ['id', 'style'],
         h4: ['id', 'style'], h5: ['id', 'style'], h6: ['id', 'style'],
         p: ['style'],
+        td: ['colspan', 'rowspan'], th: ['colspan', 'rowspan'],
       },
       disallowedTagsMode: 'escape',
       allowedClasses: {
