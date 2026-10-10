@@ -4,18 +4,22 @@ import logger from '../../logger';
 import { kysely } from '../../db/kysely';
 import fs from 'fs';
 import path from 'path';
-import mjml from 'mjml';
 import Handlebars from 'handlebars';
 import { API } from '..';
 import { User } from './user';
 import { ForbiddenError, RateLimitError, UnauthorizedError, ValidationError } from '../../errors';
 
+const EMAIL_DIR = path.join(__dirname, '../../email');
+
+// Isolated instance so the email partials don't leak into the global Handlebars registry.
+const emailHbs = Handlebars.create();
+for (const partial of ['layout', 'button']) {
+  emailHbs.registerPartial(partial, fs.readFileSync(path.join(EMAIL_DIR, `${partial}.hbs`), 'utf-8'));
+}
+
 const renderTemplate = (templateName, data) => {
-  const templatePath = path.join(__dirname, '../../mjml', `${templateName}.mjml`);
-  const mjmlRaw = fs.readFileSync(templatePath, 'utf-8');
-  const mjmlPopulated = Handlebars.compile(mjmlRaw)(data);
-  const html = mjml(mjmlPopulated, { minify: true }).html;
-  return html;
+  const templateRaw = fs.readFileSync(path.join(EMAIL_DIR, `${templateName}.hbs`), 'utf-8');
+  return emailHbs.compile(templateRaw)(data);
 };
 
 export class EmailAPI {

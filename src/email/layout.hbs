@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>{{#if title}}{{title}}{{else}}Archivium{{/if}}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" type="text/css">
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+    body { margin: 0; padding: 0; }
+    a { color: #069; text-decoration: none; }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#e9e9e9;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#e9e9e9;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;font-family:Montserrat,sans-serif;font-size:16px;line-height:1.5;color:#222222;">
+          {{#if title}}
+          <tr>
+            <td align="center" style="background-color:#006699;padding:18px 20px;font-family:Montserrat,sans-serif;font-size:24px;font-weight:bold;color:#fefefe;">
+              {{title}}
+            </td>
+          </tr>
+          {{/if}}
+          <tr>
+            <td style="background-color:#fefefe;padding:16px;font-family:Montserrat,sans-serif;font-size:16px;line-height:1.5;color:#222222;">
+              {{> @partial-block}}
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="background-color:#d8d8d8;padding:12px 18px;font-family:Montserrat,sans-serif;text-align:center;">
+              <p style="margin:0 0 12px;font-size:14px;line-height:1.5;color:#666666;">
+                Need help? <a href="mailto:contact@archivium.net?subject=Archivium Support&amp;body=" style="color:#006699;text-decoration:none;">Contact support</a> or visit the <a href="https://archivium.net/help" style="color:#006699;text-decoration:none;">Archivium Wiki</a>.
+              </p>
+              <p style="margin:0 0 12px;font-size:12px;line-height:1.5;color:#666666;">
+                You're receiving this email because you signed up for Archivium. If this wasn't you, please <a href="mailto:contact@archivium.net" style="color:#006699;text-decoration:none;">let us know</a>.
+                Want to stop receiving emails from us? Manage email preferences <a href="https://archivium.net/settings?tab=notifications" style="color:#006699;text-decoration:none;">here</a>.
+              </p>
+              <p style="margin:0;font-size:12px;line-height:1.5;color:#444444;">
+                © 2026 Archivium
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

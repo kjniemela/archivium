@@ -4,7 +4,7 @@ const path = require('path');
 
 const SRC_DIRS = [
   'db/patches',
-  'mjml',
+  'email',
 ];
 
 const STATIC_DIRS = [
