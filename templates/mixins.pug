@@ -47,3 +47,187 @@ mixin userIcon(user)
         .badge.user-badge
           span.material-symbols-outlined security
           b #{T('Site Admin')}
+
+mixin themeSwatches(selectId, availableTier, allowNone)
+  style.
+    .theme-swatches { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; justify-content: center; }
+    .theme-swatch {
+      display: flex; flex-direction: column; gap: 0.25rem; width: 6.5rem; padding: 0.25rem;
+      font-size: 0.75rem; text-align: center; cursor: pointer;
+    }
+    .theme-swatch { position: relative; }
+    .theme-swatch.locked { opacity: 0.6; cursor: not-allowed; }
+    .theme-swatch .lock { position: absolute; top: 0.375rem; right: 0.375rem; font-size: 1rem; color: var(--text-color); text-shadow: 0 0 0.25rem var(--sheet-color); }
+    .theme-swatch[aria-pressed="true"] { outline: 0.125rem solid var(--link-color); outline-offset: 0.0625rem; }
+    .theme-swatch-preview {
+      display: flex; flex-direction: column; justify-content: center; align-items: center; height: 3rem;
+      border: 0.0625rem solid var(--input-border-color); border-radius: 0.25rem; overflow: hidden;
+    }
+    .theme-swatch-half {
+      flex: 1; align-self: stretch; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 0.25rem;
+      padding: 0.25rem; background-size: cover;
+    }
+    .theme-swatch-preview.split { flex-direction: row; }
+    .theme-swatch-half i { display: block; height: 0.375rem; border-radius: 0.1875rem; }
+  .theme-swatches(data-select=selectId data-var-names=JSON.stringify(THEME_VAR_NAMES))
+    if allowNone
+      button.theme-swatch(type='button' data-theme='' aria-pressed='false' title=T('None'))
+        .theme-swatch-preview
+          span.material-symbols-outlined block
+        span #{T('None')}
+    each theme, key in themes
+      - const locked = availableTier !== undefined && (theme.tier || 0) > availableTier;
+      - const swatchTitle = locked ? `${T(`theme_${key}`)} — ${T('Premium Only')}` : T(`theme_${key}`);
+      if key !== 'custom'
+        - const p = themePreview(theme);
+        button.theme-swatch(type='button' class={ locked } disabled=locked data-theme=key data-attrs=JSON.stringify(themeAttrs(theme)) aria-pressed='false' title=swatchTitle)
+          if locked
+            span.material-symbols-outlined.lock lock
+          .theme-swatch-preview.split(style=theme.backgroundImage ? `background: ${p.background}; background-color: ${p.page};` : '')
+            each mode in ['light', 'dark']
+              .theme-swatch-half(
+                style=`
+                   color-scheme: ${mode};
+                   ${style=!theme.backgroundImage ? ` background: ${p.background || p.page}; background-color: ${p.page};
+                ` : ''}`
+              )
+                i(style=`background: ${p.sheet}; width: 100%;`)
+                i(style=`background: ${p.link}; width: 60%;`)
+                if p.accent
+                  i(style=`background: ${p.accent}; width: 40%;`)
+                i(style=`background: ${p.text}; width: 80%;`)
+          span #{T(`theme_${key}`)}
+      else
+        button.theme-swatch(type='button' class={ locked } disabled=locked data-theme=key aria-pressed='false' title=swatchTitle)
+          if locked
+            span.material-symbols-outlined.lock lock
+          .theme-swatch-preview
+            p(style='font-size: 1.875rem;') ?
+          span #{T(`theme_${key}`)}
+
+  script.
+    (() => {
+      const box = document.currentScript.previousElementSibling;
+      const select = document.getElementById(box.dataset.select);
+      const root = document.documentElement;
+      const varNames = JSON.parse(box.dataset.varNames);
+      const sync = () => box.querySelectorAll('.theme-swatch').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === select.value)));
+
+      function applyTheme({ classes, vars, credit }) {
+        for (const cls of [...root.classList]) {
+          if (cls === 'palette' || cls === 'palette-accent' || cls.startsWith('theme-')) root.classList.remove(cls);
+        }
+        root.classList.add(...classes);
+        varNames.forEach(name => root.style.removeProperty(name));
+        Object.entries(vars).forEach(([name, value]) => root.style.setProperty(name, value));
+        const glassPane = document.getElementById('glassPane');
+        if (glassPane) glassPane.classList.toggle('glass-pane', classes.includes('theme-glass'));
+        const creditBox = document.getElementById('themeCredit');
+        if (creditBox) {
+          creditBox.classList.toggle('hidden', !credit);
+          const link = creditBox.querySelector('a');
+          link.textContent = credit ? credit.text : '';
+          link.href = credit ? credit.url : '#';
+        }
+      }
+
+      function customAttrs() {
+        const classes = [];
+        const vars = {};
+        if (document.getElementById('glass')?.checked) classes.push('theme-glass');
+        const image = document.getElementById('backgroundImage')?.value.trim();
+        if (image) {
+          classes.push('theme-bg-image');
+          vars['--theme-background-image'] = `url("${image.replace(/["\\\n]/g, encodeURIComponent)}")`;
+        }
+        const palette = document.getElementById('paletteEditor')?.readPalette();
+        if (palette) {
+          classes.push('palette');
+          for (const key of Object.keys(palette.light)) {
+            vars[`--${key}-color`] = `light-dark(${palette.light[key]}, ${palette.dark[key]})`;
+          }
+          if (palette.light.accent) classes.push('palette-accent');
+          vars['color-scheme'] = 'light dark';
+        }
+        return { classes, vars, credit: null };
+      }
+
+      function preview() {
+        const btn = box.querySelector(`.theme-swatch[data-theme="${select.value}"]`);
+        if (!btn) return;
+        if (btn.dataset.attrs) applyTheme(JSON.parse(btn.dataset.attrs));
+        else if (btn.dataset.theme === 'custom') applyTheme(customAttrs());
+      }
+
+      box.addEventListener('click', (e) => {
+        const btn = e.target.closest('.theme-swatch');
+        if (!btn) return;
+        select.value = btn.dataset.theme;
+        select.dispatchEvent(new Event('change'));
+      });
+      select.addEventListener('change', () => { sync(); preview(); });
+      // Keep the preview up to date while editing the custom theme.
+      document.addEventListener('change', (e) => {
+        if (select.value === 'custom' && e.target.closest('#customTheme, #paletteEditor')) preview();
+      });
+      sync();
+    })();
+
+mixin paletteRow(palette, key, label)
+  - const paletteDefaults = { light: { page: '#e9e9e9', sheet: '#fefefe', text: '#000000', link: '#006699', accent: '#006699' }, dark: { page: '#444444', sheet: '#333333', text: '#f5f5f5', link: '#46b9f2', accent: '#46b9f2' } };
+  .inputGroup
+    label #{label}:
+    .palette-pair
+      each mode in ['light', 'dark']
+        input(type='color' data-palette-mode=mode data-palette-key=key title=T(mode === 'light' ? 'Light' : 'Dark') aria-label=`${label} (${mode})` value=((palette[mode] || {})[key] || paletteDefaults[mode][key]))
+
+mixin paletteEditor(savedPalette)
+  - const palette = savedPalette || {};
+  #paletteEditor
+    .inputGroup
+      label #{T('Use custom color palette')}:
+      label.switch
+        input#usePalette(type='checkbox' checked=Boolean(palette.light || palette.dark))
+        span.slider
+
+    #paletteFields.hidden(style='display: grid; gap: inherit;')
+      .inputGroup
+        span
+        .palette-pair
+          strong #{T('Light')}
+          strong #{T('Dark')}
+      +paletteRow(palette, 'page', T('Page Color'))
+      +paletteRow(palette, 'sheet', T('Sheet Color'))
+      +paletteRow(palette, 'text', T('Text Color'))
+      +paletteRow(palette, 'link', T('Link Color'))
+      .inputGroup
+        label #{T('Use accent color')}:
+        label.switch
+          input#useAccent(type='checkbox' checked=Boolean((palette.light || {}).accent || (palette.dark || {}).accent))
+          span.slider
+      #accentRow.hidden
+        +paletteRow(palette, 'accent', T('Accent Color'))
+  script.
+    (() => {
+      const editor = document.getElementById('paletteEditor');
+      const usePalette = editor.querySelector('#usePalette');
+      const useAccent = editor.querySelector('#useAccent');
+      const sync = () => {
+        editor.querySelector('#paletteFields').classList.toggle('hidden', !usePalette.checked);
+        editor.querySelector('#accentRow').classList.toggle('hidden', !useAccent.checked);
+      };
+      editor.readPalette = () => {
+        if (!usePalette.checked) return undefined;
+        const result = { light: {}, dark: {} };
+        for (const input of editor.querySelectorAll('input[type=color]')) {
+          if (input.dataset.paletteKey === 'accent' && !useAccent.checked) continue;
+          result[input.dataset.paletteMode][input.dataset.paletteKey] = input.value;
+        }
+        return result;
+      };
+      editor.addEventListener('change', () => {
+        sync();
+        editor.dispatchEvent(new CustomEvent('palettechange', { bubbles: true }));
+      });
+      sync();
+    })();

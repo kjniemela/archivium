@@ -9,6 +9,7 @@ import { deepCompare } from '../../lib/utils';
 import { BaseOptions, Tier, executeQuery, getPfpUrl, handleAsNull, parseData, perms, tierAllowance, tiers, withTransaction } from '../utils';
 import { Item, ItemEvent } from './item';
 import { User } from './user';
+import themes, { themeAvailable } from '../../themes';
 
 export type UniverseAccessRequest<T = boolean> = {
   universe_id: number,
@@ -64,6 +65,11 @@ export type Universe = {
   followers: { [id: number]: boolean },
   tier: Tier | null,
   sponsoring_user: number,
+};
+
+const checkTheme = (theme: unknown, tier: Tier | null) => {
+  if (typeof theme !== 'string' || !theme || !themes.hasOwnProperty(theme)) return;
+  if (!themeAvailable(theme, tier ?? tiers.FREE)) throw new ForbiddenError('This theme requires a premium universe.');
 };
 
 const validateShortname = (shortname: string, reservedShortnames: string[] = ['create', 'news', 'help', '_home', '_public']) => {
@@ -319,6 +325,7 @@ export class UniverseAPI {
     }
     const typeProblems = typeConfigProblems(parsedObjData);
     if (typeProblems.length > 0) throw new ValidationError(typeProblems.slice(0, 5).join(' '));
+    checkTheme((parsedObjData as UniverseObjData | null)?.theme, universe.tier);
     if (!isPremium && !deepCompare((parsedObjData as UniverseObjData | null)?.tabTypes ?? {}, universe.obj_data.tabTypes ?? {})) {
       // TODO might change our minds on this
       throw new ValidationError('Custom tab types require a premium universe.');
@@ -357,6 +364,7 @@ export class UniverseAPI {
     if (!changes || typeof changes !== 'object' || Array.isArray(changes)) throw new ValidationError('Data must be an object.');
 
     const universe = await this.getOne(user, { shortname: universeShortname }, perms.WRITE);
+    checkTheme(changes.theme, universe.tier);
     const obj_data = { ...universe.obj_data, ...changes };
 
     const queryString = 'UPDATE universe SET obj_data = ?, updated_at = ? WHERE id = ?';

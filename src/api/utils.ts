@@ -17,17 +17,10 @@ export enum plans {
   SUPER,
 }
 
-export const paidTiers = {
-  PREMIUM: 1,
-} as const;
-type ValueOf<T> = T[keyof T];
-export type PaidTier = ValueOf<typeof paidTiers>;
-
-export const tiers = {
-  FREE: 0,
-  ...paidTiers,
-} as const;
-export type Tier = ValueOf<typeof tiers>;
+import { paidTiers, tiers } from '../lib/tiers';
+import type { PaidTier, Tier } from '../lib/tiers';
+export { paidTiers, tiers };
+export type { PaidTier, Tier };
 
 export const tierAllowance: Record<plans, Record<PaidTier | 'total', number>> = {
   [plans.FREE]: { total: 5, [tiers.PREMIUM]: 0 },
@@ -36,6 +29,19 @@ export const tierAllowance: Record<plans, Record<PaidTier | 'total', number>> = 
   [plans.PREMIUM_BETA]: { total: 20, [tiers.PREMIUM]: 5 },
   [plans.SUPER]: { total: 999, [tiers.PREMIUM]: 99  },
 };
+
+// TODO a lot of this is now very redundant - I think a major refactor of how tiers work is in order soon
+const planTiers: Record<plans, Tier> = {
+  [plans.FREE]: tiers.FREE,
+  [plans.PREMIUM]: tiers.PREMIUM,
+  [plans.BETA]: tiers.PREMIUM,
+  [plans.PREMIUM_BETA]: tiers.PREMIUM,
+  [plans.SUPER]: tiers.PREMIUM,
+};
+
+export function planTier(plan: plans | null | undefined): Tier {
+  return planTiers[plan ?? plans.FREE] ?? tiers.FREE;
+}
 
 type TierLimit = {
   images: number, // image upload limit in bytes

@@ -1,13 +1,13 @@
 import { Request } from 'express';
 import pug from 'pug';
 import api from './api';
-import { getPfpUrl, handleAsNull, perms, plans, tierAllowance, tiers } from './api/utils';
+import { Universe } from './api/models/universe';
+import { getPfpUrl, handleAsNull, perms, plans, planTier, tierAllowance, tiers } from './api/utils';
 import { DEV_MODE, DOMAIN, PROVIDER_ADDRESS, VAPID_PUBLIC_KEY } from './config';
 import { ForbiddenError, NotFoundError, UnauthorizedError } from './errors';
 import { lang, locale, sprintf, T } from './locale';
 import logger from './logger';
-import themes from './themes';
-import { Universe } from './api/models/universe';
+import themes, { THEME_VAR_NAMES, themeAttrs, themeHtmlAttrs, themePreview } from './themes';
 
 export function universeLink(req: Request, uniShort) {
   const displayUniverse = req.headers['x-subdomain'];
@@ -61,9 +61,14 @@ async function contextData(req: Request) {
     locale: locale[lang],
     themes,
     theme: req.theme ?? themes.default,
+    themePreview,
+    themeHtmlAttrs: themeHtmlAttrs(req.theme ?? themes.default),
+    themeAttrs,
+    THEME_VAR_NAMES,
     plans,
     tiers,
     tierAllowance,
+    planTier,
     T,
     sprintf,
     validateUsername: api.user.validateUsername,
