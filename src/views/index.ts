@@ -1,16 +1,17 @@
 import { Express, Handler, Request, Response } from 'express';
-import Auth from '../middleware/auth';
-import { render, universeLink } from '../templates';
+import api from '../api';
 import { tiers } from '../api/utils';
 import logger from '../logger';
+import Auth from '../middleware/auth';
 import * as ReCaptcha from '../middleware/reCaptcha';
 import Theme from '../middleware/theme';
+import { render, universeLink } from '../templates';
 import themes from '../themes';
 
-import pages from './pages';
-import forms from './forms';
-import { RequestError } from '../errors';
 import { HttpStatusCode } from 'axios';
+import { RequestError } from '../errors';
+import forms from './forms';
+import pages from './pages';
 
 type Method = 'get' | 'post';
 type Site = 'DISPLAY' | 'NORMAL' | 'ALL';
@@ -161,6 +162,22 @@ export default function(app: Express) {
   get('/news/:itemShortname', sites.ALL, [], async (req, res) => {
     req.params.universeShortname = 'archivium';
     req.headers['x-subdomain'] = 'news';
+    await pages.item.view(req, res);
+  });
+  get('/help', sites.ALL, [], async (req, res) => {
+    const helpHomePageExists = await api.item.exists(req.session.user, 'archivium', '_home');
+    if (!helpHomePageExists) {
+      res.redirect('https://github.com/HMI-Studios/archivium/wiki');
+      return;
+    }
+    req.params.universeShortname = 'archivium';
+    req.headers['x-subdomain'] = 'help';
+    req.params.itemShortname = '_home';
+    await pages.item.view(req, res);
+  });
+  get('/help/:itemShortname', sites.ALL, [], async (req, res) => {
+    req.params.universeShortname = 'archivium';
+    req.headers['x-subdomain'] = 'help';
     await pages.item.view(req, res);
   });
 

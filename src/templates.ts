@@ -19,7 +19,7 @@ export function universeLink(req: Request, uniShort) {
   }
 }
 
-export const systemDisplayModes = ['news'];
+export const systemDisplayModes = ['news', 'help'];
 
 // Basic context information to be sent to the templates
 async function contextData(req: Request) {

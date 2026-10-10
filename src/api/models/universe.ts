@@ -65,7 +65,7 @@ export type Universe = {
   sponsoring_user: number,
 };
 
-const validateShortname = (shortname: string, reservedShortnames: string[] = ['create', 'news', '_home', '_public']) => {
+const validateShortname = (shortname: string, reservedShortnames: string[] = ['create', 'news', 'help', '_home', '_public']) => {
   if (shortname.length < 3 || shortname.length > 64) {
     return 'Shortnames must be between 3 and 64 characters long.';
   }
