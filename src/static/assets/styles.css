@@ -1200,11 +1200,11 @@ button:disabled, .button-link:disabled {
 }
 
 .tiptap .selectedCell {
-  background-color: color-mix(in srgb, var(--accent-color) 25%, transparent);
+  background-color: color-mix(in srgb, var(--link-color) 30%, transparent) !important; /* beats the inline color of remote cell selections */
 }
 
 .tiptap .column-resize-handle {
-  background-color: var(--accent-color);
+  background-color: var(--link-color);
   bottom: 0;
   pointer-events: none;
   position: absolute;
