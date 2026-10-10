@@ -34,6 +34,7 @@ function MenuBar({ editor, getLink, itemTitles, itemGroups, gallery }: RichEdito
         canClearMarks: ctx.editor.can().chain().unsetAllMarks().run() ?? false,
         isParagraph: ctx.editor.isActive('paragraph') ?? false,
         isToc: ctx.editor.isActive('toc') ?? false,
+        isHeading: ctx.editor.isActive('heading') ?? false,
         isHeading1: ctx.editor.isActive('heading', { level: 1 }) ?? false,
         isHeading2: ctx.editor.isActive('heading', { level: 2 }) ?? false,
         isHeading3: ctx.editor.isActive('heading', { level: 3 }) ?? false,
@@ -241,6 +242,66 @@ function MenuBar({ editor, getLink, itemTitles, itemGroups, gallery }: RichEdito
         </button>
         <button
           onMouseDown={e => e.preventDefault()}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+          className={`material-symbols-outlined ${editorState.isHeading ? 'is-active' : ''}`}
+          title={T('Heading')}
+        >
+          title
+        </button>
+        {editorState.isHeading && (
+          <div className='tiptap-nav-section'>
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+              className={`material-symbols-outlined ${editorState.isHeading1 ? 'is-active' : ''}`}
+              title={T('Heading 1')}
+            >
+              format_h1
+            </button>
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+              className={`material-symbols-outlined ${editorState.isHeading2 ? 'is-active' : ''}`}
+              title={T('Heading 2')}
+            >
+              format_h2
+            </button>
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+              className={`material-symbols-outlined ${editorState.isHeading3 ? 'is-active' : ''}`}
+              title={T('Heading 3')}
+            >
+              format_h3
+            </button>
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
+              className={`material-symbols-outlined ${editorState.isHeading4 ? 'is-active' : ''}`}
+              title={T('Heading 4')}
+            >
+              format_h4
+            </button>
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
+              className={`material-symbols-outlined ${editorState.isHeading5 ? 'is-active' : ''}`}
+              title={T('Heading 5')}
+            >
+              format_h5
+            </button>
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
+              className={`material-symbols-outlined ${editorState.isHeading6 ? 'is-active' : ''}`}
+              title={T('Heading 6')}
+            >
+              format_h6
+            </button>
+          </div>
+        )}
+        <button
+          onMouseDown={e => e.preventDefault()}
           onClick={() => editor.chain().focus().unsetAllMarks().run()}
           className='material-symbols-outlined'
           title='Clear Formatting'
@@ -257,56 +318,8 @@ function MenuBar({ editor, getLink, itemTitles, itemGroups, gallery }: RichEdito
         </button>
         <button
           onMouseDown={e => e.preventDefault()}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={`material-symbols-outlined ${editorState.isHeading1 ? 'is-active' : ''}`}
-          title={T('Heading 1')}
-        >
-          format_h1
-        </button>
-        <button
-          onMouseDown={e => e.preventDefault()}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={`material-symbols-outlined ${editorState.isHeading2 ? 'is-active' : ''}`}
-          title={T('Heading 2')}
-        >
-          format_h2
-        </button>
-        <button
-          onMouseDown={e => e.preventDefault()}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-          className={`material-symbols-outlined ${editorState.isHeading3 ? 'is-active' : ''}`}
-          title={T('Heading 3')}
-        >
-          format_h3
-        </button>
-        <button
-          onMouseDown={e => e.preventDefault()}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-          className={`material-symbols-outlined ${editorState.isHeading4 ? 'is-active' : ''}`}
-          title={T('Heading 4')}
-        >
-          format_h4
-        </button>
-        <button
-          onMouseDown={e => e.preventDefault()}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
-          className={`material-symbols-outlined ${editorState.isHeading5 ? 'is-active' : ''}`}
-          title={T('Heading 5')}
-        >
-          format_h5
-        </button>
-        <button
-          onMouseDown={e => e.preventDefault()}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
-          className={`material-symbols-outlined ${editorState.isHeading6 ? 'is-active' : ''}`}
-          title={T('Heading 6')}
-        >
-          format_h6
-        </button>
-        <button
-          onMouseDown={e => e.preventDefault()}
           onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
-          className='material-symbols-outlined'
+          className={`material-symbols-outlined ${editorState.isTable ? 'is-active' : ''}`}
           title={T('Insert Table')}
         >
           table
