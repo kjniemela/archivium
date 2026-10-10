@@ -52,6 +52,7 @@ function MenuBar({ editor, getLink, itemTitles, itemGroups, gallery }: RichEdito
         isCodeBlock: ctx.editor.isActive('codeBlock') ?? false,
         isAside: ctx.editor.isActive('aside') ?? false,
         isBlockquote: ctx.editor.isActive('blockquote') ?? false,
+        isTable: ctx.editor.isActive('table') ?? false,
         canUndo: ctx.editor.can().chain().undo().run() ?? false,
         canRedo: ctx.editor.can().chain().redo().run() ?? false,
       }
@@ -302,6 +303,74 @@ function MenuBar({ editor, getLink, itemTitles, itemGroups, gallery }: RichEdito
         >
           format_h6
         </button>
+        <button
+          onMouseDown={e => e.preventDefault()}
+          onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+          className='material-symbols-outlined'
+          title={T('Insert Table')}
+        >
+          table
+        </button>
+        {editorState.isTable && (
+          <div className='tiptap-nav-section'>
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => editor.chain().focus().addRowAfter().run()}
+              className='material-symbols-outlined'
+              title={T('Add Row Below')}
+            >
+              table_rows
+            </button>
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => editor.chain().focus().addColumnAfter().run()}
+              className='material-symbols-outlined'
+              title={T('Add Column Right')}
+            >
+              view_column
+            </button>
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => editor.chain().focus().deleteRow().run()}
+              className='material-symbols-outlined'
+              title={T('Delete Row')}
+            >
+              delete_sweep
+            </button>
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => editor.chain().focus().deleteColumn().run()}
+              className='material-symbols-outlined'
+              title={T('Delete Column')}
+            >
+              variable_remove
+            </button>
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => editor.chain().focus().mergeOrSplit().run()}
+              className='material-symbols-outlined'
+              title={T('Merge or Split Cells')}
+            >
+              cell_merge
+            </button>
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => editor.chain().focus().toggleHeaderRow().run()}
+              className='material-symbols-outlined'
+              title={T('Toggle Header Row')}
+            >
+              toolbar
+            </button>
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => editor.chain().focus().deleteTable().run()}
+              className='material-symbols-outlined'
+              title={T('Delete Table')}
+            >
+              delete
+            </button>
+          </div>
+        )}
         <button
           onMouseDown={e => e.preventDefault()}
           onClick={() => editor.chain().focus().setTextAlign('left').run()}

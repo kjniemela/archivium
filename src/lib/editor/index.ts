@@ -1,6 +1,7 @@
 import { Extendable } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
+import { Table, TableRow, TableHeader, TableCell } from '@tiptap/extension-table';
 import Collaboration from '@tiptap/extension-collaboration';
 import CollaborationCaret from '@tiptap/extension-collaboration-caret';
 import Aside from './extensions/Aside';
@@ -86,6 +87,10 @@ export const editorExtensions = (editMode: boolean, context?: TiptapContext, col
     Heading,
     imageExtension,
     IFrame,
+    Table.configure({ resizable: editMode }),
+    TableRow,
+    TableHeader,
+    TableCell,
     Link.configure({
       enableClickSelection: editMode,
       openOnClick: !editMode,

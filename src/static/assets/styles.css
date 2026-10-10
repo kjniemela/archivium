@@ -1143,13 +1143,20 @@ button:disabled, .button-link:disabled {
 .tiptap-navbar button {
   border: 0;
   padding: 0.125rem 0.25rem;
-  background-color: var(--menu-color);
+  background-color: unset;
   cursor: pointer;
   font-size: 1.75rem;
 }
 
 .tiptap-navbar button.is-active {
   background-color: #ddd;
+}
+
+.tiptap-nav-section {
+  background-color: var(--sheet-color);
+  border-radius: 0.5rem;
+  margin-right: 0.25rem;
+  display: flex;
 }
 
 .tiptap .collaboration-carets__caret {
@@ -1179,6 +1186,35 @@ button:disabled, .button-link:disabled {
 
 .tiptap > p:last-child:has(> br:only-child) {
   display: none; /* Hide empty trailing paragraph */
+}
+
+.tiptap th, .tiptap td {
+  min-width: 3rem;
+  position: relative;
+  vertical-align: top;
+}
+
+.tiptap th {
+  background-color: var(--menu-color);
+  text-align: left;
+}
+
+.tiptap .selectedCell {
+  background-color: color-mix(in srgb, var(--accent-color) 25%, transparent);
+}
+
+.tiptap .column-resize-handle {
+  background-color: var(--accent-color);
+  bottom: 0;
+  pointer-events: none;
+  position: absolute;
+  right: -2px;
+  top: 0;
+  width: 4px;
+}
+
+.tiptap.resize-cursor {
+  cursor: col-resize;
 }
 
 /* EasyMDE styles */
