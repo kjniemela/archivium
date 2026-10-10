@@ -87,7 +87,7 @@ export const editorExtensions = (editMode: boolean, context?: TiptapContext, col
     Heading,
     imageExtension,
     IFrame,
-    Table.configure({ resizable: editMode }),
+    Table,
     TableRow,
     TableHeader,
     TableCell,
