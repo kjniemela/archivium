@@ -143,7 +143,8 @@ block content
     .container.hidden( data-tab='items' )
       if universe.obj_data.cats && Object.keys(universe.obj_data.cats).length
         .type-card-container
-          +typeCard(null, null)
+          if  universe.obj_data.showAllItemsCard || !('showAllItemsCard' in universe.obj_data)
+            +typeCard(null, null)
           each category, shortname in universe.obj_data.cats
             +typeCard(shortname, category)
       else
@@ -154,7 +155,7 @@ block content
             |  page to add some.
           else
             | #{T('ask the owner of this universe to add some.')}
-    
+
     .hidden( data-tab='authors' )
       if contextUser && ((universe.author_permissions[contextUser.id] || 0) < perms.ADMIN)
         .d-flex.justify-center.gap-4.mb-2

@@ -40,6 +40,7 @@ export type UniverseObjData = {
   customTheme?: { glass?: boolean, backgroundImage?: string },
   homePage?: boolean,
   publicPage?: boolean,
+  showAllItemsCard?: boolean,
   [key: string]: unknown,
 };
 
