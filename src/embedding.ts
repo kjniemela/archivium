@@ -21,7 +21,11 @@ const VECTOR_DIMENSIONS = 768;
 // Embedding may not always be available - we need to handle the case when it's not.
 const EMBEDDING_ENABLED = Boolean(EMBEDDING_API_URL);
 
-const qdrantClient = new QdrantClient({ url: QDRANT_URL });
+let qdrantClient: QdrantClient | undefined;
+function getQdrantClient(): QdrantClient {
+  qdrantClient ??= new QdrantClient({ url: QDRANT_URL });
+  return qdrantClient;
+}
 
 async function requestEmbedding(input: string): Promise<number[]> {
   let lastErr: unknown;
@@ -65,12 +69,12 @@ async function requestEmbedding(input: string): Promise<number[]> {
 
 async function ensureCollection() {
   logger.info('Starting Qdrant...');
-  const collections = await qdrantClient.getCollections()
+  const collections = await getQdrantClient().getCollections()
 
   const exists = collections.collections.some(c => c.name === COLLECTION_NAME);
 
   if (!exists) {
-    await qdrantClient.createCollection(COLLECTION_NAME, {
+    await getQdrantClient().createCollection(COLLECTION_NAME, {
       vectors: {
         size: VECTOR_DIMENSIONS,
         distance: 'Cosine',
@@ -174,7 +178,7 @@ class Embedder {
   // Must be called before items/universes are deleted to ensure embeddings are cleaned up!
   public async deleteForItem(itemId: number): Promise<void> {
     if (!EMBEDDING_ENABLED) return;
-    await qdrantClient.delete(COLLECTION_NAME, {
+    await getQdrantClient().delete(COLLECTION_NAME, {
       wait: true,
       filter: {
         must: [{ key: 'itemId', match: { value: itemId } }],
@@ -184,7 +188,7 @@ class Embedder {
 
   public async deleteForUniverse(universeId: number): Promise<void> {
     if (!EMBEDDING_ENABLED) return;
-    await qdrantClient.delete(COLLECTION_NAME, {
+    await getQdrantClient().delete(COLLECTION_NAME, {
       wait: true,
       filter: {
         must: [{ key: 'universeId', match: { value: universeId } }],
@@ -221,7 +225,7 @@ class Embedder {
         .executeTakeFirst();
       if (!ownChunk) return [];
 
-      const { points } = await qdrantClient.query(COLLECTION_NAME, {
+      const { points } = await getQdrantClient().query(COLLECTION_NAME, {
         query: ownChunk.id,
         limit: limit * 5,
         filter: {
@@ -313,7 +317,7 @@ class Embedder {
       if (chunkId in existingChunks) {
         if (!(hash === existingChunks[chunkId].hash && chunk.text === existingChunks[chunkId].content)) {
           await kysely.deleteFrom('itemembeddedchunks').where('id', '=', existingChunks[chunkId].id).execute();
-          await qdrantClient.delete(COLLECTION_NAME, {
+          await getQdrantClient().delete(COLLECTION_NAME, {
             wait: true,
             points: [existingChunks[chunkId].id],
           });
@@ -337,7 +341,7 @@ class Embedder {
     }
     for (const chunkId in existingChunks) {
       await kysely.deleteFrom('itemembeddedchunks').where('id', '=', existingChunks[chunkId].id).execute();
-      await qdrantClient.delete(COLLECTION_NAME, {
+      await getQdrantClient().delete(COLLECTION_NAME, {
         wait: true,
         points: [existingChunks[chunkId].id],
       });
@@ -417,7 +421,7 @@ class Embedder {
 
     const payload = { universeId, itemId, itemTitle, itemType, chunkId, path: chunk.path, scope: chunk.scope };
 
-    await qdrantClient.upsert(COLLECTION_NAME, {
+    await getQdrantClient().upsert(COLLECTION_NAME, {
       wait: true,
       points: [{ id: Number(insertResult.insertId), vector, payload }],
     });
@@ -427,7 +431,7 @@ class Embedder {
     if (!EMBEDDING_ENABLED) return;
     const deleteResult = await kysely.deleteFrom('itemembeddedchunks').where('item_id', '=', id).executeTakeFirst();
     if (Number(deleteResult.numDeletedRows) > 0) {
-      await qdrantClient.delete(COLLECTION_NAME, {
+      await getQdrantClient().delete(COLLECTION_NAME, {
         wait: true,
         filter: {
           must: [
@@ -473,7 +477,7 @@ class Embedder {
     }
     // Over-fetch chunks since multiple chunks can belong to the same item; search() truncates to options.limit items.
     const itemLimit = options.limit ?? 20;
-    const { points } = await qdrantClient.query(COLLECTION_NAME, {
+    const { points } = await getQdrantClient().query(COLLECTION_NAME, {
       query: vector,
       limit: itemLimit * 5,
       filter: {
