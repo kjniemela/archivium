@@ -11,6 +11,7 @@ import { Note } from './models/note';
 import { Session } from './models/session';
 import { User } from './models/user';
 import { handleAsNull, perms, sendCachedImage } from './utils';
+import { CommenterUser } from './models/discussion';
 
 type RouteMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 export type APIRouteHandler = (req: Request<{ [key: string]: string }>, res: Response) => Promise<any>;
@@ -296,7 +297,7 @@ export default function (app: Express, upload: Multer) {
                   { 'note.uuid': req.params.uuid },
                   { fullBody: true, connections: true, limit: 1 },
                 )
-                  .then((data: [Note[], User[]?]) => data[0][0])
+                  .then((data: [Note[], CommenterUser[]?]) => data[0][0])
                   .then(async (note) => req.getQueryParam('renderBody') === '1' ? { ...note, body: await tryRenderContent(req, note.body, null) } : note),
               }),
             ]),
@@ -345,7 +346,12 @@ export default function (app: Express, upload: Multer) {
             new APIRoute('/comments', {
               GET: async (req) => {
                 const item = await api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortName, req.params.itemShortName);
-                return await api.discussion.getCommentsByItem(item.id);
+                const [comments, users] = await api.discussion.getCommentsByItem(item.id, true);
+                const authors = {};
+                for (const user of users ?? []) {
+                  authors[user.id] = user;
+                }
+                return { comments, authors };
               },
             }, [
               new APIRoute('/:commentId', {

@@ -4,9 +4,9 @@ import { API } from "..";
 import { kysely } from '../../db/kysely';
 import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from "../../errors";
 import { IndexedDocument } from "../../lib/tiptapHelpers";
-import { BaseOptions, perms } from '../utils';
-import { CommenterUserBasic } from './discussion';
+import { BaseOptions, perms, withPfp } from '../utils';
 import { User } from "./user";
+import { CommenterUser } from './discussion';
 
 export type NoteItemTuple = [string, string, string, string];
 export type NoteBoardTuple = [string, string, string, string];
@@ -170,7 +170,7 @@ export class NoteAPI {
     conditions?: any,
     options?: NoteOptions,
     inclAuthors = false
-  ): Promise<[Note[], CommenterUserBasic[]?]> {
+  ): Promise<[Note[], CommenterUser[]?]> {
     const item = await this.api.item.getByUniverseAndItemShortnames(user, universeShortname, itemShortname, perms.READ, true);
     const notes = await this.getMany(
       user,
@@ -183,11 +183,12 @@ export class NoteAPI {
         .innerJoin('note', 'note.author_id', 'user.id')
         .innerJoin('itemnote', 'itemnote.note_id', 'note.id')
         .leftJoin('userimage as ui', 'ui.user_id', 'user.id')
-        .select((eb) => ['user.id', 'user.username', 'user.email', eb('ui.user_id', 'is not', null).as('hasPfp')])
+        .leftJoin('userplan', 'user.id', 'userplan.user_id')
+        .select((eb) => ['user.id', 'user.username', 'user.email', eb('ui.user_id', 'is not', null).as('hasPfp'), 'userplan.plan'])
         .where('itemnote.item_id', '=', item.id)
-        .groupBy('user.id')
+        .groupBy(['user.id', 'userplan.plan'])
         .execute();
-      return [notes, users];
+      return [notes, withPfp(users)];
     }
     return [notes];
   }

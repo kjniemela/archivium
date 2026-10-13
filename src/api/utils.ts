@@ -17,6 +17,7 @@ export enum plans {
 
 import { paidTiers, tiers } from '../lib/tiers';
 import type { PaidTier, Tier } from '../lib/tiers';
+import { CommenterUser, CommenterUserRaw } from './models/discussion';
 export { paidTiers, tiers };
 export type { PaidTier, Tier };
 
@@ -133,8 +134,21 @@ class MultiCond extends Cond {
   }
 }
 
-export function getPfpUrl(user: { hasPfp: SqlBool, username: string, email: string }) {
+export function getPfpUrl(user: CommenterUserRaw) {
   return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email ?? '')}.jpg`;
+}
+
+export function withPfp(users: CommenterUserRaw[]): CommenterUser[] {
+  const result: CommenterUser[] = [];
+  for (const user of users) {
+    result.push({
+      id: user.id,
+      username: user.username,
+      plan: user.plan,
+      pfpUrl: getPfpUrl(user),
+    });
+  }
+  return result;
 }
 
 type CacheableImage = { mimetype: string, name: string, data?: Buffer };
