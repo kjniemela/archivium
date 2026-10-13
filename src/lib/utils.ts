@@ -1,5 +1,6 @@
 import md5 from 'md5';
 import { SqlBool } from 'kysely';
+import { CommenterUserRaw, CommenterUser } from '../api/models/discussion';
 
 export function deepCompare(a: unknown, b: unknown): boolean {
   if (!(a instanceof Object && b instanceof Object)) {
@@ -17,4 +18,17 @@ export function deepCompare(a: unknown, b: unknown): boolean {
 
 export function getPfpUrl(user: { hasPfp: SqlBool, username: string, email: string }) {
   return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email ?? '')}.jpg`;
+}
+
+export function withPfp(users: CommenterUserRaw[]): CommenterUser[] {
+  const result: CommenterUser[] = [];
+  for (const user of users) {
+    result.push({
+      id: user.id,
+      username: user.username,
+      plan: user.plan,
+      pfpUrl: getPfpUrl(user),
+    });
+  }
+  return result;
 }

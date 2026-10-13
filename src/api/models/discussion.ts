@@ -2,9 +2,9 @@ import { SqlBool } from 'kysely';
 import { API } from '..';
 import { kysely } from '../../db/kysely';
 import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
+import { getPfpUrl, withPfp } from '../../lib/utils';
 import { perms } from '../utils';
 import { User } from './user';
-import { getPfpUrl } from '../../lib/utils';
 
 export type Thread = {
   id: number,
@@ -25,16 +25,15 @@ export type Comment = {
   created_at: Date,
 };
 
-export type CommenterUserBasic = {
+export type CommenterUserRaw = {
   id: number,
   username: string,
   email: string,
   hasPfp: SqlBool,
-};
-
-export type CommenterUser = CommenterUserBasic & {
   plan: number | null,
 };
+
+export type CommenterUser = Omit<Omit<CommenterUserRaw, 'email'>, 'hasPfp'> & { pfpUrl: string };
 
 export class DiscussionAPI {
   readonly api: API;
@@ -101,7 +100,7 @@ export class DiscussionAPI {
     return await query.execute();
   }
 
-  async getCommentsByThread(user: User | undefined, threadId: number, validate = true, inclCommenters = false): Promise<[Comment[], CommenterUser[]?]> {
+  async getCommentsByThread(user: User | undefined, threadId: number, validate = true, inclCommenters = false): Promise<[Comment[], CommenterUserRaw[]?]> {
     if (validate) {
       const threads = await this.getThreads(user, { 'discussion.id': threadId });
       const thread = threads[0];
@@ -140,7 +139,7 @@ export class DiscussionAPI {
   /**
    * This assumes you have already validated access to the item!
    */
-  async getCommentsByItem(itemId: number, inclCommenters = false): Promise<[Comment[], CommenterUserBasic[]?]> {
+  async getCommentsByItem(itemId: number, inclCommenters = false): Promise<[Comment[], CommenterUser[]?]> {
     const comments = await kysely
       .selectFrom('comment')
       .innerJoin('itemcomment as ic', 'ic.comment_id', 'comment.id')
@@ -154,11 +153,12 @@ export class DiscussionAPI {
         .innerJoin('comment', 'user.id', 'comment.author_id')
         .innerJoin('itemcomment as ic', 'ic.comment_id', 'comment.id')
         .leftJoin('userimage as ui', 'user.id', 'ui.user_id')
-        .select((eb) => ['user.id', 'user.username', 'user.email', eb('ui.user_id', 'is not', null).as('hasPfp')])
+        .leftJoin('userplan', 'user.id', 'userplan.user_id')
+        .select((eb) => ['user.id', 'user.username', 'user.email', eb('ui.user_id', 'is not', null).as('hasPfp'), 'userplan.plan'])
         .where('ic.item_id', '=', itemId)
-        .groupBy('user.id')
+        .groupBy(['user.id', 'userplan.plan'])
         .execute();
-      return [comments, users];
+      return [comments, withPfp(users)];
     }
     return [comments];
   }
@@ -166,7 +166,7 @@ export class DiscussionAPI {
   /**
    * This assumes you have already validated access to the chapter!
    */
-  async getCommentsByChapter(chapterId: number, inclCommenters = false): Promise<[Comment[], CommenterUserBasic[]?]> {
+  async getCommentsByChapter(chapterId: number, inclCommenters = false): Promise<[Comment[], CommenterUserRaw[]?]> {
     const comments = await kysely
       .selectFrom('comment')
       .innerJoin('storychaptercomment as scc', 'scc.comment_id', 'comment.id')
@@ -180,9 +180,10 @@ export class DiscussionAPI {
         .innerJoin('comment', 'user.id', 'comment.author_id')
         .innerJoin('storychaptercomment as scc', 'scc.comment_id', 'comment.id')
         .leftJoin('userimage as ui', 'user.id', 'ui.user_id')
-        .select((eb) => ['user.id', 'user.username', 'user.email', eb('ui.user_id', 'is not', null).as('hasPfp')])
+        .leftJoin('userplan', 'user.id', 'userplan.user_id')
+        .select((eb) => ['user.id', 'user.username', 'user.email', eb('ui.user_id', 'is not', null).as('hasPfp'), 'userplan.plan'])
         .where('scc.chapter_id', '=', chapterId)
-        .groupBy('user.id')
+        .groupBy(['user.id', 'userplan.plan'])
         .execute();
       return [comments, users];
     }

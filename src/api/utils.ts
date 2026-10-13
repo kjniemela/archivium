@@ -11,6 +11,7 @@ export { plans };
 
   import type { PaidTier, Tier } from '../lib/tiers';
   import { paidTiers, tiers } from '../lib/tiers';
+import type { CommenterUser, CommenterUserRaw } from './models/discussion';
 export { paidTiers, tiers };
 export type { PaidTier, Tier };
 
