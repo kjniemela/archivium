@@ -16,7 +16,9 @@ export function deepCompare(a: unknown, b: unknown): boolean {
   return true;
 }
 
-export function getPfpUrl(user: { hasPfp: SqlBool, username: string, email: string }) {
+export type PfpSource = { hasPfp: SqlBool, username: string, email: string };
+
+export function getPfpUrl(user: PfpSource) {
   return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email ?? '')}.jpg`;
 }
 

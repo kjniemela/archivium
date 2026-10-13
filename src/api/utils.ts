@@ -1,13 +1,12 @@
 import type { Request, Response } from 'express';
-import { SqlBool } from 'kysely';
-import md5 from 'md5';
 import { kysely, Trx } from '../db/kysely';
 import { RequestError } from '../errors';
 import { plans } from '../lib/plans';
+import { getPfpUrl } from '../lib/utils';
 import logger from '../logger';
 
 export { perms } from '../lib/perms';
-export { plans };
+export { plans, getPfpUrl };
 
   import type { PaidTier, Tier } from '../lib/tiers';
   import { paidTiers, tiers } from '../lib/tiers';

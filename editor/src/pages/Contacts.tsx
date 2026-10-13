@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { fetchAsync, fetchData, T } from '../helpers';
-import type { ContactUser } from '../../../src/api/models/contact';
+import type { ContactListEntry } from '../../../src/api/models/contact';
 import type { User } from '../../../src/api/models/user';
 import ContactCard from '../components/ContactCard';
 import { useOnlineUsers } from '../hooks/useOnlineUsers';
 
 function contactsList(
-  contacts: ContactUser[] | null,
+  contacts: ContactListEntry[] | null,
   onlineUsers: string[],
   deleteContact: (usr: string) => Promise<void>,
   respond: (usr: string, acc: boolean) => Promise<void>,
@@ -55,12 +55,12 @@ function contactsList(
 
 export default function Contacts() {
   const [, setSelf] = useState<User | null>(null);
-  const [contacts, setContacts] = useState<ContactUser[] | null>(null);
+  const [contacts, setContacts] = useState<ContactListEntry[] | null>(null);
 
   const onlineUsers = useOnlineUsers();
 
   async function refetchContacts() {
-    const contactsData = await fetchAsync(`/api/contacts`) as ContactUser[];
+    const contactsData = await fetchAsync(`/api/contacts`) as ContactListEntry[];
     setContacts(contactsData);
   }
 

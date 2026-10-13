@@ -1,9 +1,10 @@
-import { SqlBool } from 'kysely';
+import type { SqlBool } from 'kysely';
 import { API } from '..';
 import { kysely } from '../../db/kysely';
 import { NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
 import { getPfpUrl } from '../../lib/utils';
 import { handleAsNull } from '../utils';
+import type { UserRef } from './user';
 import { User } from './user';
 
 export type ContactUser = Pick<User, 'id' | 'username' | 'email' | 'created_at' | 'updated_at'> & {
@@ -14,11 +15,11 @@ export type ContactUser = Pick<User, 'id' | 'username' | 'email' | 'created_at' 
   accepting_id: number,
 };
 
-export type ContactListEntry = Pick<User, 'id' | 'username' | 'email' | 'created_at' | 'updated_at'> & {
+export type ContactListEntry = Pick<User, 'id' | 'username'> & {
   accepted: boolean | null,
   is_request: SqlBool,
-  hasPfp: SqlBool,
   plan: number | null,
+  pfpUrl: string,
 };
 
 export class ContactAPI {
@@ -67,7 +68,7 @@ export class ContactAPI {
     return user;
   }
 
-  async getAll(user: User | undefined, includePending = true, includeAccepted = true): Promise<ContactListEntry[]> {
+  async getAll(user: UserRef | undefined, includePending = true, includeAccepted = true): Promise<ContactListEntry[]> {
     if (!(includePending || includeAccepted)) throw new ValidationError('Either includePending or includeAccepted must be true');
     if (!user) throw new UnauthorizedError();
 
@@ -100,8 +101,11 @@ export class ContactAPI {
       query = query.where('contact.accepted', '=', includeAccepted);
     }
 
-    const users = await query.execute();
-    return users;
+    const rows = await query.execute();
+    return rows.map(({ email, hasPfp, created_at: _c, updated_at: _u, ...rest }) => ({
+      ...rest,
+      pfpUrl: getPfpUrl({ hasPfp, username: rest.username, email }),
+    }));
   }
 
   async post(user: User | undefined, username: string): Promise<{ insertId: number }> {

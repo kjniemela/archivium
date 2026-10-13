@@ -1,10 +1,9 @@
-import type { ContactUser } from "../../../src/api/models/contact";
-import { plans } from "../../../src/lib/plans";
-import { getPfpUrl } from "../../../src/lib/utils";
-import { T } from "../helpers";
+import type { ContactListEntry } from '../../../src/api/models/contact';
+import { plans } from '../../../src/lib/plans';
+import { T } from '../helpers';
 
 type ContactCardProps = {
-  contact: ContactUser,
+  contact: ContactListEntry,
   online: boolean,
   remove: (usr: string) => Promise<void>,
   respond: (usr: string, acc: boolean) => Promise<void>,
@@ -15,7 +14,7 @@ export default function ContactCard({ contact, online, remove, respond }: Contac
     <div className='contact-card sheet d-flex gap-4 align-start pa-2 badge-anchor' data-user={contact.username}>
       <div style={{ fontSize: '0.75rem' }}>
         <div className='badge-anchor mb-auto'>
-          <img className='userIcon' alt={contact.username} src={getPfpUrl(contact)} />
+          <img className='userIcon' alt={contact.username} src={contact.pfpUrl} />
           <div
             className={`badge online-badge badge-success${online ? '' : ' hidden'}`}
             style={{ top: 'unset', bottom: '0.25em', right: '0.25em', border: '0.125rem solid var(--sheet-color)' }}

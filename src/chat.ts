@@ -1,9 +1,9 @@
-import WebSocket, { WebSocketServer } from "ws";
-import { User } from "./api/models/user";
-import { AssertionError } from "./errors";
-import { IncomingMessage } from "http";
-import logger from "./logger";
-import api from "./api";
+import WebSocket, { WebSocketServer } from 'ws';
+import { User, UserRef } from './api/models/user';
+import { AssertionError } from './errors';
+import { IncomingMessage } from 'http';
+import logger from './logger';
+import api from './api';
 
 type SocketMsg = { action?: string };
 type SocketResponse = { onlineUsers?: string[] };
@@ -28,7 +28,7 @@ type Connection = { user: User, sockets: Set<WebSocket>, disconnectTimeout?: Nod
 const connections = new Map<number, Connection>();
 const userBySocket = new WeakMap<WebSocket, number>();
 
-async function refreshOnlineListFor(user: User) {
+async function refreshOnlineListFor(user: UserRef) {
   const contacts = await api.contact.getAll(user, false, true);
   const usernames = contacts.filter((contact) => connections.has(contact.id)).map((contact) => contact.username);
   for (const socket of connections.get(user.id)?.sockets ?? []) {
@@ -100,7 +100,7 @@ export default function listenSockets(wss: WebSocketServer) {
     try {
       handleConnect(ws, user);
     } catch (err) {
-      logger.error("Failed to connect socket!");
+      logger.error('Failed to connect socket!');
       logger.error(err);
       ws.close();
     }

@@ -18,12 +18,14 @@ export type UserImage = {
   data: Buffer,
 };
 
+export type UserRef = { id: number };
+
 export type BasicUser = {
   id: number,
   username: string,
   created_at: Date,
   updated_at: Date,
-  isContact: boolean,
+  isContact?: boolean,
   hasPfp: boolean,
   pfpUrl?: string,
 };
