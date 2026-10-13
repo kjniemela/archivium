@@ -34,6 +34,11 @@ export type CommenterUserRaw = {
 
 export type CommenterUser = Omit<Omit<CommenterUserRaw, 'email'>, 'hasPfp'> & { pfpUrl: string };
 
+export type CommentsResponse = {
+  authors: { [id: number]: CommenterUser },
+  comments: Comment[],
+};
+
 export class DiscussionAPI {
   readonly api: API;
 

@@ -11,7 +11,7 @@ import { Note } from './models/note';
 import { Session } from './models/session';
 import { User } from './models/user';
 import { handleAsNull, perms, sendCachedImage } from './utils';
-import { CommenterUser } from './models/discussion';
+import { CommenterUser, CommentsResponse } from './models/discussion';
 
 type RouteMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 export type APIRouteHandler = (req: Request<{ [key: string]: string }>, res: Response) => Promise<any>;
@@ -351,8 +351,9 @@ export default function (app: Express, upload: Multer) {
                 for (const user of users ?? []) {
                   authors[user.id] = user;
                 }
-                return { comments, authors };
+                return { comments, authors } satisfies CommentsResponse;
               },
+              POST: (req) => api.discussion.postCommentToItem(req.session.user, req.params.universeShortName, req.params.itemShortName, req.body),
             }, [
               new APIRoute('/:commentId', {
                 DELETE: (req) => api.discussion.deleteItemComment(req.session.user, req.params.universeShortName, req.params.itemShortName, Number(req.params.commentId)),
