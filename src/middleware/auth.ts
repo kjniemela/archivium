@@ -61,7 +61,7 @@ const createSession = async (req: Request, res: Response, next: NextFunction): P
   next();
 };
 
-async function refreshSession(user: any) {
+async function refreshSession(user: { id: number }) { // TODO switch out for UserRef when available!
   await api.user.put(user.id, user.id, { updated_at: new Date() });
 }
 

@@ -139,7 +139,7 @@ class CtxLookup {
   def?: string;
   constructor(...lookup: string[]) {
     this.lookup = lookup;
-    this.def;
+    // this.def;
   }
 
   default(def: string) {

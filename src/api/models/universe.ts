@@ -70,7 +70,7 @@ export type Universe = {
 };
 
 const checkTheme = (theme: unknown, tier: Tier | null) => {
-  if (typeof theme !== 'string' || !theme || !themes.hasOwnProperty(theme)) return;
+  if (typeof theme !== 'string' || !theme || !Object.prototype.hasOwnProperty.call(themes, theme)) return;
   if (!themeAvailable(theme, tier ?? tiers.FREE)) throw new ForbiddenError('This theme requires a premium universe.');
 };
 

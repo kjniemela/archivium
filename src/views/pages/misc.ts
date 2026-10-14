@@ -7,6 +7,7 @@ import { Cond, perms } from '../../api/utils';
 import embedder from '../../embedding';
 import { UnauthorizedError } from '../../errors';
 import logger from '../../logger';
+import { Universe } from '../../api/models/universe';
 
 const staticDir = path.join(__dirname, '../../static');
 
@@ -109,7 +110,7 @@ export default {
   /* React Editor */
   async editor(req, res) {
     const params = req.params[0]?.split('/') ?? [];
-    const data: any = {};
+    const data: { universe?: Universe, preloadChunk?: string | null } = {};
     if (params[0] === 'universes' && params[1]) {
       const [, universeShort] = params;
       data.universe = await api.universe.getOne(req.session.user, { shortname: universeShort });

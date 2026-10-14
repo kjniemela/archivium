@@ -14,6 +14,8 @@ export default defineConfig([
   tseslint.configs.recommended,
   {
     rules: {
+      // TODO remove once we have no more "any" types
+      "@typescript-eslint/no-explicit-any": "warn",
       "no-sparse-arrays": "off",
     },
   },

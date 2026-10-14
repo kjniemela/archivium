@@ -257,7 +257,7 @@ export class StoryAPI {
   /**
    * This assumes we have write access to the provided story!
    */
-  async reorderChapters(story, orderedIndexes) {
+  async reorderChapters(story: Story, orderedIndexes: (string | number)[]) {
     const newIndexes = {};
     const ids = (await kysely
       .selectFrom('storychapter')
@@ -266,7 +266,9 @@ export class StoryAPI {
       `.as('ids'))
       .where('story_id', '=', story.id)
       .groupBy('story_id')
-      .executeTakeFirst())?.ids!;
+      .executeTakeFirst())?.ids;
+
+    if (!ids) throw new NotFoundError();
 
     await withTransaction(async (trx) => {
       await trx.updateTable('storychapter').set({ chapter_number: 0 }).where('story_id', '=', story.id).execute();

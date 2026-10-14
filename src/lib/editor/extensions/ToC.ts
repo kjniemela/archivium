@@ -1,5 +1,5 @@
 import { Node, mergeAttributes, nodeInputRule } from '@tiptap/core'
-import { DOMSerializer, Node as PMNode } from '@tiptap/pm/model';
+import { DOMOutputSpec, DOMSerializer, Node as PMNode } from '@tiptap/pm/model';
 import { TiptapContext } from '..';
 import { slugify } from './Heading';
 
@@ -39,7 +39,7 @@ function computeLiveTocData(doc: PMNode): { headings: HeadingEntry[], scopedByPo
 }
 
 export interface ToCOptions {
-  HTMLAttributes: Record<string, any>
+  HTMLAttributes: Record<string, unknown>
   context?: TiptapContext;
 }
 
@@ -51,16 +51,16 @@ declare module '@tiptap/core' {
   }
 }
 
-function generateToCDOM(headings: { title: string, level: number }[]): any {
+function generateToCDOM(headings: { title: string, level: number }[]): DOMOutputSpec {
   if (!headings.length) return ['p', { style: 'margin-top: -1rem; margin-bottom: 0;' }, '. . .'];
 
-  const root: any[] = ['ol', {}];
-  const stack: any[][] = [root];
+  const root: unknown[] = ['ol', {}];
+  const stack: unknown[][] = [root];
   let currentLevel = headings[0].level;
 
   for (const { title, level } of headings) {
     while (currentLevel < level) {
-      const newList: any[] = ['ol', {}];
+      const newList: unknown[] = ['ol', {}];
       stack[stack.length - 1].push(newList);
       stack.push(newList);
       currentLevel++;
@@ -74,7 +74,7 @@ function generateToCDOM(headings: { title: string, level: number }[]): any {
     stack[stack.length - 1].push(['li', { class: `toc-level-${level}` }, ['a', { class: 'link link-animated', href: `#${slugify(title)}` }, title]]);
   }
 
-  return root;
+  return root as unknown as DOMOutputSpec; // TODO awful...
 }
 
 const ToC = Node.create<ToCOptions>({

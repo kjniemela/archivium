@@ -13,7 +13,7 @@ import crypto from 'crypto';
  * @returns {string} A string with the hashed value.
  */
 export const createHash = (data: string, salt: string = ''): string => {
-  let shasum = crypto.createHash('sha256');
+  const shasum = crypto.createHash('sha256');
   shasum.update(data + salt);
   return shasum.digest('hex');
 };
