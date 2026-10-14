@@ -5,7 +5,7 @@ import { GalleryImage } from '../api/models/item';
 import { executeQuery } from './legacy';
 import { editorExtensions } from '../lib/editor';
 import { renderMarkdown } from '../lib/markdownRender';
-import { jsonToIndexed } from '../lib/tiptapHelpers';
+import { JsonNode, jsonToIndexed } from '../lib/tiptapHelpers';
 
 async function main() {
   const universeItems = {};
@@ -33,7 +33,7 @@ async function main() {
 
     const html = await renderMarkdown(item.universe_short, objData.body, { item: { ...item, obj_data: objData, gallery } });
     const json = generateJSON(html, editorExtensions(false));
-    const indexed = jsonToIndexed(json);
+    const indexed = jsonToIndexed(json as JsonNode);
     objData.body = indexed;
     await executeQuery('UPDATE item SET obj_data = ? WHERE id = ?', [JSON.stringify(objData), item.id]);
     readline.moveCursor(process.stdout, 0, -1);
@@ -55,7 +55,7 @@ async function main() {
 
     const html = await renderMarkdown(chapter.universe_short, chapter.body, {});
     const json = generateJSON(html, editorExtensions(false));
-    const indexed = jsonToIndexed(json);
+    const indexed = jsonToIndexed(json as JsonNode);
     await executeQuery('UPDATE storychapter SET body = ? WHERE id = ?', [JSON.stringify(indexed), chapter.id]);
     readline.moveCursor(process.stdout, 0, -1);
     count++;
@@ -77,7 +77,7 @@ async function main() {
 
     const html = await renderMarkdown(note.universe_short, note.body, {});
     const json = generateJSON(html, editorExtensions(false));
-    const indexed = jsonToIndexed(json);
+    const indexed = jsonToIndexed(json as JsonNode);
     await executeQuery('UPDATE note SET body = ? WHERE id = ?', [JSON.stringify(indexed), note.id]);
     readline.moveCursor(process.stdout, 0, -1);
     count++;
@@ -97,7 +97,7 @@ async function main() {
     if (objData.homeBody) {
       const html = await renderMarkdown(universe.shortname, objData.homeBody, {});
       const json = generateJSON(html, editorExtensions(false));
-      const indexed = jsonToIndexed(json);
+      const indexed = jsonToIndexed(json as JsonNode);
       const newObjData = { body: indexed };
       await executeQuery(`
         INSERT INTO item (title, shortname, item_type, author_id, universe_id, created_at, updated_at, obj_data)
@@ -109,7 +109,7 @@ async function main() {
     if (objData.publicBody) {
       const html = await renderMarkdown(universe.shortname, objData.publicBody, {});
       const json = generateJSON(html, editorExtensions(false));
-      const indexed = jsonToIndexed(json);
+      const indexed = jsonToIndexed(json as JsonNode);
       const newObjData = { body: indexed };
       await executeQuery(`
         INSERT INTO item (title, shortname, item_type, author_id, universe_id, created_at, updated_at, obj_data)

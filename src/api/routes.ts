@@ -13,7 +13,7 @@ import { User } from './models/user';
 import { handleAsNull, perms, sendCachedImage } from './utils';
 
 type RouteMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
-export type APIRouteHandler = (req: Request<{ [key: string]: string }>, res: Response) => Promise<any>;
+export type APIRouteHandler = (req: Request<{ [key: string]: string }>, res: Response) => Promise<unknown>;
 type MethodFuncs = {
   [method in RouteMethod]?: APIRouteHandler;
 } & {

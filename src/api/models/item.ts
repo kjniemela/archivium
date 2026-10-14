@@ -7,7 +7,7 @@ import { ForbiddenError, InsufficientStorageError, ModelError, NotFoundError, Un
 import { extractLinkData, LinkData } from '../../lib/editor';
 import { generatePreview, previewToDataUri } from '../../lib/imagePreview';
 import { IndexedDocument, indexedToJson, updateLinks } from '../../lib/tiptapHelpers';
-import { BaseOptions, handleAsNull, parseData, perms, tierLimits, withTransaction } from '../utils';
+import { BaseOptions, SqlValue, handleAsNull, parseData, perms, tierLimits, withTransaction } from '../utils';
 import { User } from './user';
 import { deepCompare } from '../../lib/utils';
 import embedder from '../../embedding';
@@ -113,9 +113,9 @@ export type ObjData = {
   notes?: boolean,
   comments?: boolean,
   body?: IndexedDocument,
-  tabs?: { [key: string]: any }, // TODO remove these any types at some point
+  tabs?: { [key: string]: unknown },
   layoutTabs?: { [tabTypeId: string]: unknown },
-} & { [K in BuiltinTab]?: any };
+} & { [K in BuiltinTab]?: unknown };
 
 export type BasicItem = {
   id: number,
@@ -158,7 +158,7 @@ class MapImageAPI {
     return await this.getOneByItem(item, options);
   }
 
-  async getMany(options: { [key: string]: any } | null): Promise<MapImage[]> {
+  async getMany(options: { [key: string]: unknown } | null): Promise<MapImage[]> {
     let query = kysely
       .selectFrom('map')
       .innerJoin('image', 'image.id', 'map.image_id')
@@ -258,7 +258,7 @@ class ItemImageAPI {
     return image;
   }
 
-  async getMany(options: { [key: string]: any } | null, inclData = true): Promise<ItemImage[]> {
+  async getMany(options: { [key: string]: unknown } | null, inclData = true): Promise<ItemImage[]> {
     let query = kysely
       .selectFrom('itemimage')
       .innerJoin('image', 'image.id', 'itemimage.image_id')
@@ -350,7 +350,7 @@ export class ItemAPI {
     this.api = api;
   }
 
-  async getOneBasic(user: User | undefined, conditions: any={}, permissionsRequired=perms.READ, options: ItemOptions = {}): Promise<BasicItem> {
+  async getOneBasic(user: User | undefined, conditions: Record<string, SqlValue>={}, permissionsRequired=perms.READ, options: ItemOptions = {}): Promise<BasicItem> {
     const parsedConditions = parseData(conditions);
 
     const data = await this.getMany(user, parsedConditions, permissionsRequired, { ...options, limit: 1 });
@@ -363,7 +363,7 @@ export class ItemAPI {
     return item;
   }
 
-  async getOne(user: User | undefined, conditions: any = {}, permissionsRequired = perms.READ, options: ItemOptions = {}): Promise<Item> {
+  async getOne(user: User | undefined, conditions: Record<string, SqlValue> = {}, permissionsRequired = perms.READ, options: ItemOptions = {}): Promise<Item> {
     const item: Item = {
       ...await this.getOneBasic(user, conditions, permissionsRequired, options),
       events: [],
@@ -582,31 +582,36 @@ export class ItemAPI {
 
 
     // TODO even more condition hacking we want to get rid of
-    let bridged: any = query;
     if (conditions) {
       for (let i = 0; i < conditions.strings.length; i++) {
-        bridged = bridged.where(toRawSql<boolean>(conditions.strings[i], [conditions.values[i]]));
+        query = query.where(toRawSql<boolean>(conditions.strings[i], [conditions.values[i]]));
       }
     }
     if (options.where) {
       const raw = condToRawSql(options.where);
-      if (raw) bridged = bridged.where(raw);
+      if (raw) query = query.where(raw);
     }
     for (const [joinType, table, onCond] of options.join ?? []) {
-      const tableExpr = Array.isArray(table) ? `${table[0]} as ${table[1]}` : table;
-      const method = joinType === 'INNER' ? 'innerJoin' : joinType === 'LEFT' ? 'leftJoin' : 'rightJoin';
+      const tableExpr = Array.isArray(table)
+        ? sql.table(table[0]).as(table[1])
+        : sql.table(table).as(table);
       const raw = condToRawSql(onCond);
-      bridged = bridged[method](tableExpr, (join: any) => (raw ? join.on(raw) : join));
+      if (joinType === 'INNER') {
+        query = query.innerJoin(tableExpr, (join) => (raw ? join.on(raw) : join));
+      } else if (joinType === 'LEFT') {
+        query = query.leftJoin(tableExpr, (join) => (raw ? join.on(raw) : join));
+      } else {
+        query = query.rightJoin(tableExpr, (join) => (raw ? join.on(raw) : join));
+      }
     }
     for (const [col, alias, value] of options.select ?? []) {
       if (!alias) continue;
       const values = value === undefined ? [] : (Array.isArray(value) ? value : [value]);
-      bridged = bridged.select(toRawSql(col, values).as(alias));
+      query = query.select(toRawSql(col, values).as(alias));
     }
     if (options.groupBy?.length) {
-      bridged = bridged.groupBy(options.groupBy.map((col) => kysely.dynamic.ref(col)));
+      query = query.groupBy(options.groupBy.map((col) => kysely.dynamic.ref(col)));
     }
-    query = bridged as typeof query;
 
 
     query = options.sort
@@ -1154,7 +1159,7 @@ export class ItemAPI {
     };
   }
 
-  async handleLinks(item: Item, objData: any, conn?: Trx): Promise<void> {
+  async handleLinks(item: Item, objData: Record<string, unknown>, conn?: Trx): Promise<void> {
     if (objData.body && typeof objData.body !== 'string') {
       const links: ({ href: string } & LinkData)[] = [];
       indexedToJson(objData.body as IndexedDocument, (href) => href.startsWith('@') && links.push({ href, ...extractLinkData(href) }));
@@ -1327,7 +1332,7 @@ export class ItemAPI {
 
     let numUpdatedRows = 0;
     await withTransaction(async (trx) => {
-      await this.handleLinks(item as Item, item.obj_data, trx);
+      await this.handleLinks(item as Item, item.obj_data ?? {}, trx);
 
       const result = await trx
         .updateTable('item')

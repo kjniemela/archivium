@@ -13,7 +13,7 @@ export interface NodeAttributes {
 export type MarkdownData = [string, string, MarkdownData[], NodeAttributes];
 
 class MarkdownNode {
-  type: any;
+  type: string;
   content: string;
   attrs: NodeAttributes;
   children: MarkdownNode[];
@@ -135,14 +135,14 @@ class MarkdownNode {
 }
 
 class CtxLookup {
-  lookup: any[];
-  def: any;
-  constructor(...lookup) {
+  lookup: string[];
+  def?: string;
+  constructor(...lookup: string[]) {
     this.lookup = lookup;
     this.def;
   }
 
-  default(def) {
+  default(def: string) {
     this.def = def;
     return this;
   }
@@ -161,8 +161,8 @@ class CtxLookup {
 }
 
 class GalleryUrl {
-  idLookup: any;
-  constructor(idLookup) {
+  idLookup: CtxLookup;
+  constructor(idLookup: CtxLookup) {
     this.idLookup = idLookup;
   }
 
@@ -173,9 +173,9 @@ class GalleryUrl {
 }
 
 class Line {
-  text: any;
+  text: string;
   index: number;
-  constructor(text) {
+  constructor(text: string) {
     this.text = text;
     this.index = 0;
   }

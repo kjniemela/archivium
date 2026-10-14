@@ -74,7 +74,7 @@ export default {
       res.redirect('/');
       return;
     }
-    const data = await api.email.trySendVerifyLink(req.session.user, req.session.user.username).catch(handleErrorWithData);
+    const data = await api.email.trySendVerifyLink(req.session.user, req.session.user.username).catch((error) => handleErrorWithData<Date>(error));
     if (data && !(data instanceof Date) && data.alreadyVerified) {
       res.redirect(`${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
       return;

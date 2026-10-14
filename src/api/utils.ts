@@ -65,7 +65,11 @@ export async function withTransaction(callback: (conn: Trx) => Promise<void>) {
   }
 }
 
-export const parseData = (conditions: { [key: string]: any } | undefined | null) => {
+export type SqlValue = string | number | boolean | Date | null | undefined | SqlValue[];
+
+export type LegacyConditions = { strings: string[], values: SqlValue[] };
+
+export const parseData = (conditions: { [key: string]: SqlValue } | undefined | null): LegacyConditions => {
   if (!conditions) return { strings: [], values: [] };
   const keys = Object.keys(conditions).filter(key => conditions[key] !== undefined);
   const values = keys.map(key => conditions[key]);
@@ -87,27 +91,27 @@ export type BaseOptions = {
 
 export class Cond {
   check?: string;
-  value?: any;
-  constructor(check?: string, value?: any) {
+  value?: SqlValue;
+  constructor(check?: string, value?: SqlValue) {
     this.check = check;
     this.value = value;
   }
 
-  or(cond?: string | Cond, value?) {
+  or(cond?: string | Cond, value?: SqlValue) {
     if (!(cond instanceof Cond)) return this.or(new Cond(cond, value));
     if (cond && !(cond.check || cond instanceof MultiCond)) return this;
     if (this && !(this.check || this instanceof MultiCond)) return cond;
     return new MultiCond('OR', this, cond);
   }
 
-  and(cond?: string | Cond, value?) {
+  and(cond?: string | Cond, value?: SqlValue) {
     if (!(cond instanceof Cond)) return this.and(new Cond(cond, value));
     if (cond && !(cond.check || cond instanceof MultiCond)) return this;
     if (this && !(this.check || this instanceof MultiCond)) return cond;
     return new MultiCond('AND', this, cond);
   }
 
-  export(): [string | undefined, any[]] {
+  export(): [string | undefined, SqlValue[]] {
     return [this.check, [this.value]];
   }
 }
@@ -125,7 +129,7 @@ class MultiCond extends Cond {
     this.b = b;
   }
 
-  export(): [string, any[]] {
+  export(): [string, SqlValue[]] {
     const [aStr, aValues] = this.a.export();
     const [bStr, bValues] = this.b.export();
     if (!(aStr && bStr)) return [`${aStr || bStr || ''}`, [...aValues, ...bValues]];
@@ -154,14 +158,14 @@ export function sendCachedImage(req: Request, res: Response, image: CacheableIma
 
 export function handleAsNull(type: typeof RequestError | (typeof RequestError)[]) {
   if (type instanceof Array) {
-    return (error: any): null => {
+    return (error: unknown): null => {
       if (type.some(t => error instanceof t)) {
         return null;
       }
       throw error;
     };
   } else {
-    return (error: any): null => {
+    return (error: unknown): null => {
       if (error instanceof type) {
         return null;
       }
@@ -170,9 +174,9 @@ export function handleAsNull(type: typeof RequestError | (typeof RequestError)[]
   }
 }
 
-export function handleErrorWithData(error: any): null {
-  if (error.data) {
-    return error.data;
+export function handleErrorWithData<T>(error: unknown): T {
+  if (error instanceof RequestError && error.data) {
+    return error.data as T;
   }
   throw error;
 }

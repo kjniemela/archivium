@@ -26,7 +26,7 @@ type OAuthClientRow = {
   grant_types: string[] | null,
   response_types: string[] | null,
   scope: string | null,
-  metadata: Record<string, any> | null,
+  metadata: Record<string, unknown> | null,
   created_at: Date,
 };
 

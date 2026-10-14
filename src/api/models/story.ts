@@ -4,7 +4,7 @@ import { API } from '..';
 import { kysely } from '../../db/kysely';
 import { NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
 import { IndexedDocument } from '../../lib/tiptapHelpers';
-import { BaseOptions, perms, withTransaction } from '../utils';
+import { BaseOptions, SqlValue, perms, withTransaction } from '../utils';
 import { User } from './user';
 
 export type StoryCover = {
@@ -130,7 +130,7 @@ export class StoryAPI {
     return story;
   }
 
-  async getMany(user: User | undefined, conditions: { [key: string]: any } | null = null, permissionsRequired = perms.READ, options: BaseOptions = {}): Promise<Story[]> {
+  async getMany(user: User | undefined, conditions: { [key: string]: SqlValue } | null = null, permissionsRequired = perms.READ, options: BaseOptions = {}): Promise<Story[]> {
     if (permissionsRequired >= perms.WRITE) {
       if (!user) throw new UnauthorizedError();
       conditions = {

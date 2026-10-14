@@ -1,41 +1,56 @@
+export type NodeMark = {
+  type: string;
+  attrs?: { href?: string, class?: string, [key: string]: unknown };
+};
+
+export type NodeAttrs = { level?: number, [key: string]: unknown };
+
 interface OffsetTextNode {
   type: string;
   start?: number;
   end?: number;
-  marks?: any[];
+  marks?: NodeMark[];
   content?: OffsetTextNode[];
-  attrs?: { [key: string]: any };
+  attrs?: NodeAttrs;
 }
 
-interface CombinedNode {
+export interface CombinedNode {
   type: string;
   text?: string;
-  marks?: any[];
-  content?: OffsetTextNode[];
-  attrs?: { [key: string]: any };
+  marks?: NodeMark[];
+  content?: CombinedNode[];
+  attrs?: NodeAttrs;
 }
+
+export type JsonNode = {
+  type: string;
+  text?: string;
+  marks?: NodeMark[];
+  content?: JsonNode[];
+  attrs?: NodeAttrs;
+};
 
 export interface IndexedDocument {
   text: string;
   structure: OffsetTextNode[];
 }
 
-function cleanupMark(mark) {
+function cleanupMark(mark: NodeMark): NodeMark {
   const newMark = { ...mark };
   if (newMark.type === 'link') {
     newMark.attrs = {
-      href: newMark.attrs.href,
-      class: newMark.attrs.class,
+      href: newMark.attrs?.href,
+      class: newMark.attrs?.class,
     };
   }
   return newMark;
 }
 
-export function jsonToIndexed(doc: any): IndexedDocument {
+export function jsonToIndexed(doc: JsonNode): IndexedDocument {
   let textBuffer = '';
   let pos = 0;
 
-  function walk(node: any): OffsetTextNode {
+  function walk(node: JsonNode): OffsetTextNode {
     if (node.type === 'text') {
       const start = pos;
       textBuffer += node.text || '';
@@ -95,10 +110,10 @@ export function updateLinks(indexed: IndexedDocument, getNewLink: (href: string)
   structure.forEach(walk)
 }
 
-export function indexedToJson(indexed: IndexedDocument, linkHandler?: (href: string) => void, headingHandler?: (text: string, level: number) => void): any {
+export function indexedToJson(indexed: IndexedDocument, linkHandler?: (href: string) => void, headingHandler?: (text: string, level: number) => void): { type: 'doc', content: CombinedNode[] } {
   const { text, structure } = indexed;
 
-  function walk(node: OffsetTextNode): any {
+  function walk(node: OffsetTextNode): CombinedNode {
     if (node.type === 'text') {
       const combinedNode: CombinedNode = {
         type: 'text',
