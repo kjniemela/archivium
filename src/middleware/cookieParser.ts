@@ -12,4 +12,4 @@ const parseCookies = (req: express.Request, res: express.Response, next: express
   next()
 };
 
-module.exports = parseCookies;
+export default parseCookies;
