@@ -73,7 +73,7 @@ class MarkdownNode {
     return `${this.content ?? ''}${this.children.map(child => child.innerText()).join('')}`;
   }
 
-  async evaluate(currentUniverse: string, ctx, transform?, topLevel=true): Promise<MarkdownData> {
+  async evaluate(currentUniverse: string, ctx, transform?): Promise<MarkdownData> {
     if (this.type === 'a') {
       this.addClass('link');
       this.addClass('link-animated');
@@ -129,7 +129,7 @@ class MarkdownNode {
       }
       delete this.attrs.ctx;
     }
-    const result: MarkdownData = [this.type, this.content ?? '', await Promise.all(this.children.map(tag => tag.evaluate(currentUniverse, ctx, transform, false))), this.attrs];
+    const result: MarkdownData = [this.type, this.content ?? '', await Promise.all(this.children.map(tag => tag.evaluate(currentUniverse, ctx, transform))), this.attrs];
     return result;
   }
 }
@@ -333,11 +333,11 @@ export function splitIgnoringQuotes(str) {
 export function parseMarkdown(text) {
   const root = new MarkdownNode('div', '', { class: 'markdown' });
   let toc: MarkdownNode | null = null;
-  const maxTocDepth: number | null = null;
+  // const maxTocDepth: number | null = null;
   let curParagraph = new MarkdownNode('p');
   let curList: [MarkdownNode | null, number] = [null, -1];
   let rootList: MarkdownNode | null = null;
-  const curTocList: [MarkdownNode | null, number] = [null, -1];
+  // const curTocList: [MarkdownNode | null, number] = [null, -1];
   let asideStart: number | null = null;
 
   const lines = text.split('\n');

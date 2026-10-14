@@ -266,7 +266,7 @@ export class NoteAPI {
 
   async put(user: User | undefined, uuid: string, changes: Partial<Note>): Promise<{ numUpdatedRows: number }> {
     if (!user) throw new UnauthorizedError();
-    const { title, body, is_public, items, boards, tags } = changes;
+    const { title, body, is_public, items, tags } = changes;
     if (title === undefined || is_public === undefined) throw new ValidationError();
     const note = await this.getOne(user, uuid);
 
