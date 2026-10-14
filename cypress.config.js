@@ -9,7 +9,7 @@ module.exports = defineConfig({
   e2e: {
     baseUrl: 'http://localhost:33004',
     setupNodeEvents(on, config) {
-      const kysely = require('./dist/db/kysely');
+      const { kysely } = require('./dist/db/kysely');
 
       on('task', {
         // PKCE requires real SHA-256; generating it here (Node) is simpler than
