@@ -2,7 +2,7 @@ import db from '.';
 import readline from 'readline';
 import api from '../api';
 import { kysely } from '../db/kysely';
-import { askQuestion } from './import';
+import { askQuestion } from './cliUtils';
 import { handleAsNull } from '../api/utils';
 import { ForbiddenError, UnauthorizedError } from '../errors';
 

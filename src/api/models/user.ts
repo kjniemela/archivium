@@ -4,7 +4,7 @@ import { API } from '..';
 import { SITE_OWNER_EMAIL } from '../../config';
 import { kysely } from '../../db/kysely';
 import { ForbiddenError, NotFoundError, RequestError, UnauthorizedError, ValidationError } from '../../errors';
-import utils from '../../lib/hashUtils';
+import * as utils from '../../lib/hashUtils';
 import logger from '../../logger';
 import themes, { Theme, themeAvailable, ThemeName } from '../../themes';
 import { perms, plans, planTier, withTransaction } from '../utils';

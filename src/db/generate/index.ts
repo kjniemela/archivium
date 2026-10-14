@@ -10,7 +10,7 @@ import { User } from '../../api/models/user';
 import { perms, plans } from '../../api/utils';
 import { DB_CONFIG } from '../../config';
 import { IndexedDocument, jsonToIndexed } from '../../lib/tiptapHelpers';
-import { loadSchema } from '../import';
+import { loadSchema } from '../updateSchema';
 import { executeQuery } from '../legacy';
 import { defaultItemData, defaultUniverseData, unformattedTiptapDocument } from './defaults.js';
 

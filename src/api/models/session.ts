@@ -1,6 +1,6 @@
 import { sql } from 'kysely';
 import { kysely } from '../../db/kysely';
-import utils from '../../lib/hashUtils';
+import * as utils from '../../lib/hashUtils';
 import { API } from '..';
 import { User } from './user';
 

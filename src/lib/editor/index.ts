@@ -35,15 +35,16 @@ export function extractLinkData(href: string): LinkData {
   const data: LinkData = {};
 
   if (href.startsWith('@')) {
-    let [first, second] = href.substring(1).split('/');
+    const [first, second] = href.substring(1).split('/');
     if (first) {
+      let itemString = second;
       data.universe = first;
       if (!second) {
-        second = first;
+        itemString = first;
         delete data.universe;
       }
 
-      const [itemQuery, hash] = second.split('#');
+      const [itemQuery, hash] = itemString.split('#');
       const [item, query] = itemQuery.split('?');
 
       data.item = item;

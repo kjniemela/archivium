@@ -4,10 +4,10 @@ import { kysely } from '../../db/kysely';
 import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from "../../errors";
 import { User } from "./user";
 
-const { WEB_PUSH_ENABLED, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, DOMAIN } = require('../../config');
-const logger = require('../../logger');
-const md5 = require('md5');
-const webpush = require('web-push');
+import { WEB_PUSH_ENABLED, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, DOMAIN } from '../../config';
+import logger from '../../logger';
+import md5 from 'md5';
+import webpush from 'web-push';
 
 if (WEB_PUSH_ENABLED) {
   webpush.setVapidDetails(

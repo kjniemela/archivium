@@ -12,4 +12,9 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   tseslint.configs.recommended,
+  {
+    rules: {
+      "no-sparse-arrays": "off",
+    },
+  },
 ]);
