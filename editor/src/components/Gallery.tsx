@@ -1,6 +1,6 @@
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent, type UniqueIdentifier } from '@dnd-kit/core';
 import { arrayMove, rectSortingStrategy, SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { type GalleryImage } from '../../../src/api/models/item';
 import { HTTP_INSUFFICIENT_STORAGE, postFormData, T } from '../helpers';
@@ -104,13 +104,13 @@ export default function Gallery({ universe, item, images, onRemoveImage, onUploa
                 for (const image of imageInput.files) {
                   const response = await postFormData(`/api/universes/${universe}/items/${item}/gallery/upload`, { image });
                   const data = await response.json();
-  
+
                   if (response.status === HTTP_INSUFFICIENT_STORAGE) {
                     setUploadModalError('There is not enough available storage to upload this image!');
                     setUploading(false);
                     return;
                   }
-                  
+
                   uploadedImages.push({
                     id: data.insertId,
                     name: image.name,

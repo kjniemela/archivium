@@ -127,7 +127,7 @@ function MenuBar({ editor, getLink, itemTitles, itemGroups, gallery }: RichEdito
   const setVideoEmbed = useCallback(() => {
     const previousSrc = editor.getAttributes('iframe').src;
 
-    getLinkInput(previousSrc, 'videoembed').then(([src, _]) => {
+    getLinkInput(previousSrc, 'videoembed').then(([src]) => {
       if (!src) {
         return;
       }

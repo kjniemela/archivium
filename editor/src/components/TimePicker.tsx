@@ -14,28 +14,6 @@ function getMonthValue(time: Time) {
   else if (Month === 4 || Month === 6 || Month === 9 || Month === 11) return 30 * 864000;
   else return 31 * 864000;
 }
-function nameMonth(month: number): string {
-  return {
-    1: 'January',
-    2: 'February',
-    3: 'March',
-    4: 'April',
-    5: 'May',
-    6: 'June',
-    7: 'July',
-    8: 'August',
-    9: 'September',
-    10: 'October',
-    11: 'November',
-    12: 'December',
-  }[month] as string;
-}
-function nameDay(day: number): string {
-  if (day % 10 === 1 && day % 100 !== 11) return `${day}st`;
-  else if (day % 10 === 2 && day % 100 !== 12) return `${day}nd`;
-  else if (day % 10 === 3 && day % 100 !== 13) return `${day}rd`;
-  else return `${day}th`;
-}
 
 const defaults: Time = {
   Year: 0,
@@ -53,15 +31,6 @@ const evals: { [key: string]: (time: Time) => number } = {
   Hour: () => 36000,
   Minute: () => 600,
   Second: () => 10,
-};
-
-const names: { [key: string]: (v: number) => string } = {
-  Year: v => v.toString(),
-  Month: v => nameMonth(v),
-  Day: v => nameDay(v),
-  Hour: v => v.toString(),
-  Minute: v => v.toString(),
-  Second: v => v.toString(),
 };
 
 function computeTime(abstime: number): Time {
