@@ -1,11 +1,11 @@
-const { DB_CONFIG, DOMAIN } = require('../config');
-const logger = require('../logger');
-const { spawn } = require('child_process');
+import { DB_CONFIG, DOMAIN } from '../config';
+import logger from '../logger';
+import { spawn } from 'child_process';
 
 /**
  * Back up contents of database to Cloudflare R2 in case the database is lost.
  */
-async function backup() {
+async function backup(): Promise<void> {
   logger.info('Backing up db...');
 
   try {
@@ -27,7 +27,7 @@ async function backup() {
     dump.stdout.pipe(gzip.stdin);
     gzip.stdout.pipe(rclone.stdin);
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       dump.stderr.on('data', (data) => logger.error(`mysqldump: ${data}`));
       gzip.stderr.on('data', (data) => logger.error(`gzip: ${data}`));
       rclone.stderr.on('data', (data) => logger.error(`rclone: ${data}`));
@@ -54,4 +54,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = backup;
+export default backup;

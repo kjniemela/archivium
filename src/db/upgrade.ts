@@ -1,11 +1,11 @@
-const mysql = require('mysql2/promise');
-const { DB_CONFIG } = require('../config');
-const fs = require('fs').promises;
-const path = require('path');
-const { askQuestion } = require('./import');
-const backup = require('./backup');
+import { promises as fs } from 'fs';
+import mysql from 'mysql2/promise';
+import path from 'path';
+import { DB_CONFIG } from '../config';
+import backup from './backup';
+import { askQuestion } from './cliUtils';
 
-async function applySchemaPatches(db) {
+async function applySchemaPatches(db: mysql.Connection) {
   try {
     const [rows] = await db.query('SELECT version FROM schema_version');
     const currentVersion = rows[0].version || 0;
@@ -17,7 +17,7 @@ async function applySchemaPatches(db) {
     const patches = files
       .filter(file => /^patch_from_\d+\.sql$/.test(file))
       .map(file => {
-        const fromVersion = parseInt(file.match(/^patch_from_(\d+)\.sql$/)[1], 10);
+        const fromVersion = parseInt((file.match(/^patch_from_(\d+)\.sql$/) ?? [])[1], 10);
         return { file, fromVersion };
       })
       .filter(patch => patch.fromVersion >= currentVersion)
@@ -27,7 +27,7 @@ async function applySchemaPatches(db) {
       console.log('No patches to apply. Schema is up to date.');
       return;
     }
-    
+
     const ans = await askQuestion(`Backup ${DB_CONFIG.database} database first? [y/N] `);
     if (ans.toUpperCase() === 'Y') {
       await backup();

@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 /************************************************************/
 // Add any hashing utility functions below
@@ -12,7 +12,7 @@ const crypto = require('crypto');
  * @param {string} [salt] - The salt to add to the data before hashing.
  * @returns {string} A string with the hashed value.
  */
-exports.createHash = (data, salt = '') => {
+export const createHash = (data: string, salt: string = ''): string => {
   let shasum = crypto.createHash('sha256');
   shasum.update(data + salt);
   return shasum.digest('hex');
@@ -26,15 +26,15 @@ exports.createHash = (data, salt = '') => {
  * @returns {boolean} A boolean indicating if the attempted value
  * matches the stored value.
  */
-exports.compareHash = (attempted, stored, salt) => {
-  return stored === this.createHash(attempted, salt);
+export const compareHash = (attempted: string, stored: string, salt: string): boolean => {
+  return stored === createHash(attempted, salt);
 };
 
 /**
  * Creates a random 32 byte string.
  * @returns {string} A random string.
  */
-exports.createRandom32String = () => {
+export const createRandom32String = (): string => {
   return crypto.randomBytes(32).toString('hex');
 };
 

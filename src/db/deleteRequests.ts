@@ -1,7 +1,8 @@
-const db = require(".");
-const api = require("../api");
-const { executeQuery } = require("./legacy");
-const { askQuestion } = require("./import");
+import db from ".";
+import api from "../api";
+import { executeQuery } from "./legacy";
+import { askQuestion } from "./cliUtils";
+import { User } from "../api/models/user";
 
 async function main() {
   await executeQuery('DELETE FROM itemlink');
@@ -25,7 +26,7 @@ async function main() {
     console.error('Invalid ID, exiting.');
     return;
   }
-  let user;
+  let user: User;
   try {
     user = await api.user.getOne({ 'user.id': id });
   } catch {

@@ -15,8 +15,6 @@
     "dev": "nodemon -e '.js,.pug' --watch dist --ignore dist/static/editor --ignore cypress --delay 1000ms dist/index.js",
     "devl": "nodemon --ext \".js,.pug\" --legacy-watch --ignore dist/static/editor --ignore cypress --delay 1000ms dist/index.js",
     "db:backup": "node dist/db/backup.js",
-    "db:export": "node dist/db/export.js",
-    "db:import": "node dist/db/import.js",
     "db:clean": "node dist/db/updateSchema.js",
     "db:reset": "node dist/db/generate",
     "db:upgrade": "node dist/db/upgrade",
