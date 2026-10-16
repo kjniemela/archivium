@@ -17,7 +17,8 @@ const server = new Server({
     const [type, ...args] = data.documentName.split('/');
     if (type === 'item') {
       const [universeShort, itemShort] = args;
-      const item = await api.item.getByUniverseAndItemShortnames(user, universeShort, itemShort, perms.WRITE, true);
+      // Check item exists
+      await api.item.getByUniverseAndItemShortnames(user, universeShort, itemShort, perms.WRITE, true);
     } else if (type === 'room') {
       // TTRPG room sync
       const [universeShort] = args;

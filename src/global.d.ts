@@ -1,4 +1,3 @@
-import { Express } from 'express-serve-static-core';
 import { Theme } from './themes';
 import { Session } from './api/models/session';
 
@@ -18,7 +17,7 @@ declare module 'express-serve-static-core' {
   }
 
   interface Response extends Response {
-    prepareRender: (template: string, data?: { [key: string]: any }) => void,
+    prepareRender: (template: string, data?: { [key: string]: unknown }) => void,
     templateData: { template: string, data: { [key: string]: any } },
     error?: string,
   }

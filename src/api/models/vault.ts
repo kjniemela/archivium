@@ -1,7 +1,7 @@
 import { sql } from 'kysely';
 import { API } from '..';
 import { ForbiddenError, ModelError, NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
-import { BaseOptions, perms, withTransaction } from '../utils';
+import { BaseOptions, LegacyConditions, perms, withTransaction } from '../utils';
 import { kysely, Trx } from '../../db/kysely';
 import { toRawSql } from '../../db/legacyCond';
 import { User } from './user';
@@ -55,7 +55,7 @@ export class VaultAPI {
     return vault;
   }
 
-  async getMany(user: User | undefined, conditions: any = null, permissionLevel = perms.READ, options: VaultOptions = {}): Promise<Vault[]> {
+  async getMany(user: User | undefined, conditions: LegacyConditions | null = null, permissionLevel = perms.READ, options: VaultOptions = {}): Promise<Vault[]> {
     if (!user) throw new UnauthorizedError();
 
     let query = kysely
@@ -99,17 +99,15 @@ export class VaultAPI {
         .select((eb) => eb.fn.count<number>('item.id').as('items')));
 
     // TODO more hacky condition stuff...
-    let bridged: any = query;
     if (conditions) {
       let valueIndex = 0;
       for (const str of conditions.strings) {
         const placeholderCount = (str.match(/\?/g) ?? []).length;
         const vals = conditions.values.slice(valueIndex, valueIndex + placeholderCount);
         valueIndex += placeholderCount;
-        bridged = bridged.where(toRawSql<boolean>(str, vals));
+        query = query.where(toRawSql<boolean>(str, vals));
       }
     }
-    query = bridged as typeof query;
 
     const data = await query.execute();
     return data;

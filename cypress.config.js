@@ -9,7 +9,7 @@ module.exports = defineConfig({
   e2e: {
     baseUrl: 'http://localhost:33004',
     setupNodeEvents(on, config) {
-      const db = require('./dist/db');
+      const { kysely } = require('./dist/db/kysely');
 
       on('task', {
         // PKCE requires real SHA-256; generating it here (Node) is simpler than
@@ -22,7 +22,7 @@ module.exports = defineConfig({
 
         async deleteOAuthClients(clientIds) {
           for (const clientId of clientIds) {
-            await db.query('DELETE FROM oauth_client WHERE client_id = ?', [clientId]);
+            await kysely.deleteFrom('oauth_client').where('client_id', '=', clientId).execute();
           }
           return null;
         },

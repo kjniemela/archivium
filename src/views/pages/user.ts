@@ -1,10 +1,7 @@
-import api from '../../api';
 import md5 from 'md5';
-import { render } from '../../templates';
-import { perms, Cond, getPfpUrl, handleAsNull, handleErrorWithData } from '../../api/utils';
-import fs from 'fs/promises';
-import logger from '../../logger';
 import { RouteHandler } from '..';
+import api from '../../api';
+import { Cond, getPfpUrl, handleAsNull, handleErrorWithData, perms } from '../../api/utils';
 import { NotFoundError, UnauthorizedError } from '../../errors';
 
 export default {
@@ -77,7 +74,7 @@ export default {
       res.redirect('/');
       return;
     }
-    const data = await api.email.trySendVerifyLink(req.session.user, req.session.user.username).catch(handleErrorWithData);
+    const data = await api.email.trySendVerifyLink(req.session.user, req.session.user.username).catch((error) => handleErrorWithData<Date>(error));
     if (data && !(data instanceof Date) && data.alreadyVerified) {
       res.redirect(`${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
       return;
@@ -91,8 +88,7 @@ export default {
   },
 
   async verifyUser(req, res) {
-    const userId = await api.user.verifyUser(req.params.key);
-    const user = await api.user.getOne({ id: userId });
+    await api.user.verifyUser(req.params.key);
     try {
       // TODO should we send a welcome email?
       // api.email.sendTemplateEmail(api.email.templates.WELCOME, req.body.email, { username: user.username });

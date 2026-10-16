@@ -12,7 +12,7 @@
     "lib": ["ESNext", "dom"],
     "rootDir": "src",
     "outDir": "dist",
-    "allowJs": true,
+    "allowJs": false,
   },
   "include": ["src"],
   "exclude": ["src/static"]

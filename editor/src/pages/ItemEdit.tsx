@@ -207,8 +207,8 @@ export default function ItemEdit({ universeLink, providerAddress }: ItemEditProp
 
             await fetchData(`/api/universes/${universeShort}/items/${itemShort}`, async (data: Item) => {
               const objData = data.obj_data;
-              let initialContent: Object | null = null;
-              if (objData.body) {
+              let initialContent: object | null = null;
+              if (objData?.body) {
                 const links: LinkData[] = [];
                 initialContent = indexedToJson(objData.body, (href) => links.push(extractLinkData(href)));
                 const bulkFetcher = new BulkExistsFetcher();

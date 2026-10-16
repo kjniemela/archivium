@@ -1,7 +1,7 @@
 import { API } from '..';
 import { kysely } from '../../db/kysely';
 import { sql } from 'kysely';
-import utils from '../../lib/hashUtils';
+import * as utils from '../../lib/hashUtils';
 import { OAuthClientInformationFull } from '@modelcontextprotocol/sdk/shared/auth.js';
 
 export type OAuthClient = {
@@ -26,7 +26,7 @@ type OAuthClientRow = {
   grant_types: string[] | null,
   response_types: string[] | null,
   scope: string | null,
-  metadata: Record<string, any> | null,
+  metadata: Record<string, unknown> | null,
   created_at: Date,
 };
 

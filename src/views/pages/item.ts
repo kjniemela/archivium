@@ -50,7 +50,7 @@ export default {
   async view(req, res) {
     const universe = await api.universe.getOne(req.session.user, { shortname: req.params.universeShortname });
 
-    let item: Item & { [key: string]: any }; // TODO this is ugly
+    let item: Item & Record<string, unknown>; // TODO this is ugly
     try {
       item = await api.item.getByUniverseAndItemShortnames(req.session.user, req.params.universeShortname, req.params.itemShortname) as Item;
     } catch (err) {

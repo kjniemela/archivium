@@ -69,7 +69,7 @@ export default {
       commenters[user.id] = api.user.toBasicUser(user);
     }
 
-    let renderedBody: RenderedBody = await tryRenderContent(req, chapter.body, story.universe_short);
+    const renderedBody: RenderedBody = await tryRenderContent(req, chapter.body, story.universe_short);
 
     res.prepareRender('chapter', {
       story, chapter, comments, commenters, renderedBody,

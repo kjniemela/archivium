@@ -1,10 +1,10 @@
 import { DndContext, KeyboardSensor, MouseSensor, TouchSensor, useDraggable, useSensor, useSensors } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { Item, Map, MapLocation } from '../../../src/api/models/item';
 import { capitalize, HTTP_INSUFFICIENT_STORAGE, postFormData, T } from '../helpers';
 import type { Categories, ItemOptionEntry } from '../pages/ItemEdit';
-import { createPortal } from 'react-dom';
 import ProgressiveImage from './ProgressiveImage';
 import SearchableSelect from './SearchableSelect';
 
@@ -26,7 +26,7 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
   const [selectedLocation, setSelectedLocation] = useState<number | null>(null);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  
+
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor, {
     activationConstraint: {
@@ -67,7 +67,7 @@ export default function MapEditor({ item, categories, onUpdate, itemMap }: MapEd
     fn(location);
     onUpdate(newItem);
   };
-  
+
   const itemTitles: Record<string, string> = Object.keys(itemMap).reduce((acc, key) => ({ ...acc, [key]: itemMap[key].title }), {});
   const itemTypes = Object.keys(itemMap).reduce((acc, key) => ({ ...acc, [key]: capitalize(categories[itemMap[key].type][1]) }), {});
 
@@ -206,7 +206,7 @@ function MapLocation({
   x,
   y,
 }: MapLocationProps) {
-  const { attributes, isDragging, listeners, setNodeRef, transform } = useDraggable({
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: index,
   });
 

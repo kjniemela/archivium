@@ -1,12 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import api from '../api';
-import { DEV_MODE } from '../config';
-import logger from '../logger';
-import { ResultSetHeader } from 'mysql2/promise';
 import { Session } from '../api/models/session';
+import { DEV_MODE } from '../config';
 
 const SESSION_LIFETIME_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
-const SESSION_REFRESH_THRESHOLD_MS = 1000 * 60 * 60 * 24; // 1 day
+// const SESSION_REFRESH_THRESHOLD_MS = 1000 * 60 * 60 * 24; // 1 day // TODO, implement session refresh (?)
 
 const createSession = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   let staleSession: Session | null = null;
@@ -63,7 +61,7 @@ const createSession = async (req: Request, res: Response, next: NextFunction): P
   next();
 };
 
-async function refreshSession(user: any) {
+async function refreshSession(user: { id: number }) { // TODO switch out for UserRef when available!
   await api.user.put(user.id, user.id, { updated_at: new Date() });
 }
 

@@ -6,7 +6,7 @@ import { typeConfigProblems, type TypeConfigs } from '../../lib/itemTypeConfig';
 import type { TabLayout } from '../../lib/tabLayout';
 import { IndexedDocument } from '../../lib/tiptapHelpers';
 import { deepCompare } from '../../lib/utils';
-import { BaseOptions, Tier, getPfpUrl, handleAsNull, parseData, perms, tierAllowance, tiers, withTransaction } from '../utils';
+import { BaseOptions, LegacyConditions, Tier, getPfpUrl, handleAsNull, parseData, perms, tierAllowance, tiers, withTransaction } from '../utils';
 import { kysely, Trx } from '../../db/kysely';
 import { toRawSql } from '../../db/legacyCond';
 import { Item, ItemEvent } from './item';
@@ -70,7 +70,7 @@ export type Universe = {
 };
 
 const checkTheme = (theme: unknown, tier: Tier | null) => {
-  if (typeof theme !== 'string' || !theme || !themes.hasOwnProperty(theme)) return;
+  if (typeof theme !== 'string' || !theme || !Object.prototype.hasOwnProperty.call(themes, theme)) return;
   if (!themeAvailable(theme, tier ?? tiers.FREE)) throw new ForbiddenError('This theme requires a premium universe.');
 };
 
@@ -131,7 +131,7 @@ export class UniverseAPI {
     return universe;
   }
 
-  async getMany(user: User | undefined, conditions: { strings: string[], values: any[] } | null = null, permissionLevel = perms.READ, options: BaseOptions = {}): Promise<Universe[]> {
+  async getMany(user: User | undefined, conditions: LegacyConditions | null = null, permissionLevel = perms.READ, options: BaseOptions = {}): Promise<Universe[]> {
 
     if (options.sort && !options.forceSort) {
       const validSorts = { 'title': true, 'created_at': true, 'updated_at': true };
@@ -177,17 +177,15 @@ export class UniverseAPI {
 
     // support the old-style `conditions`
     // TODO at some point we should clean this up
-    let bridged: any = query;
     if (conditions) {
       let valueIndex = 0;
       for (const str of conditions.strings) {
         const placeholderCount = (str.match(/\?/g) ?? []).length;
         const vals = conditions.values.slice(valueIndex, valueIndex + placeholderCount);
         valueIndex += placeholderCount;
-        bridged = bridged.where(toRawSql<boolean>(str, vals));
+        query = query.where(toRawSql<boolean>(str, vals));
       }
     }
-    query = bridged as typeof query;
 
     query = options.sort
       ? query.orderBy(kysely.dynamic.ref(options.sort), options.sortDesc ? 'desc' : 'asc')
@@ -389,7 +387,7 @@ export class UniverseAPI {
     return universe.id;
   }
 
-  async putData(user: User | undefined, universeShortname: string, changes: Record<string, any>): Promise<{ numUpdatedRows: number }> {
+  async putData(user: User | undefined, universeShortname: string, changes: Partial<UniverseObjData>): Promise<{ numUpdatedRows: number }> {
     if (!user) throw new UnauthorizedError();
     if (!changes || typeof changes !== 'object' || Array.isArray(changes)) throw new ValidationError('Data must be an object.');
 

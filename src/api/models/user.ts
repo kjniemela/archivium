@@ -4,7 +4,7 @@ import { API } from '..';
 import { SITE_OWNER_EMAIL } from '../../config';
 import { kysely } from '../../db/kysely';
 import { ForbiddenError, NotFoundError, RequestError, UnauthorizedError, ValidationError } from '../../errors';
-import utils from '../../lib/hashUtils';
+import * as utils from '../../lib/hashUtils';
 import logger from '../../logger';
 import themes, { Theme, themeAvailable, ThemeName } from '../../themes';
 import { perms, plans, planTier, withTransaction } from '../utils';
@@ -155,7 +155,7 @@ export class UserAPI {
     };
   }
 
-  private async fetchUser<T extends User>(options: { [key: string]: any }, includeAuth = false, includeNotifs = false): Promise<T> {
+  private async fetchUser<T extends User>(options: { [key: string]: unknown }, includeAuth = false, includeNotifs = false): Promise<T> {
     if (!options || Object.keys(options).length === 0) throw new ValidationError('options required for api.get.user');
 
     let query = kysely
@@ -191,7 +191,7 @@ export class UserAPI {
    * @param {*} options
    * @returns {Promise<User>}
    */
-  getOne(options: any, includeNotifs=false): Promise<User> {
+  getOne(options: { [key: string]: unknown }, includeNotifs=false): Promise<User> {
     return this.fetchUser<User>(options, false, includeNotifs);
   }
 
@@ -200,7 +200,7 @@ export class UserAPI {
    * @param {*} options
    * @returns {Promise<User>}
    */
-  getOneWithAuth(options: any, includeNotifs=false): Promise<AuthUser> {
+  getOneWithAuth(options: { [key: string]: unknown }, includeNotifs=false): Promise<AuthUser> {
     return this.fetchUser<AuthUser>(options, true, includeNotifs);
   }
 
@@ -210,7 +210,7 @@ export class UserAPI {
    * @returns {Promise<Pick<User, 'id' | 'username' | 'created_at' | 'updated_at'> & Partial<Pick<User, 'email' | 'hasPfp'>>>[]}
    */
   async getMany(
-    options: { [key: string]: any } | null = null,
+    options: { [key: string]: unknown } | null = null,
     includeEmail = false,
   ): Promise<(Pick<User, 'id' | 'username' | 'created_at' | 'updated_at'> & Partial<Pick<User, 'email' | 'hasPfp'>>)[]> {
     let query = kysely
@@ -268,7 +268,7 @@ export class UserAPI {
     return universes;
   }
 
-  async post({ username, email, password, hp }: any): Promise<{ insertId: number }> {
+  async post({ username, email, password, hp }: { username: string, email: string, password: string, hp?: string }): Promise<{ insertId: number }> {
     const salt = utils.createRandom32String();
 
     if (!username) throw new Error('username is required');
@@ -302,7 +302,7 @@ export class UserAPI {
    * @param {*} salt
    * @returns
    */
-  validatePassword(attempted: any, password: any, salt: any) {
+  validatePassword(attempted: string, password: string, salt: string) {
     return utils.compareHash(attempted, password, salt);
   }
 
@@ -313,14 +313,14 @@ export class UserAPI {
    * @param {{ updated_at?, verified? }} param2
    * @returns
    */
-  async put(user_id: any, userIDToPut: any, { updated_at, verified }: { updated_at?; verified?; }) {
+  async put(user_id: number | string, userIDToPut: number | string, { updated_at, verified }: { updated_at?: Date, verified?: boolean }) {
     if (Number(user_id) !== Number(userIDToPut)) return [403];
 
     const setObj: { updated_at?: Date, verified?: boolean } = {};
     if (updated_at !== undefined) setObj.updated_at = updated_at;
     if (verified !== undefined) setObj.verified = verified;
 
-    const result = await kysely.updateTable('user').set(setObj).where('id', '=', userIDToPut).executeTakeFirstOrThrow();
+    const result = await kysely.updateTable('user').set(setObj).where('id', '=', Number(userIDToPut)).executeTakeFirstOrThrow();
     return [200, { numUpdatedRows: Number(result.numUpdatedRows) }];
   }
 

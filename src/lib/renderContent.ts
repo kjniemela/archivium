@@ -16,7 +16,7 @@ function wrapTableHeaders(html: string): string {
   );
 }
 
-export type RenderedBody = { type: string, content: any };
+export type RenderedBody = { type: 'html', content: string } | { type: 'text', content: unknown };
 export async function tryRenderContent(req: Request, content: unknown, universeShortname: string | null): Promise<RenderedBody> {
   try {
     const links: LinkData[] = [];
@@ -27,7 +27,7 @@ export async function tryRenderContent(req: Request, content: unknown, universeS
       (title, level) => headings.push({ title, level }),
     );
     annotateTocScopes(jsonBody);
-    const itemsPerUniverse = {};
+    const itemsPerUniverse: Record<string, Record<string, boolean>> = {};
     /* Because Tiptap rendering cannot be async, we extract the links we'll need to check ahead of time. */
     await Promise.all(links.map(async (link) => {
       if (link.item) {

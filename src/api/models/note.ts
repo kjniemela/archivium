@@ -4,7 +4,7 @@ import { API } from "..";
 import { kysely } from '../../db/kysely';
 import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from "../../errors";
 import { IndexedDocument } from "../../lib/tiptapHelpers";
-import { BaseOptions, perms } from '../utils';
+import { BaseOptions, SqlValue, perms } from '../utils';
 import { CommenterUserBasic } from './discussion';
 import { User } from "./user";
 
@@ -67,10 +67,10 @@ export class NoteAPI {
    * @param {*} options
    * @returns
    */
-  async getMany(user: User | undefined, conditions: { [key: string]: any } | undefined, options: NoteOptions): Promise<Note[]> {
+  async getMany(user: User | undefined, conditions: { [key: string]: SqlValue } | undefined, options: NoteOptions): Promise<Note[]> {
     const search = options?.search;
 
-    let query = kysely
+    const query = kysely
       .selectFrom('note')
       .distinct()
       .leftJoin('itemnote', 'itemnote.note_id', 'note.id')
@@ -167,7 +167,7 @@ export class NoteAPI {
     user: User | undefined,
     universeShortname: string,
     itemShortname: string,
-    conditions?: any,
+    conditions?: { [key: string]: SqlValue },
     options?: NoteOptions,
     inclAuthors = false
   ): Promise<[Note[], CommenterUserBasic[]?]> {
@@ -202,7 +202,7 @@ export class NoteAPI {
     return boards;
   }
 
-  async getByBoardShortname(user: User | undefined, shortname: string, conditions: any = null, options: any = null, validate = true, inclAuthors = false): Promise<Note[] | [Note[], { id: number, username: string, email: string }[]]> {
+  async getByBoardShortname(user: User | undefined, shortname: string, conditions: { [key: string]: SqlValue } | null = null, options: NoteOptions | null = null, validate = true, inclAuthors = false): Promise<Note[] | [Note[], { id: number, username: string, email: string }[]]> {
     const board = await kysely
       .selectFrom('noteboard')
       .selectAll()
@@ -266,7 +266,7 @@ export class NoteAPI {
 
   async put(user: User | undefined, uuid: string, changes: Partial<Note>): Promise<{ numUpdatedRows: number }> {
     if (!user) throw new UnauthorizedError();
-    const { title, body, is_public, items, boards, tags } = changes;
+    const { title, body, is_public, items, tags } = changes;
     if (title === undefined || is_public === undefined) throw new ValidationError();
     const note = await this.getOne(user, uuid);
 

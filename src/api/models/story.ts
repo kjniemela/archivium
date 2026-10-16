@@ -4,7 +4,7 @@ import { API } from '..';
 import { kysely } from '../../db/kysely';
 import { NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
 import { IndexedDocument } from '../../lib/tiptapHelpers';
-import { BaseOptions, perms, withTransaction } from '../utils';
+import { BaseOptions, SqlValue, perms, withTransaction } from '../utils';
 import { User } from './user';
 
 export type StoryCover = {
@@ -130,7 +130,7 @@ export class StoryAPI {
     return story;
   }
 
-  async getMany(user: User | undefined, conditions: { [key: string]: any } | null = null, permissionsRequired = perms.READ, options: BaseOptions = {}): Promise<Story[]> {
+  async getMany(user: User | undefined, conditions: { [key: string]: SqlValue } | null = null, permissionsRequired = perms.READ, options: BaseOptions = {}): Promise<Story[]> {
     if (permissionsRequired >= perms.WRITE) {
       if (!user) throw new UnauthorizedError();
       conditions = {
@@ -257,7 +257,7 @@ export class StoryAPI {
   /**
    * This assumes we have write access to the provided story!
    */
-  async reorderChapters(story, orderedIndexes) {
+  async reorderChapters(story: Story, orderedIndexes: (string | number)[]) {
     const newIndexes = {};
     const ids = (await kysely
       .selectFrom('storychapter')
@@ -266,7 +266,9 @@ export class StoryAPI {
       `.as('ids'))
       .where('story_id', '=', story.id)
       .groupBy('story_id')
-      .executeTakeFirst())?.ids!;
+      .executeTakeFirst())?.ids;
+
+    if (!ids) throw new NotFoundError();
 
     await withTransaction(async (trx) => {
       await trx.updateTable('storychapter').set({ chapter_number: 0 }).where('story_id', '=', story.id).execute();

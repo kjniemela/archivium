@@ -51,8 +51,8 @@ class MarkdownElement implements MDElementParent {
   dataset!: { [key: string]: any };
   meta!: MarkdownMeta;
   content!: string;
-  children!: any[];
-  classes: any;
+  children!: MarkdownElement[];
+  classes: string[] = [];
 
   constructor(parent: MDElementParent, data: MarkdownData, meta: MarkdownMeta={}) {
     this.parent = parent;

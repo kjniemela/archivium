@@ -2,9 +2,9 @@ import { HttpStatusCode } from 'axios';
 
 export class RequestError extends Error {
   readonly code: number = HttpStatusCode.InternalServerError;
-  readonly data: any;
+  readonly data: unknown;
 
-  constructor(msgOrError?: string | Error, { cause, code, data }: { cause?: Error, code?: number, data?: any } = {}) {
+  constructor(msgOrError?: string | Error, { cause, code, data }: { cause?: Error, code?: number, data?: unknown } = {}) {
     if (msgOrError instanceof Error) {
       cause = msgOrError;
       msgOrError = msgOrError.message;
@@ -24,7 +24,7 @@ export class RequestError extends Error {
 }
 
 export class ModelError extends RequestError {
-  constructor(msgOrError?: string | Error, { cause, data }: { cause?: Error, data?: any } = {}) {
+  constructor(msgOrError?: string | Error, { cause, data }: { cause?: Error, data?: unknown } = {}) {
     super(msgOrError, { cause, data });
   }
 }

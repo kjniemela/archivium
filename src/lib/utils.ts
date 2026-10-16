@@ -1,4 +1,4 @@
-export function deepCompare(a: any, b: any): boolean {
+export function deepCompare(a: unknown, b: unknown): boolean {
   if (!(a instanceof Object && b instanceof Object)) {
     return a === b;
   }

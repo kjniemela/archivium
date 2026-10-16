@@ -13,7 +13,7 @@ export interface NodeAttributes {
 export type MarkdownData = [string, string, MarkdownData[], NodeAttributes];
 
 class MarkdownNode {
-  type: any;
+  type: string;
   content: string;
   attrs: NodeAttributes;
   children: MarkdownNode[];
@@ -73,7 +73,7 @@ class MarkdownNode {
     return `${this.content ?? ''}${this.children.map(child => child.innerText()).join('')}`;
   }
 
-  async evaluate(currentUniverse: string, ctx, transform?, topLevel=true): Promise<MarkdownData> {
+  async evaluate(currentUniverse: string, ctx, transform?): Promise<MarkdownData> {
     if (this.type === 'a') {
       this.addClass('link');
       this.addClass('link-animated');
@@ -129,20 +129,20 @@ class MarkdownNode {
       }
       delete this.attrs.ctx;
     }
-    const result: MarkdownData = [this.type, this.content ?? '', await Promise.all(this.children.map(tag => tag.evaluate(currentUniverse, ctx, transform, false))), this.attrs];
+    const result: MarkdownData = [this.type, this.content ?? '', await Promise.all(this.children.map(tag => tag.evaluate(currentUniverse, ctx, transform))), this.attrs];
     return result;
   }
 }
 
 class CtxLookup {
-  lookup: any[];
-  def: any;
-  constructor(...lookup) {
+  lookup: string[];
+  def?: string;
+  constructor(...lookup: string[]) {
     this.lookup = lookup;
-    this.def;
+    // this.def;
   }
 
-  default(def) {
+  default(def: string) {
     this.def = def;
     return this;
   }
@@ -161,8 +161,8 @@ class CtxLookup {
 }
 
 class GalleryUrl {
-  idLookup: any;
-  constructor(idLookup) {
+  idLookup: CtxLookup;
+  constructor(idLookup: CtxLookup) {
     this.idLookup = idLookup;
   }
 
@@ -173,9 +173,9 @@ class GalleryUrl {
 }
 
 class Line {
-  text: any;
+  text: string;
   index: number;
-  constructor(text) {
+  constructor(text: string) {
     this.text = text;
     this.index = 0;
   }
@@ -333,11 +333,11 @@ export function splitIgnoringQuotes(str) {
 export function parseMarkdown(text) {
   const root = new MarkdownNode('div', '', { class: 'markdown' });
   let toc: MarkdownNode | null = null;
-  let maxTocDepth: number | null = null;
+  // const maxTocDepth: number | null = null;
   let curParagraph = new MarkdownNode('p');
   let curList: [MarkdownNode | null, number] = [null, -1];
   let rootList: MarkdownNode | null = null;
-  let curTocList: [MarkdownNode | null, number] = [null, -1];
+  // const curTocList: [MarkdownNode | null, number] = [null, -1];
   let asideStart: number | null = null;
 
   const lines = text.split('\n');
