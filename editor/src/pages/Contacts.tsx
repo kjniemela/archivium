@@ -65,11 +65,12 @@ export default function Contacts() {
 
   const [newUser, setNewUser] = useState<string>('');
   async function addContact(username: string) {
-    await fetch('/api/contacts', {
+    const res = await fetch('/api/contacts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username }),
     });
+    if (res.ok) setNewUser('');
   }
 
   async function deleteContact(username: string) {
@@ -94,7 +95,18 @@ export default function Contacts() {
     <div className='grid gap-2' style={{ gridTemplateColumns: '1fr 2fr' }}>
       <div className='col-1'>
         <div className='d-flex'>
-          <input id='username' name='username' placeholder={T('Username')} value={newUser} onChange={(e) => setNewUser(e.target.value)} />
+          <input
+            id='username'
+            name='username'
+            placeholder={T('Username')}
+            value={newUser}
+            onChange={(e) => setNewUser(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                addContact(newUser);
+              }
+            }}
+          />
           <button onClick={() => addContact(newUser)}>{T('Add Contact')}</button>
         </div>
         {contactsList(contacts, onlineUsers, deleteContact, respond)}
