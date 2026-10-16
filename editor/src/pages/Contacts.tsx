@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { fetchAsync, fetchData, T } from '../helpers';
 import type { ContactListEntry } from '../../../src/api/models/contact';
 import type { User } from '../../../src/api/models/user';
 import ContactCard from '../components/ContactCard';
+import { fetchData, T } from '../helpers';
+import { useContacts } from '../hooks/useContacts';
 import { useOnlineUsers } from '../hooks/useOnlineUsers';
 
 function contactsList(
@@ -55,18 +56,11 @@ function contactsList(
 
 export default function Contacts() {
   const [, setSelf] = useState<User | null>(null);
-  const [contacts, setContacts] = useState<ContactListEntry[] | null>(null);
-
   const onlineUsers = useOnlineUsers();
-
-  async function refetchContacts() {
-    const contactsData = await fetchAsync(`/api/contacts`) as ContactListEntry[];
-    setContacts(contactsData);
-  }
+  const contacts = useContacts();
 
   useEffect(() => {
     fetchData(`/api/me`, async (user: User) => setSelf(user));
-    refetchContacts();
   }, []);
 
   const [newUser, setNewUser] = useState<string>('');
@@ -76,7 +70,6 @@ export default function Contacts() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username }),
     });
-    refetchContacts();
   }
 
   async function deleteContact(username: string) {
@@ -85,7 +78,6 @@ export default function Contacts() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username }),
     });
-    refetchContacts();
   }
 
   async function respond(username: string, accepted: boolean) {
@@ -94,7 +86,6 @@ export default function Contacts() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, accepted }),
     });
-    refetchContacts();
   }
 
   return <>

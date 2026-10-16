@@ -4,8 +4,8 @@ import { kysely } from '../../db/kysely';
 import { NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
 import { getPfpUrl } from '../../lib/utils';
 import { handleAsNull } from '../utils';
-import type { UserRef } from './user';
-import { User } from './user';
+import type { User, UserRef } from './user';
+import { refreshContactListFor } from '../../chat';
 
 export type ContactUser = Pick<User, 'id' | 'username' | 'email' | 'created_at' | 'updated_at'> & {
   hasPfp: SqlBool,
@@ -133,6 +133,9 @@ export class ContactAPI {
       clickUrl: '/contacts',
     });
 
+    refreshContactListFor(user);
+    refreshContactListFor(target);
+
     return { insertId: Number(result.insertId ?? 0) };
   }
 
@@ -150,8 +153,11 @@ export class ContactAPI {
         .where('accepting_user', '=', contact.accepting_id!)
         .executeTakeFirstOrThrow();
       result = { numUpdatedRows: Number(updateResult.numUpdatedRows) };
+
+      refreshContactListFor(user);
+      refreshContactListFor(target);
     } else {
-      result = await this.del(user, target.id);
+      result = await this.del(user, target);
     }
 
     await this.api.notification.notify(target, this.api.notification.types.CONTACTS, {
@@ -164,8 +170,9 @@ export class ContactAPI {
     return result;
   }
 
-  async del(user: User | undefined, targetID: number): Promise<{ numDeletedRows: number }> {
-    const contact = await this.getOne(user, targetID);
+  async del(user: User | undefined, target: User): Promise<{ numDeletedRows: number }> {
+    if (!user) throw new UnauthorizedError();
+    const contact = await this.getOne(user, target.id);
 
     const result = await kysely
       .deleteFrom('contact')
@@ -173,11 +180,14 @@ export class ContactAPI {
       .where('accepting_user', '=', contact.accepting_id!)
       .executeTakeFirstOrThrow();
 
+    refreshContactListFor(user);
+    refreshContactListFor(target);
+
     return { numDeletedRows: Number(result.numDeletedRows) };
   }
 
   async delByUsername(user: User | undefined, username: string): Promise<{ numDeletedRows: number }> {
     const target = await this.api.user.getOne({ 'user.username': username });
-    return await this.del(user, target.id);
+    return await this.del(user, target);
   }
 }

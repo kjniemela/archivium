@@ -1,12 +1,6 @@
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore } from 'react';
 
 const EMPTY: never[] = [];
-
-declare global {
-  interface Window {
-    presence?: { onlineUsers: string[] };
-  }
-}
 
 export function useOnlineUsers(): string[] {
   return useSyncExternalStore(

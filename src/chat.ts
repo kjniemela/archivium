@@ -1,12 +1,16 @@
 import WebSocket, { WebSocketServer } from 'ws';
-import { User, UserRef } from './api/models/user';
+import type { User, UserRef } from './api/models/user';
 import { AssertionError } from './errors';
 import { IncomingMessage } from 'http';
 import logger from './logger';
 import api from './api';
+import type { ContactListEntry } from './api/models/contact';
 
 type SocketMsg = { action?: string };
-type SocketResponse = { onlineUsers?: string[] };
+type SocketResponse = {
+  onlineUsers?: string[],
+  contacts: ContactListEntry[],
+};
 
 function assert(condition: any, msg?: string): asserts condition {
   if (!condition) {
@@ -28,11 +32,12 @@ type Connection = { user: User, sockets: Set<WebSocket>, disconnectTimeout?: Nod
 const connections = new Map<number, Connection>();
 const userBySocket = new WeakMap<WebSocket, number>();
 
-async function refreshOnlineListFor(user: UserRef) {
-  const contacts = await api.contact.getAll(user, false, true);
-  const usernames = contacts.filter((contact) => connections.has(contact.id)).map((contact) => contact.username);
+export async function refreshContactListFor(user: UserRef) {
+  const contacts = await api.contact.getAll(user);
+  const acceptedContacts = contacts.filter((contact) => contact.accepted);
+  const onlineUsers = acceptedContacts.filter((contact) => connections.has(contact.id)).map((contact) => contact.username);
   for (const socket of connections.get(user.id)?.sockets ?? []) {
-    sendJSON(socket, { onlineUsers: usernames });
+    sendJSON(socket, { onlineUsers, contacts });
   }
 }
 
@@ -42,7 +47,7 @@ function handleMessage(data: unknown, ws: WebSocket, user: User) {
   if (user.id !== userBySocket.get(ws)) ws.close(); // We're not who the server thinks we are, abort
 
 	if (data.action === 'sync') {
-    refreshOnlineListFor(user);
+    refreshContactListFor(user);
   }
 }
 
@@ -67,7 +72,7 @@ function handleClose(ws: WebSocket, user: User) {
 
         const contacts = await api.contact.getAll(user, false, true);
         for (const contact of contacts) {
-          refreshOnlineListFor(contact);
+          refreshContactListFor(contact);
         }
       }
     }, 5000);
@@ -89,10 +94,10 @@ async function handleConnect(ws: WebSocket, user: User) {
   if (firstConnection) {
     const contacts = await api.contact.getAll(user, false, true);
     for (const contact of contacts) {
-      refreshOnlineListFor(contact);
+      refreshContactListFor(contact);
     }
   }
-  refreshOnlineListFor(user);
+  refreshContactListFor(user);
 }
 
 export default function listenSockets(wss: WebSocketServer) {
