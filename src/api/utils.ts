@@ -6,11 +6,10 @@ import { getPfpUrl } from '../lib/utils';
 import logger from '../logger';
 
 export { perms } from '../lib/perms';
-export { plans, getPfpUrl };
+export { getPfpUrl, plans };
 
-  import type { PaidTier, Tier } from '../lib/tiers';
-  import { paidTiers, tiers } from '../lib/tiers';
-import type { CommenterUser, CommenterUserRaw } from './models/discussion';
+import type { PaidTier, Tier } from '../lib/tiers';
+import { paidTiers, tiers } from '../lib/tiers';
 export { paidTiers, tiers };
 export type { PaidTier, Tier };
 

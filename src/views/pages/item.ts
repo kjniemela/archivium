@@ -9,7 +9,6 @@ import { FamilyTreeLayout, layoutFamilyTree } from '../../lib/familyTree';
 import { itemLayoutTabs, layoutTabKey } from '../../lib/itemTypeConfig';
 import { RenderedBody, tryRenderContent } from '../../lib/renderContent';
 import { buildLayoutView, LayoutView } from '../../lib/tabLayout';
-import { getPfpUrl } from '../../lib/utils';
 import { universeLink } from '../../templates';
 
 export default {

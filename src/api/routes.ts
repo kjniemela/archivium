@@ -7,11 +7,10 @@ import embedder from '../embedding';
 import { ForbiddenError, NotFoundError, RequestError } from '../errors';
 import { tryRenderContent } from '../lib/renderContent';
 import logger from '../logger';
+import { CommenterUser } from './models/discussion';
 import { Note } from './models/note';
 import { Session } from './models/session';
-import { User } from './models/user';
 import { handleAsNull, perms, sendCachedImage } from './utils';
-import { CommenterUser } from './models/discussion';
 
 type RouteMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 export type APIRouteHandler = (req: Request<{ [key: string]: string }>, res: Response) => Promise<unknown>;
@@ -35,7 +34,7 @@ export default function (app: Express, upload: Multer) {
 
     setup(parentPath = '') {
       const path = parentPath + this.path;
-      app.options(path, async (req, res, next) => {
+      app.options(path, async (_req, res, next) => {
         res.setHeader('Access-Control-Allow-Methods', Object.keys(this.methodFuncs).join(','));
         return next();
       });
@@ -77,7 +76,7 @@ export default function (app: Express, upload: Multer) {
     }
   }
 
-  app.use('/api', (req, res, next) => {
+  app.use('/api', (_req, res, next) => {
     res.set('Content-Type', 'application/json; charset=utf-8');
     next();
   });
@@ -110,7 +109,7 @@ export default function (app: Express, upload: Multer) {
     credentials: true
   }));
 
-  app.use('/api', (err: Error, req: Request, res: Response, next: () => void) => {
+  app.use('/api', (err: Error, _req: Request, res: Response, next: () => void) => {
     if (!err) return next();
     const code = err instanceof RequestError ? err.code : 500;
     res.status(code).json({ error: err.message, code });

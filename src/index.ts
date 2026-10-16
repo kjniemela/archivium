@@ -1,16 +1,16 @@
-import express from 'express';
 import compression from 'compression';
+import express from 'express';
+import { IncomingMessage } from 'http';
 import path from 'path';
+import { Duplex } from 'stream';
+import { WebSocketServer } from 'ws';
 import api from './api';
 import { render } from './templates';
-import { WebSocket, WebSocketServer } from 'ws';
-import { IncomingMessage } from 'http';
-import { Duplex } from 'stream';
 
 
-import CookieParser, { parseCookies } from './middleware/cookieParser';
 import multer from 'multer';
 import Auth, { getSessionFromHash } from './middleware/auth';
+import CookieParser, { parseCookies } from './middleware/cookieParser';
 import * as ReCaptcha from './middleware/reCaptcha';
 
 import cron from 'node-cron';
@@ -58,13 +58,13 @@ cron.schedule('0 0 * * *', () => {
 
 
 // Timer
-app.use('/', (req, res, next) => {
+app.use('/', (req, _res, next) => {
   req.startTime = new Date();
   next();
 });
 
 // IP Extraction
-app.use('/', (req, res, next) => {
+app.use('/', (req, _res, next) => {
   let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   if (clientIp instanceof Array) clientIp = clientIp[0];
   // If the IP is in IPv6-mapped IPv4 format, extract the IPv4 part
@@ -94,12 +94,12 @@ loadViews(app);
 // Load api routes
 import loadRoutes from './api/routes';
 import { handleAsNull } from './api/utils';
-import { NotFoundError } from './errors';
-import { User } from './api/models/user';
 import listenSockets from './chat';
+import { NotFoundError } from './errors';
 loadRoutes(app, upload);
 
-const server = require('http').createServer(app);
+import http from 'http';
+const server = http.createServer(app);
 
 
 logger.info('Starting websocket server...');
