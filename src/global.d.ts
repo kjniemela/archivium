@@ -3,7 +3,7 @@ import { Session } from './api/models/session';
 
 declare module 'express-serve-static-core' {
   interface Request extends Request {
-    session: Session,
+    session: Partial<Session>,
     startTime: Date,
     clientIp?: string,
     loginId?: number,

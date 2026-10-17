@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import api from '../api';
 import { Session } from '../api/models/session';
+import { UserRef } from '../api/models/user';
 import { DEV_MODE } from '../config';
 
 const SESSION_LIFETIME_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
@@ -14,60 +15,68 @@ export async function getSessionFromHash(hash?: string, returnStale=false) {
   return session;
 }
 
-const createSession = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  let staleSession: Session | null = null;
-
-  const session = await getSessionFromHash(req.cookies['archiviumuid'], true);
-  if (session) {
-    const sessionAge = new Date().getTime() - session.created_at.getTime();
-    if (sessionAge < SESSION_LIFETIME_MS) {
-      req.session = {
-        id: session.id,
-        hash: session.hash,
-        created_at: session.created_at,
-      };
-      if (session.user) {
-        req.session = {
-          ...req.session,
-          user_id: session.user_id,
-          user: session.user,
-        }
-      }
-      return next();
-    } else {
-      // Session is older than 7 days, it needs to be replaced
-      staleSession = session;
-    }
-  }
-
-  const { insertId } = await api.session.post();
-  const newSession = await api.session.getOne({ id: insertId }) as Session; // We just created this session, so it must exist.
-  res.cookie('archiviumuid', newSession.hash, {
+const setSessionCookie = (res: Response, hash: string) => {
+  res.cookie('archiviumuid', hash, {
     httpOnly: true,
     secure: true,
     sameSite: DEV_MODE ? 'none' : 'lax',
     maxAge: SESSION_LIFETIME_MS,
   });
-  req.session = {
-    id: newSession.id,
-    hash: newSession.hash,
-    created_at: newSession.created_at,
-  };
-  if (staleSession) {
-    if (staleSession.user_id) {
-      await api.session.put({ id: newSession.id }, { user_id: staleSession.user_id });
+};
+
+const createSession = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  req.session = {};
+  const hash = req.cookies['archiviumuid'];
+  if (!hash) return next();
+
+  const session = await getSessionFromHash(req.cookies['archiviumuid'], true);
+  if (!session) return next();
+
+  const sessionAge = new Date().getTime() - session.created_at.getTime();
+  if (sessionAge < SESSION_LIFETIME_MS) {
+    req.session = {
+      id: session.id,
+      hash: session.hash,
+      created_at: session.created_at,
+    };
+    if (session.user) {
       req.session = {
         ...req.session,
-        user_id: staleSession.user_id,
-        user: staleSession.user,
-      }
+        user_id: session.user_id,
+        user: session.user,
+      };
     }
-    await api.session.del({ id: staleSession.id });
+    return next();
   }
+
+  // Session is older than 7 days, it needs to be replaced
+  if (session.user_id) {
+    const fresh = await newSession(req, res);
+    await api.session.put({ id: fresh.id }, { user_id: session.user_id });
+    req.session = { ...req.session, user_id: session.user_id, user: session.user };
+  }
+  await api.session.del({ id: session.id });
   next();
 };
 
-async function refreshSession(user: { id: number }) { // TODO switch out for UserRef when available!
+async function newSession(req: Request, res: Response): Promise<Session> {
+  const { insertId } = await api.session.post();
+  const session = await api.session.getOne({ id: insertId }) as Session; // We just created this session, so it must exist.
+  setSessionCookie(res, session.hash);
+  req.session = {
+    id: session.id,
+    hash: session.hash,
+    created_at: session.created_at,
+  };
+  return session;
+}
+
+const ensureSession = async (req: Request, res: Response): Promise<number> => {
+  if (req.session.id !== undefined) return req.session.id;
+  return (await newSession(req, res)).id;
+};
+
+async function refreshSession(user: UserRef) {
   await api.user.put(user.id, user.id, { updated_at: new Date() });
 }
 
@@ -112,4 +121,5 @@ export default {
   verifySession,
   verifySessionOrRedirect,
   bypassEmailVerification,
+  ensureSession,
 };
