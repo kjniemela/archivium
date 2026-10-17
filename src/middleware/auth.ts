@@ -6,50 +6,56 @@ import { DEV_MODE } from '../config';
 const SESSION_LIFETIME_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
 // const SESSION_REFRESH_THRESHOLD_MS = 1000 * 60 * 60 * 24; // 1 day // TODO, implement session refresh (?)
 
+export async function getSessionFromHash(hash?: string, returnStale=false) {
+  if (!hash) return null;
+  const session = await api.session.getOne({ hash });
+  if (!session) return null;
+  if (Date.now() - session.created_at.getTime() >= SESSION_LIFETIME_MS) return returnStale ? session : null;
+  return session;
+}
+
 const createSession = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   let staleSession: Session | null = null;
 
-  if (req.cookies['archiviumuid']) {
-    const session = await api.session.getOne({ hash: req.cookies['archiviumuid'] });
-    if (session) {
-      const sessionAge = new Date().getTime() - session.created_at.getTime();
-      if (sessionAge < SESSION_LIFETIME_MS) {
+  const session = await getSessionFromHash(req.cookies['archiviumuid'], true);
+  if (session) {
+    const sessionAge = new Date().getTime() - session.created_at.getTime();
+    if (sessionAge < SESSION_LIFETIME_MS) {
+      req.session = {
+        id: session.id,
+        hash: session.hash,
+        created_at: session.created_at,
+      };
+      if (session.user) {
         req.session = {
-          id: session.id,
-          hash: session.hash,
-          created_at: session.created_at,
-        };
-        if (session.user) {
-          req.session = {
-            ...req.session,
-            user_id: session.user_id,
-            user: session.user,
-          }
+          ...req.session,
+          user_id: session.user_id,
+          user: session.user,
         }
-        return next();
-      } else {
-        // Session is older than 7 days, it needs to be replaced
-        staleSession = session;
       }
+      return next();
+    } else {
+      // Session is older than 7 days, it needs to be replaced
+      staleSession = session;
     }
   }
 
   const { insertId } = await api.session.post();
-  const session = await api.session.getOne({ id: insertId }) as Session; // We just created this session, so it must exist.
-  res.cookie('archiviumuid', session.hash, {
+  const newSession = await api.session.getOne({ id: insertId }) as Session; // We just created this session, so it must exist.
+  res.cookie('archiviumuid', newSession.hash, {
     httpOnly: true,
     secure: true,
     sameSite: DEV_MODE ? 'none' : 'lax',
     maxAge: SESSION_LIFETIME_MS,
   });
   req.session = {
-    id: session.id,
-    hash: session.hash,
-    created_at: session.created_at,
+    id: newSession.id,
+    hash: newSession.hash,
+    created_at: newSession.created_at,
   };
   if (staleSession) {
     if (staleSession.user_id) {
-      await api.session.put({ id: session.id }, { user_id: staleSession.user_id });
+      await api.session.put({ id: newSession.id }, { user_id: staleSession.user_id });
       req.session = {
         ...req.session,
         user_id: staleSession.user_id,
@@ -93,7 +99,7 @@ const verifySessionOrRedirect = async (req: Request, res: Response, next: NextFu
   }
 }
 
-const bypassEmailVerification = async (req: Request, res: Response, next: NextFunction) => {
+const bypassEmailVerification = async (req: Request, _res: Response, next: NextFunction) => {
   const user = req.session.user;
   if (user) {
     user.verified = true;

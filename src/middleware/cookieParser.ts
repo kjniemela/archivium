@@ -1,15 +1,16 @@
-import express from 'express';
+import type { Request, Response, NextFunction } from 'express';
 
-const parseCookies = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  req.cookies = {};
-
-  if ('cookie' in req.headers) {
-    for (const cookie of req.headers.cookie?.split('; ') ?? []) {
-      const [key, value] = cookie.split('=');
-      req.cookies[key] = value;
-    }
+export function parseCookies(header: string | undefined): Record<string, string> {
+  const cookies: Record<string, string> = {};
+  if (!header) return cookies;
+  for (const cookie of header.split('; ')) {
+    const [key, value] = cookie.split('=');
+    cookies[key] = value;
   }
-  next()
-};
+  return cookies;
+}
 
-export default parseCookies;
+export default (req: Request, _res: Response, next: NextFunction) => {
+  req.cookies = parseCookies(req.headers.cookie);
+  next();
+};

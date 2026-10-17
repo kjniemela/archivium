@@ -141,7 +141,6 @@ export default function(app: Express) {
   get('/code-of-conduct', sites.ALL, [], pages.misc.codeOfConduct);
 
   /* User Pages */
-  get('/contacts', sites.ALL, [Auth.verifySessionOrRedirect], pages.user.contactList);
   get('/users/:username', sites.ALL, [], pages.user.profilePage);
   get('/settings', sites.ALL, [Auth.bypassEmailVerification, Auth.verifySessionOrRedirect], pages.user.settings);
   get('/verify', sites.ALL, [], pages.user.requestVerify);
@@ -210,6 +209,7 @@ export default function(app: Express) {
     get('/editor', sites.ALL, [Auth.verifySessionOrRedirect], pages.misc.editor);
     get('/editor/*', sites.ALL, [Auth.verifySessionOrRedirect], pages.misc.editor);
     get('/notes/*', sites.ALL, [Auth.verifySessionOrRedirect], pages.misc.editor);
+    get('/contacts', sites.ALL, [Auth.verifySessionOrRedirect], pages.misc.editor);
 
     /* Universe Pages */
     get('/universes', sites.NORMAL, [], pages.universe.list);

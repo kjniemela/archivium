@@ -1,8 +1,8 @@
 import { RouteHandler } from '..';
 import api from '../../api';
-import { CommenterUserBasic } from '../../api/models/discussion';
+import { CommenterUser } from '../../api/models/discussion';
 import { Family, Item } from '../../api/models/item';
-import { getPfpUrl, perms } from '../../api/utils';
+import { perms } from '../../api/utils';
 import embedder from '../../embedding';
 import { ForbiddenError, NotFoundError } from '../../errors';
 import { FamilyTreeLayout, layoutFamilyTree } from '../../lib/familyTree';
@@ -93,15 +93,15 @@ export default {
     }
 
     const [comments, commentUsers = []] = await api.discussion.getCommentsByItem(item.id, true);
-    const commenters: { [id: number]: CommenterUserBasic & { pfpUrl: string } } = {};
+    const commenters: { [id: number]: CommenterUser } = {};
     for (const user of commentUsers) {
-      commenters[user.id] = { ...user, pfpUrl: getPfpUrl(user) };
+      commenters[user.id] = user;
     }
 
     const [notes, noteUsers = []] = await api.note.getByItemShortname(req.session.user, universe.shortname, item.shortname, {}, { connections: true }, true);
-    const noteAuthors: { [id: number]: CommenterUserBasic & { pfpUrl: string } } = {};
+    const noteAuthors: { [id: number]: CommenterUser } = {};
     for (const user of noteUsers) {
-      noteAuthors[user.id] = { ...user, pfpUrl: getPfpUrl(user) };
+      noteAuthors[user.id] = user;
     }
 
     const relatedItems = universe.obj_data.semanticSearchEnabled

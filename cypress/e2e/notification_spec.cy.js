@@ -39,7 +39,7 @@ describe('Notification spec', () => {
     cy.get('.navbar').contains('Contacts').click();
     
     cy.intercept('PUT', '/api/contacts').as('reject');
-    cy.get('.card [data-user="testadmin"]').contains('Reject').click();
+    cy.get('.contact-card[data-user="testadmin"]').contains('Reject').click();
     cy.wait('@reject');
 
     cy.login('testadmin');
@@ -80,7 +80,7 @@ describe('Notification spec', () => {
     cy.get('.navbar').contains('Contacts').click();
     
     cy.intercept('PUT', '/api/contacts').as('reject');
-    cy.get('.card [data-user="testadmin"]').contains('Reject').click();
+    cy.get('.contact-card[data-user="testadmin"]').contains('Reject').click();
     cy.wait('@reject');
 
     cy.login('testadmin');

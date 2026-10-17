@@ -1,22 +1,15 @@
 import type { Request, Response } from 'express';
-import md5 from 'md5';
-import { RequestError } from '../errors';
-import logger from '../logger';
-import { SqlBool } from 'kysely';
 import { kysely, Trx } from '../db/kysely';
+import { RequestError } from '../errors';
+import { plans } from '../lib/plans';
+import { getPfpUrl } from '../lib/utils';
+import logger from '../logger';
 
 export { perms } from '../lib/perms';
+export { getPfpUrl, plans };
 
-export enum plans {
-  FREE,
-  PREMIUM,
-  BETA,
-  PREMIUM_BETA,
-  SUPER,
-}
-
-import { paidTiers, tiers } from '../lib/tiers';
 import type { PaidTier, Tier } from '../lib/tiers';
+import { paidTiers, tiers } from '../lib/tiers';
 export { paidTiers, tiers };
 export type { PaidTier, Tier };
 
@@ -135,10 +128,6 @@ class MultiCond extends Cond {
     if (!(aStr && bStr)) return [`${aStr || bStr || ''}`, [...aValues, ...bValues]];
     return [`(${aStr} ${this.type} ${bStr})`, [...aValues, ...bValues]];
   }
-}
-
-export function getPfpUrl(user: { hasPfp: SqlBool, username: string, email: string }) {
-  return user.hasPfp ? `/api/users/${user.username}/pfp` : `https://www.gravatar.com/avatar/${md5(user.email ?? '')}.jpg`;
 }
 
 type CacheableImage = { mimetype: string, name: string, data?: Buffer };

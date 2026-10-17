@@ -110,6 +110,30 @@ html(lang='en' class=themeHtmlAttrs.class style=themeHtmlAttrs.style)
         }
       }
       const VAPID_PUBLIC_KEY = '#{VAPID_PUBLIC_KEY}';
+    script.
+      window.addEventListener('load', () => {
+        window.presence = {};
+
+        const socket = new WebSocket('/ws');
+        socket.addEventListener('message', (msg) => {
+          const data = JSON.parse(msg.data);
+          window.presence = {
+            ...window.presence,
+            ...(data.onlineUsers && { onlineUsers: data.onlineUsers }),
+            ...(data.contacts && { contacts: data.contacts }),
+          };
+          window.dispatchEvent(new CustomEvent('presence'));
+
+          if (data.onlineUsers) {
+            const onlineUsersBadge = document.querySelector('#contacts-link .badge');
+            const badgeText = onlineUsersBadge.querySelector('b');
+            if (onlineUsersBadge && badgeText) {
+              onlineUsersBadge.classList.toggle('hidden', data.onlineUsers.length === 0);
+              badgeText.textContent = data.onlineUsers.length.toString();
+            }
+          }
+        });
+      });
     script
       include /static/scripts/notifications.js
     block scripts
@@ -125,7 +149,11 @@ html(lang='en' class=themeHtmlAttrs.class style=themeHtmlAttrs.style)
           li.navbarBtn
             a.navbarBtnLink.navbarText(href='/search') #{T('Search')}
           li.navbarBtn
-            a.navbarBtnLink.navbarText(href='/contacts') #{T('Contacts')}
+            a#contacts-link.navbarBtnLink.navbarText(href='/contacts')
+              .badge-anchor
+                .badge.hidden(style='right: -1rem;')
+                  b 0
+                | #{T('Contacts')}
           if !displayUniverse || systemDisplayModes.includes(displayUniverse)
             li.navbarBtn
               a.navbarBtnLink.navbarText(href='/universes') #{T('Universes')}

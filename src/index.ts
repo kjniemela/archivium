@@ -1,13 +1,16 @@
-import express from 'express';
 import compression from 'compression';
+import express from 'express';
+import { IncomingMessage } from 'http';
 import path from 'path';
+import { Duplex } from 'stream';
+import { WebSocketServer } from 'ws';
 import api from './api';
 import { render } from './templates';
 
 
-import CookieParser from './middleware/cookieParser';
 import multer from 'multer';
-import Auth from './middleware/auth';
+import Auth, { getSessionFromHash } from './middleware/auth';
+import CookieParser, { parseCookies } from './middleware/cookieParser';
 import * as ReCaptcha from './middleware/reCaptcha';
 
 import cron from 'node-cron';
@@ -55,13 +58,13 @@ cron.schedule('0 0 * * *', () => {
 
 
 // Timer
-app.use('/', (req, res, next) => {
+app.use('/', (req, _res, next) => {
   req.startTime = new Date();
   next();
 });
 
 // IP Extraction
-app.use('/', (req, res, next) => {
+app.use('/', (req, _res, next) => {
   let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   if (clientIp instanceof Array) clientIp = clientIp[0];
   // If the IP is in IPv6-mapped IPv4 format, extract the IPv4 part
@@ -91,8 +94,38 @@ loadViews(app);
 // Load api routes
 import loadRoutes from './api/routes';
 import { handleAsNull } from './api/utils';
+import listenSockets from './chat';
 import { NotFoundError } from './errors';
 loadRoutes(app, upload);
+
+import http from 'http';
+const server = http.createServer(app);
+
+
+logger.info('Starting websocket server...');
+
+const wss = new WebSocketServer({ noServer: true });
+listenSockets(wss);
+
+server.on('upgrade', async (req: IncomingMessage, socket: Duplex, head: Buffer) => {
+  try {
+    if (req.url !== '/ws') return socket.destroy();
+
+    const cookies = parseCookies(req.headers.cookie);
+    const session = await getSessionFromHash(cookies['archiviumuid']);
+    if (!session?.user) {
+      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+      return socket.destroy();
+    }
+
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.emit('connection', ws, req, session.user);
+    });
+  } catch (err) {
+    logger.error(err);
+    socket.destroy();
+  }
+});
 
 
 /*
@@ -218,6 +251,6 @@ const errorLogger: express.ErrorRequestHandler = async (err, req, res, next) => 
 };
 app.use(errorLogger);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   logger.info(`Server listening at http://localhost:${PORT}`);
 });

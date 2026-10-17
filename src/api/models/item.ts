@@ -1348,7 +1348,7 @@ export class ItemAPI {
   }
 
   // TODO - how should permissions work on this?
-  async exists(user: User | undefined, universeShortname: string, itemShortname: string): Promise<boolean> {
+  async exists(_user: User | undefined, universeShortname: string, itemShortname: string): Promise<boolean> {
     const row = await kysely
       .selectFrom('item')
       .innerJoin('universe', 'universe.id', 'item.universe_id')

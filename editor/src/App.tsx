@@ -4,6 +4,7 @@ import { Route, Routes } from 'react-router';
 const ChapterEdit = lazy(() => import(/* webpackChunkName: "chapter-edit" */ './pages/ChapterEdit'));
 const ItemEdit = lazy(() => import(/* webpackChunkName: "item-edit" */ './pages/ItemEdit'));
 const NoteEdit = lazy(() => import(/* webpackChunkName: "note-edit" */ './pages/NoteEdit'));
+const Contacts = lazy(() => import(/* webpackChunkName: "contacts" */ './pages/Contacts'));
 
 export type AppProps = {
   displayUniverse: string,
@@ -41,6 +42,7 @@ export default function App({ displayUniverse, domain, providerAddress }: AppPro
         <Route path='notes'>
           <Route path=':noteUuid' element={<NoteEdit universeLink={universeLink} />} />
         </Route>
+        <Route path='contacts' element={<Contacts />} />
       </Routes>
     </Suspense>
   );

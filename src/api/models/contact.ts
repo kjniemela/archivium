@@ -1,9 +1,11 @@
-import { SqlBool } from 'kysely';
-import { kysely } from '../../db/kysely';
-import { getPfpUrl, handleAsNull } from '../utils';
+import type { SqlBool } from 'kysely';
 import { API } from '..';
-import { User } from './user';
+import { kysely } from '../../db/kysely';
 import { NotFoundError, UnauthorizedError, ValidationError } from '../../errors';
+import { getPfpUrl } from '../../lib/utils';
+import { handleAsNull } from '../utils';
+import type { User, UserRef } from './user';
+import { refreshContactListFor } from '../../chat';
 
 export type ContactUser = Pick<User, 'id' | 'username' | 'email' | 'created_at' | 'updated_at'> & {
   hasPfp: SqlBool,
@@ -13,11 +15,11 @@ export type ContactUser = Pick<User, 'id' | 'username' | 'email' | 'created_at' 
   accepting_id: number,
 };
 
-export type ContactListEntry = Pick<User, 'id' | 'username' | 'email' | 'created_at' | 'updated_at'> & {
+export type ContactListEntry = Pick<User, 'id' | 'username'> & {
   accepted: boolean | null,
   is_request: SqlBool,
-  hasPfp: SqlBool,
   plan: number | null,
+  pfpUrl: string,
 };
 
 export class ContactAPI {
@@ -66,7 +68,7 @@ export class ContactAPI {
     return user;
   }
 
-  async getAll(user: User | undefined, includePending = true, includeAccepted = true): Promise<ContactListEntry[]> {
+  async getAll(user: UserRef | undefined, includePending = true, includeAccepted = true): Promise<ContactListEntry[]> {
     if (!(includePending || includeAccepted)) throw new ValidationError('Either includePending or includeAccepted must be true');
     if (!user) throw new UnauthorizedError();
 
@@ -99,8 +101,11 @@ export class ContactAPI {
       query = query.where('contact.accepted', '=', includeAccepted);
     }
 
-    const users = await query.execute();
-    return users;
+    const rows = await query.execute();
+    return rows.map(({ email, hasPfp, created_at: _c, updated_at: _u, ...rest }) => ({
+      ...rest,
+      pfpUrl: getPfpUrl({ hasPfp, username: rest.username, email }),
+    }));
   }
 
   async post(user: User | undefined, username: string): Promise<{ insertId: number }> {
@@ -128,6 +133,9 @@ export class ContactAPI {
       clickUrl: '/contacts',
     });
 
+    refreshContactListFor(user);
+    refreshContactListFor(target);
+
     return { insertId: Number(result.insertId ?? 0) };
   }
 
@@ -145,8 +153,11 @@ export class ContactAPI {
         .where('accepting_user', '=', contact.accepting_id!)
         .executeTakeFirstOrThrow();
       result = { numUpdatedRows: Number(updateResult.numUpdatedRows) };
+
+      refreshContactListFor(user);
+      refreshContactListFor(target);
     } else {
-      result = await this.del(user, target.id);
+      result = await this.del(user, target);
     }
 
     await this.api.notification.notify(target, this.api.notification.types.CONTACTS, {
@@ -159,8 +170,9 @@ export class ContactAPI {
     return result;
   }
 
-  async del(user: User | undefined, targetID: number): Promise<{ numDeletedRows: number }> {
-    const contact = await this.getOne(user, targetID);
+  async del(user: User | undefined, target: User): Promise<{ numDeletedRows: number }> {
+    if (!user) throw new UnauthorizedError();
+    const contact = await this.getOne(user, target.id);
 
     const result = await kysely
       .deleteFrom('contact')
@@ -168,11 +180,14 @@ export class ContactAPI {
       .where('accepting_user', '=', contact.accepting_id!)
       .executeTakeFirstOrThrow();
 
+    refreshContactListFor(user);
+    refreshContactListFor(target);
+
     return { numDeletedRows: Number(result.numDeletedRows) };
   }
 
   async delByUsername(user: User | undefined, username: string): Promise<{ numDeletedRows: number }> {
     const target = await this.api.user.getOne({ 'user.username': username });
-    return await this.del(user, target.id);
+    return await this.del(user, target);
   }
 }
