@@ -132,7 +132,7 @@ server.on('upgrade', async (req: IncomingMessage, socket: Duplex, head: Buffer) 
   ACCOUNT ROUTES
 */
 async function logout(req: express.Request, res: express.Response) {
-  await api.session.del({ id: req.session.id });
+  if (req.session.id !== undefined) await api.session.del({ id: req.session.id });
   res.clearCookie('archiviumuid');
 }
 
@@ -172,7 +172,8 @@ app.post('/login', async (req, res, next) => {
       req.loginId = user.id;
       const isCorrectLogin = api.user.validatePassword(req.body.password, user.password, user.salt);
       if (isCorrectLogin) {
-        await api.session.put({ id: req.session.id }, { user_id: req.loginId });
+        const sessionId = await Auth.ensureSession(req, res);
+        await api.session.put({ id: sessionId }, { user_id: req.loginId });
         res.status(200);
         res.redirect(`${req.query.page || '/'}${req.query.search ? `?${req.query.search}` : ''}`);
       } else {
@@ -194,7 +195,8 @@ app.post('/signup', ReCaptcha.verifyReCaptcha, async (req, res, next) => {
   try {
     const data = await api.user.post( req.body );
     try {
-      await api.session.put({ id: req.session.id }, { user_id: data.insertId });
+      const sessionId = await Auth.ensureSession(req, res);
+      await api.session.put({ id: sessionId }, { user_id: data.insertId });
       res.status(201);
 
       if (!req.body.hp) {
